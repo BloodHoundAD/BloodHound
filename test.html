@@ -1,0 +1,755 @@
+<html>
+<head>
+	<title>GraphTest</title>
+	<script src="http://code.jquery.com/jquery-2.2.1.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<script src="js/sigma.min.js"></script>
+	<script src="js/plugins.min.js"></script>
+	<script src="js/bootstrap3-typeahead.min.js"></script>
+	<script src="js/mustache.min.js"></script>
+	<style>
+		body{
+			padding-top:50px;
+		}
+		#graph{
+			height:100%;
+		}
+	    .sigma-tooltip {
+	      max-width: 300px;
+	      max-height: 280px;
+	      background-color: rgb(249, 247, 237);
+	      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+	      border-radius: 6px;
+	    }
+	    .sigma-tooltip-header {
+	      font-variant: small-caps;
+	      font-size: 120%;
+	      color: #437356;
+	      border-bottom: 1px solid #aac789;
+	      padding: 10px;
+	    }
+	    .sigma-tooltip-body {
+	      padding: 10px;
+	    }
+	    .sigma-tooltip-body th {
+	      color: #999;
+	      text-align: left;
+	    }
+	    .sigma-tooltip-footer {
+	      padding: 10px;
+	      border-top: 1px solid #aac789;
+	    }
+	    .sigma-tooltip > .arrow {
+	      border-width: 10px;
+	      position: absolute;
+	      display: block;
+	      width: 0;
+	      height: 0;
+	      border-color: transparent;
+	      border-style: solid;
+	    }
+	    .sigma-tooltip.top {
+	      margin-top: -12px;
+	    }
+	    .sigma-tooltip.top > .arrow {
+	      left: 50%;
+	      bottom: -10px;
+	      margin-left: -10px;
+	      border-top-color: rgb(249, 247, 237);
+	      border-bottom-width: 0;
+	    }
+	    .sigma-tooltip.bottom {
+	      margin-top: 12px;
+	    }
+	    .sigma-tooltip.bottom > .arrow {
+	      left: 50%;
+	      top: -10px;
+	      margin-left: -10px;
+	      border-bottom-color: rgb(249, 247, 237);
+	      border-top-width: 0;
+	    }
+	    .sigma-tooltip.left {
+	      margin-left: -12px;
+	    }
+	    .sigma-tooltip.left > .arrow {
+	      top: 50%;
+	      right: -10px;
+	      margin-top: -10px;
+	      border-left-color: rgb(249, 247, 237);
+	      border-right-width: 0;
+	    }
+	    .sigma-tooltip.right {
+	      margin-left: 12px;
+	    }
+	    .sigma-tooltip.right > .arrow {
+	      top: 50%;
+	      left: -10px;
+	      margin-top: -10px;
+	      border-right-color: rgb(249, 247, 237);
+	      border-left-width: 0;
+	    }
+
+	    .boxsize{
+	      border: 3px solid black;
+	      box-sizing: border-box;
+	      background-color: white;
+	      -moz-box-sizing: border-box;
+	      padding-left: 10px;
+	      margin-top:10px;
+	    }
+
+	    .lister dl{
+	    	padding: .5em;
+	    }
+
+	    .lister dt{
+	    	float: left;
+	    	clear: left;
+	    	width: 300px;
+	    	text-align: left;
+	    	font-weight:bold;
+	    }
+
+	    .lister dt:after{
+	    	content: ":";
+	    }
+
+	    .lister dd{
+	    	margin: 0 0 0 110px;
+	    }
+
+		.loader {
+		  margin: 100px auto;
+		  font-size: 25px;
+		  width: 1em;
+		  height: 1em;
+		  border-radius: 50%;
+		  position: relative;
+		  text-indent: -9999em;
+		  -webkit-animation: load5 1.1s infinite ease;
+		  animation: load5 1.1s infinite ease;
+		  -webkit-transform: translateZ(0);
+		  -ms-transform: translateZ(0);
+		  transform: translateZ(0);
+		}
+		@-webkit-keyframes load5 {
+		  0%,
+		  100% {
+		    box-shadow: 0em -2.6em 0em 0em #C0C0C0, 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.5), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.7);
+		  }
+		  12.5% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.7), 1.8em -1.8em 0 0em #C0C0C0, 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.5);
+		  }
+		  25% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.5), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.7), 2.5em 0em 0 0em #C0C0C0, 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+		  }
+		  37.5% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.5), 2.5em 0em 0 0em rgba(255, 255, 255, 0.7), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+		  }
+		  50% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.5), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.7), 0em 2.5em 0 0em #C0C0C0, -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+		  }
+		  62.5% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.5), 0em 2.5em 0 0em rgba(255, 255, 255, 0.7), -1.8em 1.8em 0 0em #C0C0C0, -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+		  }
+		  75% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.5), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.7), -2.6em 0em 0 0em #C0C0C0, -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+		  }
+		  87.5% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.5), -2.6em 0em 0 0em rgba(255, 255, 255, 0.7), -1.8em -1.8em 0 0em #C0C0C0;
+		  }
+		}
+		@keyframes load5 {
+		  0%,
+		  100% {
+		    box-shadow: 0em -2.6em 0em 0em #C0C0C0, 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.5), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.7);
+		  }
+		  12.5% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.7), 1.8em -1.8em 0 0em #C0C0C0, 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.5);
+		  }
+		  25% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.5), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.7), 2.5em 0em 0 0em #C0C0C0, 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+		  }
+		  37.5% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.5), 2.5em 0em 0 0em rgba(255, 255, 255, 0.7), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+		  }
+		  50% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.5), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.7), 0em 2.5em 0 0em #C0C0C0, -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+		  }
+		  62.5% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.5), 0em 2.5em 0 0em rgba(255, 255, 255, 0.7), -1.8em 1.8em 0 0em #C0C0C0, -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+		  }
+		  75% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.5), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.7), -2.6em 0em 0 0em #C0C0C0, -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+		  }
+		  87.5% {
+		    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.5), -2.6em 0em 0 0em rgba(255, 255, 255, 0.7), -1.8em -1.8em 0 0em #C0C0C0;
+		  }
+		}transform: 
+	</style>
+	<script type="text/javascript">
+		var queryStack = new Array();
+		var currentQuery = null;
+		var currentTooltip = null;
+
+		var descriptionTemplate = "{{#type_none}} \
+					<h3 align='center'>Node Properties</h3> \
+					<div style='padding-bottom:1em'>Select a node for more information</div> \
+					{{/type_none}} \
+					{{#type_loading}} \
+					<h3 align='center'>Loading...</h3> \
+					<div class='loader'>Loading...</div> \
+					{{/type_loading}} \
+					{{#type_user}} \
+					<h3 align='center'>{{label}} Properties</h2> \
+					<dl class='lister'>\
+					<dt>SAMAccountName</dt> \
+					<dd> None </dd> \
+					<dt>Display Name</dt> \
+					<dd> None </dd> \
+					<dt>Password Last Changed</dt> \
+					<dd> None </dd> \
+					<dt>First Degree Group Memberships</dt>\
+					<dd>\
+					<a href=\"#\" onclick=\"doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1]->(target)) RETURN p')\">\
+					{{first_degree_group}}\
+					</a>\
+					</dd>\
+					<dt>Unrolled Group Memberships</dt>\
+					<dd>\
+					<a href=\"#\" onclick=\"doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1..]->(target)) RETURN p')\">\
+					{{unrolled}}\
+					</a>\
+					</dd>\
+					<dt>First Degree Local Admin</dt>\
+					<dd>\
+					<a href=\"#\" onclick=\"doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN p')\">\
+					{{first_degree_admin}}\
+					</a>\
+					</dd>\
+					<dt>Group Delegated Local Admin Rights</dt>\
+					<dd>\
+					<a href=\"#\" onclick=\"doQuery('MATCH (n:User {name:&quot;{{label}}&quot;})-[r:MemberOf]->(m:Group)-[s:AdminTo]->(l:Computer) RETURN n,r,m,s,l')\">\
+					{{dlar}}\
+					</a>\
+					</dd>\
+					<dt>Derivative Local Admin Rights</dt>\
+					<dd>\
+					<a href=\"#\" onclick=\"doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN p')\">\
+					{{derivative}}\
+					</a>\
+					</dd>\
+					</dd>\
+					<dt>Sessions</dt>\
+					<dd>\
+					<a href=\"#\" onclick=\"doQuery('MATCH (n:Computer)-[r:HasSession]->(m:User {name:&quot;{{label}}&quot;}) RETURN n,r,m')\">\
+					{{sessions}}\
+					</a>\
+					</dd>\
+					</dl> \
+					{{/type_user}}\
+					{{#type_computer}} \
+					<h3 align='center'>{{label}} Properties</h2> \
+					<dl class='lister'>\
+					<dt>OS</dt> \
+					<dd> None </dd> \
+					<dt>Allows Unconstrained Delegation</dt> \
+					<dd> None </dd> \
+					<dt>Explicit Admins</dt>\
+					<dd>\
+					<a href=\"#\" onclick=\"doQuery('MATCH (a)-[b:AdminTo]->(c:Computer {name:&quot;{{label}}&quot;}) RETURN a,b,c')\">\
+					{{explicit_admins}}\
+					</a>\
+					</dd>\
+					<dt>Sessions</dt>\
+					<dd>\
+					<a href=\"#\" onclick=\"doQuery('MATCH (m:Computer {name:&quot;{{label}}&quot})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH &quot$&quot RETURN n,r,m')\">\
+					{{sessioncount}}\
+					</a>\
+					</dd>\
+					<dt>First Degree Local Admin</dt>\
+					<dd>\
+					<a href=\"#\" onclick=\"doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN p')\">\
+					{{first_degree_admin}}\
+					</a>\
+					</dd>\
+					<dt>Group Delegated Local Admin Rights</dt>\
+					<dd>\
+					<a href=\"#\" onclick=\"doQuery('MATCH (n:User {name:&quot;{{label}}&quot;})-[r:MemberOf]->(m:Group)-[s:AdminTo]->(l:Computer) RETURN n,r,m,s,l')\">\
+					{{dlar}}\
+					</a>\
+					</dd>\
+					<dt>Derivative Local Admin Rights</dt>\
+					<dd>\
+					<a href=\"#\" onclick=\"doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN p')\">\
+					{{derivative}}\
+					</a>\
+					</dd>\
+					</dl> \
+					{{/type_computer}}\
+					"
+		function redoLast(){
+			if (queryStack.length > 0){
+				if (currentTooltip != null){
+					currentTooltip.close();	
+				}
+				sigma.layouts.stopForceLink();
+				currentQuery = queryStack.pop();
+				sigma.neo4j.cypher(
+					{url: 'http://localhost:7474', user:'neo4j', password:'neo4jj'},
+					currentQuery,
+					sigmaInstance,
+					function() {
+						$.each(sigmaInstance.graph.nodes(), function(index, node){
+							node.label = node.neo4j_data['name']
+							if (node.neo4j_labels[0]=='Group'){
+								node.type_group = true
+								node.color="#FF0000"
+							}else if (node.neo4j_labels[0] == 'User'){
+								node.type_user = true
+								node.color="#80FF00"
+							}else{
+								node.type_computer = true
+								node.color="#0000CC"
+							}
+						})
+						sigmaInstance.refresh();
+						sigma.layouts.startForceLink();
+					}
+				);
+			}
+		}
+
+		function doQuery(query){
+			queryStack.push(currentQuery);
+			currentQuery = query;
+			if (currentTooltip != null){
+				currentTooltip.close();	
+			}
+			
+			sigma.layouts.stopForceLink();
+			sigma.neo4j.cypher(
+				{url: 'http://localhost:7474', user:'neo4j', password:'neo4jj'},
+				query,
+				sigmaInstance,
+				function() {
+					$.each(sigmaInstance.graph.nodes(), function(index, node){
+						node.label = node.neo4j_data['name']
+						if (node.neo4j_labels[0]=='Group'){
+							node.type_group = true
+							node.color="#FF0000"
+						}else if (node.neo4j_labels[0] == 'User'){
+							node.type_user = true
+							node.color="#80FF00"
+						}else{
+							node.type_computer = true
+							node.color="#0000CC"
+						}
+					})
+					sigmaInstance.refresh();
+					sigma.layouts.startForceLink();
+				}
+			);
+		}
+
+		function loadDbData(){
+			$.ajax({
+				url: "http://localhost:7474/db/data/transaction/commit",
+				type: 'POST',
+				accepts: {json: "application/json"},
+				dataType: "json",
+				contentType: "application/json",
+				headers: {
+					"Authorization": "Basic bmVvNGo6bmVvNGpq"
+				},
+				data: JSON.stringify({
+					  "statements" : [ {
+					    "statement" : "MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)"
+					  }, {
+					    "statement" : "MATCH (n:Group) RETURN count(n)"
+					  }, {
+					    "statement" : "MATCH ()-[r]->() RETURN count(r)"
+					  }, {
+					    "statement" : "MATCH (n:Computer) RETURN count(n)"
+					  } ]
+				}),
+				success: function(json) {
+					var usercount = json.results[0].data[0].row[0];
+					var groupcount = json.results[1].data[0].row[0];
+					var relcount = json.results[2].data[0].row[0];
+					var compcount = json.results[3].data[0].row[0];
+
+					var template = $('#dbdata').html();
+					Mustache.parse(template);
+					var rendered = Mustache.render(template, {url:"http://localhost:7474/db/data/cypher", user: "neo4j", num_users: usercount, num_groups: groupcount, num_relationships: relcount, num_computers: compcount});
+					$('#dbdata').html(rendered);
+				}
+			});
+		}
+
+		function updateNodeData(node){
+			var rendered = Mustache.render(descriptionTemplate, {type_loading: true});
+			$('#nodeproperties').html(rendered);
+			if (node.data.node.type_user == true){
+				$.ajax({
+					url: "http://localhost:7474/db/data/transaction/commit",
+					type: 'POST',
+					accepts: {json: "application/json"},
+					dataType: "json",
+					contentType: "application/json",
+					headers: {
+						"Authorization": "Basic bmVvNGo6bmVvNGpq"
+					},
+					data: JSON.stringify({
+						  "statements" : [ {
+						    "statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Group), p=allShortestPaths((n)-[:MemberOf*1]->(target)) RETURN count(target)"
+						  }, {
+						    "statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Group), p=allShortestPaths((n)-[:MemberOf*1..]->(target)) RETURN count(target)"
+						  }, {
+						    "statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN count(target)"
+						  }, {
+						  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'})-[:MemberOf]->(m:Group)-[:AdminTo]->(l:Computer) RETURN count(l)"
+						  }, {
+						  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN count(target)"
+						  }, {
+						  	"statement" : "MATCH (n:Computer)-[r:HasSession]->(m:User {name:'" + node.data.node.label + "'}) RETURN count(n)"
+						  } ]
+					}),
+					success: function(json) {
+						var fdg = json.results[0].data[0].row[0];
+						var unr = json.results[1].data[0].row[0];
+						var diradmin = json.results[2].data[0].row[0];
+						var dla = json.results[3].data[0].row[0];
+						var dir = json.results[4].data[0].row[0];
+						var sessions = json.results[5].data[0].row[0];
+
+						var rendered = Mustache.render(descriptionTemplate, {label: node.data.node.label, first_degree_group:fdg, unrolled: unr, first_degree_admin: diradmin, type_user: true, dlar: dla, derivative:dir, sessions:sessions});
+						$('#nodeproperties').html(rendered);
+					}
+				});
+			}else if (node.data.node.type_computer == true){
+				$.ajax({
+					url: "http://localhost:7474/db/data/transaction/commit",
+					type: 'POST',
+					accepts: {json: "application/json"},
+					dataType: "json",
+					contentType: "application/json",
+					headers: {
+						"Authorization": "Basic bmVvNGo6bmVvNGpq"
+					},
+					data: JSON.stringify({
+						  "statements" : [ {
+						    "statement" : "MATCH (a)-[b:AdminTo]->(c:Computer {name:'" + node.data.node.label + "'}) RETURN count(a)"
+						  }, {
+						    "statement" : "MATCH (m:Computer {name:'" + node.data.node.label + "'})-[r:HasSession]->(n:User) WITH n WHERE NOT n.name ENDS WITH '$' RETURN count(n)"
+						  } ]
+					}),
+					success: function(json) {
+						var c1 = json.results[0].data[0].row[0];
+						var c2 = json.results[1].data[0].row[0];
+						
+
+						var rendered = Mustache.render(descriptionTemplate, {label: node.data.node.label, explicit_admins: c1, type_computer: true, sessioncount: c2});
+						$('#nodeproperties').html(rendered);
+					}
+				});
+			}
+		}
+
+		function initNodeData(){
+			Mustache.parse(descriptionTemplate);
+			var rendered = Mustache.render(descriptionTemplate, {type_none: true});
+			$('#nodeproperties').html(rendered);
+		}
+
+		function setLabelAsStart(label){
+			$('#startpoint').val(label);
+		};
+
+		function setLabelAsEnd(label){
+			$('#endpoint').val(label);
+		};
+
+		jQuery(document).ready(function(){
+			sigma.renderers.def = sigma.renderers.canvas
+			sigmaInstance = new sigma({
+				container: 'graph'
+			});
+			sigmaInstance.settings({
+				edgeColor: 'default',
+				defaultEdgeColor: '#356',
+				nodeColor: 'default',
+				edgeHoverColor: 'default',
+				defaultEdgeHoverColor: '#090',
+				enableEdgeHovering: false,
+				defaultEdgeType: 'arrow',
+				minEdgeSize: 1,
+				maxEdgeSize: 2.5,
+				autoRescale: true
+			})
+
+			sigmaInstance.bind('clickNode', function(e){
+				updateNodeData(e)
+			})
+
+			loadDbData()
+			initNodeData()
+
+			var tooltips = sigma.plugins.tooltips(
+				sigmaInstance,
+				sigmaInstance.renderers[0],
+				{
+					node: [{
+						show: 'rightClickNode',
+						cssClass: 'sigma-tooltip',
+						template:
+						 '<div class="arrow"></div>' +
+					     ' <div class="sigma-tooltip-header">{{label}}</div>' +
+					     '  <div class="sigma-tooltip-body">' +
+					     '		<div class="btn-group btn-group-justified" role="group" aria-label="...">' +
+					   	 '			{{#type_user}}'+
+					   	 '			<div class="btn-group" role="group">'+
+					     '				<button type="button" class="btn btn-default" onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})-[r:MemberOf]->m RETURN n,r,m\')">Members Of</button>' +
+					     '			</div>'+
+					     '			<div class="btn-group" role="group">'+
+					     '				<button type="button" class="btn btn-default" onclick="doQuery(\'MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer),p=allShortestPaths((n)-[*]->(target)) RETURN p\')">Admin To</button>' +
+					     '			</div>'+
+					     '			{{/type_user}}' + 
+					     '			{{#type_computer}}' + 
+					     '			<div class="btn-group" role="group">'+
+					     '				<button type="button" class="btn btn-default" onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})-[r:HasSession]->m WITH n,r,m WHERE NOT m.name ENDS WITH &quot;$&quot; RETURN n,r,m\')">Get Sessions</button>' +
+					     '			</div>'+
+					     '			<div class="btn-group" role="group">'+
+					     '				<button type="button" class="btn btn-default" onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})<-[r:AdminTo]-m RETURN n,r,m\')">Get Admins</button>' +
+					     '			</div>'+
+					     '			{{/type_computer}}' +
+					     '			{{#type_group}}' +
+					     '			<div class="btn-group" role="group">'+
+					     '				<button type="button" class="btn btn-default" onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})<-[r:MemberOf]-m RETURN n,r,m\')">Get Members</button>' + 
+					     '			</div>'+
+					     '			<div class="btn-group" role="group">'+
+					     '				<button type="button" class="btn btn-default" onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})-[r:AdminTo]->m RETURN n,r,m\')">Admin To</button>' + 
+					     '			</div>'+
+					     '			{{/type_group}}' +
+					     '		</div>' +
+					     '		<div class="btn-group btn-group-justified" role="group" aria-label="...">' +
+					   	 '			{{#type_user}}'+
+					   	 '			<div class="btn-group" role="group">'+
+					     '				<button type="button" class="btn btn-default" onclick="setLabelAsStart(\'{{label}}\')">Set As Start Point</button>' +
+					     '			</div>'+
+					     '			<div class="btn-group" role="group">'+
+					     '				<button type="button" class="btn btn-default" onclick="setLabelAsEnd(\'{{label}}\')">Set As End Point</button>' +
+					     '			</div>'+
+					     '			{{/type_user}}' + 
+					     '			{{#type_computer}}' + 
+					     '			<div class="btn-group" role="group">'+
+					     '				<button type="button" class="btn btn-default" onclick="setLabelAsStart(\'{{label}}\')">Set As Start Point</button>' +
+					     '			</div>'+
+					     '			<div class="btn-group" role="group">'+
+					     '				<button type="button" class="btn btn-default" onclick="setLabelAsEnd(\'{{label}}\')">Set As End Point</button>' +
+					     '			</div>'+
+					     '			{{/type_computer}}' +
+					     '			{{#type_group}}' +
+					     '			<div class="btn-group" role="group">'+
+					     '				<button type="button" class="btn btn-default" onclick="setLabelAsStart(\'{{label}}\')">Set As Start Point</button>' +
+					     '			</div>'+
+					     '			<div class="btn-group" role="group">'+
+					     '				<button type="button" class="btn btn-default" onclick="setLabelAsEnd(\'{{label}}\')">Set As End Point</button>' +
+					     '			</div>'+
+					     '			{{/type_group}}' +
+					     '		</div>' +
+					     '  </div>' +
+					     '  <div class="sigma-tooltip-footer">Number of connections: {{degree}}</div>',
+					     autoadjust: true,
+						renderer: function(node, template){
+							node.degree = this.degree(node.id)
+							return Mustache.render(template, node)
+						}
+					}]
+				}
+			)
+
+			tooltips.bind('shown', function(event){
+				currentTooltip = event.target;
+			})
+
+			tooltips.bind('hidden', function(event){
+				currentTooltip = null;
+			})
+
+			var fa = sigma.layouts.configForceLink(sigmaInstance, {
+				worker: true,
+				background: true,
+				scalingRatio: 5,
+				gravity: 1,
+				easing: 'cubicInOut',
+				autoStop: true,
+				alignNodeSiblings:true
+			});
+
+			fa.bind('start stop', function(event){
+				console.log(event.type);
+			})
+
+			$('#searchbar').bind('keypress', function(e){
+				if (e.which == 13){
+					doQuery('MATCH (n) WHERE n.name STARTS WITH "' + $('#searchbar').val() + '" AND NOT n.name ENDS WITH "$" RETURN n');
+				}
+			});
+
+			var dragListener = sigma.plugins.dragNodes(sigmaInstance, sigmaInstance.renderers[0])
+
+			$('#findpath').on('click', function(event){
+				doQuery("MATCH (source {name:'" + $('#startpoint').val() + "'}), (target {name:'" + $('#endpoint').val() + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p");
+			})
+
+			$('#backButton').on('click', function () {
+				redoLast()
+			});
+
+			$('#endpoint').typeahead({
+				source: function (query, process) {
+					return $.ajax({
+						url: "http://localhost:7474/db/data/cypher",
+						type: 'POST',
+						accepts: {json: "application/json"},
+						dataType: "json",
+						contentType: "application/json",
+						headers: {
+							"Authorization": "Basic bmVvNGo6bmVvNGpq"
+						},
+						data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name STARTS WITH '" + query + "' AND NOT n.name ENDS WITH '$' RETURN n.name LIMIT 10"}),
+						success: function(json) {
+							var d = json.data
+							var l = d.length;
+							for (var i = 0; i < l; i++) {
+								d[i] = d[i].toString();
+							}
+							return process(json.data);
+						}
+					});
+				}
+			});
+
+			$('#startpoint').typeahead({
+				source: function (query, process) {
+					return $.ajax({
+						url: "http://localhost:7474/db/data/cypher",
+						type: 'POST',
+						accepts: {json: "application/json"},
+						dataType: "json",
+						contentType: "application/json",
+						headers: {
+							"Authorization": "Basic bmVvNGo6bmVvNGpq"
+						},
+						data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name STARTS WITH '" + query + "' AND NOT n.name ENDS WITH '$' RETURN n.name LIMIT 25"}),
+						success: function(json) {
+							var d = json.data
+							var l = d.length;
+							for (var i = 0; i < l; i++) {
+								d[i] = d[i].toString();
+							}
+							return process(json.data);
+						}
+					});
+				}
+			});
+
+			$('#searchbar').typeahead({
+				source: function (query, process) {
+					return $.ajax({
+						url: "http://localhost:7474/db/data/cypher",
+						type: 'POST',
+						accepts: {json: "application/json"},
+						dataType: "json",
+						contentType: "application/json",
+						headers: {
+							"Authorization": "Basic bmVvNGo6bmVvNGpq"
+						},
+						data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name STARTS WITH '" + query + "' AND NOT n.name ENDS WITH '$' RETURN n.name LIMIT 10"}),
+						success: function(json) {
+							var d = json.data
+							var l = d.length;
+							for (var i = 0; i < l; i++) {
+								d[i] = d[i].toString();
+							}
+							return process(json.data);
+						}
+					});
+				}, afterSelect: function(selected){
+					doQuery('MATCH (n) WHERE n.name STARTS WITH "' + selected + '" AND NOT n.name ENDS WITH "$" RETURN n');
+				}
+			});
+
+			doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})-[r]->(m) RETURN n,r,m");
+		});
+	</script>
+</head>
+<body role="document">
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Offensive Dashboard</a>
+			</div>
+			<div style="width:40%" class="navbar-form navbar-left">
+				<input id="searchbar" style="width:100%" autocomplete="off" type="text" class="form-control" placeholder="Start typing to search for a node...">
+			</div>
+		</div>
+	</nav>
+	<div class="jumbotron" style="padding-top:10px; height:80%" id="graph-container">
+		<div class="row">
+			<div class="col-md-7" id="graph" height="100%">
+
+			</div>
+			<div class="col-md-4" type="x-tmpl-mustache">
+				<div id="dbdata" class="boxsize" style="overflow:auto; width: 100%; padding-bottom: 10px">
+					<h4>
+						Connected to DB: {{url}} as {{user}}
+					</h4>
+					Users: {{num_users}}<br>
+					Computers: {{num_computers}}<br>
+					Groups: {{num_groups}}<br>
+					Relationships: {{num_relationships}}
+				</div>
+				<div id="nodeproperties" class="boxsize" style="overflow: auto;width:100%">
+					
+				</div>
+				<div class="boxsize" style="height: 20%; width:100%;">
+					<h4 align="center">
+						Pre-Built Analytics Queries
+					</h4>
+					<a href="#" onclick="doQuery('MATCH (n), (target:Group {name:&quot;DOMAIN ADMINS&quot;}),p=allShortestPaths((n)-[*]->(target)) RETURN p')">Find Shortest Paths to DA</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3">
+				<div class="input-group">
+					<span class="input-group-addon" id="basic-addon1">Starting Node</span>
+					<input type="text" id="startpoint" class="form-control" data-provide="typeahead" autocomplete="off" aria-describedby="basic-addon1">
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="input-group">
+					<span class="input-group-addon" id="basic-addon2">Ending Node</span>
+					<input type="text" id="endpoint" class="form-control" data-provide="typeahead" autocomplete="off" aria-describedby="basic-addon2">
+				</div>
+			</div>
+			<div class="col-md-3">
+				<button id="findpath" type="button" class="btn btn-block">
+					<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>Find Path
+				</button>
+			</div>
+			<div class="col-md-3">
+				<button id="backButton" type="button" class="btn btn-block">
+					<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>Go Back
+				</button>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

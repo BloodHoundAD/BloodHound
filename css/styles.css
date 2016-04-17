@@ -1,0 +1,178 @@
+html, body{
+	height:100%;
+	font-family: 'Roboto', sans-serif;
+	background-color: lightgray;
+}
+
+.queryInput{
+	position: relative;
+	width: 70%;
+	left:50%;
+	transform: translateX(-50%);
+}
+
+.bottomdiv{
+	z-index: 10;
+	position:absolute;
+	width: 100%;
+	overflow: auto;
+	bottom:0;
+}
+
+.menudiv{
+	z-index: 10;
+	position: absolute;
+	overflow: visible;
+	top: 1em;
+	right: 1em;
+}
+
+.slideupbutton{
+	border-radius: 20px 20px 0 0;
+	position:relative;
+	left:50%;
+	transform: translateX(-50%);
+	display: block;
+	width: 200px;
+	height: 2em;
+	background-color: white
+}
+
+.slideupbutton:focus{
+	outline: 0
+}
+
+.graph{
+	height:97%;
+	width:100%;
+	background-color: lightgray;
+}
+
+.searchdiv{
+	z-index: 10;
+	position: absolute;
+	overflow: visible;
+	width: 25%;
+	top: 1em;
+	left: 1em;
+	background-color: white;
+}
+
+dl.dictlist{
+	margin-bottom: 0;
+	padding: 0 .5em .5em .5em;
+}
+
+.dictlist dt{
+	float: left;
+	clear: left;
+	text-align: left;
+	font-weight:bold;
+}
+
+.dictlist dt:after{
+	content: ":";
+}
+
+.dictlist dd{
+	margin: 0 15% 0 0;
+	float:right;
+}
+
+.nodedatabox{
+	border-top: .5px solid lightgray;
+  	background-color: white;
+  	overflow: auto;
+}
+
+.searchbox{
+	border:0;
+}
+
+.form-control:focus{
+	border: 0;
+  	box-shadow: none;
+}
+
+.menuglyph{
+	top:0;
+}
+
+.spanfix{
+	border: none;
+	cursor: pointer;
+	background-color: white;
+}
+
+
+.rightspan{
+	float:right;
+	clear: right;
+}
+
+.rightglyph{
+	padding-top:3px;
+	padding-left: 5px;
+}
+
+.btn:focus,.btn:active:focus,.btn.active:focus,
+.btn.focus,.btn:active.focus,.btn.active.focus {
+    outline: none;
+}
+
+.padvert{
+	padding-bottom: 10px;
+	overflow: visible;
+}
+
+#abc li.active>a{
+	border-left:1px solid lightgray;
+	border-right:1px solid lightgray;
+}
+
+.rightmenu{
+	padding-top: 5px;
+	float:right;
+	clear: right;
+}
+
+.rightmenubutton{
+	background-color: white;
+}
+
+
+.hideme{
+	position:absolute;
+	top:0;
+	visibility: hidden
+}
+
+#abc li>a{
+	border-radius: 0;
+	border-top:0;
+	border-left:0;
+	border-right:0;
+	border-bottom: 1px solid lightgray;
+}
+
+.content{
+	padding: 0 10px 0 10px;
+}
+
+.alertdiv{
+	z-index: 10;
+	position:absolute;
+	top:10px;
+	left:50%;
+	transform: translateX(-50%);
+}
+
+.uploadSelectDiv{
+  z-index: 20;
+  position: absolute;
+  top: 1em;
+  right: 10em;
+  overflow: auto;
+  background-color: rgba(255, 255, 255, .9);
+  box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+}

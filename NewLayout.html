@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Offensive Dashboard</title>
+		<script src="js/jquery-2.2.1.min.js"></script>
+		<script src="js/jquery-ui.min.js"></script>
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<link rel="stylesheet" type="text/css" href="css/styles.css">
+		<link rel="stylesheet" type="text/css" href="css/animation.css">
+		<link rel="stylesheet" type="text/css" href="css/tooltip.css">
+		<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+		<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/sigma.min.js"></script>
+		<script src="js/plugins.js"></script>
+		<script src="js/bootstrap3-typeahead.min.js"></script>
+		<script src="js/mustache.min.js"></script>
+		<script src="js/bloodhound.js"></script>
+		<script src="js/jquery.csv.min.js"></script>
+		<script type="text/javascript" src="js/sigma.renderers.linkurious.min.js"></script>
+		<script type="text/javascript" src="js/sigma.plugins.design.min.js"></script>
+		<script type="text/javascript" src="js/sigma.layouts.dagre.min.js"></script>
+		<script type="text/javascript" src="js/sigma.layouts.noverlap.js"></script>
+		<script type="text/javascript" src="js/sigma.renderers.glyphs.min.js"></script>
+		<script type="text/javascript" src="js/sigma.exporters.image.min.js"></script>
+		<script type="text/javascript" src="js/dagre.min.js"></script>
+
+		<script id="datatemplate" type="x-tmpl-mustache">
+			<ul class='nav nav-tabs nav-justified' id="abc" role="tablist">
+				<li role='presentation' class='active'><a href='#dbinfo' role='tab' data-toggle='tab' aria-controls='dbinfo'>Database Info</a></li>
+				<li role='presentation'><a href='#nodeinfo' role='tab' data-toggle='tab' aria-controls='nodeinfo'>Node Info</a></li>
+				<li role='presentation'><a href='#pbqueries' role='tab' data-toggle='tab' aria-controls='pbqueries'>Queries</a></li>
+			</ul>
+
+			<div class="tab-content content">
+				<div role="tabpanel" class="tab-pane active" id="dbinfo">
+					{{{dbinfo}}}
+				</div>
+				<div role="tabpanel" class="tab-pane" id="nodeinfo">
+					{{{nodeinfo}}}
+				</div>
+				<div role="tabpanel" class="tab-pane" id="pbqueries">
+					<h3 align="center">
+						Pre-Built Analytics Queries
+					</h3>
+					<div style="padding: 0 .5em .5em .5em">
+						<a href="#" onclick="doQuery('MATCH (n:User), (target:Group {name:&quot;DOMAIN ADMINS&quot;}),p=allShortestPaths((n)-[*]->(target)) RETURN p',&quot;&quot;, &quot;DOMAIN ADMINS&quot;)">Find Shortest Paths to DA</a><br>
+						<a href="#" onclick="doQuery('start n=node(*) match n<-[r:HasSession]-() WHERE NOT n.name=&quot;ANONYMOUS LOGON&quot; AND NOT n.name=&quot;&quot; with n, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)-[r:HasSession]->n RETURN n,r,m')">Find User with Most Sessions</a>
+					</div>
+				</div>
+			</div>
+		</script>
+
+		<script id="dbdata" type="x-tmpl-mustache">
+			<div>
+				<h3 align="center">Database Info</h3>
+				<dl class="dictlist">
+					<dt>DB Address</dt>
+					<dd>{{url}}</dd>
+					<dt>DB User</dt>
+					<dd>{{user}}</dd>
+					<dt>Users</dt>
+					<dd>{{num_users}}</dd>
+					<dt>Computers</dt>
+					<dd>{{num_computers}}</dd>
+					<dt>Groups</dt>
+					<dd>{{num_groups}}</dd>
+					<dt>Relationships</dt>
+					<dd>{{num_relationships}}</dd>
+				</dl>
+			</div>
+		</script>
+
+		<script id="usernodetemplate" type="x-tmpl-mustache">
+			<h3 align='center'>{{label}} Properties</h2>
+			<dl class='dictlist'>
+				<dt>SAMAccountName</dt>
+				<dd> None </dd>
+				<dt>Display Name</dt>
+				<dd> None </dd>
+				<dt>Password Last Changed</dt>
+				<dd> None </dd>
+				<dt>First Degree Group Memberships</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1]->(target)) RETURN p')">{{first_degree_group}}</a></dd>
+				<dt>Unrolled Group Memberships</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1..]->(target)) RETURN p', &quot;{{label}}&quot;)">{{unrolled}}</a></dd>
+				<dt>First Degree Local Admin</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN p')">{{first_degree_admin}}</a></dd>
+				<dt>Group Delegated Local Admin Rights</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;})-[r:MemberOf]->(m:Group)-[s:AdminTo]->(l:Computer) RETURN n,r,m,s,l', &quot;{{label}}&quot;)">{{dlar}}</a></dd>
+				<dt>Derivative Local Admin Rights</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN p', &quot;{{label}}&quot;)">{{derivative}}</a></dd>
+				<dt>Sessions</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (n:Computer)-[r:HasSession]->(m:User {name:&quot;{{label}}&quot;}) RETURN n,r,m')">{{sessions}}</a></dd>
+			</dl>
+		</script>
+
+		<script id="computertemplate" type="x-tmpl-mustache">
+			<h3 align='center'>{{label}} Properties</h2>
+			<dl class='dictlist'>
+				<dt>OS</dt>
+				<dd> None </dd>
+				<dt>Allows Unconstrained Delegation Name</dt>
+				<dd> None </dd>
+				<dt>Explicit Admins</dt>
+				<dd> <a href="#" onclick="doQuery('MATCH (n)-[r:AdminTo]->(m:Computer {name:&quot;{{label}}&quot;}) RETURN n,r,m')">{{explicit_admins}}</a></dd>
+				<dt>Unrolled Admins</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User),(target:Computer {name:&quot;{{label}}&quot;}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(target)) RETURN p', &quot;{{label}}&quot;)">{{unrolled_admin}}</a></dd>
+				<dt>Sessions</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (m:Computer {name:&quot;{{label}}&quot;})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH &quot;$&quot; RETURN n,r,m')">{{sessions}}</a></dd>
+			</dl>
+		</script>
+
+		<script id="grouptemplate" type="x-tmpl-mustache">
+			<h3 align='center'>{{label}} Properties</h2>
+			<dl class='dictlist'>
+				<dt>Direct Members</dt>
+				<dd> <a href="#" onclick="doQuery('MATCH (n)-[r:MemberOf]-(m:Group {name:&quot;{{label}}&quot;}) RETURN n,r,m')">{{explicit_members}}</a></dd>
+				<dt>Unrolled Members</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User), (m:Group {name:&quot;{{label}}&quot;}), p=allShortestPaths((n)-[:MemberOf*1..]->(m)) RETURN p', &quot;{{label}}&quot;)">{{unrolled_members}}</a></dd>
+				<dt>Direct Admin To</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (n:Group {name:&quot;{{label}}&quot;})-[r:AdminTo]->(m:Computer) RETURN n,r,m', &quot;{{label}}&quot;)">{{adminto}}</a></dd>
+				<dt>Derivative Admin To</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (n:Group {name:&quot;{{label}}&quot;}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN p', &quot;{{label}}&quot;)">{{derivative_admin}}</a></dd>
+			</dl>
+		</script>
+	</head>
+
+	<body role="document">
+		<div  id="nodataalert" class="alert alert-warning alert-dismissible alertdiv" role="alert">
+			<button type="button" class="close" onclick="$('#nodataalert').fadeToggle(false)" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>No data returned from query.
+		</div>
+		<div  id="layoutchange" class="alert alert-warning alert-dismissible alertdiv" role="alert">
+			<button type="button" class="close" onclick="$('#layoutchange').fadeToggle(false)" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>Changed Layout To Hierarchical
+		</div>
+		<div id="graph" class="graph"> </div>
+		<div id= "bottomdiv" class="bottomdiv">
+			<button id="bottomSlide" class="slideupbutton">
+				<span class="glyphicon glyphicon-chevron-up"></span>  Raw Query  <span class="glyphicon glyphicon-chevron-up"></span>
+			</button>
+			<input type="text" class="form-control queryInput" autocomplete="off" id="rawQueryBox" placeholder="Enter a raw query...">
+		</div>
+		<div id="searchDiv" class="searchdiv">
+			<div class="input-group input-group-unstyled">
+				<span id="menu" class="input-group-addon spanfix" data-toggle="tooltip" data-placement="bottom" title="More Info">
+					<i class="glyphicon glyphicon-menu-hamburger menuglyph"></i></span>
+				<input id="searchBar" type="search" class="form-control searchbox" autocomplete="off" placeholder="Start typing to search for a node...">
+				<span id="openpath" class="input-group-addon spanfix" data-toggle="tooltip" data-placement="bottom" title="Pathfinding">
+					<i class="glyphicon glyphicon glyphicon-road menuglyph"></i></span>
+				<span id="back" class="input-group-addon spanfix" data-toggle="tooltip" data-placement="bottom" title="Back">
+					<i class="glyphicon glyphicon-step-backward menuglyph"></i></span>
+			</div>
+			<div  id="pathfindingbox">
+				<div class="input-group input-group-unstyled">
+					<span class="input-group-addon spanfix" style="visibility: hidden">
+						<i class="glyphicon glyphicon-menu-hamburger menuglyph"></i></span>
+					<input id="endNode" type="search" class="form-control searchbox" autocomplete="off" placeholder="Target Node">
+					<span class="input-group-addon spanfix" style="visibility: hidden">
+						<i class="glyphicon glyphicon glyphicon-road menuglyph"></i></span>
+					<span id="play" class="input-group-addon spanfix" data-toggle="tooltip" data-placement="bottom" title="Findpath">
+						<i class="glyphicon glyphicon-play menuglyph"></i></span>
+				</div>
+			</div>
+
+			<div class="nodedatabox" id="nodedatabox">
+
+			</div>
+		</div>
+
+		<div id="menuDiv" class="menudiv">
+			<div class="rightmenu">
+				<button id="refreshbutton" class="btn rightmenubutton">
+					<span class="glyphicon glyphicon-refresh rightspan"></span>
+				</button>
+			</div>
+			<div class="rightmenu">
+				<button id="exportbutton" class="btn rightmenubutton">
+					<span class="glyphicon glyphicon-export rightspan"></span>
+				</button>
+			</div>
+			<div class="rightmenu">
+				<button id="importbutton" class="btn rightmenubutton">
+					<span class="glyphicon glyphicon-import rightspan"></span>
+				</button>
+			</div>
+			<div class="rightmenu">
+				<button id="uploadbutton" class="btn rightmenubutton">
+					<span class="glyphicon glyphicon-upload rightspan"></span>
+				</button>
+			</div>
+
+			<div class="rightmenu">
+				<button id="layoutbutton" class="btn rightmenubutton">
+					<span style="width:14px" class="fa fa-line-chart rightspan"></span>
+				</button>
+			</div>
+		</div>
+
+		<div id="uploadSelectDiv" class="uploadSelectDiv panel panel-default">
+			<div class="panel-heading">
+				Ingest CSV
+				<button type="button" class="close" onclick="$('#uploadSelectDiv').fadeToggle(false)" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</div>
+
+			<div class="panel-body">
+				<div>
+					File Name: <input id="uploadFileSelected" class="form-control-inline"> <button class="glyphicon glyphicon-file" style="font-size:1.5em; top:5px"></button>
+				</div>
+
+				<div class="list-group" style="margin-top:15px;">
+					<a href="#" id="ingestlocaladmin" class="list-group-item active">
+						<h4 class="list-group-item-heading">Local Admin Membership</h4>
+						<p class="list-group-item-text">
+							Data containing members of local Administrator groups
+						</p>
+					</a>
+
+					<a href="#" id="ingestdomaingroup" class="list-group-item">
+						<h4 class="list-group-item-heading">Domain Group Membership</h4>
+						<p class="list-group-item-text">
+							Data containing members of domain groups
+						</p>
+					</a>
+
+					<a href="#" id="ingestusersessions" class="list-group-item">
+						<h4 class="list-group-item-heading">User Sessions</h4>
+						<p class="list-group-item-text">
+							Data containing login sessions for users
+						</p>
+					</a>
+				</div>
+
+				<div style="text-align: center">
+					<button class="btn btn-large">Ingest Data</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="exportSelectDiv" class="uploadSelectDiv panel panel-default">
+			<div class="panel-heading">
+				Export Graph
+				<button type="button" class="close" onclick="$('#exportSelectDiv').fadeToggle(false)" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</div>
+
+			<div class="panel-body">
+				<div class="list-group">
+					<a href="#" id="exportjson" class="list-group-item active">
+						<h4 class="list-group-item-heading">Export to JSON</h4>
+						<p class="list-group-item-text">
+							Use this format to export data and re-import it later
+						</p>
+					</a>
+
+					<a href="#" id="exportimage" class="list-group-item">
+						<h4 class="list-group-item-heading">Export to Image</h4>
+						<p class="list-group-item-text">
+							Use this format to export data and view it as an image
+						</p>
+					</a>
+				</div>
+
+				<div style="text-align: center">
+					<button id="exportFinishButton" class="btn btn-lg">Export Data</button>
+				</div>
+			</div>
+		</div>
+
+		<button id="refreshbuttonhidden" class="btn rightmenubutton hideme">
+			Refresh<span class="glyphicon glyphicon-refresh rightglyph"></span>
+		</button>
+		<button id="exportbuttonhidden" class="btn rightmenubutton hideme">
+			Export Graph<span class="glyphicon glyphicon-export rightglyph"></span>
+		</button>
+		<button id="importbuttonhidden" class="btn rightmenubutton hideme">
+			Import Graph<span class="glyphicon glyphicon-import rightglyph"></span>
+		</button>
+		<button id="uploadbuttonhidden" class="btn rightmenubutton hideme">
+			Upload Data<span class="glyphicon glyphicon-upload rightglyph"></span>
+		</button>
+		<button id="layoutbuttonhidden" class="btn rightmenubutton hideme">
+			Change Layout Type<span class="glyphicon glyphicon-upload rightglyph"></span>
+		</button>
+		<input type="file" accept=".json" id="fileloader" name="files" title="Open JSON" style="display:none">
+		<input type="file" id="uploader" name="import" title="Open CSV for Import" style="display: none">
+	</body>
+</html>
