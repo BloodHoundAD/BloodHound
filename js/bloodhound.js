@@ -1,4 +1,5 @@
 $(document).ready(function(){
+	// Set our default renderer to Canvas, since a lot of plugins dont work on WebGL
 	sigma.renderers.def = sigma.renderers.canvas
 	sigmaInstance = new sigma({
 		container: 'graph'
@@ -23,16 +24,61 @@ $(document).ready(function(){
 		glyphTextColor: 'white'
 	})
 
+	// Initialize the design plugin
+	var myPalette = {
+		iconScheme: {
+			'User': {
+				font:'FontAwesome',
+				content:'\uF007',
+				scale: 1.5,
+				color: '#ffffff'
+			},
+			'Computer': {
+				font:'FontAwesome',
+				content:'\uF108',
+				scale: 1.2,
+				color: '#ffffff'
+			},
+			'Group': {
+				font:'FontAwesome',
+				content:'\uF0C0',
+				scale: 1.5,
+				color: '#ffffff'
+			}
+		}
+	}
+
+	var myStyles = {
+	  nodes: {
+	  	label: {
+	  		by: 'neo4j_data.name'
+	  	},
+	    size: {
+	      	by: 'degree',
+	      	bins: 7,
+	      	min: 10,
+	      	max: 20
+	    },
+	    icon: {
+	    	by: 'neo4j_labels.0',
+	    	scheme: 'iconScheme'
+	    }
+	  }
+	};
+
 	design = sigma.plugins.design(sigmaInstance);
 	design.setPalette(myPalette);
 	design.setStyles(myStyles);
 
+	// Make glyphs draw whenever sigma renders
 	sigmaInstance.renderers[0].bind('render', function(e) {
       sigmaInstance.renderers[0].glyphs();
     });
 
+	// Initialize the noverlap plugin
 	sigmaInstance.configNoverlap({nodeMargin: 2.0, easing: 'cubicInOut', gridSize: 50})
 
+	// Initialize the tooltips plugin
 	var tooltips = sigma.plugins.tooltips(
 		sigmaInstance,
 		sigmaInstance.renderers[0],
@@ -73,6 +119,15 @@ $(document).ready(function(){
 		}
 	)
 
+	tooltips.bind('shown', function(event){
+		currentTooltip = event.target;
+	})
+
+	tooltips.bind('hidden', function(event){
+		currentTooltip = null;
+	})
+
+	// Initialize ForceLink layout
 	var fa = sigma.layouts.configForceLink(sigmaInstance, {
 		worker: true,
 		background: true,
@@ -81,21 +136,35 @@ $(document).ready(function(){
 		alignNodeSiblings:true
 	});
 
-	// Start the algorithm:
+	// Set Noverlap to run when forcelink is run
+	fa.bind('stop', function(event){
+		if (event.type == 'stop'){
+			sigmaInstance.startNoverlap()
+		}
+	})
+
+	// Initialize the Dagre Layout
 	var listener = sigma.layouts.dagre.configure(sigmaInstance, {
 	  easing: 'cubicInOut',
 	  boundingBox: true,
 	  background: true
 	});
 
-	listener.bind('start stop interpolate', function(event) {
+	// Set Noverlap to run when dagre layout is finished
+	listener.bind('stop', function(event) {
 	  if (event.type == 'stop'){
 	  	sigmaInstance.startNoverlap()
 	  }
 	});
 
+	// Initialize the dragNodes plugin
 	var dragListener = sigma.plugins.dragNodes(sigmaInstance, sigmaInstance.renderers[0])
 
+	dragListener.bind('drag', function(event){
+		dragged = true;
+	})
+
+	// Initialize DB Info
 	$.ajax({
 		url: "http://localhost:7474/db/data/transaction/commit",
 		type: 'POST',
@@ -132,7 +201,7 @@ $(document).ready(function(){
 		}
 	});
 	
-
+	// Add typeaheads for pathfinding/search boxes
 	$('#searchBar').typeahead({
 		source: function (query, process) {
 			return $.ajax({
@@ -197,6 +266,7 @@ $(document).ready(function(){
 		}, autoSelect: false
 	});
 
+	// Add enter keybinds for pathfinding/search bars
 	$('#searchBar').bind('keypress', function(e){
 		if (e.which == 13){
 			if (!pathfindingMode){
@@ -221,6 +291,7 @@ $(document).ready(function(){
 		}
 	});
 
+	// Hide a bunch of stuff that needs to be hidden on load
 	$('#nodedatabox').slideToggle(0)
 	$('#pathfindingbox').slideToggle(0)
 	$('#nodataalert').toggle(false)
@@ -229,7 +300,7 @@ $(document).ready(function(){
 	$('#exportSelectDiv').fadeToggle(0)
 	$("#layoutchange").toggle(false)
 
-
+	// Click handlers for various buttons/elements
 	$('#menu').on('click', function(event){
 		$('#nodedatabox').slideToggle()
 	});
@@ -258,6 +329,29 @@ $(document).ready(function(){
 		$('#uploadSelectDiv').fadeToggle()
 	});
 
+	$('#bottomSlide').on('click', function(event){
+		$('#rawQueryBox').slideToggle(400, function(e){
+			if ($('#rawQueryBox').is(':hidden')){
+				$('#bottomSlide').html('<span class="glyphicon glyphicon-chevron-up"></span>  Raw Query  <span class="glyphicon glyphicon-chevron-up"></span>')
+			}else{
+				$('#bottomSlide').html('<span class="glyphicon glyphicon-chevron-down"></span>  Raw Query  <span class="glyphicon glyphicon-chevron-down"></span>')
+			}
+		})
+	});
+
+	$('#exportFinishButton').on('click', function(event){
+		if ($('#exportimage').hasClass('active')){
+			var size = $('#graph').outerWidth()
+			sigma.plugins.image(sigmaInstance, sigmaInstance.renderers[0], {download:true, size:size, background: 'lightgray', clip: true});
+		}else{
+			var jsonString = sigmaInstance.toJSON({
+				download: true,
+				pretty: true,
+				filename: 'graph.json'
+			});
+		}
+	});
+
 	$('#layoutbutton').on('click', function(event){
 		usedagre = !usedagre;
 		forceRelayout();
@@ -268,6 +362,10 @@ $(document).ready(function(){
 		}
 		$("#layoutchange").fadeToggle(true)
 		$("#layoutchange").delay(1500).fadeToggle(false)
+	});
+
+	$('#play').on('click', function(event){
+		doQuery("MATCH (source {name:'" + $('#searchBar').val() + "'}), (target {name:'" + $('#endNode').val() + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p",$('#searchBar').val() ,$('#endNode').val());
 	});
 
 	//Functions for the Export Box
@@ -281,6 +379,7 @@ $(document).ready(function(){
 		$('#exportjson').removeClass('active');
 	});
 
+	// Functions for the ingest box
 	$('#ingestlocaladmin').on('click', function(event){
 		$('#ingestdomaingroup').removeClass('active');
 		$('#ingestlocaladmin').addClass('active');
@@ -300,21 +399,7 @@ $(document).ready(function(){
 	});
 
 
-
-	$('#exportFinishButton').on('click', function(event){
-		if ($('#exportimage').hasClass('active')){
-			var size = $('#graph').outerWidth()
-			sigma.plugins.image(sigmaInstance, sigmaInstance.renderers[0], {download:true, size:size, background: 'lightgray', clip: true});
-		}else{
-			var jsonString = sigmaInstance.toJSON({
-				download: true,
-				pretty: true,
-				filename: 'graph.json'
-			});
-
-		}
-	});
-
+	// Initialization and events for the right toolbar
 	if (ohrefresh == 0){
 		ohrefresh = $('#refreshbuttonhidden').outerHeight() + "px"
 		$('#refreshbutton').css({'height':ohrefresh})
@@ -430,26 +515,15 @@ $(document).ready(function(){
 		}, 100)	
 	})
 
-	$('#play').on('click', function(event){
-		doQuery("MATCH (source {name:'" + $('#searchBar').val() + "'}), (target {name:'" + $('#endNode').val() + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p",$('#searchBar').val() ,$('#endNode').val());
-	});
 
+	// Some random binds for important stuff
 	sigmaInstance.bind('clickNode', function(e){
+		// Check if the node has been dragged, if not, display the node info
 		if (!dragged){
 			updateNodeData(e);
 		}else{
 			dragged = false;
 		}
-	});
-
-	$('#bottomSlide').on('click', function(event){
-		$('#rawQueryBox').slideToggle(400, function(e){
-			if ($('#rawQueryBox').is(':hidden')){
-				$('#bottomSlide').html('<span class="glyphicon glyphicon-chevron-up"></span>  Raw Query  <span class="glyphicon glyphicon-chevron-up"></span>')
-			}else{
-				$('#bottomSlide').html('<span class="glyphicon glyphicon-chevron-down"></span>  Raw Query  <span class="glyphicon glyphicon-chevron-down"></span>')
-			}
-		})
 	});
 
 	$('#rawQueryBox').bind('keypress', function(e){
@@ -458,24 +532,7 @@ $(document).ready(function(){
 		}
 	});
 
-	dragListener.bind('drag', function(event){
-		dragged = true;
-	})
-
-	fa.bind('start stop', function(event){
-		if (event.type == 'stop'){
-			sigmaInstance.startNoverlap()
-		}
-	})
-
-	tooltips.bind('shown', function(event){
-		currentTooltip = event.target;
-	})
-
-	tooltips.bind('hidden', function(event){
-		currentTooltip = null;
-	})
-
+	// Opens the file selector for importing graphs
 	$('#fileloader').on('change',function(e){
 		handleImport(e);
 	})
@@ -484,8 +541,10 @@ $(document).ready(function(){
 		
 	})
 
+	// Do this query to set the initial graph
 	doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})-[r]->(m) RETURN n,r,m");
 
+	// Make our export/ingest boxes draggable
 	$('#uploadSelectDiv').draggable({scroll:false, containment: "window"});
 	$('#exportSelectDiv').draggable({scroll:false, containment: "window"});
 })
@@ -511,47 +570,6 @@ var owlayout = 0
 var ohlayout = 0
 var design = null;
 var usedagre = false;
-
-var myPalette = {
-	iconScheme: {
-		'User': {
-			font:'FontAwesome',
-			content:'\uF007',
-			scale: 1.5,
-			color: '#ffffff'
-		},
-		'Computer': {
-			font:'FontAwesome',
-			content:'\uF108',
-			scale: 1.2,
-			color: '#ffffff'
-		},
-		'Group': {
-			font:'FontAwesome',
-			content:'\uF0C0',
-			scale: 1.5,
-			color: '#ffffff'
-		}
-	}
-}
-
-var myStyles = {
-  nodes: {
-  	label: {
-  		by: 'neo4j_data.name'
-  	},
-    size: {
-      	by: 'degree',
-      	bins: 7,
-      	min: 10,
-      	max: 20
-    },
-    icon: {
-    	by: 'neo4j_labels.0',
-    	scheme: 'iconScheme'
-    }
-  }
-};
 
 function handleImport(event){
 	var reader = new FileReader();
@@ -700,7 +718,7 @@ function redoLast(){
 }
 
 $(function () {
-  $('[data-toggle="tooltip"]').tooltip()
+ 	$('[data-toggle="tooltip"]').tooltip()
 })
 
 function updateNodeData(node){
@@ -826,7 +844,6 @@ function updateNodeData(node){
 }
 
 function forceRelayout(){
-	
 	sigma.layouts.stopForceLink();
 	if (usedagre){
 		sigma.layouts.dagre.start(sigmaInstance);	
