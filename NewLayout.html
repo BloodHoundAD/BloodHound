@@ -153,7 +153,13 @@
 	</head>
 
 	<body role="document">
-		<div  id="nodataalert" class="alert alert-warning alert-dismissible alertdiv" role="alert">
+		<div id="loginwindow" class="loginwindow">
+			<div id="loginpanel">
+				<img src="img/logo-white-transparent.png">
+				<button type="button" class="btn btn-default" onclick="document.getElementById('loginwindow').style.display='none'">Close</button>
+			</div>
+		</div>
+		<div id="nodataalert" class="alert alert-warning alert-dismissible alertdiv" role="alert">
 			<button type="button" class="close" onclick="$('#nodataalert').fadeToggle(false)" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 			</button>No data returned from query.

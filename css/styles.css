@@ -182,15 +182,41 @@ dl.dictlist{
 }
 
 .uploadSelectDiv{
-  z-index: 20;
-  position: absolute;
-  top: 1em;
-  right: 10em;
-  overflow: auto;
-  background-color: rgba(255, 255, 255, .9);
-  box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+	z-index: 20;
+	position: absolute;
+	top: 1em;
+	right: 10em;
+	overflow: auto;
+	background-color: rgba(255, 255, 255, .9);
+	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
 .ingestinput{
 	max-width: 27em;
+}
+
+.loginwindow{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 1000;
+	background-color: rgba(0, 0, 0, .7);
+}
+
+.loginwindow div{
+	position: absolute;
+	top: 27%;
+	bottom: 27%;
+	left: 40%;
+	right: 40%;
+	background-color: rgba(255, 255, 255, .9);
+	border: 5px solid rgba(0, 0, 0, .5);
+	border-radius: 10px;
+	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+.loginwindow div img{
+	height: 40%;
+	display: block;
+	margin: auto;
 }
