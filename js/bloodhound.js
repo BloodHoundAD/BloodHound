@@ -305,6 +305,14 @@ $(document).ready(function(){
 		$('#nodedatabox').slideToggle()
 	});
 
+	$('#startingestbutton').on('click', function(event){
+		ingestDomainGroupMembership()
+	})
+
+	$('#selectUploadFile').on('click', function(event){
+		$('#uploader').click();
+	});
+
 	$('#back').on('click', function(event){
 		redoLast()
 	});
@@ -537,8 +545,9 @@ $(document).ready(function(){
 		handleImport(e);
 	})
 
-	$('#uploader').on('change',function(e){
-		
+	$('#uploader').on('change', function(e){
+		uploadFileEvent = e;
+		$('#uploadFileSelected').val(e.target.files[0].name);
 	})
 
 	// Do this query to set the initial graph
@@ -570,6 +579,21 @@ var owlayout = 0
 var ohlayout = 0
 var design = null;
 var usedagre = false;
+var uploadFileEvent = null;
+
+function makeWorker(script) {
+    var URL = window.URL || window.webkitURL;
+    var Blob = window.Blob;
+    var Worker = window.Worker;
+    
+    if (!URL || !Blob || !Worker || !script) {
+        return null;
+    }
+    
+    var blob = new Blob([script]);
+    var worker = new Worker(URL.createObjectURL(blob));
+    return worker;
+}
 
 function handleImport(event){
 	var reader = new FileReader();
@@ -594,7 +618,7 @@ function handleUpload(event){
 		var x = event.target.result;
 		console.log($.csv.toObjects(x));
 	}
-	reader.readAsText(event.target.files[0]);
+	reader.readAsText(event.target.files);
 }
 
 function togglePathFinding(){
@@ -846,7 +870,7 @@ function updateNodeData(node){
 function forceRelayout(){
 	sigma.layouts.stopForceLink();
 	if (usedagre){
-		sigma.layouts.dagre.start(sigmaInstance);	
+		sigma.layouts.dagre.start(sigmaInstance);
 		
 	}else{
 		sigma.layouts.startForceLink();	
@@ -857,10 +881,19 @@ function ingestDomainGroupMembership(){
 	var reader = new FileReader();
 	reader.onload = function(event){
 		var x = event.target.result;
-		var data = $.csv.toObjects(x);
-		console.log(data);
+		//var data = $.csv.toObjects(x);
+		var d = [];
+		var hr = window.location.href
+		hr = hr.split('/');
+		hr.pop()
+		hr = hr.join('/');
+		d['url'] = hr
+		d['data'] = x
+		var ingestWorker = makeWorker(document.getElementById('ingestworker').textContent);
+		ingestWorker.postMessage(d);
 	}
-	reader.readAsText(event.target.files[0]);
+
+	reader.readAsText(document.getElementById('uploader').files[0]);
 }
 
 function uploadDialogButton(){
