@@ -200,6 +200,29 @@ $(document).ready(function(){
 			$('#nodedatabox').html(rendered);
 		}
 	});
+
+	$.ajax({
+		url: "http://localhost:7474/db/data/transaction/commit",
+		type: 'POST',
+		accepts: {json: "application/json"},
+		dataType: "json",
+		contentType: "application/json",
+		headers: {
+			"Authorization": "Basic bmVvNGo6bmVvNGpq"
+		},
+		data: JSON.stringify({
+			  "statements" : [ {
+			    "statement" : "CREATE CONSTRAINT ON (c:User) ASSERT c.UserName IS UNIQUE"
+			  }, {
+			    "statement" : "CREATE CONSTRAINT ON (c:Computer) ASSERT c.ComputerName IS UNIQUE"
+			  }, {
+			    "statement" : "CREATE CONSTRAINT ON (c:Group) ASSERT c.GroupName IS UNIQUE"
+			  } ]
+		}),
+		success: function(json) {
+			console.log('Set Constraints');
+		}
+	});
 	
 	// Add typeaheads for pathfinding/search boxes
 	$('#searchBar').typeahead({
@@ -881,7 +904,6 @@ function ingestDomainGroupMembership(){
 	var reader = new FileReader();
 	reader.onload = function(event){
 		var x = event.target.result;
-		//var data = $.csv.toObjects(x);
 		var d = [];
 		var hr = window.location.href
 		hr = hr.split('/');
@@ -889,6 +911,13 @@ function ingestDomainGroupMembership(){
 		hr = hr.join('/');
 		d['url'] = hr
 		d['data'] = x
+		if ($('#ingestlocaladmin').hasClass('active')){
+			d['type'] = 'localadmin';
+		}else if ($('#ingestdomaingroup').hasClass('active')){
+			d['type'] = 'domainmembership';
+		}else{
+			d['type'] = 'sessions';
+		}
 		var ingestWorker = makeWorker(document.getElementById('ingestworker').textContent);
 		ingestWorker.postMessage(d);
 	}

@@ -17,7 +17,6 @@
 		<script type="text/javascript" src="js/bootstrap3-typeahead.min.js"></script>
 		<script type="text/javascript" src="js/mustache.min.js"></script>
 		<script type="text/javascript" src="js/bloodhound.js"></script>
-		<script type="text/javascript" src="js/jquery.csv.min.js"></script>
 		<script type="text/javascript" src="js/sigma.renderers.linkurious.min.js"></script>
 		<script type="text/javascript" src="js/sigma.plugins.design.min.js"></script>
 		<script type="text/javascript" src="js/sigma.layouts.dagre.min.js"></script>
@@ -28,8 +27,27 @@
 
 		<script type="javascript/worker" id="ingestworker">
 			self.addEventListener('message', function(e){
+				var groups = [], i;
 				importScripts(e.data.url + "/js/papaparse.min.js");
-				console.log(Papa.parse(e.data.data));
+				var data = Papa.parse(e.data.data, {header:true}).data;
+				var testElement = data[0];
+				console.log(testElement);
+				if (e.data.type === 'localadmin'){
+
+				}
+				for (i=0; i < data.length; i += 50){
+					groups.push(data.slice(i, i+50));
+				}
+				console.log(groups[0]);
+				var xmlhttp = new XMLHttpRequest();
+				xmlhttp.open("POST", "http://localhost:7474/db/data/transaction/commit", false);
+				xmlhttp.setRequestHeader('Accepts', 'application/json');
+				xmlhttp.setRequestHeader('Content-Type', 'application/json');
+				xmlhttp.setRequestHeader('Authorization', 'Basic bmVvNGo6bmVvNGpq');
+				var postdata = {}
+				postdata.statements = []
+				postdata.statements.push({"statement":"MATCH (n:Group) RETURN count(n)"})
+				xmlhttp.send(JSON.stringify(postdata));
 			}, false)
 		</script>
 
