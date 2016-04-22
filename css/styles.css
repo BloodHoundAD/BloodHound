@@ -190,3 +190,7 @@ dl.dictlist{
   background-color: rgba(255, 255, 255, .9);
   box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
+
+.ingestinput{
+	max-width: 27em;
+}
