@@ -26,6 +26,13 @@
 		<script type="text/javascript" src="js/sigma.exporters.image.min.js"></script>
 		<script type="text/javascript" src="js/dagre.min.js"></script>
 
+		<script type="javascript/worker" id="ingestworker">
+			self.addEventListener('message', function(e){
+				importScripts(e.data.url + "/js/papaparse.min.js");
+				console.log(Papa.parse(e.data.data));
+			}, false)
+		</script>
+
 		<script id="datatemplate" type="x-tmpl-mustache">
 			<ul class='nav nav-tabs nav-justified' id="abc" role="tablist">
 				<li role='presentation' class='active'><a href='#dbinfo' role='tab' data-toggle='tab' aria-controls='dbinfo'>Database Info</a></li>
@@ -174,28 +181,28 @@
 
 		<div id="menuDiv" class="menudiv">
 			<div class="rightmenu">
-				<button id="refreshbutton" class="btn rightmenubutton">
+				<button id="refreshbutton" class="btn rightmenubutton" style="white-space: inherit !important;">
 					<span class="glyphicon glyphicon-refresh rightspan"></span>
 				</button>
 			</div>
 			<div class="rightmenu">
-				<button id="exportbutton" class="btn rightmenubutton">
+				<button id="exportbutton" class="btn rightmenubutton" style="white-space: inherit !important;">
 					<span class="glyphicon glyphicon-export rightspan"></span>
 				</button>
 			</div>
 			<div class="rightmenu">
-				<button id="importbutton" class="btn rightmenubutton">
+				<button id="importbutton" class="btn rightmenubutton" style="white-space: inherit !important;">
 					<span class="glyphicon glyphicon-import rightspan"></span>
 				</button>
 			</div>
 			<div class="rightmenu">
-				<button id="uploadbutton" class="btn rightmenubutton">
+				<button id="uploadbutton" class="btn rightmenubutton" style="white-space: inherit !important;">
 					<span class="glyphicon glyphicon-upload rightspan"></span>
 				</button>
 			</div>
 
 			<div class="rightmenu">
-				<button id="layoutbutton" class="btn rightmenubutton">
+				<button id="layoutbutton" class="btn rightmenubutton" style="white-space: inherit !important;">
 					<span style="width:14px" class="fa fa-line-chart rightspan"></span>
 				</button>
 			</div>
@@ -208,9 +215,15 @@
 				<span aria-hidden="true">&times;</span>
 			</div>
 
-			<div class="panel-body">
-				<div>
-					File Name: <input id="uploadFileSelected" class="form-control-inline"> <button class="glyphicon glyphicon-file" style="font-size:1.5em; top:5px"></button>
+			<div class="panel-body ingestinput">
+				<div class="input-group" id="fileselectdiv">
+					<span class="input-group-addon" id="addonforfile">File Name:</span>
+					<input id="uploadFileSelected" aria-described-by="addonforfile" class="form-control">
+					<span class="input-group-btn">
+						<button id="selectUploadFile" class="btn btn-default">
+							<span class="glyphicon glyphicon-file"></span>
+						</button>
+					</span>
 				</div>
 
 				<div class="list-group" style="margin-top:15px;">
@@ -237,7 +250,7 @@
 				</div>
 
 				<div style="text-align: center">
-					<button class="btn btn-large">Ingest Data</button>
+					<button id="startingestbutton" class="btn btn-large">Ingest Data</button>
 				</div>
 			</div>
 		</div>
