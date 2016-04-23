@@ -322,6 +322,7 @@ $(document).ready(function(){
 	$('#uploadSelectDiv').fadeToggle(0)
 	$('#exportSelectDiv').fadeToggle(0)
 	$("#layoutchange").toggle(false)
+	$('#dburlspinner').toggle(false)
 
 	// Click handlers for various buttons/elements
 	$('#menu').on('click', function(event){
@@ -358,6 +359,47 @@ $(document).ready(function(){
 
 	$('#uploadbutton').on('click', function(event){
 		$('#uploadSelectDiv').fadeToggle()
+	});
+
+	$('#loginbutton').on('click', function(event){
+		if (!($('#loginbadpw').hasClass('hide'))){
+			$('#loginbadpw').addClass('hide')	
+		}
+		
+		if (!($(this).hasClass('activate')) && !($(this).hasClass('btn-success'))){
+			$(this).toggleClass('activate');
+			var url = $('#dburl').val()
+			var uname = $('#dbusername').val()
+			var upwd = $('#dbpassword').val()
+			var header = "Basic " + window.btoa(uname + ":" + upwd)
+
+			if (!(url.startsWith('http'))){
+				url = 'http://' + url
+			}
+
+			$.ajax({
+				url: url + '/db/data/',
+				type: 'GET',
+				headers: {
+					"Authorization":header
+				},
+				success: function(e){
+					$('#loginbutton').toggleClass('activate');
+					$('#loginbutton').removeClass('btn-default')
+					$('#loginbutton').addClass('btn-success');
+					$('#loginbutton').html('Success!')
+					localStorage.setItem("auth", header)
+					localStorage.setItem("dbpath", url)
+					setTimeout(function(){
+						$('#loginwindow').fadeToggle()	
+					}, 1500)					
+				},
+				error: function(e){
+					$('#loginbadpw').removeClass('hide')
+					$('#loginbutton').toggleClass('activate');
+				}
+			})
+		}
 	});
 
 	$('#bottomSlide').on('click', function(event){
@@ -571,6 +613,52 @@ $(document).ready(function(){
 	$('#uploader').on('change', function(e){
 		uploadFileEvent = e;
 		$('#uploadFileSelected').val(e.target.files[0].name);
+	})
+
+	$('#dburl').on('focus', function(e){
+		$('#dbHelpBlock').addClass('hide')
+		dburlchecked = false;
+	})
+
+	$('#dburl').bind('keypress', function(e){
+		if (e.which == 13){
+			event.preventDefault();
+			$('#dburl').blur();
+		}
+	});
+
+	$('#dburl').on('blur', function(e){
+		$('#dburlspinner').toggle(false)
+		var url = e.currentTarget.value
+		if (!(url === "")){
+			var icon = $('#dburlspinner')
+			icon.removeClass();
+			icon.addClass("fa fa-spinner fa-spin form-control-feedback")
+			$('#dburlspinner').toggle(true)
+			if (!(url.startsWith('http'))){
+				url = 'http://' + url
+			}
+			$.ajax({
+				url: url,
+				type: 'GET',
+				success: function(e){
+					if (e.data.endsWith('/db/data/')){
+						icon.removeClass();
+						icon.addClass("fa fa-check-circle green-icon-color form-control-feedback")
+					}else{
+						icon.removeClass();
+						icon.addClass("fa fa-times-circle red-icon-color form-control-feedback")
+						$('#dbHelpBlock').removeClass('hide')
+					}
+				},
+				error: function(e){
+					icon.removeClass();
+					icon.addClass("fa fa-times-circle red-icon-color form-control-feedback")
+					$('#dbHelpBlock').removeClass('hide')
+				}
+			})
+		}
+		
 	})
 
 	// Do this query to set the initial graph

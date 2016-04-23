@@ -4,13 +4,12 @@
 		<title>Offensive Dashboard</title>
 		<script src="js/jquery-2.2.1.min.js"></script>
 		<script src="js/jquery-ui.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
 		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
 		<link type="text/css" rel="stylesheet" href="css/bootstrap-theme.min.css">
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
 		<link rel="stylesheet" type="text/css" href="css/animation.css">
 		<link rel="stylesheet" type="text/css" href="css/tooltip.css">
-		<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
-		<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/sigma.min.js"></script>
 		<script type="text/javascript" src="js/plugins.min.js"></script>
@@ -156,7 +155,29 @@
 		<div id="loginwindow" class="loginwindow">
 			<div id="loginpanel">
 				<img src="img/logo-white-transparent-full.png">
-				<button type="button" class="btn btn-default" onclick="document.getElementById('loginwindow').style.display='none'">Close</button>
+				<form>
+					<div class="form-group has-feedback">
+						<div class="input-group">
+							<span class="input-group-addon" id="dburladdon">Database URL</span>
+							<input id="dburl" type="text" class="form-control" placeholder="http://db-ip:dp-port" aria-describedby="dburladdon">
+							<i id="dburlspinner" class="fa fa-spinner fa-spin form-control-feedback"></i>
+						</div>
+						<p id="dbHelpBlock" class="help-block help-block-add hide">No Neo4j REST API Found</p>
+						<div class="input-group spacing">
+							<span class="input-group-addon" id="dbuseraddon">&nbsp;DB Username</span>
+							<input id="dbusername" type="text" class="form-control" placeholder="neo4j" aria-describedby="dbuseraddon">
+						</div>
+						<div class="input-group spacing">
+							<span class="input-group-addon" id="dbpwaddon">&nbsp;DB Password</span>
+							<input id="dbpassword" type="password" class="form-control" placeholder="neo4j" aria-describedby="dbpwaddon">
+						</div>
+						<p id="loginbadpw" class="help-block help-block-add hide" style="color: #d9534f">Wrong username or password</p>
+						<button id="loginbutton" type="button" class="btn btn-primary loginbutton has-spinner">
+							Login
+							<span class="spinner"><i class="fa fa-spinner fa-spin"></i></span>
+						</button>
+					</div>
+				</form>
 			</div>
 		</div>
 		<div id="nodataalert" class="alert alert-warning alert-dismissible alertdiv" role="alert">
