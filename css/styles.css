@@ -203,7 +203,7 @@ dl.dictlist{
 	background-color: rgba(0, 0, 0, .7);
 }
 
-.loginwindow > div{
+.loginwindow > div:first-child{
 	position: absolute;
 	top:50%;
 	left:50%;
@@ -216,15 +216,34 @@ dl.dictlist{
 	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
-.loginwindow > div img{
+.loginwindow > div:first-child img{
 	height: 150px;
 	display: block;
 	margin: auto;
 }
 
-.loginwindow > div form{
+.loginwindow > div:first-child form{
 	margin-left: 2em;
 	margin-right: 2em
+}
+
+.loginwindow > div:last-child{
+	position: absolute;
+	top:50%;
+	left:50%;
+	transform:translate(-50%,-50%);
+	max-width:30%;
+	overflow: auto;
+	background-color: rgba(255, 255, 255, .9);
+	border: 5px solid rgba(0, 0, 0, .5);
+	border-radius: 10px;
+	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+.loginwindow > div:last-child span{
+	margin: 8px;
+	font-weight: 700;
+	font-size: 1.5em;
 }
 
 .green-icon-color{

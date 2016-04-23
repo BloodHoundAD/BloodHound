@@ -1,4 +1,7 @@
 $(document).ready(function(){
+	$('#loginpanel').fadeToggle(0)
+	$('#checkconnectionpanel').fadeToggle(0)
+
 	// Set our default renderer to Canvas, since a lot of plugins dont work on WebGL
 	sigma.renderers.def = sigma.renderers.canvas
 	sigmaInstance = new sigma({
@@ -164,130 +167,40 @@ $(document).ready(function(){
 		dragged = true;
 	})
 
-	// Initialize DB Info
-	$.ajax({
-		url: "http://localhost:7474/db/data/transaction/commit",
-		type: 'POST',
-		accepts: {json: "application/json"},
-		dataType: "json",
-		contentType: "application/json",
-		headers: {
-			"Authorization": "Basic bmVvNGo6bmVvNGpq"
-		},
-		data: JSON.stringify({
-			  "statements" : [ {
-			    "statement" : "MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)"
-			  }, {
-			    "statement" : "MATCH (n:Group) RETURN count(n)"
-			  }, {
-			    "statement" : "MATCH ()-[r]->() RETURN count(r)"
-			  }, {
-			    "statement" : "MATCH (n:Computer) RETURN count(n)"
-			  } ]
-		}),
-		success: function(json) {
-			var usercount = json.results[0].data[0].row[0];
-			var groupcount = json.results[1].data[0].row[0];
-			var relcount = json.results[2].data[0].row[0];
-			var compcount = json.results[3].data[0].row[0];
-
-			var template = $('#dbdata').html();
-			Mustache.parse(template);
-			dbinforendered = Mustache.render(template, {url:"http://localhost:7474", user: "neo4j", num_users: usercount, num_groups: groupcount, num_relationships: relcount, num_computers: compcount});
-			var template = $('#datatemplate').html();
-			var nodeinfo = Mustache.render(noDataString);
-			var rendered = Mustache.render(template, {dbinfo: dbinforendered, nodeinfo: nodeinfo})
-			$('#nodedatabox').html(rendered);
-		}
-	});
-
-	$.ajax({
-		url: "http://localhost:7474/db/data/transaction/commit",
-		type: 'POST',
-		accepts: {json: "application/json"},
-		dataType: "json",
-		contentType: "application/json",
-		headers: {
-			"Authorization": "Basic bmVvNGo6bmVvNGpq"
-		},
-		data: JSON.stringify({
-			  "statements" : [ {
-			    "statement" : "CREATE CONSTRAINT ON (c:User) ASSERT c.UserName IS UNIQUE"
-			  }, {
-			    "statement" : "CREATE CONSTRAINT ON (c:Computer) ASSERT c.ComputerName IS UNIQUE"
-			  }, {
-			    "statement" : "CREATE CONSTRAINT ON (c:Group) ASSERT c.GroupName IS UNIQUE"
-			  } ]
-		}),
-		success: function(json) {
-			console.log('Set Constraints');
-		}
-	});
-	
-	// Add typeaheads for pathfinding/search boxes
-	$('#searchBar').typeahead({
-		source: function (query, process) {
-			return $.ajax({
-				url: "http://localhost:7474/db/data/cypher",
-				type: 'POST',
-				accepts: {json: "application/json"},
-				dataType: "json",
-				contentType: "application/json",
+	if (localStorage.getItem("dbpath")){
+		$('#checkconnectionpanel').fadeToggle(0)
+		//Checking Stored Credentials <i class="fa fa-spinner fa-spin"></i>
+		setTimeout(function(){
+			$.ajax({
+				url: localStorage.getItem('dbpath') + '/db/data/',
+				type: 'GET',
 				headers: {
-					"Authorization": "Basic bmVvNGo6bmVvNGpq"
+					"Authorization": localStorage.getItem('auth')
 				},
-				data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name =~ '(?i)" + query + ".*' AND NOT n.name ENDS WITH '$' RETURN n.name LIMIT 10"}),
-				success: function(json) {
-					var d = json.data
-					var l = d.length;
-					for (var i = 0; i < l; i++) {
-						d[i] = d[i].toString();
-					}
-					return process(json.data);
-				}
-			});
-		}, afterSelect: function(selected){
-			if (!pathfindingMode){
-				doQuery("MATCH (n) WHERE n.name =~ '(?i)" + selected + ".*' AND NOT n.name ENDS WITH '$' RETURN n");	
-			}else{
-				var start = $('#searchBar').val();
-				var end = $('#endNode').val();
-				if (start != "" &&  end != ""){
-					doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);	
-				}
-			}
-		}, autoSelect: false
-	});
-
-	$('#endNode').typeahead({
-		source: function (query, process) {
-			return $.ajax({
-				url: "http://localhost:7474/db/data/cypher",
-				type: 'POST',
-				accepts: {json: "application/json"},
-				dataType: "json",
-				contentType: "application/json",
-				headers: {
-					"Authorization": "Basic bmVvNGo6bmVvNGpq"
+				success: function(e){
+					$('#connectionstatus').html("Success!")
+					doInit()
+					setTimeout(function(){
+						$('#checkconnectionpanel').fadeToggle()
+						$('#loginwindow').fadeToggle(400, 'swing', function(){
+							$('#connectionstatus').html('Checking Stored Credentials <i class="fa fa-spinner fa-spin"></i>')
+						})
+					}, 1500)
 				},
-				data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name =~ '(?i)" + query + ".*' AND NOT n.name ENDS WITH '$' RETURN n.name LIMIT 10"}),
-				success: function(json) {
-					var d = json.data
-					var l = d.length;
-					for (var i = 0; i < l; i++) {
-						d[i] = d[i].toString();
-					}
-					return process(json.data);
+				error: function(e){
+					$('#connectionstatus').html("Invalid Credentials!")
+					setTimeout(function(){
+						$('#checkconnectionpanel').fadeToggle(400, 'swing', function(){
+							$('#loginpanel').fadeToggle()
+							$('#connectionstatus').html('Checking Stored Credentials <i class="fa fa-spinner fa-spin"></i>')
+						})
+					}, 1500)
 				}
-			});
-		}, afterSelect: function(selected){
-			var start = $('#searchBar').val();
-			var end = $('#endNode').val();
-			if (start != "" &&  end != ""){
-				doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);	
-			}
-		}, autoSelect: false
-	});
+			})
+		}, 1500)
+	}else{
+		$('#loginpanel').fadeToggle()
+	}
 
 	// Add enter keybinds for pathfinding/search bars
 	$('#searchBar').bind('keypress', function(e){
@@ -390,6 +303,9 @@ $(document).ready(function(){
 					$('#loginbutton').html('Success!')
 					localStorage.setItem("auth", header)
 					localStorage.setItem("dbpath", url)
+					localStorage.setItem("uname", uname)
+					localStorage.setItem("pwd", upwd)
+					doInit()
 					setTimeout(function(){
 						$('#loginwindow').fadeToggle()	
 					}, 1500)					
@@ -661,9 +577,6 @@ $(document).ready(function(){
 		
 	})
 
-	// Do this query to set the initial graph
-	doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})-[r]->(m) RETURN n,r,m");
-
 	// Make our export/ingest boxes draggable
 	$('#uploadSelectDiv').draggable({scroll:false, containment: "window"});
 	$('#exportSelectDiv').draggable({scroll:false, containment: "window"});
@@ -775,7 +688,7 @@ function doQuery(query, start, end){
 	sigma.layouts.stopForceLink();
 	
 	sigma.neo4j.cypher(
-		{url: 'http://localhost:7474', user:'neo4j', password:'neo4jj'},
+		{url: localStorage.getItem("dbpath"), user:localStorage.getItem("uname"), password:localStorage.getItem("pwd")},
 		query,
 		sigmaInstance,
 		function() {
@@ -869,13 +782,13 @@ function updateNodeData(node){
 	
 	if (node.data.node.type_user == true){
 		$.ajax({
-			url: "http://localhost:7474/db/data/transaction/commit",
+			url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
 			type: 'POST',
 			accepts: {json: "application/json"},
 			dataType: "json",
 			contentType: "application/json",
 			headers: {
-				"Authorization": "Basic bmVvNGo6bmVvNGpq"
+				"Authorization": localStorage.getItem("auth")
 			},
 			data: JSON.stringify({
 				  "statements" : [ {
@@ -910,13 +823,13 @@ function updateNodeData(node){
 		});
 	}else if (node.data.node.type_computer == true){
 		$.ajax({
-			url: "http://localhost:7474/db/data/transaction/commit",
+			url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
 			type: 'POST',
 			accepts: {json: "application/json"},
 			dataType: "json",
 			contentType: "application/json",
 			headers: {
-				"Authorization": "Basic bmVvNGo6bmVvNGpq"
+				"Authorization": localStorage.getItem("auth")
 			},
 			data: JSON.stringify({
 				  "statements" : [ {
@@ -942,13 +855,13 @@ function updateNodeData(node){
 		});
 	}else if (node.data.node.type_group == true){
 		$.ajax({
-			url: "http://localhost:7474/db/data/transaction/commit",
+			url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
 			type: 'POST',
 			accepts: {json: "application/json"},
 			dataType: "json",
 			contentType: "application/json",
 			headers: {
-				"Authorization": "Basic bmVvNGo6bmVvNGpq"
+				"Authorization": localStorage.getItem("auth")
 			},
 			data: JSON.stringify({
 				  "statements" : [ {
@@ -1015,4 +928,134 @@ function ingestDomainGroupMembership(){
 
 function uploadDialogButton(){
 
+}
+
+function doInit(){
+	// Initialize DB Info
+	$.ajax({
+		url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
+		type: 'POST',
+		accepts: {json: "application/json"},
+		dataType: "json",
+		contentType: "application/json",
+		headers: {
+			"Authorization": localStorage.getItem("auth")
+		},
+		data: JSON.stringify({
+			  "statements" : [ {
+			    "statement" : "MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)"
+			  }, {
+			    "statement" : "MATCH (n:Group) RETURN count(n)"
+			  }, {
+			    "statement" : "MATCH ()-[r]->() RETURN count(r)"
+			  }, {
+			    "statement" : "MATCH (n:Computer) RETURN count(n)"
+			  } ]
+		}),
+		success: function(json) {
+			var usercount = json.results[0].data[0].row[0];
+			var groupcount = json.results[1].data[0].row[0];
+			var relcount = json.results[2].data[0].row[0];
+			var compcount = json.results[3].data[0].row[0];
+
+			var template = $('#dbdata').html();
+			Mustache.parse(template);
+			dbinforendered = Mustache.render(template, {url:localStorage.getItem("dbpath"), user: localStorage.getItem("uname"), num_users: usercount, num_groups: groupcount, num_relationships: relcount, num_computers: compcount});
+			var template = $('#datatemplate').html();
+			var nodeinfo = Mustache.render(noDataString);
+			var rendered = Mustache.render(template, {dbinfo: dbinforendered, nodeinfo: nodeinfo})
+			$('#nodedatabox').html(rendered);
+		}
+	});
+
+	$.ajax({
+		url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
+		type: 'POST',
+		accepts: {json: "application/json"},
+		dataType: "json",
+		contentType: "application/json",
+		headers: {
+			"Authorization": localStorage.getItem("auth")
+		},
+		data: JSON.stringify({
+			  "statements" : [ {
+			    "statement" : "CREATE CONSTRAINT ON (c:User) ASSERT c.UserName IS UNIQUE"
+			  }, {
+			    "statement" : "CREATE CONSTRAINT ON (c:Computer) ASSERT c.ComputerName IS UNIQUE"
+			  }, {
+			    "statement" : "CREATE CONSTRAINT ON (c:Group) ASSERT c.GroupName IS UNIQUE"
+			  } ]
+		}),
+		success: function(json) {
+			console.log('Set Constraints');
+		}
+	});
+
+	// Add typeaheads for pathfinding/search boxes
+	$('#searchBar').typeahead({
+		source: function (query, process) {
+			return $.ajax({
+				url: "http://localhost:7474/db/data/cypher",
+				type: 'POST',
+				accepts: {json: "application/json"},
+				dataType: "json",
+				contentType: "application/json",
+				headers: {
+					"Authorization": "Basic bmVvNGo6bmVvNGpq"
+				},
+				data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name =~ '(?i)" + query + ".*' AND NOT n.name ENDS WITH '$' RETURN n.name LIMIT 10"}),
+				success: function(json) {
+					var d = json.data
+					var l = d.length;
+					for (var i = 0; i < l; i++) {
+						d[i] = d[i].toString();
+					}
+					return process(json.data);
+				}
+			});
+		}, afterSelect: function(selected){
+			if (!pathfindingMode){
+				doQuery("MATCH (n) WHERE n.name =~ '(?i)" + selected + ".*' AND NOT n.name ENDS WITH '$' RETURN n");	
+			}else{
+				var start = $('#searchBar').val();
+				var end = $('#endNode').val();
+				if (start != "" &&  end != ""){
+					doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);	
+				}
+			}
+		}, autoSelect: false
+	});
+
+	$('#endNode').typeahead({
+		source: function (query, process) {
+			return $.ajax({
+				url: "http://localhost:7474/db/data/cypher",
+				type: 'POST',
+				accepts: {json: "application/json"},
+				dataType: "json",
+				contentType: "application/json",
+				headers: {
+					"Authorization": "Basic bmVvNGo6bmVvNGpq"
+				},
+				data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name =~ '(?i)" + query + ".*' AND NOT n.name ENDS WITH '$' RETURN n.name LIMIT 10"}),
+				success: function(json) {
+					var d = json.data
+					var l = d.length;
+					for (var i = 0; i < l; i++) {
+						d[i] = d[i].toString();
+					}
+					return process(json.data);
+				}
+			});
+		}, afterSelect: function(selected){
+			var start = $('#searchBar').val();
+			var end = $('#endNode').val();
+			if (start != "" &&  end != ""){
+				doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);	
+			}
+		}, autoSelect: false
+	});
+
+	// Do this query to set the initial graph
+	doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})-[r]->(m) RETURN n,r,m");
 }
