@@ -227,6 +227,18 @@ $(document).ready(function(){
 		}
 	});
 
+	$('#dbusername').bind('keypress', function(e){
+		if (e.which == 13){
+			$('#loginbutton').click()
+		}
+	});
+
+	$('#dbpassword').bind('keypress', function(e){
+		if (e.which == 13){
+			$('#loginbutton').click()
+		}
+	});
+
 	// Hide a bunch of stuff that needs to be hidden on load
 	$('#nodedatabox').slideToggle(0)
 	$('#pathfindingbox').slideToggle(0)
