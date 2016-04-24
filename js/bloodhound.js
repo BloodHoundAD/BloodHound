@@ -322,6 +322,10 @@ $(document).ready(function(){
 					setTimeout(function(){
 						$('#overlay').fadeToggle(400, 'swing', function(){
 							$('#loginpanel').fadeToggle(0)
+							$('#loginbutton').removeClass('activate');
+							$('#loginbutton').html('Login<span class="spinner"><i class="fa fa-spinner fa-spin"></i></span>')
+							$('#loginbutton').addClass('btn-default')
+							$('#loginbutton').removeClass('btn-success');
 						})
 					}, 1500)					
 				},
