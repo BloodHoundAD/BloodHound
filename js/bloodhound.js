@@ -256,7 +256,7 @@ $(document).ready(function(){
 	});
 
 	$('#startingestbutton').on('click', function(event){
-		ingestDomainGroupMembership()
+		ingestData()
 	})
 
 	$('#selectUploadFile').on('click', function(event){
@@ -925,7 +925,7 @@ function forceRelayout(){
 	}	
 }
 
-function ingestDomainGroupMembership(){
+function ingestData(){
 	var reader = new FileReader();
 	reader.onload = function(event){
 		var x = event.target.result;
@@ -950,8 +950,7 @@ function ingestDomainGroupMembership(){
 	reader.readAsText(document.getElementById('uploader').files[0]);
 }
 
-function doInit(){
-	// Initialize DB Info
+function getDBInfo(){
 	$.ajax({
 		url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
 		type: 'POST',
@@ -987,7 +986,10 @@ function doInit(){
 			$('#nodedatabox').html(rendered);
 		}
 	});
+}
 
+function doInit(){
+	getDBInfo()
 	$.ajax({
 		url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
 		type: 'POST',
@@ -1105,7 +1107,14 @@ function resetUI(){
 	}
 
 	localStorage.clear()
-	$('#logoutpanel').fadeToggle(400, 'swing', function(){
-		$('#loginpanel').fadeToggle();
-	})
+
+	$('#logoutModal').modal('hide')
+	$('#loginpanel').fadeToggle(0);
+	$('#overlay').fadeToggle();
+}
+
+function clearDB(){
+	sigmaInstance.graph.clear();
+	sigmaInstance.refresh();
+
 }

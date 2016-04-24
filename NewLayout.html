@@ -95,9 +95,9 @@
 					<dd>{{num_relationships}}</dd>
 				</dl>
 				<div class="text-center" style="clear:both">
-					<div class="btn-group dbbuttons" role="group" aria-label="...">
-						<button type="button" class="btn btn-warning" onclick="startLogout()">Log Out/Switch DB</button>
-						<button type="button" class="btn btn-danger">Clear Database</button>
+					<div class="dbbuttons">
+						<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#logoutModal">Log Out/Switch DB</button>
+						<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#clearDBWarn">Clear Database</button>
 					</div>
 				</div>
 			</div>
@@ -192,13 +192,6 @@
 			<div id="checkconnectionpanel">
 				<span id="connectionstatus">Checking Stored Credentials <i class="fa fa-spinner fa-spin"></i></span>
 			</div>
-			<div id="logoutpanel">
-				<span>Are you sure you want to log out?</span>
-				<div class="text-right">
-					<button type="button" class="btn btn-danger" onclick="resetUI()">Yes</button>
-					<button type="button" class="btn btn-primary" onclick="stopLogout()">Cancel</button>
-				</div>
-			</div>
 		</div>
 		<div id="nodataalert" class="alert alert-warning alert-dismissible alertdiv" role="alert">
 			<button type="button" class="close" onclick="$('#nodataalert').fadeToggle(false)" aria-label="Close">
@@ -278,6 +271,7 @@
 				Ingest CSV
 				<button type="button" class="close" onclick="$('#uploadSelectDiv').fadeToggle(false)" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
+				</button>
 			</div>
 
 			<div class="panel-body ingestinput">
@@ -325,6 +319,7 @@
 				Export Graph
 				<button type="button" class="close" onclick="$('#exportSelectDiv').fadeToggle(false)" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
+				</button>
 			</div>
 
 			<div class="panel-body">
@@ -367,5 +362,64 @@
 		</button>
 		<input type="file" accept=".json" id="fileloader" name="files" title="Open JSON" style="display:none">
 		<input type="file" accept=".csv" id="uploader" name="import" title="Open CSV for Import" style="display:none">
+
+		<div id="logoutModal" class="modal fade" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="logoutModalLabel">Logout</h4>
+					</div>
+					<div class="modal-body">
+						<p>Are you sure you want to logout?</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-danger" onclick="resetUI()">Logout</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="clearDBWarn" class="modal fade" role="dialog" aria-labelledby="clearDBWarnLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="clearDBWarnLabel">Clear Database</h4>
+					</div>
+					<div class="modal-body">
+						<p>Are you sure you want to clear the database? This is irreversible!</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#clearDBConfirm" data-dismiss="modal">Clear Database</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="clearDBConfirm" class="modal fade" role="dialog" aria-labelledby="clearDBConfirmLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="clearDBWarnLabel">Clear Database</h4>
+					</div>
+					<div class="modal-body">
+						<p>Are you ABSOLUTELY sure you want to clear the database?</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+						<button type="button" class="btn btn-danger" data-dismiss="modal" onclick="clearDB()">Clear Database</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
