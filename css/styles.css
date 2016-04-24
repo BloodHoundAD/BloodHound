@@ -203,12 +203,12 @@ dl.dictlist{
 	background-color: rgba(0, 0, 0, .7);
 }
 
-.loginwindow > div:first-child{
+.loginwindow > #loginpanel{
 	position: absolute;
 	top:50%;
 	left:50%;
 	transform:translate(-50%,-50%);
-	max-width:30%;
+	max-width:25%;
 	overflow: auto;
 	background-color: rgba(255, 255, 255, .9);
 	border: 5px solid rgba(0, 0, 0, .5);
@@ -216,18 +216,18 @@ dl.dictlist{
 	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
-.loginwindow > div:first-child img{
+.loginwindow > #loginpanel img{
 	height: 150px;
 	display: block;
 	margin: auto;
 }
 
-.loginwindow > div:first-child form{
+.loginwindow > #loginpanel form{
 	margin-left: 2em;
 	margin-right: 2em
 }
 
-.loginwindow > div:last-child{
+.loginwindow > #checkconnectionpanel{
 	position: absolute;
 	top:50%;
 	left:50%;
@@ -240,10 +240,34 @@ dl.dictlist{
 	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
-.loginwindow > div:last-child span{
+.loginwindow > #checkconnectionpanel span{
 	margin: 8px;
 	font-weight: 700;
 	font-size: 1.5em;
+}
+
+.loginwindow > #logoutpanel{
+	position: absolute;
+	top:50%;
+	left:50%;
+	transform:translate(-50%,-50%);
+	max-width:30%;
+	overflow: auto;
+	background-color: rgba(255, 255, 255, .9);
+	border: 5px solid rgba(0, 0, 0, .5);
+	border-radius: 10px;
+	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+.loginwindow > #logoutpanel span{
+	margin: 8px;
+	font-weight: 700;
+	font-size: 1.5em;
+}
+
+.loginwindow > #logoutpanel div{
+	margin-top: 5px;
+	margin-right: 5px;
 }
 
 .green-icon-color{
@@ -282,4 +306,9 @@ dl.dictlist{
 .has-spinner.activate .spinner {
   opacity: 1;
   width: auto;
+}
+
+.dbbuttons{
+	padding-top: 1em;
+	padding-bottom: 1em;
 }

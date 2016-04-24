@@ -94,6 +94,12 @@
 					<dt>Relationships</dt>
 					<dd>{{num_relationships}}</dd>
 				</dl>
+				<div class="text-center" style="clear:both">
+					<div class="btn-group dbbuttons" role="group" aria-label="...">
+						<button type="button" class="btn btn-warning" onclick="startLogout()">Log Out/Switch DB</button>
+						<button type="button" class="btn btn-danger">Clear Database</button>
+					</div>
+				</div>
 			</div>
 		</script>
 
@@ -153,7 +159,7 @@
 	</head>
 
 	<body role="document">
-		<div id="loginwindow" class="loginwindow">
+		<div id="overlay" class="loginwindow">
 			<div id="loginpanel">
 				<img src="img/logo-white-transparent-full.png">
 				<form>
@@ -182,6 +188,13 @@
 			</div>
 			<div id="checkconnectionpanel">
 				<span id="connectionstatus">Checking Stored Credentials <i class="fa fa-spinner fa-spin"></i></span>
+			</div>
+			<div id="logoutpanel">
+				<span>Are you sure you want to log out?</span>
+				<div class="text-right">
+					<button type="button" class="btn btn-danger" onclick="resetUI()">Yes</button>
+					<button type="button" class="btn btn-primary" onclick="stopLogout()">Cancel</button>
+				</div>
 			</div>
 		</div>
 		<div id="nodataalert" class="alert alert-warning alert-dismissible alertdiv" role="alert">

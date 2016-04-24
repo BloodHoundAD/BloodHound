@@ -1,6 +1,7 @@
 $(document).ready(function(){
 	$('#loginpanel').fadeToggle(0)
 	$('#checkconnectionpanel').fadeToggle(0)
+	$('#logoutpanel').fadeToggle(0)
 
 	// Set our default renderer to Canvas, since a lot of plugins dont work on WebGL
 	sigma.renderers.def = sigma.renderers.canvas
@@ -182,10 +183,10 @@ $(document).ready(function(){
 					doInit()
 					setTimeout(function(){
 						$('#checkconnectionpanel').fadeToggle()
-						$('#loginwindow').fadeToggle(400, 'swing', function(){
+						$('#overlay').fadeToggle(400, 'swing', function(){
 							$('#connectionstatus').html('Checking Stored Credentials <i class="fa fa-spinner fa-spin"></i>')
 						})
-					}, 1500)
+					}, 1000)
 				},
 				error: function(e){
 					$('#connectionstatus').html("Invalid Credentials!")
@@ -319,7 +320,9 @@ $(document).ready(function(){
 					localStorage.setItem("pwd", upwd)
 					doInit()
 					setTimeout(function(){
-						$('#loginwindow').fadeToggle()	
+						$('#overlay').fadeToggle(400, 'swing', function(){
+							$('#loginpanel').fadeToggle(0)
+						})
 					}, 1500)					
 				},
 				error: function(e){
@@ -938,10 +941,6 @@ function ingestDomainGroupMembership(){
 	reader.readAsText(document.getElementById('uploader').files[0]);
 }
 
-function uploadDialogButton(){
-
-}
-
 function doInit(){
 	// Initialize DB Info
 	$.ajax({
@@ -1070,4 +1069,34 @@ function doInit(){
 
 	// Do this query to set the initial graph
 	doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})-[r]->(m) RETURN n,r,m");
+}
+
+function startLogout(){
+	$('#logoutpanel').fadeToggle(0);
+	$('#overlay').fadeToggle();
+}
+
+function stopLogout(){
+	$('#overlay').fadeToggle(400, 'swing', function(){
+		$('#logoutpanel').fadeToggle(0);
+	});
+}
+
+function resetUI(){
+	sigmaInstance.graph.clear();
+	sigmaInstance.refresh();
+	$('#searchBar').val("");
+	$('#endNode').val("");
+	if ($('#nodedatabox').is(':visible')){
+		$('#nodedatabox').slideToggle()
+	}
+
+	if ($('#pathfindingbox').is(':visible')){
+		$('#pathfindingbox').slideToggle()
+	}
+
+	localStorage.clear()
+	$('#logoutpanel').fadeToggle(400, 'swing', function(){
+		$('#loginpanel').fadeToggle();
+	})
 }
