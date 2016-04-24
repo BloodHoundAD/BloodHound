@@ -162,6 +162,9 @@
 		<div id="overlay" class="loginwindow">
 			<div id="loginpanel">
 				<img src="img/logo-white-transparent-full.png">
+				<div class="text-center">
+					<span>Log in to Neo4j Database</span>
+				</div>
 				<form>
 					<div class="form-group has-feedback">
 						<div class="input-group">
@@ -179,7 +182,7 @@
 							<input id="dbpassword" type="password" class="form-control" placeholder="neo4j" aria-describedby="dbpwaddon">
 						</div>
 						<p id="loginbadpw" class="help-block help-block-add hide" style="color: #d9534f">Wrong username or password</p>
-						<button id="loginbutton" type="button" class="btn btn-primary loginbutton has-spinner">
+						<button id="loginbutton" disabled=true type="button" class="btn btn-primary loginbutton has-spinner">
 							Login
 							<span class="spinner"><i class="fa fa-spinner fa-spin"></i></span>
 						</button>

@@ -229,13 +229,13 @@ $(document).ready(function(){
 	});
 
 	$('#dbusername').bind('keypress', function(e){
-		if (e.which == 13){
+		if ((e.which == 13) && ($('#loginbutton').prop('disabled') != true)){
 			$('#loginbutton').click()
 		}
 	});
 
 	$('#dbpassword').bind('keypress', function(e){
-		if (e.which == 13){
+		if ((e.which == 13) && ($('#loginbutton').prop('disabled') != true)){
 			$('#loginbutton').click()
 		}
 	});
@@ -556,10 +556,12 @@ $(document).ready(function(){
 		dburlchecked = false;
 	})
 
-	$('#dburl').bind('keypress', function(e){
+	$('#dburl').bind('keydown', function(e){
 		if (e.which == 13){
 			event.preventDefault();
 			$('#dburl').blur();
+		}else{
+			$('#loginbutton').prop('disabled', true)
 		}
 	});
 
@@ -586,11 +588,13 @@ $(document).ready(function(){
 						icon.addClass("fa fa-times-circle red-icon-color form-control-feedback")
 						$('#dbHelpBlock').removeClass('hide')
 					}
+					$('#loginbutton').prop('disabled', false)
 				},
 				error: function(e){
 					icon.removeClass();
 					icon.addClass("fa fa-times-circle red-icon-color form-control-feedback")
 					$('#dbHelpBlock').removeClass('hide')
+					$('#loginbutton').prop('disabled', true)
 				}
 			})
 		}

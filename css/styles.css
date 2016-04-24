@@ -266,8 +266,7 @@ dl.dictlist{
 }
 
 .loginwindow > #logoutpanel div{
-	margin-top: 5px;
-	margin-right: 5px;
+	margin: .5em 1em .5em 1em;
 }
 
 .green-icon-color{
