@@ -326,8 +326,9 @@ $(document).ready(function(){
 							$('#loginbutton').html('Login<span class="spinner"><i class="fa fa-spinner fa-spin"></i></span>')
 							$('#loginbutton').addClass('btn-default')
 							$('#loginbutton').removeClass('btn-success');
+							$('#dbpassword').val("");
 						})
-					}, 1500)					
+					}, 1500)
 				},
 				error: function(e){
 					$('#loginbadpw').removeClass('hide')
