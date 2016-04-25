@@ -1117,4 +1117,59 @@ function clearDB(){
 	sigmaInstance.graph.clear();
 	sigmaInstance.refresh();
 
+	deleteEdges();
+}
+
+function deleteEdges(){
+	$.ajax({
+		url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
+		type: 'POST',
+		accepts: {json: "application/json"},
+		dataType: "json",
+		contentType: "application/json",
+		headers: {
+			"Authorization": localStorage.getItem("auth")
+		},
+		data: JSON.stringify({
+			  "statements" : [ {
+			    "statement" : "MATCH ()-[r]-() WITH r LIMIT 50000 DELETE r RETURN count(r)"
+			  } ]
+		}),
+		success: function(json) {
+			console.log(json);
+			deleted = json.results[0].data[0].row[0];
+			if (deleted != 0){
+				deleteEdges()
+			}else{
+				deleteNodes()
+			}
+		}
+	});
+}
+
+function deleteNodes(){
+	$.ajax({
+		url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
+		type: 'POST',
+		accepts: {json: "application/json"},
+		dataType: "json",
+		contentType: "application/json",
+		headers: {
+			"Authorization": localStorage.getItem("auth")
+		},
+		data: JSON.stringify({
+			  "statements" : [ {
+			    "statement" : "MATCH (n) WITH n LIMIT 50000 DELETE n RETURN count(n)"
+			  } ]
+		}),
+		success: function(json) {
+			console.log(json);
+			deleted = json.results[0].data[0].row[0];
+			if (deleted != 0){
+				deleteNodes()
+			}else{
+				$('#deleteProgressModal').modal('hide');
+			}
+		}
+	});	
 }

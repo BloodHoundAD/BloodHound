@@ -392,7 +392,7 @@
 						<h4 class="modal-title" id="clearDBWarnLabel">Clear Database</h4>
 					</div>
 					<div class="modal-body">
-						<p>Are you sure you want to clear the database? This is irreversible!</p>
+						<p>Are you sure you want to clear the database? This is irreversible and may take some time!</p>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#clearDBConfirm" data-dismiss="modal">Clear Database</button>
@@ -409,14 +409,31 @@
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
-						<h4 class="modal-title" id="clearDBWarnLabel">Clear Database</h4>
+						<h4 class="modal-title" id="clearDBConfirmLabel">Clear Database</h4>
 					</div>
 					<div class="modal-body">
 						<p>Are you ABSOLUTELY sure you want to clear the database?</p>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-						<button type="button" class="btn btn-danger" data-dismiss="modal" onclick="clearDB()">Clear Database</button>
+						<button type="button" class="btn btn-danger" data-dismiss="modal" data-toggle="modal" data-target="#deleteProgressModal" onclick="clearDB()">Clear Database</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="deleteProgressModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="deleteDBLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title" id="deleteDBLabel">Clearing Database</h4>
+					</div>
+					<div class="modal-body">
+						<div class="progress">
+						 	<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+								
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
