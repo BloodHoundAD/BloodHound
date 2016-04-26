@@ -123,7 +123,7 @@
 									var gb = o['GroupName'].toUpperCase()
 
 									var obj = {
-										"statement": 'MERGE (group1:Group {name: "' + ga + '"}) WITH group MERGE (group2:Group {name: "' + gb +'"}) WITH group1,group2 MERGE (group1)-[:MemberOf]->(group2)'
+										"statement": 'MERGE (group1:Group {name: "' + ga + '"}) WITH group1 MERGE (group2:Group {name: "' + gb +'"}) WITH group1,group2 MERGE (group1)-[:MemberOf]->(group2)'
 									}
 
 									postdata.statements.push(obj) 
