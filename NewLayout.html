@@ -32,8 +32,8 @@
 				importScripts(e.data.url + "/js/papaparse.min.js");
 				var data = Papa.parse(e.data.data, {header:true}).data;
 				var testElement = data[0];
-				for (i=0; i < data.length; i += 1000){
-					groups.push(data.slice(i, i+1000));
+				for (i=0; i < data.length; i += 5000){
+					groups.push(data.slice(i, i+5000));
 				}
 				if (e.data.type === 'localadmin'){
 					var starttime = new Date();
