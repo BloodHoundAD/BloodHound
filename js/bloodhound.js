@@ -137,7 +137,8 @@ $(document).ready(function(){
 		background: true,
 		easing: 'cubicInOut',
 		autoStop: true,
-		alignNodeSiblings:true
+		alignNodeSiblings:true,
+		barnesHutOptimize: true
 	});
 
 	// Set Noverlap to run when forcelink is run
@@ -717,7 +718,7 @@ function doQuery(query, start, end){
 	
 	sigma.neo4j.cypher(
 		{url: localStorage.getItem("dbpath"), user:localStorage.getItem("uname"), password:localStorage.getItem("pwd")},
-		query,
+		query + " LIMIT 750",
 		sigmaInstance,
 		function() {
 			var startNode = null;
@@ -931,6 +932,7 @@ function forceRelayout(){
 
 function ingestData(){
 	var reader = new FileReader();
+	$('#startingestbutton').prop('disabled', true)
 	reader.onload = function(event){
 		var x = event.target.result;
 		var d = [];
@@ -963,11 +965,12 @@ function ingestData(){
 					$('#uploadSelectDiv').fadeToggle(250)
 				})
 			}else if (e.data.message == 'progress'){
-				getDBInfo()
 				var template = $('#ingestProgressBar').html();
 				var w = Math.floor((e.data.progress / e.data.len) * 100)
 				var h = Mustache.render(template, {"progress": e.data.progress, "total": e.data.len, "width": w})
 				$('#uploadSelectDiv').html(h)
+			}else if (e.data.message == 'commit'){
+				getDBInfo()
 			}else if (e.data.message == 'end'){
 				getDBInfo()
 				var template = $('#ingestComplete').html();
@@ -980,6 +983,7 @@ function ingestData(){
 								$('#uploadSelectDiv').html(ingesthtml)
 								$('#uploadFileSelected').val("")
 								$('#uploadSelectDiv').fadeToggle(250)	
+								$('#startingestbutton').prop('disabled', false)
 								
 								$('#ingestlocaladmin').on('click', function(event){
 									$('#ingestdomaingroup').removeClass('active');
@@ -1077,6 +1081,12 @@ function doInit(){
 			    "statement" : "CREATE CONSTRAINT ON (c:Computer) ASSERT c.ComputerName IS UNIQUE"
 			  }, {
 			    "statement" : "CREATE CONSTRAINT ON (c:Group) ASSERT c.GroupName IS UNIQUE"
+			  }, {
+			  	"statement" : "CREATE INDEX ON :User(name)"
+			  }, {
+			  	"statement" : "CREATE INDEX ON :Computer(name)"
+			  }, {
+			  	"statement" : "CREATE INDEX ON :Group(name)"
 			  } ]
 		}),
 		success: function(json) {
@@ -1150,7 +1160,7 @@ function doInit(){
 	});
 
 	// Do this query to set the initial graph
-	doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})-[r]->(m) RETURN n,r,m");
+	doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})<-[r:MemberOf]-m RETURN n,r,m");
 }
 
 function startLogout(){
