@@ -28,30 +28,180 @@
 		<script type="javascript/worker" id="ingestworker">
 			self.addEventListener('message', function(e){
 				var groups = [], i;
+				var sent = 0
 				importScripts(e.data.url + "/js/papaparse.min.js");
 				var data = Papa.parse(e.data.data, {header:true}).data;
 				var testElement = data[0];
-				console.log(testElement);
+				for (i=0; i < data.length; i += 1000){
+					groups.push(data.slice(i, i+1000));
+				}
 				if (e.data.type === 'localadmin'){
+					var starttime = new Date();
+					if (testElement.hasOwnProperty('Server') && testElement.hasOwnProperty('AccountName') && testElement.hasOwnProperty('IsGroup')){
+						var topost = []
+						topost.message = 'start'
+						topost.len = data.length
+						postMessage(topost)
+						groups.forEach(function(g){
+							var xmlhttp = new XMLHttpRequest();
+							xmlhttp.open("POST", e.data.dburl + "/db/data/transaction/commit", false);
+							xmlhttp.setRequestHeader('Accepts', 'application/json');
+							xmlhttp.setRequestHeader('Content-Type', 'application/json');
+							xmlhttp.setRequestHeader('Authorization', e.data.auth);
+							var postdata = {}
+							postdata.statements = []
+							g.forEach(function(o){
+								if (o.IsGroup == 'False'){
+									var user = o['AccountName'].replace('\\','/').split('/')[1].toUpperCase()
+									var computer = o['Server'].toUpperCase()
 
+									var obj = {
+										"statement": 'MERGE (user:User {name: "' + user + '"}) WITH user MERGE (computer:Computer {name: "' + computer + '" }) WITH user,computer MERGE (user)-[:AdminTo]->(computer)'
+									}
+
+									postdata.statements.push(obj)
+								}else{
+									var group = o['AccountName'].replace('\\','/').split('/')[1].toUpperCase()
+									var computer = o['Server'].toUpperCase()
+
+									var obj = {
+										"statement": 'MERGE (group:Group {name: "' + group + '"}) WITH group MERGE (computer:Computer {name: "' + computer +'"}) WITH group,computer MERGE (group)-[:AdminTo]->(computer)'
+									}
+
+									postdata.statements.push(obj) 
+								}
+								
+							})
+							xmlhttp.send(JSON.stringify(postdata));
+							sent = sent + g.length
+							var topost = []
+							topost.message = 'progress'
+							topost.len = data.length
+							topost.progress = sent
+							postMessage(topost)
+						})
+						var endtime = new Date()
+						var timediff = Math.abs(endtime.getTime() - starttime.getTime())
+						var diffsec = Math.ceil(timediff / 1000)
+						var topost = []
+						topost.message = 'end'
+						topost.len = data.length
+						topost.time = diffsec
+						postMessage(topost)
+					}else{
+						var topost = []
+						topost.message = 'baddata'
+						postMessage(topost)
+					}
+				}else if (e.data.type == 'domainmembership'){
+					var starttime = new Date();
+					if (testElement.hasOwnProperty('MemberName') && testElement.hasOwnProperty('GroupName') && testElement.hasOwnProperty('IsGroup')){
+						var topost = []
+						topost.message = 'start'
+						topost.len = data.length
+						postMessage(topost)
+						groups.forEach(function(g){
+							var xmlhttp = new XMLHttpRequest();
+							xmlhttp.open("POST", e.data.dburl + "/db/data/transaction/commit", false);
+							xmlhttp.setRequestHeader('Accepts', 'application/json');
+							xmlhttp.setRequestHeader('Content-Type', 'application/json');
+							xmlhttp.setRequestHeader('Authorization', e.data.auth);
+							var postdata = {}
+							postdata.statements = []
+							g.forEach(function(o){
+								if (o.IsGroup == 'False'){
+									var user = o['MemberName'].toUpperCase()
+									var group = o['GroupName'].toUpperCase()
+
+									var obj = {
+										"statement": 'MERGE (user:User {name: "' + user + '"}) WITH user MERGE (group:Group {name: "' + group + '" }) WITH user,group MERGE (user)-[:MemberOf]->(group)'
+									}
+
+									postdata.statements.push(obj)
+								}else{
+									var ga = o['MemberName'].toUpperCase()
+									var gb = o['GroupName'].toUpperCase()
+
+									var obj = {
+										"statement": 'MERGE (group1:Group {name: "' + ga + '"}) WITH group MERGE (group2:Group {name: "' + gb +'"}) WITH group1,group2 MERGE (group1)-[:MemberOf]->(group2)'
+									}
+
+									postdata.statements.push(obj) 
+								}
+								
+							})
+							xmlhttp.send(JSON.stringify(postdata));
+							sent = sent + g.length
+							var topost = []
+							topost.message = 'progress'
+							topost.len = data.length
+							topost.progress = sent
+							postMessage(topost)
+						})
+						var endtime = new Date()
+						var timediff = Math.abs(endtime.getTime() - starttime.getTime())
+						var diffsec = Math.ceil(timediff / 1000)
+						var topost = []
+						topost.message = 'end'
+						topost.len = data.length
+						topost.time = diffsec
+						postMessage(topost)
+					}else{
+						var topost = []
+						topost.message = 'baddata'
+						postMessage(topost)
+					}
+				}else if (e.data.type == 'sessions'){
+					var starttime = new Date();
+					if (testElement.hasOwnProperty('User') && testElement.hasOwnProperty('Computer')){
+						var topost = []
+						topost.message = 'start'
+						topost.len = data.length
+						postMessage(topost)
+						groups.forEach(function(g){
+							var xmlhttp = new XMLHttpRequest();
+							xmlhttp.open("POST", e.data.dburl + "/db/data/transaction/commit", false);
+							xmlhttp.setRequestHeader('Accepts', 'application/json');
+							xmlhttp.setRequestHeader('Content-Type', 'application/json');
+							xmlhttp.setRequestHeader('Authorization', e.data.auth);
+							var postdata = {}
+							postdata.statements = []
+							g.forEach(function(o){	
+								var user = o['User'].toUpperCase()
+								var computer = o['Computer'].toUpperCase()
+
+								var obj = {
+									"statement": 'MERGE (user:User {name: "' + user + '"}) WITH user MERGE (computer:Computer {name: "' + computer + '" }) WITH user,computer MERGE (computer)-[:HasSession]->(user)'
+								}
+
+								postdata.statements.push(obj)
+							})
+							xmlhttp.send(JSON.stringify(postdata));
+							sent = sent + g.length
+							var topost = []
+							topost.message = 'progress'
+							topost.len = data.length
+							topost.progress = sent
+							postMessage(topost)
+						})
+						var endtime = new Date()
+						var timediff = Math.abs(endtime.getTime() - starttime.getTime())
+						var diffsec = Math.ceil(timediff / 1000)
+						var topost = []
+						topost.message = 'end'
+						topost.len = data.length
+						topost.time = diffsec
+						postMessage(topost)
+					}else{
+						var topost = []
+						topost.message = 'baddata'
+						postMessage(topost)
+					}
 				}
-				for (i=0; i < data.length; i += 50){
-					groups.push(data.slice(i, i+50));
-				}
-				console.log(groups[0]);
-				var xmlhttp = new XMLHttpRequest();
-				xmlhttp.open("POST", "http://localhost:7474/db/data/transaction/commit", false);
-				xmlhttp.setRequestHeader('Accepts', 'application/json');
-				xmlhttp.setRequestHeader('Content-Type', 'application/json');
-				xmlhttp.setRequestHeader('Authorization', 'Basic bmVvNGo6bmVvNGpq');
-				var postdata = {}
-				postdata.statements = []
-				postdata.statements.push({"statement":"MATCH (n:Group) RETURN count(n)"})
-				xmlhttp.send(JSON.stringify(postdata));
 			}, false)
 		</script>
 
-		<script id="datatemplate" type="x-tmpl-mustache">
+		<script id="datatemplate" type="text/template">
 			<ul class='nav nav-tabs nav-justified' id="abc" role="tablist">
 				<li role='presentation' class='active'><a href='#dbinfo' role='tab' data-toggle='tab' aria-controls='dbinfo'>Database Info</a></li>
 				<li role='presentation'><a href='#nodeinfo' role='tab' data-toggle='tab' aria-controls='nodeinfo'>Node Info</a></li>
@@ -77,7 +227,7 @@
 			</div>
 		</script>
 
-		<script id="dbdata" type="x-tmpl-mustache">
+		<script id="dbdata" type="text/template">
 			<div>
 				<h3 align="center">Database Info</h3>
 				<dl class="dictlist">
@@ -127,7 +277,7 @@
 			</dl>
 		</script>
 
-		<script id="computertemplate" type="x-tmpl-mustache">
+		<script id="computertemplate" type="text/template">
 			<h3 align='center'>{{label}} Properties</h2>
 			<dl class='dictlist'>
 				<dt>OS</dt>
@@ -143,7 +293,7 @@
 			</dl>
 		</script>
 
-		<script id="grouptemplate" type="x-tmpl-mustache">
+		<script id="grouptemplate" type="text/template">
 			<h3 align='center'>{{label}} Properties</h2>
 			<dl class='dictlist'>
 				<dt>Direct Members</dt>
@@ -155,6 +305,49 @@
 				<dt>Derivative Admin To</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (n:Group {name:&quot;{{label}}&quot;}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN p', &quot;{{label}}&quot;)">{{derivative_admin}}</a></dd>
 			</dl>
+		</script>
+
+		<script id="ingestProgressBar" type="text/template">
+			<div class="panel-heading">
+				Ingesting Data
+			</div>
+			<div class="panel-body">
+				<div class="progress" style="width:100%">
+				 	<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="{{total}}" style="width:{{width}}%">
+				 		<span>{{progress}} / {{total}}</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel-footer">
+				<button id="startingestbutton" class="btn btn-large" onclick="cancelIngest()">Cancel</button>
+			</div>
+		</script>
+
+		<script id="ingestComplete" type="text/template">
+			<div class="panel-heading">
+				Ingest Finished
+			</div>
+			<div class="panel-body">
+				<div class="progress" style="width:100%">
+				 	<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{total}}" aria-valuemin="0" aria-valuemax="{{total}}" style="width:100%">
+					</div>
+				</div>
+				<div class="text-center">
+					<span>Ingest Complete in {{time}} seconds! <i class="fa fa-check-circle green-icon-color"></i></span>
+				</div>
+			</div>
+		</script>
+
+		<script id="ingestCancelled" type="text/template">
+			<div class="panel-heading">
+				Ingest Cancelled
+			</div>
+			<div class="panel-body">
+				<div class="text-center">
+					<span>Ingest Cancelled! <i class="fa fa-times-circle red-icon-color"></i></span>
+				</div>
+			</div>
 		</script>
 	</head>
 
@@ -417,6 +610,25 @@
 					<div class="modal-footer">
 						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 						<button type="button" class="btn btn-danger" data-dismiss="modal" data-toggle="modal" data-target="#deleteProgressModal" onclick="clearDB()">Clear Database</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="badDataModal" class="modal fade" role="dialog" aria-labelledby="badDataLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="badDataLabel">Invalid Data</h4>
+					</div>
+					<div class="modal-body">
+						<p>Provided CSV doesn't match the selected data type!</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
 					</div>
 				</div>
 			</div>

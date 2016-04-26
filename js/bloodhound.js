@@ -547,7 +547,6 @@ $(document).ready(function(){
 	})
 
 	$('#uploader').on('change', function(e){
-		uploadFileEvent = e;
 		$('#uploadFileSelected').val(e.target.files[0].name);
 	})
 
@@ -604,6 +603,8 @@ $(document).ready(function(){
 	// Make our export/ingest boxes draggable
 	$('#uploadSelectDiv').draggable({scroll:false, containment: "window"});
 	$('#exportSelectDiv').draggable({scroll:false, containment: "window"});
+	uploadwidth = $('#uploadSelectDiv').outerWidth()
+	$('#uploadSelectDiv').css('width', uploadwidth + 'px')
 })
 
 var dragged = false;
@@ -627,7 +628,10 @@ var owlayout = 0
 var ohlayout = 0
 var design = null;
 var usedagre = false;
-var uploadFileEvent = null;
+var ingesthtml = null;
+var ingestWorker = null
+var uploadwidth = null
+
 
 function makeWorker(script) {
     var URL = window.URL || window.webkitURL;
@@ -943,7 +947,74 @@ function ingestData(){
 		}else{
 			d['type'] = 'sessions';
 		}
-		var ingestWorker = makeWorker(document.getElementById('ingestworker').textContent);
+		d['auth'] = localStorage.getItem('auth')
+		d['dburl'] = localStorage.getItem('dbpath')
+		ingestWorker = makeWorker(document.getElementById('ingestworker').textContent);
+
+		ingestWorker.addEventListener('message', function(e){
+			if (e.data.message == 'baddata'){
+				$('#badDataModal').modal('show')
+			}else if (e.data.message == 'start'){
+				var template = $('#ingestProgressBar').html();
+				var w = 0
+				var h = Mustache.render(template, {"progress": 0, "total": e.data.len, "width": w})
+				$('#uploadSelectDiv').fadeToggle(250, 'swing', function(){
+					$('#uploadSelectDiv').html(h)
+					$('#uploadSelectDiv').fadeToggle(250)
+				})
+			}else if (e.data.message == 'progress'){
+				getDBInfo()
+				var template = $('#ingestProgressBar').html();
+				var w = Math.floor((e.data.progress / e.data.len) * 100)
+				var h = Mustache.render(template, {"progress": e.data.progress, "total": e.data.len, "width": w})
+				$('#uploadSelectDiv').html(h)
+			}else if (e.data.message == 'end'){
+				getDBInfo()
+				var template = $('#ingestComplete').html();
+				var h = Mustache.render(template, {"total": e.data.len, "time": e.data.time})
+				$('#uploadSelectDiv').fadeToggle(250, 'swing', function(){
+					$('#uploadSelectDiv').html(h)
+					$('#uploadSelectDiv').fadeToggle(250, 'swing', function(){
+						setTimeout(function(){
+							$('#uploadSelectDiv').fadeToggle(250, 'swing', function(){
+								$('#uploadSelectDiv').html(ingesthtml)
+								$('#uploadFileSelected').val("")
+								$('#uploadSelectDiv').fadeToggle(250)	
+								
+								$('#ingestlocaladmin').on('click', function(event){
+									$('#ingestdomaingroup').removeClass('active');
+									$('#ingestlocaladmin').addClass('active');
+									$('#ingestusersessions').removeClass('active');
+								});
+
+								$('#ingestdomaingroup').on('click', function(event){
+									$('#ingestdomaingroup').addClass('active');
+									$('#ingestlocaladmin').removeClass('active');
+									$('#ingestusersessions').removeClass('active');
+								});
+
+								$('#ingestusersessions').on('click', function(event){
+									$('#ingestdomaingroup').removeClass('active');
+									$('#ingestlocaladmin').removeClass('active');
+									$('#ingestusersessions').addClass('active');
+								});
+
+								$('#startingestbutton').on('click', function(event){
+									ingestData()
+								})
+
+								$('#selectUploadFile').on('click', function(event){
+									$('#uploader').click();
+								});
+							})
+						}, 2000)
+					})
+				})
+			}
+		});
+		ingesthtml = $('#uploadSelectDiv').html()
+
+
 		ingestWorker.postMessage(d);
 	}
 
@@ -1136,10 +1207,10 @@ function deleteEdges(){
 			  } ]
 		}),
 		success: function(json) {
-			console.log(json);
 			deleted = json.results[0].data[0].row[0];
 			if (deleted != 0){
 				deleteEdges()
+				getDBInfo()
 			}else{
 				deleteNodes()
 			}
@@ -1163,13 +1234,62 @@ function deleteNodes(){
 			  } ]
 		}),
 		success: function(json) {
-			console.log(json);
 			deleted = json.results[0].data[0].row[0];
 			if (deleted != 0){
 				deleteNodes()
+				getDBInfo()
 			}else{
 				$('#deleteProgressModal').modal('hide');
+				getDBInfo()
 			}
 		}
 	});	
+}
+
+function cancelIngest(){
+	ingestWorker.terminate()
+	var template = $('#ingestCancelled').html();
+	var h = Mustache.render(template, {})
+	$('#uploadSelectDiv').fadeToggle(250, 'swing', function(){
+		$('#uploadSelectDiv').html(h)
+		$('#uploadSelectDiv').fadeToggle(250, 'swing', function(){
+			setTimeout(function(){
+				$('#uploadSelectDiv').fadeToggle(250, 'swing', function(){
+					$('#uploadSelectDiv').html(ingesthtml)
+					$('#uploadFileSelected').val("")
+					$('#uploadSelectDiv').fadeToggle(250)	
+					
+					$('#ingestlocaladmin').on('click', function(event){
+						$('#ingestdomaingroup').removeClass('active');
+						$('#ingestlocaladmin').addClass('active');
+						$('#ingestusersessions').removeClass('active');
+					});
+
+					$('#ingestdomaingroup').on('click', function(event){
+						$('#ingestdomaingroup').addClass('active');
+						$('#ingestlocaladmin').removeClass('active');
+						$('#ingestusersessions').removeClass('active');
+					});
+
+					$('#ingestusersessions').on('click', function(event){
+						$('#ingestdomaingroup').removeClass('active');
+						$('#ingestlocaladmin').removeClass('active');
+						$('#ingestusersessions').addClass('active');
+					});
+
+					$('#startingestbutton').on('click', function(event){
+						ingestData()
+					})
+
+					$('#selectUploadFile').on('click', function(event){
+						$('#uploader').click();
+					});
+
+					$('#uploader').on('change', function(e){
+						$('#uploadFileSelected').val(e.target.files[0].name);
+					})
+				})
+			}, 2000)
+		})
+	})
 }

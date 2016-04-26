@@ -330,3 +330,14 @@ dl.dictlist{
   text-align: left;
   vertical-align: middle;
 }
+
+.progress {
+    position: relative;
+}
+
+.progress span {
+    position: absolute;
+    display: block;
+    width: 100%;
+    color: black;
+ }
