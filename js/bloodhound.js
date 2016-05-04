@@ -937,6 +937,8 @@ function updateNodeData(node){
 				    "statement" : "MATCH (n:Group {name:'" + node.data.node.label + "'})-[r:AdminTo]->(m:Computer) RETURN count(m)"
 				  }, {
 				  	"statement" : "MATCH (n:Group {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN count(target)"
+				  }, {
+				  	"statement" : "MATCH (n:Group {name:'" + node.data.node.label + "'}), (target:Group), p=allShortestPaths((n)-[r:MemberOf*1..]->(target)) RETURN count(target)"
 				  } ]
 			}),
 			success: function(json) {
@@ -944,10 +946,11 @@ function updateNodeData(node){
 				var c2 = json.results[1].data[0].row[0];
 				var c3 = json.results[2].data[0].row[0];
 				var c4 = json.results[3].data[0].row[0];
+				var c5 = json.results[4].data[0].row[0];
 				
 				var template = $('#datatemplate').html();
 				var groupnodetemplate = $('#grouptemplate').html();
-				var nodeinfo = Mustache.render(groupnodetemplate, {label: node.data.node.label, explicit_members: c1, unrolled_members: c2, adminto:c3, derivative_admin: c4});
+				var nodeinfo = Mustache.render(groupnodetemplate, {label: node.data.node.label, explicit_members: c1, unrolled_members: c2, adminto:c3, derivative_admin: c4, unrolled_member_of:c5});
 				var rendered = Mustache.render(template, {dbinfo: dbinforendered, nodeinfo: nodeinfo});
 				$('#nodedatabox').html(rendered);
 				$('.nav-tabs a[href="#nodeinfo"]').tab('show')
