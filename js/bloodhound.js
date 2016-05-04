@@ -21,11 +21,12 @@ $(document).ready(function(){
 		minArrowSize: 3,
 		iconThreshold: 4,
 		labelThreshold: 15,
-		labelAlignment: 'center',
+		labelAlignment: 'bottom',
 		labelColor: 'node',
 		font: 'Roboto',
 		glyphFillColor: 'black',
-		glyphTextColor: 'white'
+		glyphTextColor: 'white',
+		defaultLabelActiveColor:'red'
 	})
 
 	// Initialize the design plugin
@@ -69,6 +70,38 @@ $(document).ready(function(){
 	    }
 	  }
 	};
+
+	var activeState = sigma.plugins.activeState(sigmaInstance);
+
+	var kbd = sigma.plugins.keyboard(sigmaInstance, sigmaInstance.renderers[0]);
+
+	// $(document).keydown(function(e){
+	// 	if (e.keyCode == 83){
+	// 		console.log('up')
+	// 		sigmaInstance.settings("labelThreshold", 1);
+	// 		sigmaInstance.refresh( {'skipIndexation': true})
+	// 	}
+	// })
+
+	// $(document).keyup(function(e){
+	// 	if (e.keyCode == 83){
+	// 		console.log('up')
+	// 		sigmaInstance.settings("labelThreshold", 14);
+	// 		sigmaInstance.refresh( {'skipIndexation': true})
+	// 	}
+	// })
+	
+	kbd.bind('17', function(){
+		if (labelsVisible){
+			sigmaInstance.settings("labelThreshold", 15);
+			sigmaInstance.refresh( {'skipIndexation': true})
+			labelsVisible = false;	
+		}else{
+			sigmaInstance.settings("labelThreshold", 1);
+			sigmaInstance.refresh( {'skipIndexation': true})
+			labelsVisible = true;
+		}
+	});
 
 	design = sigma.plugins.design(sigmaInstance);
 	design.setPalette(myPalette);
@@ -606,6 +639,8 @@ $(document).ready(function(){
 	$('#exportSelectDiv').draggable({scroll:false, containment: "window"});
 	uploadwidth = $('#uploadSelectDiv').outerWidth()
 	$('#uploadSelectDiv').css('width', uploadwidth + 'px')
+
+
 })
 
 var dragged = false;
@@ -631,7 +666,8 @@ var design = null;
 var usedagre = false;
 var ingesthtml = null;
 var ingestWorker = null
-var uploadwidth = null
+var uploadwidth = null;
+var labelsVisible = false;
 
 
 function makeWorker(script) {
@@ -1290,6 +1326,8 @@ function cancelIngest(){
 					$('#startingestbutton').on('click', function(event){
 						ingestData()
 					})
+
+					$('#startingestbutton').prop('disabled', false);
 
 					$('#selectUploadFile').on('click', function(event){
 						$('#uploader').click();

@@ -62,6 +62,10 @@ html, body{
 	background-color: lightgray;
 }
 
+.graph:focus{
+	outline: 0;
+}
+
 .searchdiv{
 	z-index: 10;
 	position: absolute;
