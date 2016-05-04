@@ -307,7 +307,7 @@
 			</div>
 		</script>
 
-		<script id="usernodetemplate" type="x-tmpl-mustache">
+		<script id="usernodetemplate" type="text/template">
 			<h3 align='center'>{{label}} Properties</h2>
 			<dl class='dictlist'>
 				<dt>SAMAccountName</dt>
@@ -325,7 +325,7 @@
 				<dt>Group Delegated Local Admin Rights</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;})-[r:MemberOf]->(m:Group)-[s:AdminTo]->(l:Computer) RETURN n,r,m,s,l', &quot;{{label}}&quot;)">{{dlar}}</a></dd>
 				<dt>Derivative Local Admin Rights</dt>
-				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN p', &quot;{{label}}&quot;)">{{derivative}}</a></dd>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (m:Computer), (n)-[r*1..]->(m) WITH m,n,r RETURN distinct(m),r,n)">{{derivative}}</a></dd>
 				<dt>Sessions</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (n:Computer)-[r:HasSession]->(m:User {name:&quot;{{label}}&quot;}) RETURN n,r,m')">{{sessions}}</a></dd>
 			</dl>
@@ -341,7 +341,7 @@
 				<dt>Explicit Admins</dt>
 				<dd> <a href="#" onclick="doQuery('MATCH (n)-[r:AdminTo]->(m:Computer {name:&quot;{{label}}&quot;}) RETURN n,r,m')">{{explicit_admins}}</a></dd>
 				<dt>Unrolled Admins</dt>
-				<dd><a href="#" onclick="doQuery('start('MATCH (n:User),(target:Computer {name:&quot;{{label}}&quot;}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(target)) RETURN p', &quot;{{label}}&quot;)">{{unrolled_admin}}</a></dd>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User),(target:Computer {name:&quot;{{label}}&quot;}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(target)) RETURN p', &quot;{{label}}&quot;)">{{unrolled_admin}}</a></dd>
 				<dt>Sessions</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (m:Computer {name:&quot;{{label}}&quot;})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH &quot;$&quot; RETURN n,r,m')">{{sessions}}</a></dd>
 			</dl>

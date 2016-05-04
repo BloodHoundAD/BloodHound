@@ -863,7 +863,7 @@ function updateNodeData(node){
 				  }, {
 				    "statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN count(target)"
 				  }, {
-				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'})-[:MemberOf]->(m:Group)-[:AdminTo]->(l:Computer) RETURN count(l)"
+				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (m:Computer), (n)-[r*1..]->(m) WITH m,n,r RETURN count(distinct(m))"
 				  }, {
 				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN count(target)"
 				  }, {
