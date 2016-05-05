@@ -754,7 +754,7 @@ function doQuery(query, start, end){
 	
 	sigma.neo4j.cypher(
 		{url: localStorage.getItem("dbpath"), user:localStorage.getItem("uname"), password:localStorage.getItem("pwd")},
-		query + " LIMIT 750",
+		query + " LIMIT 500",
 		sigmaInstance,
 		function() {
 			var startNode = null;
@@ -863,7 +863,7 @@ function updateNodeData(node){
 				  }, {
 				    "statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN count(target)"
 				  }, {
-				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (m:Computer), (n)-[r*1..]->(m) WITH m,n,r RETURN count(distinct(m))"
+				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN count(distinct(m))"
 				  }, {
 				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN count(target)"
 				  }, {
@@ -963,7 +963,6 @@ function forceRelayout(){
 	sigma.layouts.stopForceLink();
 	if (usedagre){
 		sigma.layouts.dagre.start(sigmaInstance);
-		
 	}else{
 		sigma.layouts.startForceLink();	
 	}	
