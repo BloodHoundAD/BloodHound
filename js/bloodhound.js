@@ -26,6 +26,7 @@ $(document).ready(function(){
 		font: 'Roboto',
 		glyphFillColor: 'black',
 		glyphTextColor: 'white',
+		glyphTextThreshold: 1,
 		defaultLabelActiveColor:'red'
 	})
 
@@ -60,7 +61,7 @@ $(document).ready(function(){
 	  	},
 	    size: {
 	      	by: 'degree',
-	      	bins: 7,
+	      	bins: 10,
 	      	min: 10,
 	      	max: 20
 	    },
@@ -113,7 +114,13 @@ $(document).ready(function(){
     });
 
 	// Initialize the noverlap plugin
-	sigmaInstance.configNoverlap({nodeMargin: 2.0, easing: 'cubicInOut', gridSize: 50})
+	noverlapListener = sigmaInstance.configNoverlap({nodeMargin: 2.0, easing: 'cubicInOut', gridSize: 50})
+	noverlapListener.bind('stop', function(event){
+		if (noanimate){
+			sigmaInstance.settings('animationsTime', 200);
+			noanimate = false;
+		}
+	})
 
 	// Initialize the tooltips plugin
 	var tooltips = sigma.plugins.tooltips(
@@ -147,9 +154,24 @@ $(document).ready(function(){
 				'			<li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})<-[r:MemberOf]-m RETURN n,r,m\')"><i class="glyphicon glyphicon-screenshot"></i> Get Members</li>' + 
 				'			<li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})-[r:AdminTo]->m RETURN n,r,m\', &quot;{{label}}&quot;)"><i class="glyphicon glyphicon-screenshot"></i> Admin To</li>' + 
 				'		{{/type_group}}' +
+				'		{{#expand}}' +
+				'			<li onclick="unfold({{id}})"><i class="glyphicon glyphicon-screenshot"></i> Expand</li>' +
+				'		{{/expand}}' +
+				'		{{#collapse}}' +
+				'			<li onclick="collapse({{id}})"><i class="glyphicon glyphicon-screenshot"></i> Collapse</li>' +
+				'		{{/collapse}}' +
 				'	</ul>',
 			    autoadjust:true,
 				renderer: function(node, template){
+					node.expand = false;
+					node.collapse = false;
+					if (typeof node.folded != 'undefined'){
+						if (typeof sigmaInstance.graph.nodes(node.folded.nodes[0].id) == 'undefined'){
+							node.expand = true;
+						}else{
+							node.collapse = true;
+						}
+					}
 					return Mustache.render(template, node)
 				}
 			}]
@@ -668,6 +690,7 @@ var ingesthtml = null;
 var ingestWorker = null
 var uploadwidth = null;
 var labelsVisible = false;
+var noanimate = true;
 
 
 function makeWorker(script) {
@@ -733,12 +756,16 @@ function setLabelAsEnd(label){
 	}
 };
 
-function doQuery(query, start, end){
+function doQuery(query, start, end, prune){
 	if (typeof start === 'undefined'){
 		start = ""
 	}
 	if (typeof end === 'undefined'){
 		end = ""
+	}
+
+	if (typeof end === 'undefined'){
+		prune = false;
 	}
 	if (!firstquery){
 		queryStack.push([sigmaInstance.graph.nodes(), sigmaInstance.graph.edges()]);
@@ -754,7 +781,7 @@ function doQuery(query, start, end){
 	
 	sigma.neo4j.cypher(
 		{url: localStorage.getItem("dbpath"), user:localStorage.getItem("uname"), password:localStorage.getItem("pwd")},
-		query + " LIMIT 500",
+		query,
 		sigmaInstance,
 		function() {
 			var startNode = null;
@@ -766,6 +793,8 @@ function doQuery(query, start, end){
 			}else{
 				$.each(sigmaInstance.graph.nodes(), function(index, node){
 					node.degree = sigmaInstance.graph.degree(node.id)
+				})
+				$.each(sigmaInstance.graph.nodes(), function(index, node){
 					if (node.neo4j_labels[0]=='Group'){
 						node.type_group = true
 					}else if (node.neo4j_labels[0] == 'User'){
@@ -780,6 +809,27 @@ function doQuery(query, start, end){
 
 					if (node.neo4j_data.name == end){
 						endNode = node;
+					}
+					if (prune){
+						var e = sigmaInstance.graph.adjacentEdges(node.id);
+						if (e.length == 1 && (typeof node.folded == 'undefined')){
+							if (e[0].label == "MemberOf" || e[0].label == "AdminTo"){
+								var t = sigmaInstance.graph.nodes(e[0].target);
+								if (typeof t.folded == 'undefined'){
+									t.folded = {};
+									t.folded.nodes = [];
+									t.folded.edges = [];
+									t.hasfold = true;
+								}
+								t.folded.nodes.push(node);
+								t.folded.edges.push(e[0]);
+								sigmaInstance.graph.dropNode(node.id);
+								t.glyphs = [{
+									'position':'bottom-left',
+									'content': t.folded.nodes.length
+								}]
+							}
+						}
 					}
 				})
 				sigmaInstance.refresh();
@@ -803,11 +853,17 @@ function doQuery(query, start, end){
 						'content': '\uF05B',
 						'fontScale': 1.5
 					}]
+
+					if (typeof endNode.folded != 'undefined'){
+						endNode.glyphs.push({
+							'position':'bottom-left',
+							'content': endNode.folded.nodes.length
+						})
+					}
 					endNode.size = endNode.size + 5
 				}
 				if (usedagre){
-					sigma.layouts.dagre.start(sigmaInstance);	
-					
+					sigma.layouts.dagre.start(sigmaInstance);
 				}else{
 					sigma.layouts.startForceLink();	
 				}				
@@ -863,9 +919,9 @@ function updateNodeData(node){
 				  }, {
 				    "statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN count(target)"
 				  }, {
-				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN count(distinct(m))"
+				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (m:Computer), (o:Group), n-[r:MemberOf]->o-[s:AdminTo]->m RETURN count(distinct(m))"
 				  }, {
-				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN count(target)"
+				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN count(distinct(target))"
 				  }, {
 				  	"statement" : "MATCH (n:Computer)-[r:HasSession]->(m:User {name:'" + node.data.node.label + "'}) RETURN count(n)"
 				  } ]
@@ -1342,4 +1398,38 @@ function cancelIngest(){
 			}, 2000)
 		})
 	})
+}
+
+function unfold(id){
+	sigmaInstance.graph.read(sigmaInstance.graph.nodes(id).folded);
+	design.deprecate();
+
+	noanimate = true;
+	sigmaInstance.settings('animationsTime', 0);
+
+	if (usedagre){
+		sigma.layouts.dagre.start(sigmaInstance);
+	}else{
+		sigma.layouts.startForceLink();	
+	}
+	
+	design.apply();
+}
+
+function collapse(id){
+	design.deprecate();
+	$.each(sigmaInstance.graph.nodes(id).folded.nodes, function(index, node){
+		sigmaInstance.graph.dropNode(node.id);
+	})
+
+	noanimate = true;
+	sigmaInstance.settings('animationsTime', 0);
+
+	if (usedagre){
+		sigma.layouts.dagre.start(sigmaInstance);
+	}else{
+		sigma.layouts.startForceLink();	
+	}
+
+	design.apply();
 }
