@@ -6535,7 +6535,14 @@ function Export-BloodHoundData {
                     $Query = "MERGE (group1:Group { name: UPPER('$($Object.MemberName)') }) MERGE (group2:Group { name: UPPER('$($Object.GroupName)') }) MERGE (group1)-[:MemberOf]->(group2)"
                 }
                 else {
-                    $Query = "MERGE (user:User { name: UPPER('$($Object.MemberName)') }) MERGE (group:Group { name: UPPER('$($Object.GroupName)') }) MERGE (user)-[:MemberOf]->(group)"
+                    # check if -FullData objects are returned, and if so check if the group member is a computer object
+                    if($Object.ObjectClass -and ($Object.ObjectClass -contains 'computer')) {
+                        $Query = "MERGE (computer:Computer { name: UPPER('$($Object.dnshostname)') }) MERGE (group:Group { name: UPPER('$($Object.GroupName)') }) MERGE (computer)-[:MemberOf]->(group)"
+                    }
+                    else {
+                        # otherwise there's no way to determine if this is a computer object or not
+                        $Query = "MERGE (user:User { name: UPPER('$($Object.MemberName)') }) MERGE (group:Group { name: UPPER('$($Object.GroupName)') }) MERGE (user)-[:MemberOf]->(group)"
+                    }
                 }
             }
             elseif($Object.PSObject.TypeNames -contains 'PowerView.LocalUser') {
@@ -6679,7 +6686,7 @@ function Get-BloodHoundData {
 
     begin {
         
-        Get-NetGroup -Domain $Domain -DomainController $DomainController | Get-NetGroupMember -Domain $Domain -DomainController $DomainController | Export-BloodHoundData -BloodHoundUri $BloodHoundUri -BloodhoundUserPass $BloodHoundUserPass -Throttle $Throttle
+        Get-NetGroup -Domain $Domain -DomainController $DomainController | Get-NetGroupMember -Domain $Domain -DomainController $DomainController -FullData | Export-BloodHoundData -BloodHoundUri $BloodHoundUri -BloodhoundUserPass $BloodHoundUserPass -Throttle $Throttle
 
         if(!$ComputerName) { 
             [Array]$ComputerName = @()
