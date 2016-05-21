@@ -323,7 +323,7 @@
 				<dt>First Degree Local Admin</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN p')">{{first_degree_admin}}</a></dd>
 				<dt>Group Delegated Local Admin Rights</dt>
-				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;})-[r:MemberOf]->(m:Group)-[s:AdminTo]->(l:Computer) RETURN n,r,m,s,l', &quot;{{label}}&quot;, &quot;&quot;, true)">{{dlar}}</a></dd>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (m:Computer), (o:Group), (n)-[r:MemberOf]->(o)-[s:AdminTo]->(m) RETURN n,r,o,s,m', &quot;{{label}}&quot;, &quot;&quot;, true)">{{dlar}}</a></dd>
 				<dt>Derivative Local Admin Rights</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN p', &quot;{{label}}&quot;)">{{derivative}}</a></dd>
 				<dt>Sessions</dt>

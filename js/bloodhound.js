@@ -813,22 +813,81 @@ function doQuery(query, start, end, prune){
 					if (prune){
 						var e = sigmaInstance.graph.adjacentEdges(node.id);
 						if (e.length == 1 && (typeof node.folded == 'undefined')){
-							if (e[0].label == "MemberOf" || e[0].label == "AdminTo"){
-								var t = sigmaInstance.graph.nodes(e[0].target);
-								if (typeof t.folded == 'undefined'){
-									t.folded = {};
-									t.folded.nodes = [];
-									t.folded.edges = [];
-									t.hasfold = true;
+							if (node.type_user){
+								if (e[0].label == "MemberOf" || e[0].label == "AdminTo"){
+									var target = sigmaInstance.graph.nodes(e[0].target)
+									if (typeof target.folded == 'undefined'){
+										target.folded = {};
+										target.folded.nodes = [];
+										target.folded.edges = [];
+										target.hasfold = true;
+									}
+
+									target.folded.nodes.push(node);
+									target.folded.edges.push(e[0]);
+									sigmaInstance.graph.dropNode(node.id);
+									target.glyphs = [{
+										'position':'bottom-left',
+										'content': target.folded.nodes.length
+									}]
 								}
-								t.folded.nodes.push(node);
-								t.folded.edges.push(e[0]);
-								sigmaInstance.graph.dropNode(node.id);
-								t.glyphs = [{
-									'position':'bottom-left',
-									'content': t.folded.nodes.length
-								}]
 							}
+
+							if (node.type_computer){
+								if (e[0].label == "AdminTo"){
+									var target = sigmaInstance.graph.nodes(e[0].source)
+									if (typeof target.folded == 'undefined'){
+										target.folded = {};
+										target.folded.nodes = [];
+										target.folded.edges = [];
+										target.hasfold = true;
+									}
+
+									target.folded.nodes.push(node);
+									target.folded.edges.push(e[0]);
+									sigmaInstance.graph.dropNode(node.id);
+									target.glyphs = [{
+										'position':'bottom-left',
+										'content': target.folded.nodes.length
+									}]
+								}
+							}
+
+							if (node.type_group){
+								if (e[0].label == "AdminTo"){
+									var target = sigmaInstance.graph.nodes(e[0].source)
+									if (typeof target.folded == 'undefined'){
+										target.folded = {};
+										target.folded.nodes = [];
+										target.folded.edges = [];
+										target.hasfold = true;
+									}
+
+									target.folded.nodes.push(node);
+									target.folded.edges.push(e[0]);
+									sigmaInstance.graph.dropNode(node.id);
+									target.glyphs = [{
+										'position':'bottom-left',
+										'content': target.folded.nodes.length
+									}]
+								}
+							}
+							// if ((e[0].label == "MemberOf" || e[0].label == "AdminTo") && node.type_group){
+							// 	var t = sigmaInstance.graph.nodes(e[0].target);
+							// 	if (typeof t.folded == 'undefined'){
+							// 		t.folded = {};
+							// 		t.folded.nodes = [];
+							// 		t.folded.edges = [];
+							// 		t.hasfold = true;
+							// 	}
+							// 	t.folded.nodes.push(node);
+							// 	t.folded.edges.push(e[0]);
+							// 	sigmaInstance.graph.dropNode(node.id);
+							// 	t.glyphs = [{
+							// 		'position':'bottom-left',
+							// 		'content': t.folded.nodes.length
+							// 	}]
+							// }
 						}
 					}
 				})
@@ -842,6 +901,13 @@ function doQuery(query, start, end, prune){
 						'fillColor': '#3399FF',
 						'fontScale':1.5
 					}]
+
+					if (typeof startNode.folded != 'undefined'){
+						startNode.glyphs.push({
+							'position':'bottom-left',
+							'content': startNode.folded.nodes.length
+						})
+					}
 					startNode.size = startNode.size + 5
 				}
 
@@ -919,7 +985,7 @@ function updateNodeData(node){
 				  }, {
 				    "statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN count(target)"
 				  }, {
-				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (m:Computer), (o:Group), n-[r:MemberOf]->o-[s:AdminTo]->m RETURN count(distinct(m))"
+				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (m:Computer), (o:Group), (n)-[r:MemberOf]->(o)-[s:AdminTo]->(m) RETURN count(distinct(m))"
 				  }, {
 				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN count(distinct(target))"
 				  }, {
