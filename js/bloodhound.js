@@ -6,8 +6,14 @@ $(document).ready(function(){
 	// Set our default renderer to Canvas, since a lot of plugins dont work on WebGL
 	sigma.renderers.def = sigma.renderers.canvas
 
+	localStorage.setItem('collapseThreshold', 5)
+
 	sigma.classes.graph.addMethod('outboundNodes', function(id) {
 		return this.outNeighborsIndex.get(id).keyList();
+	})
+
+	sigma.classes.graph.addMethod('inboundNodes', function(id) {
+		return this.inNeighborsIndex.get(id).keyList();
 	})
 	sigmaInstance = new sigma({
 		container: 'graph'
@@ -39,6 +45,10 @@ $(document).ready(function(){
 			if (currentEndNode != null){
 				path(e.data.enter.nodes[0].id);
 			}
+
+			if (currentStartNode != null){
+				reversepath(e.data.enter.nodes[0].id);
+			}
 		}
 
 		if (e.data.leave.nodes.length > 0){
@@ -47,6 +57,14 @@ $(document).ready(function(){
 					edge.color = '#356';	
 				});
 				currentPath = [];
+				sigmaInstance.refresh({'skipIndexation': true})
+			}
+
+			if (reversePath.length > 0){
+				$.each(reversePath, function(index, edge){
+					edge.color = '#356';	
+				});
+				reversePath = [];
 				sigmaInstance.refresh({'skipIndexation': true})
 			}
 		}
@@ -587,6 +605,29 @@ $(document).ready(function(){
 		}, 100)	
 	})
 
+	if (ohsettings == 0){
+		ohsettings = $('#settingsbuttonhidden').outerHeight() + "px"
+		$('#settingsbutton').css({'height':ohsettings})
+	}
+
+	$('#settingsbutton').hover(function(){
+		var w = $('#settingsbuttonhidden').outerWidth() + 1 + "px"
+		if (owsettings == 0){
+			owsettings = $('#settingsbutton').outerWidth() + 1 + "px"
+		}
+
+		$(this).stop().animate({
+			width: w
+		}, 100, function(){
+			$(this).html('Settings<span style="width:19px" class="fa fa-cogs rightspan rightglyph"></span>')
+		})
+	}, function(){
+		$(this).html('<span style="width: 14px" class="fa fa-cogs rightspan"></span>')
+		$(this).stop().animate({
+			width: owsettings
+		}, 100)	
+	})
+
 
 	// Some random binds for important stuff
 	sigmaInstance.bind('clickNode', function(e){
@@ -691,6 +732,8 @@ var owupload = 0
 var ohupload = 0
 var owlayout = 0
 var ohlayout = 0
+var owsettings = 0
+var ohsettings = 0
 var design = null;
 var usedagre = false;
 var ingesthtml = null;
@@ -701,6 +744,10 @@ var noanimate = true;
 var currentStartNode = null;
 var currentEndNode = null;
 var currentPath = [];
+var reversePath = [];
+
+var cancelQuery = null;
+
 var path = function(nid){
 	n = sigmaInstance.graph.nodes(nid)
 	if (n.id != currentEndNode.id){
@@ -715,6 +762,26 @@ var path = function(nid){
 			tedge.color = 'red';
 			currentPath.push(tedge);
 			path(nextnode)
+		})
+	}else{
+		sigmaInstance.refresh({'skipIndexation': true})
+	}
+}
+
+var reversepath = function(nid){
+	n = sigmaInstance.graph.nodes(nid)
+	if (n.id != currentStartNode.id){
+		var ed = sigmaInstance.graph.adjacentEdges(n.id)
+		$.each(sigmaInstance.graph.inboundNodes(n.id), function(index, nextnode){
+			var tedge = null;
+			$.each(ed, function(index, pos){
+				if (pos.source == nextnode){
+					tedge = pos;
+				}
+			})
+			tedge.color = 'blue';
+			reversePath.push(tedge);
+			reversepath(nextnode)
 		})
 	}else{
 		sigmaInstance.refresh({'skipIndexation': true})
@@ -786,6 +853,8 @@ function setLabelAsEnd(label){
 };
 
 function doQuery(query, start, end, prune){
+	currentEndNode = null;
+	currentStartNode = null;
 	if (typeof start === 'undefined'){
 		start = ""
 	}
@@ -841,69 +910,72 @@ function doQuery(query, start, end, prune){
 						endNode = node;
 						currentEndNode = node;
 					}
-					if (prune){
-						var e = sigmaInstance.graph.adjacentEdges(node.id);
-						if (e.length == 1 && (typeof node.folded == 'undefined')){
-							if (node.type_user){
-								if (e[0].label == "MemberOf" || e[0].label == "AdminTo"){
-									var target = sigmaInstance.graph.nodes(e[0].target)
-									if (typeof target.folded == 'undefined'){
-										target.folded = {};
-										target.folded.nodes = [];
-										target.folded.edges = [];
-										target.hasfold = true;
+
+					if (node.degree > parseInt(localStorage.getItem('collapseThreshold'))){
+						var adjacentNodes = sigmaInstance.graph.adjacentNodes(node.id);
+						$.each(adjacentNodes, function(index, adjacentNode){
+							var edges = sigmaInstance.graph.adjacentEdges(adjacentNode.id)
+
+							if (edges.length == 1 && (typeof adjacentNode.folded == 'undefined')){
+								var edge = edges[0]
+								if (adjacentNode.neo4j_labels[0]=='User' && (edge.label == 'MemberOf' || edge.label == 'AdminTo')){
+									if (typeof node.folded == 'undefined'){
+										node.folded = {};
+										node.folded.nodes = [];
+										node.folded.edges = [];
+										node.hasfold = true;
 									}
 
-									target.folded.nodes.push(node);
-									target.folded.edges.push(e[0]);
-									sigmaInstance.graph.dropNode(node.id);
-									target.glyphs = [{
+									node.folded.nodes.push(adjacentNode)
+									node.folded.edges.push(edge)
+									sigmaInstance.graph.dropNode(adjacentNode.id)
+									node.glyphs = [{
 										'position':'bottom-left',
-										'content': target.folded.nodes.length
+										'content': node.folded.nodes.length
 									}]
 								}
 							}
 
-							if (node.type_computer){
-								if (e[0].label == "AdminTo"){
-									var target = sigmaInstance.graph.nodes(e[0].source)
-									if (typeof target.folded == 'undefined'){
-										target.folded = {};
-										target.folded.nodes = [];
-										target.folded.edges = [];
-										target.hasfold = true;
+							if (edges.length == 1 && (typeof adjacentNode.folded == 'undefined')){
+								var edge = edges[0]
+								if (adjacentNode.neo4j_labels[0]=='Computer' && edge.label == 'AdminTo'){
+									if (typeof node.folded == 'undefined'){
+										node.folded = {};
+										node.folded.nodes = [];
+										node.folded.edges = [];
+										node.hasfold = true;
 									}
 
-									target.folded.nodes.push(node);
-									target.folded.edges.push(e[0]);
-									sigmaInstance.graph.dropNode(node.id);
-									target.glyphs = [{
+									node.folded.nodes.push(adjacentNode)
+									node.folded.edges.push(edge)
+									sigmaInstance.graph.dropNode(adjacentNode.id)
+									node.glyphs = [{
 										'position':'bottom-left',
-										'content': target.folded.nodes.length
+										'content': node.folded.nodes.length
 									}]
 								}
 							}
 
-							if (node.type_group){
-								if (e[0].label == "AdminTo"){
-									var target = sigmaInstance.graph.nodes(e[0].source)
-									if (typeof target.folded == 'undefined'){
-										target.folded = {};
-										target.folded.nodes = [];
-										target.folded.edges = [];
-										target.hasfold = true;
+							if (edges.length == 1 && (typeof adjacentNode.folded == 'undefined')){
+								var edge = edges[0]
+								if (adjacentNode.neo4j_labels[0]=='Group' && edge.label == 'AdminTo'){
+									if (typeof node.folded == 'undefined'){
+										node.folded = {};
+										node.folded.nodes = [];
+										node.folded.edges = [];
+										node.hasfold = true;
 									}
 
-									target.folded.nodes.push(node);
-									target.folded.edges.push(e[0]);
-									sigmaInstance.graph.dropNode(node.id);
-									target.glyphs = [{
+									node.folded.nodes.push(adjacentNode)
+									node.folded.edges.push(edge)
+									sigmaInstance.graph.dropNode(adjacentNode.id)
+									node.glyphs = [{
 										'position':'bottom-left',
-										'content': target.folded.nodes.length
+										'content': node.folded.nodes.length
 									}]
 								}
 							}
-						}
+						})
 					}
 				})
 				sigmaInstance.refresh();
@@ -976,6 +1048,9 @@ function updateNodeData(node){
 	var loading = Mustache.render(loadingString, {label: node.data.node.label})
 	var rendered = Mustache.render(template, {dbinfo: dbinforendered, nodeinfo: loading});
 	var elem = $('#nodedatabox')
+	if (cancelQuery != null){
+		cancelQuery.abort()
+	}
 	elem.html(rendered);
 	$('.nav-tabs a[href="#nodeinfo"]').tab('show')
 	if (elem.is(":hidden")){
@@ -983,7 +1058,7 @@ function updateNodeData(node){
 	}
 	
 	if (node.data.node.type_user == true){
-		$.ajax({
+		cancelQuery = $.ajax({
 			url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
 			type: 'POST',
 			accepts: {json: "application/json"},
@@ -1008,6 +1083,7 @@ function updateNodeData(node){
 				  } ]
 			}),
 			success: function(json) {
+				cancelQuery = null
 				var fdg = json.results[0].data[0].row[0];
 				var unr = json.results[1].data[0].row[0];
 				var diradmin = json.results[2].data[0].row[0];
@@ -1024,7 +1100,7 @@ function updateNodeData(node){
 			}
 		});
 	}else if (node.data.node.type_computer == true){
-		$.ajax({
+		cancelQuery = $.ajax({
 			url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
 			type: 'POST',
 			accepts: {json: "application/json"},
@@ -1043,6 +1119,7 @@ function updateNodeData(node){
 				  } ]
 			}),
 			success: function(json) {
+				cancelQuery = null
 				var c1 = json.results[0].data[0].row[0];
 				var c2 = json.results[1].data[0].row[0];
 				var c3 = json.results[2].data[0].row[0];
@@ -1056,7 +1133,7 @@ function updateNodeData(node){
 			}
 		});
 	}else if (node.data.node.type_group == true){
-		$.ajax({
+		cancelQuery = $.ajax({
 			url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
 			type: 'POST',
 			accepts: {json: "application/json"},
@@ -1079,6 +1156,7 @@ function updateNodeData(node){
 				  } ]
 			}),
 			success: function(json) {
+				cancelQuery = null
 				var c1 = json.results[0].data[0].row[0];
 				var c2 = json.results[1].data[0].row[0];
 				var c3 = json.results[2].data[0].row[0];
