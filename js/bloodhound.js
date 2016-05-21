@@ -5,6 +5,10 @@ $(document).ready(function(){
 
 	// Set our default renderer to Canvas, since a lot of plugins dont work on WebGL
 	sigma.renderers.def = sigma.renderers.canvas
+
+	sigma.classes.graph.addMethod('outboundNodes', function(id) {
+		return this.outNeighborsIndex.get(id).keyList();
+	})
 	sigmaInstance = new sigma({
 		container: 'graph'
 	});
@@ -28,6 +32,24 @@ $(document).ready(function(){
 		glyphTextColor: 'white',
 		glyphTextThreshold: 1,
 		defaultLabelActiveColor:'red'
+	})
+
+	sigmaInstance.bind('hovers', function(e){
+		if (e.data.enter.nodes.length > 0){
+			if (currentEndNode != null){
+				path(e.data.enter.nodes[0].id);
+			}
+		}
+
+		if (e.data.leave.nodes.length > 0){
+			if (currentPath.length > 0){
+				$.each(currentPath, function(index, edge){
+					edge.color = '#356';	
+				});
+				currentPath = [];
+				sigmaInstance.refresh({'skipIndexation': true})
+			}
+		}
 	})
 
 	// Initialize the design plugin
@@ -75,22 +97,6 @@ $(document).ready(function(){
 	var activeState = sigma.plugins.activeState(sigmaInstance);
 
 	var kbd = sigma.plugins.keyboard(sigmaInstance, sigmaInstance.renderers[0]);
-
-	// $(document).keydown(function(e){
-	// 	if (e.keyCode == 83){
-	// 		console.log('up')
-	// 		sigmaInstance.settings("labelThreshold", 1);
-	// 		sigmaInstance.refresh( {'skipIndexation': true})
-	// 	}
-	// })
-
-	// $(document).keyup(function(e){
-	// 	if (e.keyCode == 83){
-	// 		console.log('up')
-	// 		sigmaInstance.settings("labelThreshold", 14);
-	// 		sigmaInstance.refresh( {'skipIndexation': true})
-	// 	}
-	// })
 	
 	kbd.bind('17', function(){
 		if (labelsVisible){
@@ -172,6 +178,7 @@ $(document).ready(function(){
 							node.collapse = true;
 						}
 					}
+
 					return Mustache.render(template, node)
 				}
 			}]
@@ -691,6 +698,28 @@ var ingestWorker = null
 var uploadwidth = null;
 var labelsVisible = false;
 var noanimate = true;
+var currentStartNode = null;
+var currentEndNode = null;
+var currentPath = [];
+var path = function(nid){
+	n = sigmaInstance.graph.nodes(nid)
+	if (n.id != currentEndNode.id){
+		var ed = sigmaInstance.graph.adjacentEdges(n.id)
+		$.each(sigmaInstance.graph.outboundNodes(n.id), function(index, nextnode){
+			var tedge = null;
+			$.each(ed, function(index, pos){
+				if (pos.target == nextnode){
+					tedge = pos;
+				}
+			})
+			tedge.color = 'red';
+			currentPath.push(tedge);
+			path(nextnode)
+		})
+	}else{
+		sigmaInstance.refresh({'skipIndexation': true})
+	}
+}
 
 
 function makeWorker(script) {
@@ -805,10 +834,12 @@ function doQuery(query, start, end, prune){
 
 					if (node.neo4j_data.name == start){
 						startNode = node;
+						currentStartNode = node;
 					}
 
 					if (node.neo4j_data.name == end){
 						endNode = node;
+						currentEndNode = node;
 					}
 					if (prune){
 						var e = sigmaInstance.graph.adjacentEdges(node.id);
@@ -872,22 +903,6 @@ function doQuery(query, start, end, prune){
 									}]
 								}
 							}
-							// if ((e[0].label == "MemberOf" || e[0].label == "AdminTo") && node.type_group){
-							// 	var t = sigmaInstance.graph.nodes(e[0].target);
-							// 	if (typeof t.folded == 'undefined'){
-							// 		t.folded = {};
-							// 		t.folded.nodes = [];
-							// 		t.folded.edges = [];
-							// 		t.hasfold = true;
-							// 	}
-							// 	t.folded.nodes.push(node);
-							// 	t.folded.edges.push(e[0]);
-							// 	sigmaInstance.graph.dropNode(node.id);
-							// 	t.glyphs = [{
-							// 		'position':'bottom-left',
-							// 		'content': t.folded.nodes.length
-							// 	}]
-							// }
 						}
 					}
 				})
