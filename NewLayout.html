@@ -274,7 +274,7 @@
 						Pre-Built Analytics Queries
 					</h3>
 					<div style="padding: 0 .5em .5em .5em">
-						<a href="#" onclick="doQuery('MATCH (n:User), (target:Group {name:&quot;DOMAIN ADMINS&quot;}),p=allShortestPaths((n)-[*1..]->(target)) RETURN p',&quot;&quot;, &quot;DOMAIN ADMINS&quot;, true)">Find Shortest Paths to DA</a><br>
+						<a href="#" onclick="doQuery('MATCH (n:User), (target:Group {name:&quot;DOMAIN ADMINS&quot;}),p=allShortestPaths((n)-[*1..]->(target)) RETURN p',&quot;&quot;, &quot;DOMAIN ADMINS&quot;)">Find Shortest Paths to DA</a><br>
 						<a href="#" onclick="doQuery('start n=node(*) match n<-[r:HasSession]-() WHERE NOT n.name=&quot;ANONYMOUS LOGON&quot; AND NOT n.name=&quot;&quot; with n, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)-[r:HasSession]->n RETURN n,r,m')">Find User with Most Sessions</a>
 					</div>
 				</div>
@@ -487,35 +487,35 @@
 		</div>
 
 		<div id="menuDiv" class="menudiv">
-			<div class="rightmenu">
-				<button id="refreshbutton" class="btn rightmenubutton" style="white-space: inherit !important;">
+			<div>
+				<button id="refreshbutton" class="btn">
 					<span class="glyphicon glyphicon-refresh rightspan"></span>
 				</button>
 			</div>
-			<div class="rightmenu">
-				<button id="exportbutton" class="btn rightmenubutton" style="white-space: inherit !important;">
+			<div>
+				<button id="exportbutton" class="btn">
 					<span class="glyphicon glyphicon-export rightspan"></span>
 				</button>
 			</div>
-			<div class="rightmenu">
-				<button id="importbutton" class="btn rightmenubutton" style="white-space: inherit !important;">
+			<div>
+				<button id="importbutton" class="btn">
 					<span class="glyphicon glyphicon-import rightspan"></span>
 				</button>
 			</div>
-			<div class="rightmenu">
-				<button id="uploadbutton" class="btn rightmenubutton" style="white-space: inherit !important;">
+			<div>
+				<button id="uploadbutton" class="btn">
 					<span class="glyphicon glyphicon-upload rightspan"></span>
 				</button>
 			</div>
 
-			<div class="rightmenu">
-				<button id="layoutbutton" class="btn rightmenubutton" style="white-space: inherit !important;">
+			<div>
+				<button id="layoutbutton" class="btn">
 					<span style="width:14px" class="fa fa-line-chart rightspan"></span>
 				</button>
 			</div>
 
-			<div class="rightmenu">
-				<button id="settingsbutton" class="btn rightmenubutton" style="white-space: inherit !important;">
+			<div>
+				<button id="settingsbutton" class="btn">
 					<span style="width:14px" class="fa fa-cogs rightspan"></span>
 				</button>
 			</div>
@@ -713,6 +713,19 @@
 						</div>
 					</div>
 				</div>
+			</div>
+		</div>
+
+		<div id="zoomBox" class="zoomBox">
+			<div>
+				<button id="zoomIn" class="btn zoomIn">
+					<span class="fa fa-plus"></span>
+				</button>
+			</div>
+			<div>
+				<button id="zoomOut" class="btn zoomOut">
+					<span class="fa fa-minus"></span>
+				</button>
 			</div>
 		</div>
 	</body>

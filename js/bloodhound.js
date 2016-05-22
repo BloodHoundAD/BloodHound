@@ -368,6 +368,26 @@ $(document).ready(function(){
 		$('#uploadSelectDiv').fadeToggle()
 	});
 
+	$('#zoomIn').on('click', function(event){
+		var cam = sigmaInstance.camera;
+
+		sigma.misc.animation.camera(cam, {
+		  ratio: cam.ratio / cam.settings('zoomingRatio')
+		}, {
+		  duration: sigmaInstance.settings('animationsTime')
+		});
+	})
+
+	$('#zoomOut').on('click', function(event){
+		var cam = sigmaInstance.camera;
+
+		sigma.misc.animation.camera(cam, {
+		  ratio: cam.ratio * cam.settings('zoomingRatio')
+		}, {
+		  duration: sigmaInstance.settings('animationsTime')
+		});
+	})
+
 	$('#loginbutton').on('click', function(event){
 		if (!($('#loginbadpw').hasClass('hide'))){
 			$('#loginbadpw').addClass('hide')	
@@ -852,7 +872,7 @@ function setLabelAsEnd(label){
 	}
 };
 
-function doQuery(query, start, end, prune){
+function doQuery(query, start, end, preventCollapse){
 	currentEndNode = null;
 	currentStartNode = null;
 	if (typeof start === 'undefined'){
@@ -862,8 +882,8 @@ function doQuery(query, start, end, prune){
 		end = ""
 	}
 
-	if (typeof end === 'undefined'){
-		prune = false;
+	if (typeof preventCollapse === 'undefined'){
+		preventCollapse = false;
 	}
 	if (!firstquery){
 		queryStack.push([sigmaInstance.graph.nodes(), sigmaInstance.graph.edges()]);
@@ -911,7 +931,7 @@ function doQuery(query, start, end, prune){
 						currentEndNode = node;
 					}
 
-					if (node.degree > parseInt(localStorage.getItem('collapseThreshold'))){
+					if (node.degree > parseInt(localStorage.getItem('collapseThreshold')) && !preventCollapse){
 						var adjacentNodes = sigmaInstance.graph.adjacentNodes(node.id);
 						$.each(adjacentNodes, function(index, adjacentNode){
 							var edges = sigmaInstance.graph.adjacentEdges(adjacentNode.id)
@@ -1413,7 +1433,7 @@ function doInit(){
 	});
 
 	// Do this query to set the initial graph
-	doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})<-[r:MemberOf]-m RETURN n,r,m");
+	doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})<-[r:MemberOf]-m RETURN n,r,m", "", "", true);
 }
 
 function startLogout(){

@@ -41,6 +41,17 @@ html, body{
 	right: 1em;
 }
 
+.menudiv div{
+	padding-top: 5px;
+	float:right;
+	clear: right;
+}
+
+.menudiv div button{
+	background-color: white;
+	white-space: inherit !important;
+}
+
 .slideupbutton{
 	border-radius: 20px 20px 0 0;
 	position:relative;
@@ -147,17 +158,6 @@ dl.dictlist{
 	border-left:1px solid lightgray;
 	border-right:1px solid lightgray;
 }
-
-.rightmenu{
-	padding-top: 5px;
-	float:right;
-	clear: right;
-}
-
-.rightmenubutton{
-	background-color: white;
-}
-
 
 .hideme{
 	position:absolute;
@@ -345,3 +345,30 @@ dl.dictlist{
     width: 100%;
     color: black;
  }
+
+ .zoomBox{
+ 	position: absolute;
+ 	right: 1em;
+ 	bottom: 1%;
+ 	z-index: 20;
+ }
+
+ .zoomBox div{
+ 	padding-top: 3px;
+	float:right;
+	clear: right;
+ }
+
+ .zoomBox div button{
+ 	background-color: white;
+ }
+
+.zoomIn{
+	border-top-left-radius: 2em;
+	border-top-right-radius: 2em;
+}
+
+.zoomOut{
+	border-bottom-left-radius: 2em;
+	border-bottom-right-radius: 2em;
+}
