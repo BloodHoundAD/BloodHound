@@ -38,20 +38,16 @@ $(document).ready(function(){
 		glyphFillColor: 'black',
 		glyphTextColor: 'white',
 		glyphTextThreshold: 1,
-		defaultLabelActiveColor:'red',
-		nodeHaloColor: '#ecf0f1',
-	    edgeHaloColor: '#ecf0f1',
-	    nodeHaloSize: 50,
-	    edgeHaloSize: 10
+		defaultLabelActiveColor:'red'
 	})
 
 	sigmaInstance.bind('hovers', function(e){
 		if (e.data.enter.nodes.length > 0){
-			if (currentEndNode != null){
+			if (currentEndNode != null && currentStartNode == null){
 				path(e.data.enter.nodes[0].id);
 			}
 
-			if (currentStartNode != null){
+			if (currentStartNode != null && currentEndNode == null){
 				reversepath(e.data.enter.nodes[0].id);
 			}
 		}
@@ -457,7 +453,34 @@ $(document).ready(function(){
 
       	var node = sigmaInstance.graph.nodes(tid);
       	if (typeof node == 'undefined'){
+      		var c = sigmaInstance.graph.nodes(pid).folded.nodes.filter(function(val){
+      			return val.id == tid
+      		})[0]
+
+      		c.data = {}
+      		c.data.node = {}
+      		c.data.node.label = c.neo4j_data.name
+      		if (c.neo4j_labels[0]=='Group'){
+				c.data.node.type_group = true
+			}else if (c.neo4j_labels[0] == 'User'){
+				c.data.node.type_user = true
+			}else{
+				c.data.node.type_computer = true
+			}
+      		updateNodeData(c)
       		node = sigmaInstance.graph.nodes(pid)
+      	}else{
+      		node.data = {}
+      		node.data.node = {}
+      		node.data.node.label = node.neo4j_data.name
+      		if (node.neo4j_labels[0]=='Group'){
+				node.data.node.type_group = true
+			}else if (node.neo4j_labels[0] == 'User'){
+				node.data.node.type_user = true
+			}else{
+				node.data.node.type_computer = true
+			}
+      		updateNodeData(node)
       	}
 
       	sigma.misc.animation.camera(
