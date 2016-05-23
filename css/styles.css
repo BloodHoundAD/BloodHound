@@ -372,3 +372,41 @@ dl.dictlist{
 	border-bottom-left-radius: 2em;
 	border-bottom-right-radius: 2em;
 }
+
+.settingsDiv{
+	z-index: 20;
+	position: absolute;
+	top: 1em;
+	right: 10em;
+	overflow: auto;
+	background-color: rgba(255, 255, 255, .9);
+	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+.spotlight{
+	z-index: 30;
+	position: absolute;
+	top: 15%;
+	left: 50%;
+	transform:translate(-50%,0);
+	width: 40%;
+}
+
+.nodeList{
+	overflow: auto;
+	height:11em;
+	background-color:white;
+}
+
+.nodelist table{
+	height: 100%;
+	border: 1px solid black;
+}
+
+.unborder span{
+	border-radius: 0;
+}
+
+.unborder input{
+	border-radius: 0;
+}

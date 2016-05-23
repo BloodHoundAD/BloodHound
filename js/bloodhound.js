@@ -2,6 +2,7 @@ $(document).ready(function(){
 	$('#loginpanel').fadeToggle(0)
 	$('#checkconnectionpanel').fadeToggle(0)
 	$('#logoutpanel').fadeToggle(0)
+	$('#spotlight').fadeToggle(0);
 
 	// Set our default renderer to Canvas, since a lot of plugins dont work on WebGL
 	sigma.renderers.def = sigma.renderers.canvas
@@ -127,6 +128,10 @@ $(document).ready(function(){
 			labelsVisible = true;
 		}
 	});
+
+	kbd.bind('32', function(){
+		$('#spotlight').fadeToggle()
+	})
 
 	design = sigma.plugins.design(sigmaInstance);
 	design.setPalette(myPalette);
@@ -438,6 +443,31 @@ $(document).ready(function(){
 			})
 		}
 	});
+
+	$('#spotlightTable').click( function(event) {
+	    var target = $(event.target);
+	    $tr = target.closest('tr');
+      
+      	var tid = $tr.attr('data-id')
+      	var pid = $tr.attr('data-parent-id')
+
+      	var node = sigmaInstance.graph.nodes(tid);
+      	if (typeof node == 'undefined'){
+      		node = sigmaInstance.graph.nodes(pid)
+      	}
+
+      	sigma.misc.animation.camera(
+      		sigmaInstance.camera,
+      		{
+      			x: node[sigmaInstance.camera.readPrefix + 'x'],
+      			y: node[sigmaInstance.camera.readPrefix + 'y'],
+      			ratio: 1
+      		},
+      		{duration: sigmaInstance.settings('animationsTime')}
+      	)
+
+      	$('#spotlight').fadeToggle()
+    });
 
 	$('#bottomSlide').on('click', function(event){
 		$('#rawQueryBox').slideToggle(400, function(e){
@@ -765,6 +795,7 @@ var currentStartNode = null;
 var currentEndNode = null;
 var currentPath = [];
 var reversePath = [];
+var spotlightData = {};
 
 var cancelQuery = null;
 
@@ -875,6 +906,7 @@ function setLabelAsEnd(label){
 function doQuery(query, start, end, preventCollapse){
 	currentEndNode = null;
 	currentStartNode = null;
+	$('#nodeBody').empty();
 	if (typeof start === 'undefined'){
 		start = ""
 	}
@@ -948,6 +980,7 @@ function doQuery(query, start, end, preventCollapse){
 
 									node.folded.nodes.push(adjacentNode)
 									node.folded.edges.push(edge)
+									spotlightData[adjacentNode.id] = [adjacentNode.neo4j_data.name, node.id, node.neo4j_data.name]
 									sigmaInstance.graph.dropNode(adjacentNode.id)
 									node.glyphs = [{
 										'position':'bottom-left',
@@ -968,6 +1001,7 @@ function doQuery(query, start, end, preventCollapse){
 
 									node.folded.nodes.push(adjacentNode)
 									node.folded.edges.push(edge)
+									spotlightData[adjacentNode.id] = [adjacentNode.neo4j_data.name, node.id, node.neo4j_data.name]
 									sigmaInstance.graph.dropNode(adjacentNode.id)
 									node.glyphs = [{
 										'position':'bottom-left',
@@ -988,6 +1022,7 @@ function doQuery(query, start, end, preventCollapse){
 
 									node.folded.nodes.push(adjacentNode)
 									node.folded.edges.push(edge)
+									spotlightData[adjacentNode.id] = [adjacentNode.neo4j_data.name, node.id, node.neo4j_data.name]
 									sigmaInstance.graph.dropNode(adjacentNode.id)
 									node.glyphs = [{
 										'position':'bottom-left',
@@ -997,6 +1032,32 @@ function doQuery(query, start, end, preventCollapse){
 							}
 						})
 					}
+
+					if (!spotlightData.hasOwnProperty(node.id)){
+						spotlightData[node.id] = [node.neo4j_data.name, 0, ""]
+					}
+				})
+
+				var toDisplay = []
+
+				$.each(Object.keys(spotlightData), function(index, key){
+					var d = spotlightData[key]
+					toDisplay.push([key, d[0], d[1], d[2]])
+				})
+
+				toDisplay.sort(function(a,b){
+					if (a[1] < b[1]){
+						return -1;
+					}else if (a[1] > b[1]){
+						return 1;
+					}else{
+						return 0;
+					}
+				})
+				var template = "<tr data-id=\"{{NodeId}}\" data-parent-id=\"{{ParentId}}\"><td>{{NodeName}}</td><td>{{ParentName}}</td></tr>"
+				$.each(toDisplay, function(index, data){
+					var h = Mustache.render(template, {NodeId: data[0], NodeName: data[1], ParentId: data[2], ParentName:data[3]})
+					$("#nodeBody").append(h);
 				})
 				sigmaInstance.refresh();
 				design.apply()
@@ -1431,6 +1492,14 @@ function doInit(){
 			}
 		}, autoSelect: false
 	});
+
+	$('#spotlightBar').keyup(function(){
+		var rex = new RegExp($(this).val(), 'i');
+		$('.searchable tr').hide();
+		$('.searchable tr').filter(function(){
+			return rex.test($(this).text());
+		}).show();
+	})
 
 	// Do this query to set the initial graph
 	doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})<-[r:MemberOf]-m RETURN n,r,m", "", "", true);
