@@ -38,7 +38,11 @@ $(document).ready(function(){
 		glyphFillColor: 'black',
 		glyphTextColor: 'white',
 		glyphTextThreshold: 1,
-		defaultLabelActiveColor:'red'
+		defaultLabelActiveColor:'red',
+		nodeHaloColor: '#ecf0f1',
+	    edgeHaloColor: '#ecf0f1',
+	    nodeHaloSize: 50,
+	    edgeHaloSize: 10
 	})
 
 	sigmaInstance.bind('hovers', function(e){
@@ -461,10 +465,16 @@ $(document).ready(function(){
       		{
       			x: node[sigmaInstance.camera.readPrefix + 'x'],
       			y: node[sigmaInstance.camera.readPrefix + 'y'],
-      			ratio: 1
+      			ratio: .5
       		},
       		{duration: sigmaInstance.settings('animationsTime')}
       	)
+
+      	node.color = "#2DC486"
+      	setTimeout(function(){
+      		node.color = "black"
+      		sigmaInstance.refresh({skipIndexation: true})
+      	}, 2000)
 
       	$('#spotlight').fadeToggle()
     });
@@ -1061,6 +1071,7 @@ function doQuery(query, start, end, preventCollapse){
 				})
 				sigmaInstance.refresh();
 				design.apply()
+				sigma.misc.animation.camera(sigmaInstance.camera, { x:0, y:0, ratio: 1 });
 				if (!(startNode === null)){
 					startNode.glyphs = [{
 						'position':'bottom-right',
