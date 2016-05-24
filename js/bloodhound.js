@@ -939,6 +939,7 @@ function setLabelAsEnd(label){
 function doQuery(query, start, end, preventCollapse){
 	currentEndNode = null;
 	currentStartNode = null;
+	spotlightData = {}
 	$('#nodeBody').empty();
 	if (typeof start === 'undefined'){
 		start = ""
