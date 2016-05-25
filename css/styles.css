@@ -87,25 +87,20 @@ html, body{
 	background-color: white;
 }
 
-dl.dictlist{
-	margin-bottom: 0;
-	padding: 0 .5em .5em .5em;
+.dl-horizontal dt{
+    text-align: left;
+    width: auto;
+    padding-right: 1em;
 }
 
-.dictlist dt{
-	float: left;
-	clear: left;
-	text-align: left;
-	font-weight:bold;
+.dl-horizontal dd{
+    margin-left: 0;
+    text-align:right;
+    border-bottom: 1px solid lightgray;
 }
 
-.dictlist dt:after{
-	content: ":";
-}
-
-.dictlist dd{
-	margin: 0 15% 0 0;
-	float:right;
+.dl-horizontal dd:last-child{
+	border-bottom: none;
 }
 
 .nodedatabox{
