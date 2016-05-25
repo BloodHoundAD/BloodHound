@@ -202,17 +202,34 @@ html, body{
 	background-color: rgba(0, 0, 0, .7);
 }
 
-.loginwindow > #loginpanel{
-	position: absolute;
-	top:50%;
-	left:50%;
-	transform:translate(-50%,-50%);
-	max-width:25%;
-	overflow: auto;
-	background-color: rgba(255, 255, 255, .9);
-	border: 5px solid rgba(0, 0, 0, .5);
-	border-radius: 10px;
-	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+@media all and (min-width: 1000px){
+	.loginwindow > #loginpanel{
+		position: absolute;
+		top:50%;
+		left:50%;
+		transform:translate(-50%,-50%);
+		max-width:40%;
+		overflow: auto;
+		background-color: rgba(255, 255, 255, .9);
+		border: 5px solid rgba(0, 0, 0, .5);
+		border-radius: 10px;
+		box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+	}
+}
+
+@media all and (min-width: 1500px){
+	.loginwindow > #loginpanel{
+		position: absolute;
+		top:50%;
+		left:50%;
+		transform:translate(-50%,-50%);
+		max-width:25%;
+		overflow: auto;
+		background-color: rgba(255, 255, 255, .9);
+		border: 5px solid rgba(0, 0, 0, .5);
+		border-radius: 10px;
+		box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+	}
 }
 
 .loginwindow > #loginpanel img{
