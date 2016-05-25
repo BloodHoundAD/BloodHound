@@ -333,7 +333,7 @@
 
 		<script id="computertemplate" type="text/template">
 			<h3 align='center'>{{label}} Properties</h2>
-			<dl class='dictlist'>
+			<dl class='dl-horizontal'>
 				<dt>OS</dt>
 				<dd> None </dd>
 				<dt>Allows Unconstrained Delegation Name</dt>
@@ -349,7 +349,7 @@
 
 		<script id="grouptemplate" type="text/template">
 			<h3 align='center'>{{label}} Properties</h2>
-			<dl class='dictlist'>
+			<dl class='dl-horizontal'>
 				<dt>Direct Members</dt>
 				<dd> <a href="#" onclick="doQuery('MATCH (n)-[r:MemberOf]->(m:Group {name:&quot;{{label}}&quot;}) RETURN n,r,m')">{{explicit_members}}</a></dd>
 				<dt>Unrolled Members</dt>
