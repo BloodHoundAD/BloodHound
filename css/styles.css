@@ -77,14 +77,32 @@ html, body{
 	outline: 0;
 }
 
-.searchdiv{
-	z-index: 10;
-	position: absolute;
-	overflow: visible;
-	width: 25%;
-	top: 1em;
-	left: 1em;
-	background-color: white;
+@media all and (min-width: 1000px){
+	.searchdiv{
+		z-index: 10;
+		position: absolute;
+		overflow: visible;
+		width: 35%;
+		top: 1em;
+		left: 1em;
+		background-color: white;
+	}
+}
+
+@media all and (min-width: 1500px){
+	.searchdiv{
+		z-index: 10;
+		position: absolute;
+		overflow: visible;
+		width: 25%;
+		top: 1em;
+		left: 1em;
+		background-color: white;
+	}
+}
+
+.dl-horizontal-fix{
+	margin-bottom: 1em;
 }
 
 .dl-horizontal dt{
@@ -324,7 +342,6 @@ html, body{
 }
 
 .dbbuttons{
-	padding-top: 1em;
 	padding-bottom: 1em;
 }
 
