@@ -409,6 +409,8 @@ $(document).ready(function(){
 				url = 'http://' + url
 			}
 
+			url = url.replace(/\/$/, "");
+
 			$.ajax({
 				url: url + '/db/data/',
 				type: 'GET',
@@ -792,8 +794,6 @@ $(document).ready(function(){
 	$('#exportSelectDiv').draggable({scroll:false, containment: "window"});
 	uploadwidth = $('#uploadSelectDiv').outerWidth()
 	$('#uploadSelectDiv').css('width', uploadwidth + 'px')
-
-
 })
 
 var dragged = false;
@@ -831,6 +831,10 @@ var reversePath = [];
 var spotlightData = {};
 
 var cancelQuery = null;
+
+function escapeRegExp(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
 
 var path = function(nid){
 	n = sigmaInstance.graph.nodes(nid)
@@ -1487,7 +1491,7 @@ function doInit(){
 			});
 		}, afterSelect: function(selected){
 			if (!pathfindingMode){
-				doQuery("MATCH (n) WHERE n.name =~ '(?i)" + selected + ".*' AND NOT n.name ENDS WITH '$' RETURN n");	
+				doQuery("MATCH (n) WHERE n.name =~ '(?i)" + escapeRegExp(selected) + ".*' AND NOT n.name ENDS WITH '$' RETURN n");	
 			}else{
 				var start = $('#searchBar').val();
 				var end = $('#endNode').val();
