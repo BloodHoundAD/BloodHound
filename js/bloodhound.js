@@ -1541,7 +1541,7 @@ function doInit(){
 	})
 
 	// Do this query to set the initial graph
-	doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})<-[r:MemberOf]-(m) RETURN n,r,m", "", "", true);
+	doQuery("MATCH (n:Group) WHERE n.name =~ '(?i).*DOMAIN ADMINS.*' WITH n MATCH (n)<-[r:MemberOf]-(m) RETURN n,r,m", "", "", true);
 }
 
 function startLogout(){
