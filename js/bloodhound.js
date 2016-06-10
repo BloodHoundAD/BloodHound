@@ -180,8 +180,8 @@ $(document).ready(function(){
 				'		{{#type_group}}' + 
 				'			<li onclick="setLabelAsStart(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node</li>' + 
 				'			<li onclick="setLabelAsEnd(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Ending Node</li>' + 
-				'			<li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})<-[r:MemberOf]-m RETURN n,r,m\')"><i class="glyphicon glyphicon-screenshot"></i> Get Members</li>' + 
-				'			<li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})-[r:AdminTo]->m RETURN n,r,m\', &quot;{{label}}&quot;)"><i class="glyphicon glyphicon-screenshot"></i> Admin To</li>' + 
+				'			<li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})<-[r:MemberOf]-(m) RETURN n,r,m\')"><i class="glyphicon glyphicon-screenshot"></i> Get Members</li>' + 
+				'			<li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})-[r:AdminTo]->(m) RETURN n,r,m\', &quot;{{label}}&quot;)"><i class="glyphicon glyphicon-screenshot"></i> Admin To</li>' + 
 				'		{{/type_group}}' +
 				'		{{#expand}}' +
 				'			<li onclick="unfold({{id}})"><i class="glyphicon glyphicon-screenshot"></i> Expand</li>' +
@@ -293,7 +293,7 @@ $(document).ready(function(){
 	$('#searchBar').bind('keypress', function(e){
 		if (e.which == 13){
 			if (!pathfindingMode){
-				doQuery("MATCH (n) WHERE n.name =~ '(?i)" + e.currentTarget.value + ".*' AND NOT n.name ENDS WITH '$' RETURN n");	
+				doQuery("MATCH (n) WHERE n.name =~ '(?i)" + escapeRegExp(e.currentTarget.value) + ".*' RETURN n");	
 			}else{
 				var start = $('#searchBar').val();
 				var end = $('#endNode').val();
@@ -832,8 +832,8 @@ var spotlightData = {};
 
 var cancelQuery = null;
 
-function escapeRegExp(str) {
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+function escapeRegExp(s) {
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\\\$&');
 }
 
 var path = function(nid){
@@ -1479,7 +1479,7 @@ function doInit(){
 				headers: {
 					"Authorization": "Basic bmVvNGo6bmVvNGpq"
 				},
-				data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name =~ '(?i)" + query + ".*' AND NOT n.name ENDS WITH '$' RETURN n.name LIMIT 10"}),
+				data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name =~ '(?i)" + escapeRegExp(query) + ".*' RETURN n.name LIMIT 10"}),
 				success: function(json) {
 					var d = json.data
 					var l = d.length;
@@ -1491,7 +1491,7 @@ function doInit(){
 			});
 		}, afterSelect: function(selected){
 			if (!pathfindingMode){
-				doQuery("MATCH (n) WHERE n.name =~ '(?i)" + escapeRegExp(selected) + ".*' AND NOT n.name ENDS WITH '$' RETURN n");	
+				doQuery("MATCH (n) WHERE n.name =~ '(?i)" + escapeRegExp(selected) + ".*' RETURN n");	
 			}else{
 				var start = $('#searchBar').val();
 				var end = $('#endNode').val();
@@ -1513,7 +1513,7 @@ function doInit(){
 				headers: {
 					"Authorization": "Basic bmVvNGo6bmVvNGpq"
 				},
-				data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name =~ '(?i)" + query + ".*' AND NOT n.name ENDS WITH '$' RETURN n.name LIMIT 10"}),
+				data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name =~ '(?i)" + escapeRegExp(query) + ".*' RETURN n.name LIMIT 10"}),
 				success: function(json) {
 					var d = json.data
 					var l = d.length;
@@ -1541,7 +1541,7 @@ function doInit(){
 	})
 
 	// Do this query to set the initial graph
-	doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})<-[r:MemberOf]-m RETURN n,r,m", "", "", true);
+	doQuery("MATCH (n:Group {name:\'DOMAIN ADMINS\'})<-[r:MemberOf]-(m) RETURN n,r,m", "", "", true);
 }
 
 function startLogout(){
