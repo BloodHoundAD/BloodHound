@@ -189,19 +189,21 @@ $(document).ready(function(){
 				'		{{#collapse}}' +
 				'			<li onclick="collapse({{id}})"><i class="glyphicon glyphicon-screenshot"></i> Collapse</li>' +
 				'		{{/collapse}}' +
+				'		{{#grouped}}' +
+				'			<li onclick="ungroup({{id}})"><i class="glyphicon glyphicon-screenshot"></i> Expand</li>' +
+				'		{{/grouped}}' +
 				'	</ul>',
 			    autoadjust:true,
 				renderer: function(node, template){
 					node.expand = false;
 					node.collapse = false;
-					if (typeof node.folded != 'undefined'){
+					if (typeof node.folded != 'undefined' && !node.grouped){
 						if (typeof sigmaInstance.graph.nodes(node.folded.nodes[0].id) == 'undefined'){
 							node.expand = true;
 						}else{
 							node.collapse = true;
 						}
 					}
-
 					return Mustache.render(template, node)
 				}
 			}]
@@ -943,8 +945,6 @@ function setLabelAsEnd(label){
 function doQuery(query, start, end, preventCollapse){
 	currentEndNode = null;
 	currentStartNode = null;
-	spotlightData = {}
-	$('#nodeBody').empty();
 	if (typeof start === 'undefined'){
 		start = ""
 	}
@@ -956,8 +956,9 @@ function doQuery(query, start, end, preventCollapse){
 		preventCollapse = false;
 	}
 	if (!firstquery){
-		queryStack.push([sigmaInstance.graph.nodes(), sigmaInstance.graph.edges()]);
+		queryStack.push([sigmaInstance.graph.nodes(), sigmaInstance.graph.edges(), spotlightData]);
 	}
+	spotlightData = {}
 	firstquery = false;
 	if (currentTooltip != null){
 		currentTooltip.close();	
@@ -999,104 +1000,26 @@ function doQuery(query, start, end, preventCollapse){
 					if (node.neo4j_data.name == end){
 						endNode = node;
 						currentEndNode = node;
-					}
+					}					
+				})
 
-					if (node.degree > parseInt(localStorage.getItem('collapseThreshold')) && !preventCollapse){
-						var adjacentNodes = sigmaInstance.graph.adjacentNodes(node.id);
-						$.each(adjacentNodes, function(index, adjacentNode){
-							var edges = sigmaInstance.graph.adjacentEdges(adjacentNode.id)
+				if (!preventCollapse){
+					$.each(sigmaInstance.graph.nodes(), function(index, node){
+						evaluateCollapse(node, start, end)
+					})
 
-							if (edges.length == 1 && (typeof adjacentNode.folded == 'undefined')){
-								var edge = edges[0]
-								if (adjacentNode.neo4j_labels[0]=='User' && (edge.label == 'MemberOf' || edge.label == 'AdminTo')){
-									if (typeof node.folded == 'undefined'){
-										node.folded = {};
-										node.folded.nodes = [];
-										node.folded.edges = [];
-										node.hasfold = true;
-									}
-
-									node.folded.nodes.push(adjacentNode)
-									node.folded.edges.push(edge)
-									spotlightData[adjacentNode.id] = [adjacentNode.neo4j_data.name, node.id, node.neo4j_data.name]
-									sigmaInstance.graph.dropNode(adjacentNode.id)
-									node.glyphs = [{
-										'position':'bottom-left',
-										'content': node.folded.nodes.length
-									}]
-								}
-							}
-
-							if (edges.length == 1 && (typeof adjacentNode.folded == 'undefined')){
-								var edge = edges[0]
-								if (adjacentNode.neo4j_labels[0]=='Computer' && edge.label == 'AdminTo'){
-									if (typeof node.folded == 'undefined'){
-										node.folded = {};
-										node.folded.nodes = [];
-										node.folded.edges = [];
-										node.hasfold = true;
-									}
-
-									node.folded.nodes.push(adjacentNode)
-									node.folded.edges.push(edge)
-									spotlightData[adjacentNode.id] = [adjacentNode.neo4j_data.name, node.id, node.neo4j_data.name]
-									sigmaInstance.graph.dropNode(adjacentNode.id)
-									node.glyphs = [{
-										'position':'bottom-left',
-										'content': node.folded.nodes.length
-									}]
-								}
-							}
-
-							if (edges.length == 1 && (typeof adjacentNode.folded == 'undefined')){
-								var edge = edges[0]
-								if (adjacentNode.neo4j_labels[0]=='Group' && edge.label == 'AdminTo'){
-									if (typeof node.folded == 'undefined'){
-										node.folded = {};
-										node.folded.nodes = [];
-										node.folded.edges = [];
-										node.hasfold = true;
-									}
-
-									node.folded.nodes.push(adjacentNode)
-									node.folded.edges.push(edge)
-									spotlightData[adjacentNode.id] = [adjacentNode.neo4j_data.name, node.id, node.neo4j_data.name]
-									sigmaInstance.graph.dropNode(adjacentNode.id)
-									node.glyphs = [{
-										'position':'bottom-left',
-										'content': node.folded.nodes.length
-									}]
-								}
-							}
-						})
-					}
-
+					$.each(sigmaInstance.graph.nodes(), function(index, node){
+						evaluateSiblings(node)
+					})
+				}
+				
+				$.each(sigmaInstance.graph.nodes(), function(index, node){
 					if (!spotlightData.hasOwnProperty(node.id)){
 						spotlightData[node.id] = [node.neo4j_data.name, 0, ""]
 					}
 				})
 
-				var toDisplay = []
-
-				$.each(Object.keys(spotlightData), function(index, key){
-					var d = spotlightData[key]
-					toDisplay.push([key, d[0], d[1], d[2]])
-				})
-
-				toDisplay.sort(function(a,b){
-					if (a[1] < b[1]){
-						return -1;
-					}else if (a[1] > b[1]){
-						return 1;
-					}else{
-						return 0;
-					}
-				})
-				var template = "<tr data-id=\"{{NodeId}}\" data-parent-id=\"{{ParentId}}\"><td>{{NodeName}}</td><td>{{ParentName}}</td></tr>"
-				$.each(toDisplay, function(index, data){
-					var h = Mustache.render(template, {NodeId: data[0], NodeName: data[1], ParentId: data[2], ParentName:data[3]})
-					$("#nodeBody").append(h);
-				})
+				updateSpotlight()
 				sigmaInstance.refresh();
 				design.apply()
 				sigma.misc.animation.camera(sigmaInstance.camera, { x:0, y:0, ratio: 1 });
@@ -1156,12 +1079,39 @@ function redoLast(){
 		sigmaInstance.graph.clear();
 		sigmaInstance.graph.read({nodes:query[0], edges: query[1]});
 		sigmaInstance.refresh()
+		spotlightData = query[2]
+		updateSpotlight()
 	}
 }
 
 $(function () {
  	$('[data-toggle="tooltip"]').tooltip()
 })
+
+function updateSpotlight(){
+	$('#nodeBody').empty();
+	var toDisplay = []
+
+	$.each(Object.keys(spotlightData), function(index, key){
+		var d = spotlightData[key]
+		toDisplay.push([key, d[0], d[1], d[2]])
+	})
+
+	toDisplay.sort(function(a,b){
+		if (a[1] < b[1]){
+			return -1;
+		}else if (a[1] > b[1]){
+			return 1;
+		}else{
+			return 0;
+		}
+	})
+	var template = "<tr data-id=\"{{NodeId}}\" data-parent-id=\"{{ParentId}}\"><td>{{NodeName}}</td><td>{{ParentName}}</td></tr>"
+	$.each(toDisplay, function(index, data){
+		var h = Mustache.render(template, {NodeId: data[0], NodeName: data[1], ParentId: data[2], ParentName:data[3]})
+		$("#nodeBody").append(h);
+	})
+}
 
 function updateNodeData(node){
 	var template = $('#datatemplate').html();
@@ -1719,4 +1669,188 @@ function collapse(id){
 	}
 
 	design.apply();
+}
+
+function ungroup(id){
+	var n = sigmaInstance.graph.nodes(id)
+	sigmaInstance.graph.dropNode(id)
+	sigmaInstance.refresh()
+	sigmaInstance.graph.read(n.folded);
+	design.deprecate();
+
+	noanimate = true;
+	sigmaInstance.settings('animationsTime', 0);
+
+	if (usedagre){
+		sigma.layouts.dagre.start(sigmaInstance);
+	}else{
+		sigma.layouts.startForceLink();	
+	}
+
+	design.apply();
+}
+
+function evaluateSiblings(n){
+	var adj = sigmaInstance.graph.adjacentEdges(n.id)
+	var siblings = []
+	if (adj.length > 1 && adj.allEdgesSameType() && n.type_computer){
+		var parents = adj.map(
+			function(element){
+				return element.source
+			}
+		)
+		var tocheck = parents.sort().join(',')
+		$.each(sigmaInstance.graph.nodes(), function(index, node){
+			np = sigmaInstance.graph.adjacentEdges(node.id).map(
+				function(element){
+					return element.source
+				}
+			).sort().join(',')
+			if (np == tocheck){
+				siblings.push(node)
+			}
+		})
+
+		if (siblings.length > 10){
+			var i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
+			while (sigmaInstance.graph.nodes(i) != undefined){
+				i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
+			}
+
+			var folded = {}
+			folded.nodes = []
+			folded.edges = []
+
+			sigmaInstance.graph.addNode({
+				id: i,
+				x: n.x,
+				y: n.y,
+				degree: siblings.length,
+				label: "Grouped Computers",
+				size: 20,
+				neo4j_data: {name: "Grouped Computers"},
+				neo4j_labels:["Computer"],
+				grouped: true,
+				hasFold: true
+			})
+
+			$.each(parents, function(index, p){
+				sigmaInstance.graph.addEdge({
+					id: Math.floor(Math.random() * (100000 - 10 + 1)) + 10,
+					source: p,
+					target: i,
+					label: "AdminTo",
+					neo4j_type: "AdminTo",
+					size: 1
+				})
+			})
+
+			var x = sigmaInstance.graph.nodes(i)
+			x.glyphs = [{
+				'position':'bottom-left',
+				'content':siblings.length
+			}]
+
+			$.each(siblings, function(index, sib){
+				$.each(sigmaInstance.graph.adjacentEdges(sib.id), function(index, e){
+					folded.edges.push(e)
+				})
+
+				folded.nodes.push(sib)
+				spotlightData[sib.id] = [sib.neo4j_data.name, i, x.label]
+				sigmaInstance.graph.dropNode(sib.id)
+			})
+			x.folded = folded
+		}
+	}	
+}
+
+function evaluateCollapse(node, start, end){
+	if (node.degree > parseInt(localStorage.getItem('collapseThreshold'))){
+		var adjacentNodes = sigmaInstance.graph.adjacentNodes(node.id);
+		$.each(adjacentNodes, function(index, adjacentNode){
+			if (adjacentNode.neo4j_data.name == start){
+				return true;
+			}
+
+			if (adjacentNode.neo4j_data.name == end){
+				return true;
+			}
+			var edges = sigmaInstance.graph.adjacentEdges(adjacentNode.id)
+
+			if (edges.length == 1 && (typeof adjacentNode.folded == 'undefined')){
+				var edge = edges[0]
+				if (adjacentNode.neo4j_labels[0]=='User' && (edge.label == 'MemberOf' || edge.label == 'AdminTo')){
+					if (typeof node.folded == 'undefined'){
+						node.folded = {};
+						node.folded.nodes = [];
+						node.folded.edges = [];
+						node.hasfold = true;
+					}
+
+					node.folded.nodes.push(adjacentNode)
+					node.folded.edges.push(edge)
+					spotlightData[adjacentNode.id] = [adjacentNode.neo4j_data.name, node.id, node.neo4j_data.name]
+					sigmaInstance.graph.dropNode(adjacentNode.id)
+					node.glyphs = [{
+						'position':'bottom-left',
+						'content': node.folded.nodes.length
+					}]
+				}
+			}
+
+			if (edges.length == 1 && (typeof adjacentNode.folded == 'undefined')){
+				var edge = edges[0]
+				if (adjacentNode.neo4j_labels[0]=='Computer' && edge.label == 'AdminTo'){
+					if (typeof node.folded == 'undefined'){
+						node.folded = {};
+						node.folded.nodes = [];
+						node.folded.edges = [];
+						node.hasfold = true;
+					}
+
+					node.folded.nodes.push(adjacentNode)
+					node.folded.edges.push(edge)
+					spotlightData[adjacentNode.id] = [adjacentNode.neo4j_data.name, node.id, node.neo4j_data.name]
+					sigmaInstance.graph.dropNode(adjacentNode.id)
+					node.glyphs = [{
+						'position':'bottom-left',
+						'content': node.folded.nodes.length
+					}]
+				}
+			}
+
+			if (edges.length == 1 && (typeof adjacentNode.folded == 'undefined')){
+				var edge = edges[0]
+				if (adjacentNode.neo4j_labels[0]=='Group' && edge.label == 'AdminTo'){
+					if (typeof node.folded == 'undefined'){
+						node.folded = {};
+						node.folded.nodes = [];
+						node.folded.edges = [];
+						node.hasfold = true;
+					}
+
+					node.folded.nodes.push(adjacentNode)
+					node.folded.edges.push(edge)
+					spotlightData[adjacentNode.id] = [adjacentNode.neo4j_data.name, node.id, node.neo4j_data.name]
+					sigmaInstance.graph.dropNode(adjacentNode.id)
+					node.glyphs = [{
+						'position':'bottom-left',
+						'content': node.folded.nodes.length
+					}]
+				}
+			}
+		})
+	}
+}
+
+Array.prototype.allEdgesSameType = function() {
+
+    for(var i = 1; i < this.length; i++)
+    {
+        if(this[i].neo4j_type !== this[0].neo4j_type)
+            return false;
+    }
+
+    return true;
 }
