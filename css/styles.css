@@ -82,7 +82,7 @@ html, body{
 		z-index: 10;
 		position: absolute;
 		overflow: visible;
-		width: 35%;
+		width: 33%;
 		top: 1em;
 		left: 1em;
 		background-color: white;
@@ -443,4 +443,16 @@ html, body{
 .nav-tabs li{
 	white-space:nowrap;
 	overflow:hidden;
+}
+
+.loadingIndicator{
+	z-index: 25;
+	bottom: .5em;
+	left: 1em;
+	width: 80px;
+	position: absolute;
+}
+
+.loadingIndicator div:first-child{
+	text-align: center;
 }
