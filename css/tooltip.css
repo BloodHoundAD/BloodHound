@@ -74,6 +74,7 @@
 }
 
 .new-tooltip {
+  z-index: 29;
   max-height: 400px;
   display: inline-block;
   background-color: rgba(255, 255, 255, .95);

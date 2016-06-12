@@ -3,8 +3,9 @@
 	<head>
 		<title>Bloodhound</title>
 		<link rel="icon" href="img/favicon.ico">
-		<script src="js/jquery-2.2.1.min.js"></script>
-		<script src="js/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="js/jquery-2.2.1.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="js/circle-progress/circle-progress.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
 		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
 		<link type="text/css" rel="stylesheet" href="css/bootstrap-theme.min.css">
@@ -325,7 +326,7 @@
 				<dt>Group Delegated Local Admin Rights</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (m:Computer), (o:Group), (n)-[r:MemberOf]->(o)-[s:AdminTo]->(m) RETURN n,r,o,s,m', &quot;{{label}}&quot;, &quot;&quot;)">{{dlar}}</a></dd>
 				<dt>Derivative Local Admin Rights</dt>
-				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN p', &quot;{{label}}&quot;)">{{derivative}}</a></dd>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (m:Computer), p=allShortestPaths((n)-[r*]->(m)) RETURN p', &quot;{{label}}&quot;)">{{derivative}}</a></dd>
 				<dt>Sessions</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (n:Computer)-[r:HasSession]->(m:User {name:&quot;{{label}}&quot;}) RETURN n,r,m')">{{sessions}}</a></dd>
 			</dl>
@@ -750,10 +751,14 @@
 						</tr>
 					</thead>
 					<tbody id="nodeBody" class="searchable">
-						<tr><td>Herman</td><td>Astra</td></tr><tr><td>Ira</td><td>Cara</td></tr><tr><td>Kasper</td><td>Olivia</td></tr><tr><td>Kaseem</td><td>Nita</td></tr><tr><td>Malcolm</td><td>Chava</td></tr><tr><td>Paki</td><td>Julie</td></tr><tr><td>Vladimir</td><td>Zorita</td></tr><tr><td>Price</td><td>Chava</td></tr><tr><td>Mason</td><td>Aphrodite</td></tr><tr><td>Alvin</td><td>Ulla</td></tr><tr><td>Baxter</td><td>Mara</td></tr><tr><td>Tobias</td><td>Willa</td></tr><tr><td>Samson</td><td>Bertha</td></tr><tr><td>Lars</td><td>Jaden</td></tr><tr><td>Emerson</td><td>Yael</td></tr><tr><td>Jarrod</td><td>Riley</td></tr><tr><td>Paul</td><td>Donna</td></tr><tr><td>Brian</td><td>Noelani</td></tr><tr><td>Lawrence</td><td>Indigo</td></tr><tr><td>Akeem</td><td>Charity</td></tr><tr><td>Lionel</td><td>Roanna</td></tr><tr><td>Rooney</td><td>Dorothy</td></tr><tr><td>Alexander</td><td>Colette</td></tr><tr><td>Cameron</td><td>Madaline</td></tr><tr><td>Lionel</td><td>Carissa</td></tr><tr><td>Charles</td><td>Uma</td></tr><tr><td>Deacon</td><td>Imogene</td></tr><tr><td>Alden</td><td>Audra</td></tr><tr><td>Brian</td><td>Kiara</td></tr><tr><td>Isaiah</td><td>Jessamine</td></tr><tr><td>Castor</td><td>Sade</td></tr><tr><td>Eric</td><td>Kameko</td></tr><tr><td>Owen</td><td>Jacqueline</td></tr><tr><td>Duncan</td><td>Audra</td></tr><tr><td>Kane</td><td>Madison</td></tr><tr><td>Salvador</td><td>Zena</td></tr><tr><td>Lev</td><td>Stacy</td></tr><tr><td>Craig</td><td>Yetta</td></tr><tr><td>Stewart</td><td>Violet</td></tr><tr><td>Aquila</td><td>Sylvia</td></tr><tr><td>John</td><td>Fleur</td></tr><tr><td>Gabriel</td><td>Cleo</td></tr><tr><td>Caesar</td><td>Kyra</td></tr><tr><td>Beau</td><td>Kai</td></tr><tr><td>Vincent</td><td>Zephr</td></tr><tr><td>Dylan</td><td>Molly</td></tr><tr><td>Upton</td><td>Unity</td></tr><tr><td>Jelani</td><td>Vivien</td></tr><tr><td>Noble</td><td>Carolyn</td></tr><tr><td>Tad</td><td>Ciara</td></tr><tr><td>Hop</td><td>Aiko</td></tr><tr><td>Sean</td><td>Phoebe</td></tr><tr><td>Beau</td><td>Shana</td></tr><tr><td>Phillip</td><td>Medge</td></tr><tr><td>Wade</td><td>Amelia</td></tr><tr><td>Troy</td><td>Jessica</td></tr><tr><td>Kasper</td><td>Alana</td></tr><tr><td>Kato</td><td>Ursula</td></tr><tr><td>Wallace</td><td>Darrel</td></tr><tr><td>Merrill</td><td>Jenna</td></tr><tr><td>Uriah</td><td>Sylvia</td></tr><tr><td>Channing</td><td>Isabella</td></tr><tr><td>Berk</td><td>Rose</td></tr><tr><td>Keaton</td><td>Montana</td></tr><tr><td>Forrest</td><td>Wanda</td></tr><tr><td>Ezekiel</td><td>Xandra</td></tr><tr><td>Malachi</td><td>Ursula</td></tr><tr><td>Nasim</td><td>Brenna</td></tr><tr><td>Colorado</td><td>Demetria</td></tr><tr><td>Emery</td><td>Olympia</td></tr><tr><td>Drew</td><td>Uma</td></tr><tr><td>Xenos</td><td>Isadora</td></tr><tr><td>Conan</td><td>Dawn</td></tr><tr><td>Barry</td><td>Macy</td></tr><tr><td>Kyle</td><td>Noelle</td></tr><tr><td>Robert</td><td>Galena</td></tr><tr><td>Mohammad</td><td>Claire</td></tr><tr><td>Ulric</td><td>Adele</td></tr><tr><td>Joseph</td><td>Brenda</td></tr><tr><td>Levi</td><td>Charity</td></tr><tr><td>Fitzgerald</td><td>Zephr</td></tr><tr><td>Gavin</td><td>Mia</td></tr><tr><td>Rigel</td><td>Jolie</td></tr><tr><td>Hayden</td><td>Quail</td></tr><tr><td>Cruz</td><td>Olivia</td></tr><tr><td>Aquila</td><td>Melinda</td></tr><tr><td>Daniel</td><td>Macey</td></tr><tr><td>Lyle</td><td>Rachel</td></tr><tr><td>Xander</td><td>Rosalyn</td></tr><tr><td>Travis</td><td>Naomi</td></tr><tr><td>Jin</td><td>Rina</td></tr><tr><td>Leo</td><td>Tallulah</td></tr><tr><td>Henry</td><td>Aspen</td></tr><tr><td>Chase</td><td>Kelly</td></tr><tr><td>Knox</td><td>Odette</td></tr><tr><td>Omar</td><td>Noel</td></tr><tr><td>Gage</td><td>Illiana</td></tr><tr><td>Melvin</td><td>Rebekah</td></tr><tr><td>Warren</td><td>Basia</td></tr><tr><td>Plato</td><td>Lana</td></tr>
 					</tbody>
 				</table>
 			</div>
+		</div>
+
+		<div id="queryLoad" class="loadingIndicator">
+			<div id="loadingText">Loading</div>
+			<div id="circle"></div>
 		</div>
 
 		<!-- <div id="settingsDiv" class="settingsDiv panel panel-default">

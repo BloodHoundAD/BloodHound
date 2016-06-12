@@ -3,6 +3,18 @@ $(document).ready(function(){
 	$('#checkconnectionpanel').fadeToggle(0)
 	$('#logoutpanel').fadeToggle(0)
 	$('#spotlight').fadeToggle(0);
+	$('#queryLoad').fadeToggle(0);
+
+	$('#circle').circleProgress({
+	    value: 0,
+	    size: 80,
+	    fill: {
+	    	gradient: ["red","black"]
+	    },
+	    startAngle: -1.57
+	}).on('circle-animation-progress', function(event, progress) {
+	    $(this).find('strong').html(parseInt(100 * progress) + '<i>%</i>');
+	});
 
 	// Set our default renderer to Canvas, since a lot of plugins dont work on WebGL
 	sigma.renderers.def = sigma.renderers.canvas
@@ -145,10 +157,21 @@ $(document).ready(function(){
 	// Initialize the noverlap plugin
 	noverlapListener = sigmaInstance.configNoverlap({nodeMargin: 2.0, easing: 'cubicInOut', gridSize: 50})
 	noverlapListener.bind('stop', function(event){
-		if (noanimate){
-			sigmaInstance.settings('animationsTime', 200);
-			noanimate = false;
+		$('#loadingText').text('Complete')
+		$('#circle').circleProgress({
+			animationStartValue: .75,
+			value: 1
+		})
+		if ($('#queryLoad').is(":visible")){
+			setTimeout(function(){
+				$('#queryLoad').fadeToggle()
+			}, 2000)
+			if (noanimate){
+				sigmaInstance.settings('animationsTime', 200);
+				noanimate = false;
+			}
 		}
+		
 	})
 
 	// Initialize the tooltips plugin
@@ -231,6 +254,11 @@ $(document).ready(function(){
 	// Set Noverlap to run when forcelink is run
 	fa.bind('stop', function(event){
 		if (event.type == 'stop'){
+			$('#loadingText').text('Fixing Overlap')
+			$('#circle').circleProgress({
+				animationStartValue: .50,
+				value: .75
+			})
 			sigmaInstance.startNoverlap()
 		}
 	})
@@ -245,6 +273,11 @@ $(document).ready(function(){
 	// Set Noverlap to run when dagre layout is finished
 	listener.bind('stop', function(event) {
 	  if (event.type == 'stop'){
+	  	$('#loadingText').text('Fixing Overlap')
+		$('#circle').circleProgress({
+			animationStartValue: .50,
+			value: .75
+		})
 	  	sigmaInstance.startNoverlap()
 	  }
 	});
@@ -963,6 +996,15 @@ function doQuery(query, start, end, preventCollapse){
 	if (currentTooltip != null){
 		currentTooltip.close();	
 	}
+
+	$('#loadingText').text('Querying Database')
+	$('#circle').circleProgress({
+		value: 0
+	})
+	if ($('#queryLoad').is(":hidden")){
+		$('#queryLoad').fadeToggle()	
+	}
+	
 	
 	design.deprecate()
 
@@ -980,6 +1022,10 @@ function doQuery(query, start, end, preventCollapse){
 				redoLast()
 				$("#nodataalert").delay(3000).fadeToggle(false)
 			}else{
+				$('#loadingText').text('Processing Nodes')
+				$('#circle').circleProgress({
+					value: .25
+				})
 				$.each(sigmaInstance.graph.nodes(), function(index, node){
 					node.degree = sigmaInstance.graph.degree(node.id)
 				})
@@ -1022,7 +1068,7 @@ function doQuery(query, start, end, preventCollapse){
 				updateSpotlight()
 				sigmaInstance.refresh();
 				design.apply()
-				sigma.misc.animation.camera(sigmaInstance.camera, { x:0, y:0, ratio: 1 });
+				sigma.misc.animation.camera(sigmaInstance.camera, { x:0, y:0, ratio: 1.075 });
 				if (!(startNode === null)){
 					startNode.glyphs = [{
 						'position':'bottom-right',
@@ -1058,6 +1104,11 @@ function doQuery(query, start, end, preventCollapse){
 					}
 					endNode.size = endNode.size + 5
 				}
+				$('#loadingText').text('Initial Layout')
+				$('#circle').circleProgress({
+					animationStartValue: .25,
+					value: .50
+				})
 				if (usedagre){
 					sigma.layouts.dagre.start(sigmaInstance);
 				}else{
@@ -1245,6 +1296,14 @@ function updateNodeData(node){
 }
 
 function forceRelayout(){
+	if ($('#queryLoad').is(":hidden")){
+		$('#queryLoad').fadeToggle()
+	}
+	$('#loadingText').text('Initial Layout')
+	$('#circle').circleProgress({
+		animationStartValue: .50,
+		value: .75
+	})
 	sigma.layouts.stopForceLink();
 	if (usedagre){
 		sigma.layouts.dagre.start(sigmaInstance);
