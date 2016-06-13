@@ -13503,13 +13503,13 @@ function Export-BloodHoundData {
 
                 Switch ($Object.TrustDirection) {
                     'Inbound' {
-                        $Query += " MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('FOREST'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
+                        $Query += " MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
                     }
                     'Outbound' {
-                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('FOREST'), Transitive: UPPER('$Transitive')}]->(SourceDomain)"
+                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(SourceDomain)"
                     }
                     'Bidirectional' {
-                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('FOREST'), Transitive: UPPER('$Transitive')}]->(SourceDomain) MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('FOREST'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
+                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(SourceDomain) MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
                     }
                 }
                 $Queries += $Query
@@ -13535,13 +13535,13 @@ function Export-BloodHoundData {
 
                 Switch ($Object.TrustDirection) {
                     'Inbound' {
-                        $Query += " MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
+                        $Query += " MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('FOREST'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
                     }
                     'Outbound' {
-                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(SourceDomain)"
+                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('FOREST'), Transitive: UPPER('$Transitive')}]->(SourceDomain)"
                     }
                     'Bidirectional' {
-                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(SourceDomain) MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
+                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('FOREST'), Transitive: UPPER('$Transitive')}]->(SourceDomain) MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('FOREST'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
                     }
                 }
                 $Queries += $Query
