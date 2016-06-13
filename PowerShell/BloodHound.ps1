@@ -5012,7 +5012,7 @@ function Get-DomainSID {
         $DCSID.Substring(0, $DCSID.LastIndexOf('-'))
     }
     else {
-        Write-Warning "Error extracting domain SID for $Domain"
+        Write-Verbose "Error extracting domain SID for $Domain"
     }
 }
 
@@ -12574,6 +12574,7 @@ function Get-NetDomainTrust {
                     $DomainTrust | Add-Member Noteproperty 'ObjectGuid' "{$ObjectGuid}"
                     $DomainTrust | Add-Member Noteproperty 'TrustType' $($TrustAttrib -join ',')
                     $DomainTrust | Add-Member Noteproperty 'TrustDirection' "$Direction"
+                    $DomainTrust.PSObject.TypeNames.Add('PowerView.DomainTrustLDAP')
                     $DomainTrust
                 }
                 $Results.dispose()
@@ -12651,7 +12652,10 @@ function Get-NetDomainTrust {
             # if we're using direct domain connections through .NET
             $FoundDomain = Get-NetDomain -Domain $Domain -Credential $Credential
             if($FoundDomain) {
-                $FoundDomain.GetAllTrustRelationships()
+                $FoundDomain.GetAllTrustRelationships() | ForEach-Object {
+                    $_.PSObject.TypeNames.Add('PowerView.DomainTrust')
+                    $_
+                }
             }
         }
     }
@@ -12700,7 +12704,10 @@ function Get-NetForestTrust {
         $FoundForest = Get-NetForest -Forest $Forest -Credential $Credential
 
         if($FoundForest) {
-            $FoundForest.GetAllTrustRelationships()
+            $FoundForest.GetAllTrustRelationships() | ForEach-Object {
+                $_.PSObject.TypeNames.Add('PowerView.ForestTrust')
+                $_
+            }
         }
     }
 }
@@ -13157,6 +13164,7 @@ function Invoke-MapDomainTrust {
                             $DomainTrust | Add-Member Noteproperty 'TargetSID' $Trust.TargetSID
                             $DomainTrust | Add-Member Noteproperty 'TrustType' "$TrustType"
                             $DomainTrust | Add-Member Noteproperty 'TrustDirection' "$TrustDirection"
+                            $DomainTrust.PSObject.TypeNames.Add($Trust.PSObject.TypeNames[-1])
                             $DomainTrust
                         }
                     }
@@ -13410,6 +13418,134 @@ function Export-BloodHoundData {
                     }
                 }
             }
+            elseif($Object.PSObject.TypeNames -contains 'PowerView.DomainTrustLDAP') {
+                # [uint32]'0x00000001' = 'non_transitive'
+                # [uint32]'0x00000002' = 'uplevel_only'
+                # [uint32]'0x00000004' = 'quarantined_domain'
+                # [uint32]'0x00000008' = 'forest_transitive'
+                # [uint32]'0x00000010' = 'cross_organization'
+                # [uint32]'0x00000020' = 'within_forest'
+                # [uint32]'0x00000040' = 'treat_as_external'
+                # [uint32]'0x00000080' = 'trust_uses_rc4_encryption'
+                # [uint32]'0x00000100' = 'trust_uses_aes_keys'
+                # [uint32]'0x00000200' = 'cross_organization_no_tgt_delegation'
+                # [uint32]'0x00000400' = 'pim_trust'
+                if($Object.SourceDomain) {
+                    $SourceDomain = $Object.SourceDomain
+                }
+                else {
+                    $SourceDomain = $Object.SourceName
+                }
+                if($Object.TargetDomain) {
+                    $TargetDomain = $Object.TargetDomain
+                }
+                else {
+                    $TargetDomain = $Object.TargetName
+                }
+
+                $Query = "MERGE (SourceDomain:Domain { name: UPPER('$SourceDomain') }) MERGE (TargetDomain:Domain { name: UPPER('$TargetDomain') })"
+
+                if($Object.TrustType -match 'cross_organization') {
+                    $TrustType = 'CrossLink'
+                }
+                elseif ($Object.TrustType -match 'within_forest') {
+                    $TrustType = 'ParentChild'
+                }
+                elseif ($Object.TrustType -match 'forest_transitive') {
+                    $TrustType = 'Forest'
+                }
+                elseif ($Object.TrustType -match 'treat_as_external') {
+                    $TrustType = 'External'
+                }
+                else {
+                    Write-Verbose "Trust type unhandled/unknown: $($Object.TrustType)"
+                    $TrustType = 'Unknown'
+                }
+
+                if ($Object.TrustType -match 'non_transitive') {
+                    $Transitive = $False
+                }
+                else {
+                    $Transitive = $True
+                }
+
+                Switch ($Object.TrustDirection) {
+                    'Inbound' {
+                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(SourceDomain)"
+                    }
+                    'Outbound' {
+                        $Query += " MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
+                    }
+                    'Bidirectional' {
+                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(SourceDomain) MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
+                    }
+                }
+                $Queries += $Query
+            }
+            elseif($Object.PSObject.TypeNames -contains 'PowerView.DomainTrust') {
+                if($Object.SourceDomain) {
+                    $SourceDomain = $Object.SourceDomain
+                }
+                else {
+                    $SourceDomain = $Object.SourceName
+                }
+                if($Object.TargetDomain) {
+                    $TargetDomain = $Object.TargetDomain
+                }
+                else {
+                    $TargetDomain = $Object.TargetName
+                }
+
+                $Query = "MERGE (SourceDomain:Domain { name: UPPER('$SourceDomain') }) MERGE (TargetDomain:Domain { name: UPPER('$TargetDomain') })"
+
+                $TrustType = $Object.TrustType
+                $Transitive = $True
+
+                Switch ($Object.TrustDirection) {
+                    'Inbound' {
+                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('FOREST'), Transitive: UPPER('$Transitive')}]->(SourceDomain)"
+                    }
+                    'Outbound' {
+                        $Query += " MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('FOREST'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
+                    }
+                    'Bidirectional' {
+                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('FOREST'), Transitive: UPPER('$Transitive')}]->(SourceDomain) MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('FOREST'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
+                    }
+                }
+                $Queries += $Query
+            }
+            elseif($Object.PSObject.TypeNames -contains 'PowerView.ForestTrust') {
+                if($Object.SourceDomain) {
+                    $SourceDomain = $Object.SourceDomain
+                }
+                else {
+                    $SourceDomain = $Object.SourceName
+                }
+                if($Object.TargetDomain) {
+                    $TargetDomain = $Object.TargetDomain
+                }
+                else {
+                    $TargetDomain = $Object.TargetName
+                }
+
+                $Query = "MERGE (SourceDomain:Domain { name: UPPER('$SourceDomain') }) MERGE (TargetDomain:Domain { name: UPPER('$TargetDomain') })"
+
+                $TrustType = 'Forest'
+                $Transitive = $True
+
+                Switch ($Object.TrustDirection) {
+                    'Inbound' {
+                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(SourceDomain)"
+                    }
+                    'Outbound' {
+                        $Query += " MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
+                    }
+                    'Bidirectional' {
+                        $Query += " MERGE (TargetDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(SourceDomain) MERGE (SourceDomain)-[:TrustedBy{ TrustType: UPPER('$TrustType'), Transitive: UPPER('$Transitive')}]->(TargetDomain)"
+                    }
+                }
+                $Queries += $Query
+            }
             else {
                 Write-Verbose "No matching type name"
             }
@@ -13484,9 +13620,10 @@ function Get-BloodHoundData {
 
     .PARAMETER CollectionMethod
 
-        The method to collect data. 'Group', 'LocalGroup', 'GPOLocalGroup', 'Sesssion', 'LoggedOn', 'Stealth', or 'Default'.
-        'Stealth' uses 'Group' collection, stealth user hunting ('Session' on certain servers), and 'GPOLocalGroup' enumeration.
-        'Default' uses 'Group' collection, regular user hunting with 'Session'/'LoggedOn', and 'LocalGroup' enumeration. 
+        The method to collect data. 'Group', 'LocalGroup', 'GPOLocalGroup', 'Sesssion', 'LoggedOn', 'Trusts, 'TrustsLDAP', 'Stealth', or 'Default'.
+        'TrustsLDAP' uses LDAP enumeration for trusts, while 'Trusts' using .NET methods.
+        'Stealth' uses 'Group' collection, stealth user hunting ('Session' on certain servers), 'GPOLocalGroup' enumeration, and LDAP trust enumeration.
+        'Default' uses 'Group' collection, regular user hunting with 'Session'/'LoggedOn', 'LocalGroup' enumeration, and 'Trusts' enumeration.
 
     .PARAMETER SearchForest
 
@@ -13537,7 +13674,7 @@ function Get-BloodHoundData {
         $DomainController,
 
         [String]
-        [ValidateSet('Group', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Stealth', 'Default')]
+        [ValidateSet('Group', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Stealth', 'Trusts', 'TrustsLDAP', 'Default')]
         $CollectionMethod = 'Default',
 
         [Switch]
@@ -13559,20 +13696,32 @@ function Get-BloodHoundData {
             'GPOLocalGroup' { $UseGPOGroup = $True; $SkipComputerEnumeration = $True }
             'Session'       { $UseSession = $True }
             'LoggedOn'      { $UseLoggedOn = $True }
+            'TrustsLDAP'    { $UseDomainTrustsLDAP = $True; $SkipComputerEnumeration = $True }
+            'Trusts'        { $UseDomainTrusts = $True; $SkipComputerEnumeration = $True }
             'Stealth'       {
                 $UseGroup = $True
                 $UseGPOGroup = $True
                 $UseSession = $True
+                $UseDomainTrustsLDAP = $True
             }
             'Default'       {
                 $UseGroup = $True
                 $UseLocalGroup = $True
                 $UseLoggedOn = $True
+                $UseDomainTrusts = $True
             }
         }
 
         if($UseGroup) {
             Get-NetGroup -Domain $Domain -DomainController $DomainController | Get-NetGroupMember -Domain $Domain -DomainController $DomainController -FullData | Export-BloodHoundData -BloodHoundUri $BloodHoundUri -BloodhoundUserPass $BloodHoundUserPass -Throttle $Throttle
+        }
+
+        if($UseDomainTrusts) {
+            Invoke-MapDomainTrust | Export-BloodHoundData -BloodHoundUri $BloodHoundUri -BloodhoundUserPass $BloodHoundUserPass -Throttle $Throttle
+        }
+
+        if($UseDomainTrustsLDAP) {
+            Invoke-MapDomainTrust -LDAP -DomainController $DomainController | Export-BloodHoundData -BloodHoundUri $BloodHoundUri -BloodhoundUserPass $BloodHoundUserPass -Throttle $Throttle
         }
 
         if (-not $SkipComputerEnumeration) {
