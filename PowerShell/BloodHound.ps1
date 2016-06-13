@@ -11222,7 +11222,7 @@ function Invoke-FileFinder {
 
         [Alias('Terms')]
         [String[]]
-        $SearchTerms, 
+        $SearchTerms,
 
         [ValidateScript({Test-Path -Path $_ })]
         [String]
@@ -13152,9 +13152,10 @@ function Invoke-MapDomainTrust {
                             $TargetDomain = $Trust.TargetName
                             $TrustType = $Trust.TrustType
                             $TrustDirection = $Trust.TrustDirection
+                            $ObjectType = $Trust.PSObject.TypeNames | Where-Object {$_ -match 'PowerView'} | Select-Object -First 1
 
                             # make sure we process the target
-                            $Null = $Domains.push($TargetDomain)
+                            $Null = $Domains.Push($TargetDomain)
 
                             # build the nicely-parsable custom output object
                             $DomainTrust = New-Object PSObject
@@ -13164,7 +13165,7 @@ function Invoke-MapDomainTrust {
                             $DomainTrust | Add-Member Noteproperty 'TargetSID' $Trust.TargetSID
                             $DomainTrust | Add-Member Noteproperty 'TrustType' "$TrustType"
                             $DomainTrust | Add-Member Noteproperty 'TrustDirection' "$TrustDirection"
-                            $DomainTrust.PSObject.TypeNames.Add($Trust.PSObject.TypeNames[-1])
+                            $DomainTrust.PSObject.TypeNames.Add($ObjectType)
                             $DomainTrust
                         }
                     }
@@ -13201,6 +13202,14 @@ function Export-BloodHoundData {
     .PARAMETER BloodHoundUserPass
 
         The "user:password" for the BloodHound neo4j instance.
+
+    .PARAMETER ResolveUserDomains
+
+        Switch. Try to resolve user domain memberships for session information using a global catalog.
+
+    .PARAMETER GlobalCatalog
+
+        The global catalog location to resole user memberships from, form of GC://global.catalog.
 
     .PARAMETER Credential
 
@@ -13242,7 +13251,13 @@ function Export-BloodHoundData {
         [Management.Automation.PSCredential]
         $Credential,
 
-        [Parameter(Position=3)]
+        [Switch]
+        $ResolveUserDomains,
+
+        [ValidatePattern('^GC://')]
+        [String]
+        $GlobalCatalog,
+
         [Int]
         $Throttle = 100
     )
@@ -13283,6 +13298,56 @@ function Export-BloodHoundData {
 
         $Authorized = $True
         $ObjectBuffer = New-Object System.Collections.ArrayList
+
+        $UserDomainMappings = @{}
+        if($ResolveUserDomains) {
+            # if we're doing session enumeration, create a {user : @(domain,..)} from a global catalog
+            #   in order to do user domain deconfliction for sessions
+            if(-not $PSBoundParameters['GlobalCatalog']) {
+                $ForestRoot = Get-NetForest | Select-Object -ExpandProperty RootDomain
+                $ADSPath = "GC://$ForestRoot"
+                Write-Verbose "Global catalog string from enumerated forest root: $ADSPath"
+            }
+            else {
+                $ADSpath = $GlobalCatalog
+            }
+
+            Get-NetUser -ADSPath $ADSpath | ForEach-Object {
+                $UserName = $_.samaccountname.ToUpper()
+                $UserDN = $_.distinguishedname
+
+                if (($UserDN -match 'ForeignSecurityPrincipals') -and ($UserDN -match 'S-1-5-21')) {
+                    try {
+                        if(-not $MemberSID) {
+                            $MemberSID = $_.cn[0]
+                        }
+                        $MemberSimpleName = Convert-SidToName -SID $_.objectsid | Convert-ADName -InputType 'NT4' -OutputType 'Canonical'
+                        if($MemberSimpleName) {
+                            $UserDomain = $MemberSimpleName.Split('/')[0]
+                        }
+                        else {
+                            Write-Verbose "Error converting $UserDN"
+                            $UserDomain = $Null
+                        }
+                    }
+                    catch {
+                        Write-Verbose "Error converting $UserDN"
+                        $UserDomain = $Null
+                    }
+                }
+                else {
+                    # extract the FQDN from the Distinguished Name
+                    $UserDomain = ($UserDN.subString($UserDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.').ToUpper()
+                }
+
+                if(-not $UserDomainMappings[$UserName]) {
+                    $UserDomainMappings[$UserName] = @($UserDomain)
+                }
+                elseif($UserDomainMappings[$UserName] -notcontains $UserDomain) {
+                    $UserDomainMappings[$UserName] += $UserDomain
+                }
+            }
+        }
     }
     
     process {
@@ -13293,13 +13358,55 @@ function Export-BloodHoundData {
             if($Object.PSObject.TypeNames -contains 'PowerView.UserSession') {
                 if($Object.SessionFromName) {
                     try {
-                        $SessionFromDomain = $Object.SessionFromName.SubString($Object.SessionFromName.IndexOf('.')+1)
+                        # $SessionFromDomain = $Object.SessionFromName.SubString($Object.SessionFromName.IndexOf('.')+1)
+                        $UserName = $Object.UserName.ToUpper()
+                        $SessionFromName = $Object.SessionFromName
 
-                        # TODO: later change this format to user@domain.com
-                        #   i.e. $LoggedOnUser = "$($Object.UserName)@$SessionFromDomain"
-                        $LoggedOnUser = "$($Object.UserName).$SessionFromDomain"
+                        if($UserDomainMappings) {
+                            $UserDomain = $Null
+                            if($UserDomainMappings[$UserName]) {
+                                if($UserDomainMappings[$UserName].Count -eq 1) {
+                                    $UserDomain = $UserDomainMappings[$UserName]
+                                    # TODO: later change this format to user@domain.com
+                                    #   i.e. $LoggedOnUser = "$UserName@UserDomain"
+                                    $LoggedOnUser = "$UserName.$UserDomain"
 
-                        $Queries += "MERGE (user:User { name: UPPER('$LoggedOnUser') }) MERGE (computer:Computer { name: UPPER(`"$($Object.SessionFromName)`") }) MERGE (computer)-[:HasSession]->(user)"
+                                    $Queries += "MERGE (user:User { name: UPPER('$LoggedOnUser') }) MERGE (computer:Computer { name: UPPER('$SessionFromName') }) MERGE (computer)-[:HasSession {Weight: '1'}]->(user)"
+                                }
+                                else {
+                                    $ComputerDomain = $Object.SessionFromName.SubString($Object.SessionFromName.IndexOf('.')+1).ToUpper()
+
+                                    $UserDomainMappings[$UserName] | ForEach-Object {
+                                        if($_ -eq $ComputerDomain) {
+                                            $UserDomain = $_
+                                            # TODO: later change this format to user@domain.com
+                                            $LoggedOnUser = "$UserName.$UserDomain"
+
+                                            $Queries += "MERGE (user:User { name: UPPER('$LoggedOnUser') }) MERGE (computer:Computer { name: UPPER('$SessionFromName') }) MERGE (computer)-[:HasSession {Weight: '1'}]->(user)"
+                                        }
+                                        else {
+                                            $UserDomain = $_
+                                            # TODO: later change this format to user@domain.com
+                                            $LoggedOnUser = "$UserName.$UserDomain"
+
+                                            $Queries += "MERGE (user:User { name: UPPER('$LoggedOnUser') }) MERGE (computer:Computer { name: UPPER('$SessionFromName') }) MERGE (computer)-[:HasSession {Weight: '2'}]->(user)"
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                # no user object in the GC with this username
+                                # TODO: later change this format to user@domain.com
+                                $LoggedOnUser = "$UserName.UNKNOWN"
+                                $Queries += "MERGE (user:User { name: UPPER('$LoggedOnUser') }) MERGE (computer:Computer { name: UPPER('$SessionFromName') }) MERGE (computer)-[:HasSession {Weight: '2'}]->(user)"
+                            }
+                        }
+                        else {
+                            # TODO: later change this format to user@domain.com
+                            #   i.e. $LoggedOnUser = "$($Object.UserName)@$SessionFromDomain"
+                            $LoggedOnUser = "$UserName.UNKNOWN"
+                            $Queries += "MERGE (user:User { name: UPPER('$LoggedOnUser') }) MERGE (computer:Computer { name: UPPER('$SessionFromName') }) MERGE (computer)-[:HasSession {Weight: '2'}]->(user)"
+                        }
                     }
                     catch {
                         Write-Warning "Error extracting domain from $($Object.SessionFromName)"
@@ -13907,7 +14014,7 @@ function Get-BloodHoundData {
                     'UseLoggedon2' = $UseLoggedon
                 }
 
-                Invoke-ThreadedFunction -ComputerName $TargetComputers -ScriptBlock $HostEnumBlock -ScriptParameters $ScriptParams -Threads $Threads | Export-BloodHoundData -BloodHoundUri $BloodHoundUri -BloodhoundUserPass $BloodHoundUserPass -Throttle $Throttle
+                Invoke-ThreadedFunction -ComputerName $TargetComputers -ScriptBlock $HostEnumBlock -ScriptParameters $ScriptParams -Threads $Threads | Export-BloodHoundData -BloodHoundUri $BloodHoundUri -BloodhoundUserPass $BloodHoundUserPass -Throttle $Throttle -ResolveUserDomains
             }
 
             else {
@@ -13923,13 +14030,11 @@ function Get-BloodHoundData {
                 Write-Verbose "[*] Total number of active hosts: $($TargetComputers2.count)"
                 $Counter = 0
 
-                ForEach ($Computer in $TargetComputers2) {
-
+                $TargetComputers2 | ForEach-Object {
                     $Counter = $Counter + 1
-                    Write-Verbose "[*] Enumerating server $Computer ($Counter of $($TargetComputers2.count))"
-
-                    Invoke-Command -ScriptBlock $HostEnumBlock -ArgumentList @($Computer, $False, $CurrentUser, $UseLocalGroup, $UseSession, $UseLoggedon) | Export-BloodHoundData -BloodHoundUri $BloodHoundUri -BloodhoundUserPass $BloodHoundUserPass -Throttle $Throttle
-                }
+                    Write-Verbose "[*] Enumerating server $($_) ($Counter of $($TargetComputers2.count))"
+                    Invoke-Command -ScriptBlock $HostEnumBlock -ArgumentList @($_, $False, $CurrentUser, $UseLocalGroup, $UseSession, $UseLoggedon)
+                } | Export-BloodHoundData -BloodHoundUri $BloodHoundUri -BloodhoundUserPass $BloodHoundUserPass -Throttle $Throttle -ResolveUserDomains
             }
         }
     }
