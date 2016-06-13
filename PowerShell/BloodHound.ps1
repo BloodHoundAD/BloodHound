@@ -13280,6 +13280,8 @@ function Export-BloodHoundData {
     process {
         if($Authorized) {
 
+            $Queries = @()
+
             if($Object.PSObject.TypeNames -contains 'PowerView.UserSession') {
                 if($Object.SessionFromName) {
                     try {
@@ -13289,14 +13291,14 @@ function Export-BloodHoundData {
                         #   i.e. $LoggedOnUser = "$($Object.UserName)@$SessionFromDomain"
                         $LoggedOnUser = "$($Object.UserName).$SessionFromDomain"
 
-                        $Query = "MERGE (user:User { name: UPPER('$LoggedOnUser') }) MERGE (computer:Computer { name: UPPER(`"$($Object.SessionFromName)`") }) MERGE (computer)-[:HasSession]->(user)"
+                        $Queries += "MERGE (user:User { name: UPPER('$LoggedOnUser') }) MERGE (computer:Computer { name: UPPER(`"$($Object.SessionFromName)`") }) MERGE (computer)-[:HasSession]->(user)"
                     }
                     catch {
                         Write-Warning "Error extracting domain from $($Object.SessionFromName)"
                     }
                 }
                 elseif($Object.SessionFrom) {
-                    $Query = "MERGE (user:User { name: UPPER(`"$($Object.UserName)`") }) MERGE (computer:Computer { name: UPPER(`"$($Object.SessionFrom)`") }) MERGE (computer)-[:HasSession]->(user)"
+                    $Queries += "MERGE (user:User { name: UPPER(`"$($Object.UserName)`") }) MERGE (computer:Computer { name: UPPER(`"$($Object.SessionFrom)`") }) MERGE (computer)-[:HasSession]->(user)"
                 }
                 else {
                     # assume Get-NetLoggedOn result
@@ -13313,7 +13315,7 @@ function Export-BloodHoundData {
                             $AccountName = $Object.ObjectName
                         }
 
-                        $Query = "MERGE (user:User { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$($Object.ComputerName)') }) MERGE (computer)-[:HasSession]->(user)"
+                        $Queries += "MERGE (user:User { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$($Object.ComputerName)') }) MERGE (computer)-[:HasSession]->(user)"
                     }
                     catch {
                         Write-Verbose "Error converting $($Object.UserDomain)\$($Object.UserName)"
@@ -13336,16 +13338,16 @@ function Export-BloodHoundData {
                 $GroupName = "$($Object.GroupName).$($Object.GroupDomain)"
 
                 if($Object.IsGroup) {
-                    $Query = "MERGE (group1:Group { name: UPPER('$AccountName') }) MERGE (group2:Group { name: UPPER('$GroupName') }) MERGE (group1)-[:MemberOf]->(group2)"
+                    $Queries += "MERGE (group1:Group { name: UPPER('$AccountName') }) MERGE (group2:Group { name: UPPER('$GroupName') }) MERGE (group1)-[:MemberOf]->(group2)"
                 }
                 else {
                     # check if -FullData objects are returned, and if so check if the group member is a computer object
                     if($Object.ObjectClass -and ($Object.ObjectClass -contains 'computer')) {
-                        $Query = "MERGE (computer:Computer { name: UPPER('$($Object.dnshostname)') }) MERGE (group:Group { name: UPPER('$GroupName') }) MERGE (computer)-[:MemberOf]->(group)"
+                        $Queries += "MERGE (computer:Computer { name: UPPER('$($Object.dnshostname)') }) MERGE (group:Group { name: UPPER('$GroupName') }) MERGE (computer)-[:MemberOf]->(group)"
                     }
                     else {
                         # otherwise there's no way to determine if this is a computer object or not
-                        $Query = "MERGE (user:User { name: UPPER('$AccountName') }) MERGE (group:Group { name: UPPER('$GroupName') }) MERGE (user)-[:MemberOf]->(group)"
+                        $Queries += "MERGE (user:User { name: UPPER('$AccountName') }) MERGE (group:Group { name: UPPER('$GroupName') }) MERGE (user)-[:MemberOf]->(group)"
                     }
                 }
             }
@@ -13366,10 +13368,10 @@ function Export-BloodHoundData {
                 $AccountName = "$AccountName.$MemberDomain"
 
                 if($Object.IsGroup) {
-                    $Query = "MERGE (group:Group { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$($Object.ComputerName)') }) MERGE (group)-[:AdminTo]->(computer)"
+                    $Queries += "MERGE (group:Group { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$($Object.ComputerName)') }) MERGE (group)-[:AdminTo]->(computer)"
                 }
                 else {
-                    $Query = "MERGE (user:User { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$($Object.ComputerName)') }) MERGE (user)-[:AdminTo]->(computer)"
+                    $Queries += "MERGE (user:User { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$($Object.ComputerName)') }) MERGE (user)-[:AdminTo]->(computer)"
                 }
             }
             elseif($Object.PSObject.TypeNames -contains 'PowerView.LocalUserSpecified') {
@@ -13380,10 +13382,10 @@ function Export-BloodHoundData {
                 $AccountName = "$($Object.MemberName).$($Object.MemberDomain)"
 
                 if($Object.IsGroup) {
-                    $Query = "MERGE (group:Group { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$($Object.ComputerName)') }) MERGE (group)-[:AdminTo]->(computer)"
+                    $Queries += "MERGE (group:Group { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$($Object.ComputerName)') }) MERGE (group)-[:AdminTo]->(computer)"
                 }
                 else {
-                    $Query = "MERGE (user:User { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$($Object.ComputerName)') }) MERGE (user)-[:AdminTo]->(computer)"
+                    $Queries += "MERGE (user:User { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$($Object.ComputerName)') }) MERGE (user)-[:AdminTo]->(computer)"
                 }
             }
             elseif($Object.PSObject.TypeNames -contains 'PowerView.GPOLocalGroup') {
@@ -13401,10 +13403,10 @@ function Export-BloodHoundData {
 
                 ForEach($Computer in $Object.ComputerName) {
                     if($Object.IsGroup) {
-                        $Query = "MERGE (group:Group { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$Computer') }) MERGE (group)-[:AdminTo]->(computer)"
+                        $Queries += "MERGE (group:Group { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$Computer') }) MERGE (group)-[:AdminTo]->(computer)"
                     }
                     else {
-                        $Query = "MERGE (user:User { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$Computer') }) MERGE (user)-[:AdminTo]->(computer)"
+                        $Queries += "MERGE (user:User { name: UPPER('$AccountName') }) MERGE (computer:Computer { name: UPPER('$Computer') }) MERGE (user)-[:AdminTo]->(computer)"
                     }
                 }
             }
@@ -13412,13 +13414,15 @@ function Export-BloodHoundData {
                 Write-Verbose "No matching type name"
             }
 
-            $BatchObject = @{
-                "method" = "POST";
-                "to" = "/cypher";
-                "body" = @{"query"=$Query};
+            # built the batch object submission object for each query
+            ForEach($Query in $Queries) {
+                $BatchObject = @{
+                    "method" = "POST";
+                    "to" = "/cypher";
+                    "body" = @{"query"=$Query};
+                }
+                $Null = $ObjectBuffer.Add($BatchObject)
             }
-
-            $Null = $ObjectBuffer.Add($BatchObject)
 
             if ($ObjectBuffer.Count -ge $Throttle) {
                 $JsonRequest = ConvertTo-Json20 $ObjectBuffer
