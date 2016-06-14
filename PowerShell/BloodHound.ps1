@@ -7043,18 +7043,24 @@ function Find-GPOLocation {
         'PageSize' = $PageSize
     }
 
-    # enumerate all GPO group mappings for the target domain
+    # enumerate all GPO group mappings for the target domain that involve our target SID set
     $GPOgroups = Get-NetGPOGroup @GPOGroupArgs | ForEach-Object {
 
         $GPOgroup = $_
 
-        # if the locally set group is what we're looking for or the locally set group is a 
-        # member of what we're looking for, check the GroupMembers for our target SID
-        if( ($GPOgroup.GroupSID -match $TargetLocalSID) -or ($GPOgroup.GroupMemberOf -contains $TargetLocalSID) ) {
+        # if the locally set group is what we're looking for, check the GroupMembers ('members')
+        #    for our target SID
+        if($GPOgroup.GroupSID -match $TargetLocalSID) {
             $GPOgroup.GroupMembers | Where-Object {$_} | ForEach-Object {
                 if ( ($TargetSIDs[0] -eq '*') -or ($TargetSIDs -Contains $_) ) {
                     $GPOgroup
                 }
+            }
+        }
+        # if the group is a 'memberof' the group we're looking for, check GroupSID against the targt SIDs 
+        if( ($GPOgroup.GroupMemberOf -contains $TargetLocalSID) ) {
+            if( ($TargetSIDs[0] -eq '*') -or ($TargetSIDs -Contains $GPOgroup.GroupSID) ) {
+                $GPOgroup
             }
         }
     } | Sort-Object -Property GPOName -Unique
@@ -7065,12 +7071,18 @@ function Find-GPOLocation {
         $GPOguid = $_.GPOName
         $GPOPath = $_.GPOPath
         $GPOType = $_.GPOType
-        $GPOMembers = $_.GroupMembers
+        if($_.GroupMembers) {
+            $GPOMembers = $_.GroupMembers
+        }
+        else {
+            $GPOMembers = $_.GroupSID
+        }
+        
         $Filters = $_.Filters
 
         if(-not $TargetObject) {
             # if the * wildcard was used, set the ObjectDistName as the GPO member SID set
-            # so all relationship mappings are output
+            #   so all relationship mappings are output
             $TargetObjectSIDs = $GPOMembers
         }
         else {
@@ -7116,31 +7128,30 @@ function Find-GPOLocation {
             }
         }
 
-        # # find any sites that have this GUID applied
-        # # TODO: wait to implement this into BloodHound...
-        # Get-NetSite -Domain $Domain -DomainController $DomainController -GUID $GPOguid -PageSize $PageSize -FullData | ForEach-Object {
+        # find any sites that have this GUID applied
+        Get-NetSite -Domain $Domain -DomainController $DomainController -GUID $GPOguid -PageSize $PageSize -FullData | ForEach-Object {
 
-        #     ForEach ($TargetSid in $TargetObjectSIDs) {
-        #         $Object = Get-ADObject -SID $TargetSid -Domain $Domain -DomainController $DomainController -Credential $Credential -PageSize $PageSize
+            ForEach ($TargetSid in $TargetObjectSIDs) {
+                $Object = Get-ADObject -SID $TargetSid -Domain $Domain -DomainController $DomainController -Credential $Credential -PageSize $PageSize
 
-        #         $IsGroup = @('268435456','268435457','536870912','536870913') -contains $Object.samaccounttype
+                $IsGroup = @('268435456','268435457','536870912','536870913') -contains $Object.samaccounttype
 
-        #         $AppliedSite = New-Object PSObject
-        #         $AppliedSite | Add-Member Noteproperty 'ObjectName' $Object.samaccountname
-        #         $AppliedSite | Add-Member Noteproperty 'ObjectDN' $Object.distinguishedname
-        #         $AppliedSite | Add-Member Noteproperty 'ObjectSID' $Object.objectsid
-        #         $AppliedSite | Add-Member Noteproperty 'IsGroup' $IsGroup
-        #         $AppliedSite | Add-Member Noteproperty 'Domain' $Domain
-        #         $AppliedSite | Add-Member Noteproperty 'GPODisplayName' $GPOname
-        #         $AppliedSite | Add-Member Noteproperty 'GPOGuid' $GPOGuid
-        #         $AppliedSite | Add-Member Noteproperty 'GPOPath' $GPOPath
-        #         $AppliedSite | Add-Member Noteproperty 'GPOType' $GPOType
-        #         $AppliedSite | Add-Member Noteproperty 'ContainerName' $_.distinguishedname
-        #         $AppliedSite | Add-Member Noteproperty 'ComputerName' $_.siteobjectbl
-        #         $AppliedSite.PSObject.TypeNames.Add('PowerView.GPOLocalGroup')
-        #         $AppliedSite
-        #     }
-        # }
+                $AppliedSite = New-Object PSObject
+                $AppliedSite | Add-Member Noteproperty 'ObjectName' $Object.samaccountname
+                $AppliedSite | Add-Member Noteproperty 'ObjectDN' $Object.distinguishedname
+                $AppliedSite | Add-Member Noteproperty 'ObjectSID' $Object.objectsid
+                $AppliedSite | Add-Member Noteproperty 'IsGroup' $IsGroup
+                $AppliedSite | Add-Member Noteproperty 'Domain' $Domain
+                $AppliedSite | Add-Member Noteproperty 'GPODisplayName' $GPOname
+                $AppliedSite | Add-Member Noteproperty 'GPOGuid' $GPOGuid
+                $AppliedSite | Add-Member Noteproperty 'GPOPath' $GPOPath
+                $AppliedSite | Add-Member Noteproperty 'GPOType' $GPOType
+                $AppliedSite | Add-Member Noteproperty 'ContainerName' $_.distinguishedname
+                $AppliedSite | Add-Member Noteproperty 'ComputerName' $_.siteobjectbl
+                $AppliedSite.PSObject.TypeNames.Add('PowerView.GPOLocalGroup')
+                $AppliedSite
+            }
+        }
     }
 }
 
@@ -7307,8 +7318,7 @@ function Find-GPOComputerAdmin {
 
         $TargetOUs | Where-Object {$_} | ForEach-Object {
 
-            # for each OU the computer is a part of, get the full OU object
-            $GPOgroups += Get-NetOU -Domain $Domain -DomainController $DomainController -ADSpath $_ -FullData -PageSize $PageSize | ForEach-Object { 
+            $GPOLinks = Get-NetOU -Domain $Domain -DomainController $DomainController -ADSpath $_ -FullData -PageSize $PageSize | ForEach-Object { 
                 # and then get any GPO links
                 if($_.gplink) {
                     $_.gplink.split("][") | ForEach-Object {
@@ -7317,16 +7327,24 @@ function Find-GPOComputerAdmin {
                         }
                     }
                 }
-            } | ForEach-Object {
-                $GPOGroupArgs =  @{
-                    'Domain' = $Domain
-                    'DomainController' = $DomainController
-                    'UsePSDrive' = $UsePSDrive
-                    'ResolveMemberSIDs' = $True
-                    'PageSize' = $PageSize
+            }
+
+            $GPOGroupArgs =  @{
+                'Domain' = $Domain
+                'DomainController' = $DomainController
+                'UsePSDrive' = $UsePSDrive
+                'ResolveMemberSIDs' = $True
+                'PageSize' = $PageSize
+            }
+
+            # extract GPO groups that are set through any gPlink for this OU
+            $GPOGroups += Get-NetGPOGroup @GPOGroupArgs | ForEach-Object {
+                ForEach($GPOLink in $GPOLinks) {
+                    $Name = $_.GPOName
+                    if($GPOLink -like "*$Name*") {
+                        $_
+                    }
                 }
-                # for each GPO link, get any locally set user/group SIDs
-                Get-NetGPOGroup @GPOGroupArgs
             }
         }
 
@@ -7334,8 +7352,14 @@ function Find-GPOComputerAdmin {
         $GPOgroups | Sort-Object -Property GPOName -Unique | ForEach-Object {
             $GPOGroup = $_
 
-            $GPOGroup.GroupMembers | ForEach-Object {
+            if($GPOGroup.GroupMembers) {
+                $GPOMembers = $GPOGroup.GroupMembers
+            }
+            else {
+                $GPOMembers = $GPOGroup.GroupSID
+            }
 
+            $GPOMembers | ForEach-Object {
                 # resolve this SID to a domain object
                 $Object = Get-ADObject -Domain $Domain -DomainController $DomainController -PageSize $PageSize -SID $_
 
@@ -7350,8 +7374,8 @@ function Find-GPOComputerAdmin {
                 $GPOComputerAdmin | Add-Member Noteproperty 'GPODisplayName' $GPOGroup.GPODisplayName
                 $GPOComputerAdmin | Add-Member Noteproperty 'GPOGuid' $GPOGroup.GPOName
                 $GPOComputerAdmin | Add-Member Noteproperty 'GPOPath' $GPOGroup.GPOPath
-                $GPOComputerAdmin | Add-Member Noteproperty 'GPOType' $GPOType.GPOType
-                $GPOComputerAdmin 
+                $GPOComputerAdmin | Add-Member Noteproperty 'GPOType' $GPOGroup.GPOType
+                $GPOComputerAdmin
 
                 # if we're recursing and the current result object is a group
                 if($Recurse -and $GPOComputerAdmin.isGroup) {
