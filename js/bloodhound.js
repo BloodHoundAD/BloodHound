@@ -1804,7 +1804,7 @@ function evaluateSiblings(n){
 			}
 		})
 
-		if (siblings.length > localStorage.getItem('siblingThreshold')){
+		if (siblings.length > parseInt(localStorage.getItem('siblingThreshold'))){
 			var i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
 			while (sigmaInstance.graph.nodes(i) != undefined){
 				i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
