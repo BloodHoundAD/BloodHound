@@ -328,7 +328,7 @@ $(document).ready(function(){
 	$('#searchBar').bind('keypress', function(e){
 		if (e.which == 13){
 			if (!pathfindingMode){
-				doQuery("MATCH (n) WHERE n.name =~ '(?i)" + escapeRegExp(e.currentTarget.value) + ".*' RETURN n");	
+				doQuery("MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(e.currentTarget.value) + ".*' RETURN n");	
 			}else{
 				var start = $('#searchBar').val();
 				var end = $('#endNode').val();
