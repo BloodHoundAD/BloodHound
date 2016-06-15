@@ -1237,6 +1237,10 @@ function updateNodeData(node){
 				    "statement" : "MATCH (n:User),(target:Computer {name:'" + node.data.node.label +"'}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(target)) WITH nodes(p) AS y RETURN count(distinct(filter(x in y WHERE labels(x)[0] = 'User')))"
 				  }, {
 				  	"statement" : "MATCH (m:Computer {name:'" + node.data.node.label + "'})-[r:HasSession]->(n:User) WITH n WHERE NOT n.name ENDS WITH '$' RETURN count(n)"
+				  }, {
+				  	"statement" : "MATCH (n:Computer {name:'" + node.data.node.label + "'}), (target:Group), (n)-[r:MemberOf]->(target) RETURN count(target)"
+				  }, {
+				  	"statement" : "MATCH (n:Computer {name:'" + node.data.node.label + "'}), (target:Group), p=allShortestPaths((n)-[r:MemberOf*1..]->(target)) RETURN count(target)"
 				  } ]
 			}),
 			success: function(json) {
@@ -1244,10 +1248,13 @@ function updateNodeData(node){
 				var c1 = json.results[0].data[0].row[0];
 				var c2 = json.results[1].data[0].row[0];
 				var c3 = json.results[2].data[0].row[0];
+				var c4 = json.results[3].data[0].row[0];
+				var c5 = json.results[4].data[0].row[0];
 				
 				var template = $('#datatemplate').html();
 				var compnodetemplate = $('#computertemplate').html();
-				var nodeinfo = Mustache.render(compnodetemplate, {label: node.data.node.label, explicit_admins: c1, sessions: c3, unrolled_admin: c2});
+				var nodeinfo = Mustache.render(compnodetemplate, {label: node.data.node.label, explicit_admins: c1, sessions: c3,
+				 unrolled_admin: c2, first_degree_group: c4, unrolled_group_membership: c5});
 				var rendered = Mustache.render(template, {dbinfo: dbinforendered, nodeinfo: nodeinfo});
 				$('#nodedatabox').html(rendered);
 				$('.nav-tabs a[href="#nodeinfo"]').tab('show')
@@ -1283,10 +1290,14 @@ function updateNodeData(node){
 				var c3 = json.results[2].data[0].row[0];
 				var c4 = json.results[3].data[0].row[0];
 				var c5 = json.results[4].data[0].row[0];
+				var c6 = json.results[5].data[0].row[0];
+				var c7 = json.results[6].data[0].row[0];
 				
 				var template = $('#datatemplate').html();
 				var groupnodetemplate = $('#grouptemplate').html();
-				var nodeinfo = Mustache.render(groupnodetemplate, {label: node.data.node.label, explicit_members: c1, unrolled_members: c2, adminto:c3, derivative_admin: c4, unrolled_member_of:c5});
+				var nodeinfo = Mustache.render(groupnodetemplate, {label: node.data.node.label, 
+					explicit_members: c1, unrolled_members: c2, adminto:c3, derivative_admin: c4,
+					 unrolled_member_of:c5});
 				var rendered = Mustache.render(template, {dbinfo: dbinforendered, nodeinfo: nodeinfo});
 				$('#nodedatabox').html(rendered);
 				$('.nav-tabs a[href="#nodeinfo"]').tab('show')
@@ -1488,7 +1499,7 @@ function doInit(){
 				headers: {
 					"Authorization": "Basic bmVvNGo6bmVvNGpq"
 				},
-				data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name =~ '(?i)" + escapeRegExp(query) + ".*' RETURN n.name LIMIT 10"}),
+				data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(query) + ".*' RETURN n.name LIMIT 10"}),
 				success: function(json) {
 					var d = json.data
 					var l = d.length;
@@ -1500,7 +1511,7 @@ function doInit(){
 			});
 		}, afterSelect: function(selected){
 			if (!pathfindingMode){
-				doQuery("MATCH (n) WHERE n.name =~ '(?i)" + escapeRegExp(selected) + ".*' RETURN n");	
+				doQuery("MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(selected) + ".*' RETURN n");	
 			}else{
 				var start = $('#searchBar').val();
 				var end = $('#endNode').val();
@@ -1522,7 +1533,7 @@ function doInit(){
 				headers: {
 					"Authorization": "Basic bmVvNGo6bmVvNGpq"
 				},
-				data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name =~ '(?i)" + escapeRegExp(query) + ".*' RETURN n.name LIMIT 10"}),
+				data: JSON.stringify( { "query" : "MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(query) + ".*' RETURN n.name LIMIT 10"}),
 				success: function(json) {
 					var d = json.data
 					var l = d.length;

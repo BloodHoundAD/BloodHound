@@ -343,6 +343,10 @@
 				<dd> <a href="#" onclick="doQuery('MATCH (n)-[r:AdminTo]->(m:Computer {name:&quot;{{label}}&quot;}) RETURN n,r,m')">{{explicit_admins}}</a></dd>
 				<dt>Unrolled Admins</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (n:User),(target:Computer {name:&quot;{{label}}&quot;}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(target)) RETURN p', &quot;{{label}}&quot;)">{{unrolled_admin}}</a></dd>
+				<dt>First Degree Group Membership</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (n:Computer {name:&quot;{{label}}&quot;}),(target:Group), (n)-[r:MemberOf]->(target) RETURN n,r,target', &quot;{{label}}&quot;)">{{first_degree_group}}</a></dd>
+				<dt>Unrolled Group Membership</dt>
+				<dd><a href="#" onclick="doQuery('MATCH (n:Computer {name:&quot;{{label}}&quot;}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1..]->(target)) RETURN p', &quot;{{label}}&quot;)">{{unrolled_group_membership}}</a></dd>
 				<dt>Sessions</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (m:Computer {name:&quot;{{label}}&quot;})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH &quot;$&quot; RETURN n,r,m')">{{sessions}}</a></dd>
 			</dl>
