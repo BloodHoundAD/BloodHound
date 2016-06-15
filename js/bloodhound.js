@@ -34,6 +34,7 @@ $(document).ready(function(){
 	sigmaInstance.settings({
 		edgeColor: 'default',
 		defaultEdgeColor: '#356',
+		defaultLabelColor: '#000',
 		nodeColor: 'default',
 		edgeHoverColor: 'default',
 		defaultEdgeHoverColor: '#090',
@@ -45,7 +46,7 @@ $(document).ready(function(){
 		iconThreshold: 4,
 		labelThreshold: 15,
 		labelAlignment: 'bottom',
-		labelColor: 'node',
+		labelColor: 'default',
 		font: 'Roboto',
 		glyphFillColor: 'black',
 		glyphTextColor: 'white',
@@ -90,20 +91,28 @@ $(document).ready(function(){
 				font:'FontAwesome',
 				content:'\uF007',
 				scale: 1.5,
-				color: '#ffffff'
+				color: '#63C03A'
+				//color: '#ffffff'
 			},
 			'Computer': {
 				font:'FontAwesome',
 				content:'\uF108',
 				scale: 1.2,
-				color: '#ffffff'
+				color: '#DE1E1E'
+				//color: '#ffffff'
 			},
 			'Group': {
 				font:'FontAwesome',
 				content:'\uF0C0',
 				scale: 1.5,
-				color: '#ffffff'
+				color: '#ECB305'
+				//color: '#ffffff'
 			}
+		},
+		colorScheme: {
+			'User': '#63C03A',
+			'Computer': '#DE1E1E',
+			'Group' : '#ECB305'
 		}
 	}
 
@@ -1290,8 +1299,6 @@ function updateNodeData(node){
 				var c3 = json.results[2].data[0].row[0];
 				var c4 = json.results[3].data[0].row[0];
 				var c5 = json.results[4].data[0].row[0];
-				var c6 = json.results[5].data[0].row[0];
-				var c7 = json.results[6].data[0].row[0];
 				
 				var template = $('#datatemplate').html();
 				var groupnodetemplate = $('#grouptemplate').html();
