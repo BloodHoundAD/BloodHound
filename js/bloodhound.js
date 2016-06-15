@@ -100,22 +100,28 @@ $(document).ready(function(){
 				font:'FontAwesome',
 				content:'\uF007',
 				scale: 1.5,
-				color: '#63C03A'
+				color: '#17E625'
 				//color: '#ffffff'
 			},
 			'Computer': {
 				font:'FontAwesome',
 				content:'\uF108',
 				scale: 1.2,
-				color: '#DE1E1E'
+				color: '#E67873'
 				//color: '#ffffff'
 			},
 			'Group': {
 				font:'FontAwesome',
 				content:'\uF0C0',
 				scale: 1.5,
-				color: '#ECB305'
+				color: '#DBE617'
 				//color: '#ffffff'
+			}, 
+			'Domain' : {
+				font: 'FontAwesome',
+				content: '\uF0AC',
+				scale: 1.5,
+				color: '#17E6B9'
 			}
 		},
 		colorScheme: {
