@@ -52,7 +52,7 @@ $(document).ready(function(){
 		glyphTextColor: 'white',
 		glyphTextThreshold: 1,
 		defaultLabelActiveColor:'red',
-		zoomingRatio: 1.2
+		zoomingRatio: 1.4
 	})
 
 	sigmaInstance.camera.bind('coordinatesUpdated', function(e){
