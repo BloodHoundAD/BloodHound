@@ -20,6 +20,7 @@ $(document).ready(function(){
 	sigma.renderers.def = sigma.renderers.canvas
 
 	localStorage.setItem('collapseThreshold', 5)
+	localStorage.setItem('siblingThreshold', 10)
 
 	sigma.classes.graph.addMethod('outboundNodes', function(id) {
 		return this.outNeighborsIndex.get(id).keyList();
@@ -1803,7 +1804,7 @@ function evaluateSiblings(n){
 			}
 		})
 
-		if (siblings.length > 10){
+		if (siblings.length > localStorage.getItem('siblingThreshold')){
 			var i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
 			while (sigmaInstance.graph.nodes(i) != undefined){
 				i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
