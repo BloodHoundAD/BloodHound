@@ -51,7 +51,16 @@ $(document).ready(function(){
 		glyphFillColor: 'black',
 		glyphTextColor: 'white',
 		glyphTextThreshold: 1,
-		defaultLabelActiveColor:'red'
+		defaultLabelActiveColor:'red',
+		zoomingRatio: 1.2
+	})
+
+	sigmaInstance.camera.bind('coordinatesUpdated', function(e){
+		if (e.target.ratio > 1.25){
+			sigmaInstance.settings('drawEdgeLabels', false)
+		}else{
+			sigmaInstance.settings('drawEdgeLabels', true)
+		}
 	})
 
 	sigmaInstance.bind('hovers', function(e){
