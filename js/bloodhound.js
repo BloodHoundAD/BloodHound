@@ -858,7 +858,7 @@ $(document).ready(function(){
 
 var dragged = false;
 var dbinforendered = null;
-var loadingString = "<h3 align='center'>{{label}} Properties</h3><div class='loader'>Loading...</div>"
+var loadingString = "<div class='loader'>Loading...</div>"
 var noDataString = "<h3 align='center'>Node Properties</h3><div style='padding-bottom:1em'>Select a node for more information</div>"
 var sigmaInstance = null;
 var queryStack = new Array();
