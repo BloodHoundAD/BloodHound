@@ -329,7 +329,7 @@
 				<dt>First Degree Local Admin</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN p')">{{first_degree_admin}}</a></dd>
 				<dt>Group Delegated Local Admin Rights</dt>
-				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (m:Computer), (o:Group), (n)-[r:MemberOf]->(o)-[s:AdminTo]->(m) RETURN n,r,o,s,m', &quot;{{label}}&quot;, &quot;&quot;)">{{dlar}}</a></dd>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN n,m,r,s,p', &quot;{{label}}&quot;, &quot;&quot;)">{{dlar}}</a></dd>
 				<dt>Derivative Local Admin Rights</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (m:Computer), p=allShortestPaths((n)-[r*]->(m)) RETURN p', &quot;{{label}}&quot;)">{{derivative}}</a></dd>
 				<dt>Sessions</dt>
@@ -363,7 +363,7 @@
 		<script id="grouptemplate" type="text/template">
 			<dl class='dl-horizontal'>
 				<dt>Node</dt>
-				<dd>{{label}}
+				<dd>{{label}}</dd>
 				<br>
 				<dt>Direct Members</dt>
 				<dd> <a href="#" onclick="doQuery('MATCH (n)-[r:MemberOf]->(m:Group {name:&quot;{{label}}&quot;}) RETURN n,r,m')">{{explicit_members}}</a></dd>

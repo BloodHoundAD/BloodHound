@@ -353,7 +353,8 @@ $(document).ready(function(){
 	$('#searchBar').bind('keypress', function(e){
 		if (e.which == 13){
 			if (!pathfindingMode){
-				doQuery("MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(e.currentTarget.value) + ".*' RETURN n");	
+				preventNextQuery = true;
+				doQuery("MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(e.currentTarget.value) + ".*' RETURN n");
 			}else{
 				var start = $('#searchBar').val();
 				var end = $('#endNode').val();
@@ -889,6 +890,7 @@ var currentEndNode = null;
 var currentPath = [];
 var reversePath = [];
 var spotlightData = {};
+var preventNextQuery = false;
 
 var cancelQuery = null;
 
@@ -972,7 +974,6 @@ function handleUpload(event){
 	var reader = new FileReader();
 	reader.onload = function(event){
 		var x = event.target.result;
-		console.log($.csv.toObjects(x));
 	}
 	reader.readAsText(event.target.files);
 }
@@ -1221,7 +1222,7 @@ function updateNodeData(node){
 				  }, {
 				    "statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN count(target)"
 				  }, {
-				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (m:Computer), (o:Group), (n)-[r:MemberOf]->(o)-[s:AdminTo]->(m) RETURN count(distinct(m))"
+				  	"statement" : "MATCH x=allShortestPaths((n:User {name:'" + node.data.node.label + "'})-[r:MemberOf*1..]->(m:Group)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN count(p)"
 				  }, {
 				  	"statement" : "MATCH (n:User {name:'" + node.data.node.label + "'}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN count(distinct(target))"
 				  }, {
@@ -1233,13 +1234,13 @@ function updateNodeData(node){
 				var fdg = json.results[0].data[0].row[0];
 				var unr = json.results[1].data[0].row[0];
 				var diradmin = json.results[2].data[0].row[0];
-				var dla = json.results[3].data[0].row[0];
+				var group_delegated_admin_rights = json.results[3].data[0].row[0];
 				var dir = json.results[4].data[0].row[0];
 				var sessions = json.results[5].data[0].row[0];
 				
 				var template = $('#datatemplate').html();
 				var usernodetemplate = $('#usernodetemplate').html();
-				var usernodeinfo = Mustache.render(usernodetemplate, {label: node.data.node.label, first_degree_group:fdg, unrolled: unr, first_degree_admin: diradmin, type_user: true, dlar: dla, derivative:dir, sessions:sessions});
+				var usernodeinfo = Mustache.render(usernodetemplate, {label: node.data.node.label, first_degree_group:fdg, unrolled: unr, first_degree_admin: diradmin, type_user: true, dlar: group_delegated_admin_rights, derivative:dir, sessions:sessions});
 				var rendered = Mustache.render(template, {dbinfo: dbinforendered, nodeinfo: usernodeinfo});
 				$('#nodedatabox').html(rendered);
 				$('.nav-tabs a[href="#nodeinfo"]').tab('show')
@@ -1503,6 +1504,10 @@ function doInit(){
 			  	"statement" : "CREATE INDEX ON :Computer(name)"
 			  }, {
 			  	"statement" : "CREATE INDEX ON :Group(name)"
+			  }, {
+			  	"statement" : "CREATE CONSTRAINT ON (c:Domain) ASSERT c.DomainName IS UNIQUE"
+			  }, {
+			  	"statement" : "CREATE INDEX ON :Domain(name)"
 			  } ]
 		}),
 		success: function(json) {
@@ -1533,13 +1538,15 @@ function doInit(){
 				}
 			});
 		}, afterSelect: function(selected){
-			if (!pathfindingMode){
-				doQuery("MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(selected) + ".*' RETURN n");	
-			}else{
-				var start = $('#searchBar').val();
-				var end = $('#endNode').val();
-				if (start != "" &&  end != ""){
-					doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);	
+			if (!preventNextQuery){
+				if (!pathfindingMode){
+					doQuery("MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(selected) + ".*' RETURN n");	
+				}else{
+					var start = $('#searchBar').val();
+					var end = $('#endNode').val();
+					if (start != "" &&  end != ""){
+						doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);	
+					}
 				}
 			}
 		}, autoSelect: false
