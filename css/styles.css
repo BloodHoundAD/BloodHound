@@ -412,13 +412,26 @@ html, body{
 	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
-.spotlight{
-	z-index: 30;
-	position: absolute;
-	top: 15%;
-	left: 50%;
-	transform:translate(-50%,0);
-	width: 40%;
+@media all and (min-width: 1500px){
+	.spotlight{
+		z-index: 30;
+		position: absolute;
+		top: 15%;
+		left: 50%;
+		transform:translate(-50%,0);
+		width: 40%;
+	}
+}
+
+@media all and (min-width: 1000px){
+	.spotlight{
+		z-index: 30;
+		position: absolute;
+		top: 15%;
+		left: 50%;
+		transform:translate(-50%,0);
+		width: 60%;
+	}
 }
 
 .nodeList{
