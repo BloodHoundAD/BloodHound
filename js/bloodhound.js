@@ -53,7 +53,8 @@ $(document).ready(function(){
 		glyphTextColor: 'white',
 		glyphTextThreshold: 1,
 		defaultLabelActiveColor:'red',
-		zoomingRatio: 1.4
+		zoomingRatio: 1.4,
+		batchEdgesDrawing: true
 	})
 
 	sigmaInstance.camera.bind('coordinatesUpdated', function(e){
@@ -180,7 +181,7 @@ $(document).ready(function(){
     });
 
 	// Initialize the noverlap plugin
-	noverlapListener = sigmaInstance.configNoverlap({nodeMargin: 2.0, easing: 'cubicInOut', gridSize: 50})
+	noverlapListener = sigmaInstance.configNoverlap({nodeMargin: 5.0, easing: 'cubicInOut', gridSize: 20, permittedExpansion: 1.3})
 	noverlapListener.bind('stop', function(event){
 		$('#loadingText').text('Complete')
 		$('#circle').circleProgress({
@@ -188,9 +189,13 @@ $(document).ready(function(){
 			value: 1
 		})
 		if ($('#queryLoad').is(":visible")){
-			setTimeout(function(){
-				$('#queryLoad').fadeToggle()
-			}, 2000)
+			if (!fadeOutInProgress){
+				fadeOutInProgress = true
+				setTimeout(function(){
+					$('#queryLoad').fadeToggle()
+					fadeOutInProgress = false;
+				}, 2000)
+			}
 			if (noanimate){
 				sigmaInstance.settings('animationsTime', 200);
 				noanimate = false;
@@ -891,6 +896,7 @@ var currentPath = [];
 var reversePath = [];
 var spotlightData = {};
 var preventNextQuery = false;
+var fadeOutInProgress = false;
 
 var cancelQuery = null;
 
