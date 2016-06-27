@@ -938,7 +938,7 @@ var reversePath = [];
 var spotlightData = {};
 var preventNextQuery = false;
 var fadeOutInProgress = false;
-
+var queryInProgress = false;
 var cancelQuery = null;
 
 function escapeRegExp(s) {
@@ -1049,6 +1049,13 @@ function setLabelAsEnd(label){
 };
 
 function doQuery(query, start, end, preventCollapse){
+	if (queryInProgress){
+		return;
+	}
+	queryInProgress = true;
+	setTimeout(function(){
+		queryInProgress = false;
+	}, 500)
 	currentEndNode = null;
 	currentStartNode = null;
 	if (typeof start === 'undefined'){
