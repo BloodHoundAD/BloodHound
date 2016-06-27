@@ -12,6 +12,8 @@
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
 		<link rel="stylesheet" type="text/css" href="css/animation.css">
 		<link rel="stylesheet" type="text/css" href="css/tooltip.css">
+		<link rel="stylesheet" type="text/css" href="css/simple-slider.css">
+		<link rel="stylesheet" type="text/css" href="css/simple-slider-volume.css">
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/sigma.min.js"></script>
 		<script type="text/javascript" src="js/plugins.min.js"></script>
@@ -25,6 +27,7 @@
 		<script type="text/javascript" src="js/sigma.renderers.glyphs.min.js"></script>
 		<script type="text/javascript" src="js/sigma.exporters.image.min.js"></script>
 		<script type="text/javascript" src="js/dagre.min.js"></script>
+		<script type="text/javascript" src="js/simple-slider.min.js"></script>
 
 		<script type="javascript/worker" id="ingestworker">
 			function createXHR(url, auth){
@@ -776,53 +779,37 @@
 			<div id="circle"></div>
 		</div>
 
-		<!-- <div id="settingsDiv" class="settingsDiv panel panel-default">
+		<div id="settingsDiv" class="settingsDiv panel panel-default">
 			<div class="panel-heading">
 				Settings
-				<button type="button" class="close" onclick="$('#uploadSelectDiv').fadeToggle(false)" aria-label="Close">
+				<button type="button" class="close" onclick="$('#settingsDiv').fadeToggle(false)" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
 
-			<div class="panel-body ingestinput">
-				<div class="input-group" id="fileselectdiv">
-					<span class="input-group-addon" id="addonforfile">File Name:</span>
-					<input id="uploadFileSelected" aria-described-by="addonforfile" class="form-control">
-					<span class="input-group-btn">
-						<button id="selectUploadFile" class="btn btn-default">
-							<span class="glyphicon glyphicon-file"></span>
-						</button>
+			<div class="panel-body sliderfix">
+				<div>
+					<strong>Sibling Collapse Threshold</strong> <i data-toggle="tooltip" data-placement="right" title="Merge nodes that have the same parent. 0 to Disable, Default 10" id="siblingCollapseQuestion" class="glyphicon glyphicon-question-sign"></i><br>
+					<input type="text" data-slider="true" data-slider-range="0,20" data-slider-step="1" data-slider-theme="volume slideinline" id="siblingCollapseSlider">
+					<span>
+						<input type="number" min="0" max="20" class="sliderinput" id="siblingCollapseInput">
 					</span>
 				</div>
 
-				<div class="list-group" style="margin-top:15px;">
-					<a href="#" id="ingestlocaladmin" class="list-group-item active">
-						<h4 class="list-group-item-heading">Local Admin Membership</h4>
-						<p class="list-group-item-text">
-							Data containing members of local Administrator groups
-						</p>
-					</a>
-
-					<a href="#" id="ingestdomaingroup" class="list-group-item">
-						<h4 class="list-group-item-heading">Domain Group Membership</h4>
-						<p class="list-group-item-text">
-							Data containing members of domain groups
-						</p>
-					</a>
-
-					<a href="#" id="ingestusersessions" class="list-group-item">
-						<h4 class="list-group-item-heading">User Sessions</h4>
-						<p class="list-group-item-text">
-							Data containing login sessions for users
-						</p>
-					</a>
+				<div>
+					<strong>Node Collapse Threshold</strong> <i data-toggle="tooltip" data-placement="right" title="Collapse nodes at the end of paths that only have one relationship. 0 to Disable, Default 5" id="nodeCollapseQuestion" class="glyphicon glyphicon-question-sign"></i><br>
+					<input type="text" data-slider="true" data-slider-range="0,20" data-slider-step="1" data-slider-theme="volume slideinline" id="nodeCollapseSlider">
+					<span>
+						<input type="number" min="0" max="20" class="sliderinput" id="nodeCollapseInput">
+					</span>
 				</div>
-
-				<div style="text-align: center">
-					<button id="startingestbutton" class="btn btn-large">Ingest Data</button>
+				<div class="checkbox-inline" style="padding-top:5px">
+					<label>
+						<input id="lowDetailCheck" type="checkbox"> Low Detail Mode
+					</label>
 				</div>
+				<i data-toggle="tooltip" data-placement="right" title="Lower detail of graph to improve performance" id="siblingCollapseQuestion" class="glyphicon glyphicon-question-sign"></i>
 			</div>
-		</div> -->
-
+		</div>
 	</body>
 </html>

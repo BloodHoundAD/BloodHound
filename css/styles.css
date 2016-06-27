@@ -402,16 +402,6 @@ html, body{
 	border-bottom-right-radius: 2em;
 }
 
-.settingsDiv{
-	z-index: 20;
-	position: absolute;
-	top: 1em;
-	right: 10em;
-	overflow: auto;
-	background-color: rgba(255, 255, 255, .9);
-	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
-}
-
 @media all and (min-width: 1000px){
 	.spotlight{
 		z-index: 30;
@@ -468,4 +458,33 @@ html, body{
 
 .loadingIndicator div:first-child{
 	text-align: center;
+}
+
+.settingsDiv{
+	z-index: 20;
+	position: absolute;
+	top: 1em;
+	right: 10em;
+	overflow: auto;
+	background-color: rgba(255, 255, 255, .9);
+	box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+	min-width: 15%;
+}
+
+.sliderinput{
+	width: 3em;
+	float:left;
+}
+
+.sliderfix .slideinline{
+	display:inline-block;
+	float:left;
+}
+
+.sliderfix .slideinline>.track{
+	margin-top: -2.5px !important;
+}
+
+.sliderfix .slideinline>.dragger{
+	margin-top: -5px !important;
 }

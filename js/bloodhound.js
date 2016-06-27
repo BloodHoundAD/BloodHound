@@ -19,9 +19,6 @@ $(document).ready(function(){
 	// Set our default renderer to Canvas, since a lot of plugins dont work on WebGL
 	sigma.renderers.def = sigma.renderers.canvas
 
-	localStorage.setItem('collapseThreshold', 5)
-	localStorage.setItem('siblingThreshold', 10)
-
 	sigma.classes.graph.addMethod('outboundNodes', function(id) {
 		return this.outNeighborsIndex.get(id).keyList();
 	})
@@ -401,6 +398,8 @@ $(document).ready(function(){
 	$('#exportSelectDiv').fadeToggle(0)
 	$("#layoutchange").toggle(false)
 	$('#dburlspinner').toggle(false)
+	$('#settingsDiv').fadeToggle(0)
+
 
 	// Click handlers for various buttons/elements
 	$('#menu').on('click', function(event){
@@ -439,6 +438,13 @@ $(document).ready(function(){
 		$('#uploadSelectDiv').fadeToggle()
 	});
 
+	$('#settingsbutton').on('click', function(event){
+		$('#settingsDiv').fadeToggle()
+		$('#siblingCollapseSlider').simpleSlider('setValue', localStorage.getItem('siblingThreshold'))
+		$('#nodeCollapseSlider').simpleSlider('setValue', localStorage.getItem('collapseThreshold'))
+		$('#lowDetailCheck')[0].checked = JSON.parse(localStorage.getItem('lowDetail'))
+	})
+
 	$('#zoomIn').on('click', function(event){
 		var cam = sigmaInstance.camera;
 
@@ -457,6 +463,40 @@ $(document).ready(function(){
 		}, {
 		  duration: sigmaInstance.settings('animationsTime')
 		});
+	})
+
+	if (localStorage.getItem('collapseThreshold') == null){
+		localStorage.setItem('collapseThreshold', 5)
+	}
+	
+	if (localStorage.getItem('siblingThreshold') == null){
+		localStorage.setItem('siblingThreshold', 10)	
+	}
+
+	if (localStorage.getItem('lowDetail') == null){
+		localStorage.setItem('lowDetail', "false")
+	}
+
+	$('#siblingCollapseSlider').bind("slider:changed", function(event, data){
+		$('#siblingCollapseInput').val(data.value)
+		localStorage.setItem('siblingThreshold', data.value)
+	})
+
+	$('#siblingCollapseInput').bind("change", function(event){
+		$('#siblingCollapseSlider').simpleSlider('setValue', event.target.valueAsNumber)
+	})
+
+	$('#nodeCollapseSlider').bind("slider:changed", function(event, data){
+		$('#nodeCollapseInput').val(data.value)
+		localStorage.setItem('collapseThreshold', data.value)
+	})
+
+	$('#nodeCollapseInput').bind("change", function(event){
+		$('#nodeCollapseSlider').simpleSlider('setValue', event.target.valueAsNumber)
+	})
+
+	$('#lowDetailCheck').bind("change", function(event){
+		localStorage.setItem('lowDetail', event.target.checked)
 	})
 
 	$('#loginbutton').on('click', function(event){
@@ -858,6 +898,7 @@ $(document).ready(function(){
 	// Make our export/ingest boxes draggable
 	$('#uploadSelectDiv').draggable({scroll:false, containment: "window"});
 	$('#exportSelectDiv').draggable({scroll:false, containment: "window"});
+	$('#settingsDiv').draggable({scroll:false, containment: "window"});
 	uploadwidth = $('#uploadSelectDiv').outerWidth()
 	$('#uploadSelectDiv').css('width', uploadwidth + 'px')
 })
