@@ -1851,6 +1851,9 @@ function ungroup(id){
 }
 
 function evaluateSiblings(n){
+	if (parseInt(localStorage.getItem('siblingThreshold')) == 0){
+		return
+	}
 	var adj = sigmaInstance.graph.adjacentEdges(n.id)
 	var siblings = []
 	if (adj.length > 1 && adj.allEdgesSameType() && n.type_computer){
@@ -1926,6 +1929,9 @@ function evaluateSiblings(n){
 }
 
 function evaluateCollapse(node, start, end){
+	if (parseInt(localStorage.getItem('collapseThreshold')) == 0){
+		return
+	}
 	if (node.degree > parseInt(localStorage.getItem('collapseThreshold'))){
 		var adjacentNodes = sigmaInstance.graph.adjacentNodes(node.id);
 		$.each(adjacentNodes, function(index, adjacentNode){
