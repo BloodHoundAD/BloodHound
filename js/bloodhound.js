@@ -1573,7 +1573,7 @@ function doInit(){
 	$('#searchBar').typeahead({
 		source: function (query, process) {
 			return $.ajax({
-				url: "http://localhost:7474/db/data/cypher",
+				url: localStorage.getItem("dbpath") + "/db/data/cypher",
 				type: 'POST',
 				accepts: {json: "application/json"},
 				dataType: "json",
@@ -1609,7 +1609,7 @@ function doInit(){
 	$('#endNode').typeahead({
 		source: function (query, process) {
 			return $.ajax({
-				url: "http://localhost:7474/db/data/cypher",
+				url: localStorage.getItem("dbpath") + "/db/data/cypher",
 				type: 'POST',
 				accepts: {json: "application/json"},
 				dataType: "json",
