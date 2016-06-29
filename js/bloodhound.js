@@ -186,13 +186,10 @@ $(document).ready(function(){
 			value: 1
 		})
 		if ($('#queryLoad').is(":visible")){
-			if (!fadeOutInProgress){
-				fadeOutInProgress = true
-				setTimeout(function(){
-					$('#queryLoad').fadeToggle()
-					fadeOutInProgress = false;
-				}, 2000)
-			}
+			setTimeout(function(){
+				$('#queryLoad').fadeOut()
+				fadeOutInProgress = false;
+			}, 2000)
 			if (noanimate){
 				sigmaInstance.settings('animationsTime', 200);
 				noanimate = false;
@@ -1101,6 +1098,15 @@ function doQuery(query, start, end, preventCollapse){
 				$("#nodataalert").fadeToggle(true)
 				redoLast()
 				$("#nodataalert").delay(3000).fadeToggle(false)
+				$('#loadingText').text('Complete')
+				$('#circle').circleProgress({
+					animationStartValue: .75,
+					value: 1
+				})
+				setTimeout(function(){
+					$('#queryLoad').fadeOut()
+					fadeOutInProgress = false;
+				}, 2000)
 			}else{
 				$('#loadingText').text('Processing Nodes')
 				$('#circle').circleProgress({
