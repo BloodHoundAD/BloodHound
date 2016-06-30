@@ -13816,7 +13816,7 @@ function Get-BloodHoundData {
         $Threads,
 
         [Int]
-        $Throttle = 1000
+        $Throttle = 100
     )
 
     begin {
