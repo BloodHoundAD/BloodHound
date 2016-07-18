@@ -779,14 +779,20 @@
 		</div>
 
 		<div id="nodeSelector" class="spotlight">
+			<div class="input-group input-group-unstyled unborder">
+				<span class="input-group-addon spanfix">
+					<i class="glyphicon glyphicon-search"></i>
+				</span>
+				<input id="nodeSelectorBar" type="search" class="form-control searchbox" autocomplete="off" placeholder="Filter Nodes" data-type="search">
+			</div>
 			<div class="nodeList">
-				<table id="nodeSelectorTable" data-role="table" class="table table-striped" data-filter="true" data-input="#spotlightBar">
+				<table id="nodeSelectorTable" data-role="table" class="table table-striped" data-filter="true" data-input="#nodeSelectorBar">
 					<thead style="text-align:center">
 						<tr>
-							<td>Node Label</td>
+							<td>Choose a Node</td>
 						</tr>
 					</thead>
-					<tbody id="nodeSelectorBody" class="searchable">
+					<tbody id="nodeSelectorBody" class="searchablex">
 					</tbody>
 				</table>
 			</div>

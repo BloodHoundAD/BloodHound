@@ -1674,6 +1674,14 @@ function doInit(){
 		}).show();
 	})
 
+	$('#nodeSelectorBar').keyup(function(){
+		var rex = new RegExp($(this).val(), 'i');
+		$('.searchablex tr').hide();
+		$('.searchablex tr').filter(function(){
+			return rex.test($(this).find(">:first-child").text());
+		}).show();
+	})
+
 	// Do this query to set the initial graph
 	doQuery("MATCH (n:Group) WHERE n.name =~ '(?i).*DOMAIN ADMINS.*' WITH n MATCH (n)<-[r:MemberOf]-(m) RETURN n,r,m", "", "", true);
 }
