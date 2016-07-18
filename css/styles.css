@@ -1,211 +1,160 @@
 /* roboto-regular - latin */
-@font-face
-{
+
+@font-face {
     font-family: 'Roboto';
     font-weight: 400;
     font-style: normal;
-
-    src: url('../fonts/roboto-v15-latin-regular.eot'); /* IE9 Compat Modes */
-    src: local('Roboto'), local('Roboto-Regular'),
-    url('../fonts/roboto-v15-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    src: url('../fonts/roboto-v15-latin-regular.eot');
+    /* IE9 Compat Modes */
+    src: local('Roboto'), local('Roboto-Regular'), url('../fonts/roboto-v15-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
     url('../fonts/roboto-v15-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
     url('../fonts/roboto-v15-latin-regular.woff') format('woff'), /* Modern Browsers */
     url('../fonts/roboto-v15-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
-    url('../fonts/roboto-v15-latin-regular.svg#Roboto') format('svg'); /* Legacy iOS */
+    url('../fonts/roboto-v15-latin-regular.svg#Roboto') format('svg');
+    /* Legacy iOS */
 }
 
 html,
-body
-{
+body {
     font-family: 'Roboto', sans-serif;
-
     height: 100%;
-
     background-color: lightgray;
 }
 
-.queryInput
-{
+.queryInput {
     position: relative;
     left: 50%;
-
     width: 70%;
-
     transform: translateX(-50%);
 }
 
-.bottomdiv
-{
+.bottomdiv {
     position: absolute;
     z-index: 10;
     bottom: 0;
-
     overflow: auto;
-
     width: 100%;
 }
 
-.menudiv
-{
+.menudiv {
     position: absolute;
     z-index: 10;
     top: 1em;
     right: 1em;
-
     overflow: visible;
 }
 
-.menudiv div
-{
+.menudiv div {
     float: right;
     clear: right;
-
     padding-top: 5px;
 }
 
-.menudiv div button
-{
+.menudiv div button {
     white-space: inherit !important;
-
     background-color: white;
 }
 
-.slideupbutton
-{
+.slideupbutton {
     position: relative;
     left: 50%;
-
     display: block;
-
     width: 200px;
     height: 2em;
-
     transform: translateX(-50%);
-
     border-radius: 20px 20px 0 0;
     background-color: white;
 }
 
-.slideupbutton:focus
-{
+.slideupbutton:focus {
     outline: 0;
 }
 
-.graph
-{
+.graph {
     width: 100%;
     height: 97%;
-
     background-color: lightgray;
 }
 
-.graph:focus
-{
+.graph:focus {
     outline: 0;
 }
 
-@media all and (min-width: 1000px)
-{
-    .searchdiv
-    {
+@media all and (min-width: 1000px) {
+    .searchdiv {
         position: absolute;
         z-index: 10;
         top: 1em;
         left: 1em;
-
         overflow: visible;
-
         width: 33%;
-
         background-color: white;
     }
 }
 
-@media all and (min-width: 1500px)
-{
-    .searchdiv
-    {
+@media all and (min-width: 1500px) {
+    .searchdiv {
         position: absolute;
         z-index: 10;
         top: 1em;
         left: 1em;
-
         overflow: visible;
-
         width: 25%;
-
         background-color: white;
     }
 }
 
-.dl-horizontal-fix
-{
+.dl-horizontal-fix {
     margin-bottom: 1em;
 }
 
-.dl-horizontal dt
-{
+.dl-horizontal dt {
     width: auto;
     padding-right: 1em;
-
     text-align: left;
 }
 
-.dl-horizontal dd
-{
+.dl-horizontal dd {
     margin-left: 0;
-
     text-align: right;
-
     border-bottom: 1px solid lightgray;
 }
 
-.dl-horizontal dd:last-child
-{
+.dl-horizontal dd:last-child {
     border-bottom: none;
 }
 
-.nodedatabox
-{
+.nodedatabox {
     overflow: auto;
-
     border-top: .5px solid lightgray;
     background-color: white;
 }
 
-.searchbox
-{
+.searchbox {
     border: 0;
 }
 
-.form-control:focus
-{
+.form-control:focus {
     border: 0;
     box-shadow: none;
 }
 
-.menuglyph
-{
+.menuglyph {
     top: 0;
 }
 
-.spanfix
-{
+.spanfix {
     cursor: pointer;
-
     border: none;
     background-color: white;
 }
 
-
-.rightspan
-{
+.rightspan {
     float: right;
     clear: right;
 }
 
-.rightglyph
-{
+.rightglyph {
     padding-top: 3px;
     padding-left: 5px;
 }
@@ -215,34 +164,27 @@ body
 .btn.active:focus,
 .btn.focus,
 .btn:active.focus,
-.btn.active.focus
-{
+.btn.active.focus {
     outline: none;
 }
 
-.padvert
-{
+.padvert {
     overflow: visible;
-
     padding-bottom: 10px;
 }
 
-#abc li.active > a
-{
+#abc li.active > a {
     border-right: 1px solid lightgray;
     border-left: 1px solid lightgray;
 }
 
-.hideme
-{
+.hideme {
     position: absolute;
     top: 0;
-
     visibility: hidden;
 }
 
-#abc li > a
-{
+#abc li > a {
     border-top: 0;
     border-right: 0;
     border-bottom: 1px solid lightgray;
@@ -250,64 +192,48 @@ body
     border-radius: 0;
 }
 
-.content
-{
+.content {
     padding: 0 10px 0 10px;
 }
 
-.alertdiv
-{
+.alertdiv {
     position: absolute;
     z-index: 10;
     top: 10px;
     left: 50%;
-
     transform: translateX(-50%);
 }
 
-.uploadSelectDiv
-{
+.uploadSelectDiv {
     position: absolute;
     z-index: 20;
     top: 1em;
     right: 10em;
-
     overflow: auto;
-
     background-color: rgba(255, 255, 255, .9);
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
 }
 
-.ingestinput
-{
+.ingestinput {
     max-width: 27em;
 }
 
-.loginwindow
-{
+.loginwindow {
     position: absolute;
     z-index: 1000;
-
     width: 100%;
     height: 100%;
-
     background-color: rgba(0, 0, 0, .7);
 }
 
-@media all and (min-width: 1000px)
-{
-    .loginwindow > #loginpanel
-    {
+@media all and (min-width: 1000px) {
+    .loginwindow > #loginpanel {
         position: absolute;
         top: 50%;
         left: 50%;
-
         overflow: auto;
-
         max-width: 40%;
-
-        transform: translate(-50%,-50%);
-
+        transform: translate(-50%, -50%);
         border: 5px solid rgba(0, 0, 0, .5);
         border-radius: 10px;
         background-color: rgba(255, 255, 255, .9);
@@ -315,20 +241,14 @@ body
     }
 }
 
-@media all and (min-width: 1500px)
-{
-    .loginwindow > #loginpanel
-    {
+@media all and (min-width: 1500px) {
+    .loginwindow > #loginpanel {
         position: absolute;
         top: 50%;
         left: 50%;
-
         overflow: auto;
-
         max-width: 25%;
-
-        transform: translate(-50%,-50%);
-
+        transform: translate(-50%, -50%);
         border: 5px solid rgba(0, 0, 0, .5);
         border-radius: 10px;
         background-color: rgba(255, 255, 255, .9);
@@ -336,318 +256,240 @@ body
     }
 }
 
-.loginwindow > #loginpanel img
-{
+.loginwindow > #loginpanel img {
     display: block;
-
     height: 150px;
     margin: auto;
 }
 
-.loginwindow > #loginpanel form
-{
+.loginwindow > #loginpanel form {
     margin-right: 2em;
     margin-left: 2em;
 }
 
-.loginwindow > #checkconnectionpanel
-{
+.loginwindow > #checkconnectionpanel {
     position: absolute;
     top: 50%;
     left: 50%;
-
     overflow: auto;
-
     max-width: 30%;
-
-    transform: translate(-50%,-50%);
-
+    transform: translate(-50%, -50%);
     border: 5px solid rgba(0, 0, 0, .5);
     border-radius: 10px;
     background-color: rgba(255, 255, 255, .9);
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
 }
 
-.loginwindow > #checkconnectionpanel span
-{
+.loginwindow > #checkconnectionpanel span {
     font-size: 1.5em;
     font-weight: 700;
-
     margin: 8px;
 }
 
-.loginwindow > #logoutpanel
-{
+.loginwindow > #logoutpanel {
     position: absolute;
     top: 50%;
     left: 50%;
-
     overflow: auto;
-
     max-width: 30%;
-
-    transform: translate(-50%,-50%);
-
+    transform: translate(-50%, -50%);
     border: 5px solid rgba(0, 0, 0, .5);
     border-radius: 10px;
     background-color: rgba(255, 255, 255, .9);
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
 }
 
-.loginwindow > #logoutpanel span
-{
+.loginwindow > #logoutpanel span {
     font-size: 1.5em;
     font-weight: 700;
-
     margin: 8px;
 }
 
-.loginwindow > #logoutpanel div
-{
+.loginwindow > #logoutpanel div {
     margin: .5em 1em .5em 1em;
 }
 
-.green-icon-color
-{
+.green-icon-color {
     color: green;
 }
 
-.red-icon-color
-{
+.red-icon-color {
     color: red;
 }
 
-.help-block-add
-{
+.help-block-add {
     margin-left: 3px;
 }
 
-.spacing
-{
+.spacing {
     margin-top: 5px;
 }
 
-.loginbutton
-{
+.loginbutton {
     display: block;
-
     margin: auto;
     margin-top: 5px;
 }
 
-.spinner
-{
+.spinner {
     display: inline-block;
-
     width: 0;
-
     -webkit-transition: opacity .25s, width .25s;
-       -moz-transition: opacity .25s, width .25s;
-         -o-transition: opacity .25s, width .25s;
-            transition: opacity .25s, width .25s;
-
+    -moz-transition: opacity .25s, width .25s;
+    -o-transition: opacity .25s, width .25s;
+    transition: opacity .25s, width .25s;
     opacity: 0;
 }
 
-.has-spinner.activate .spinner
-{
+.has-spinner.activate .spinner {
     width: auto;
-
     opacity: 1;
 }
 
-.dbbuttons
-{
+.dbbuttons {
     padding-bottom: 1em;
 }
 
-.modal
-{
+.modal {
     text-align: center;
 }
 
-@media screen and (min-width: 768px)
-{
-    .modal:before
-    {
+@media screen and (min-width: 768px) {
+    .modal:before {
         display: inline-block;
-
         height: 100%;
-
         content: ' ';
         vertical-align: middle;
     }
 }
 
-.modal-dialog
-{
+.modal-dialog {
     display: inline-block;
-
     text-align: left;
     vertical-align: middle;
 }
 
-.progress
-{
+.progress {
     position: relative;
 }
 
-.progress span
-{
+.progress span {
     position: absolute;
-
     display: block;
-
     width: 100%;
-
     color: black;
 }
 
-.zoomBox
-{
+.zoomBox {
     position: absolute;
     z-index: 20;
     right: 1em;
     bottom: 1%;
 }
 
-.zoomBox div
-{
+.zoomBox div {
     float: right;
     clear: right;
-
     padding-top: 3px;
 }
 
-.zoomBox div button
-{
+.zoomBox div button {
     background-color: white;
 }
 
-.zoomIn
-{
+.zoomIn {
     border-top-left-radius: 2em;
     border-top-right-radius: 2em;
 }
 
-.zoomOut
-{
+.zoomOut {
     border-bottom-right-radius: 2em;
     border-bottom-left-radius: 2em;
 }
 
-@media all and (min-width: 1000px)
-{
-    .spotlight
-    {
+@media all and (min-width: 1000px) {
+    .spotlight {
         position: absolute;
         z-index: 30;
         top: 15%;
         left: 50%;
-
         width: 60%;
-
-        transform: translate(-50%,0);
+        transform: translate(-50%, 0);
     }
 }
 
-@media all and (min-width: 1500px)
-{
-    .spotlight
-    {
+@media all and (min-width: 1500px) {
+    .spotlight {
         position: absolute;
         z-index: 30;
         top: 15%;
         left: 50%;
-
         width: 45%;
-
-        transform: translate(-50%,0);
+        transform: translate(-50%, 0);
     }
 }
 
-.nodeList
-{
+.nodeList {
     overflow: auto;
-
     height: 11em;
-
     background-color: white;
 }
 
-.nodelist table
-{
+.nodelist table {
     height: 100%;
-
     border: 1px solid black;
 }
 
-.unborder span
-{
+.unborder span {
     border-radius: 0;
 }
 
-.unborder input
-{
+.unborder input {
     border-radius: 0;
 }
 
-.nav-tabs li
-{
+.nav-tabs li {
     overflow: hidden;
-
     white-space: nowrap;
 }
 
-.loadingIndicator
-{
+.loadingIndicator {
     position: absolute;
     z-index: 25;
     bottom: .5em;
     left: 1em;
-
     width: 80px;
 }
 
-.loadingIndicator div:first-child
-{
+.loadingIndicator div:first-child {
     text-align: center;
 }
 
-.settingsDiv
-{
+.settingsDiv {
     position: absolute;
     z-index: 20;
     top: 1em;
     right: 10em;
-
     overflow: auto;
-
     min-width: 15%;
-
     background-color: rgba(255, 255, 255, .9);
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
 }
 
-.sliderinput
-{
+.sliderinput {
     float: left;
-
     width: 3em;
 }
 
-.sliderfix .slideinline
-{
+.sliderfix .slideinline {
     display: inline-block;
     float: left;
 }
 
-.sliderfix .slideinline > .track
-{
+.sliderfix .slideinline > .track {
     margin-top: -2.5px !important;
 }
 
-.sliderfix .slideinline > .dragger
-{
+.sliderfix .slideinline > .dragger {
     margin-top: -5px !important;
 }
