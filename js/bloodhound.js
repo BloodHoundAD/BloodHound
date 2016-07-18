@@ -63,11 +63,11 @@ $(document).ready(function(){
 
 	sigmaInstance.bind('hovers', function(e){
 		if (e.data.enter.nodes.length > 0){
-			if (currentEndNode != null && currentStartNode == null){
+			if (currentEndNode != null){
 				path(e.data.enter.nodes[0].id);
 			}
 
-			if (currentStartNode != null && currentEndNode == null){
+			if (currentStartNode != null){
 				reversepath(e.data.enter.nodes[0].id);
 			}
 		}
@@ -177,7 +177,7 @@ $(document).ready(function(){
     });
 
 	// Initialize the noverlap plugin
-	noverlapListener = sigmaInstance.configNoverlap({nodeMargin: 5.0, easing: 'cubicInOut', gridSize: 20, permittedExpansion: 1.3})
+	noverlapListener = sigmaInstance.configNoverlap({nodeMargin: 20.0, easing: 'cubicInOut', gridSize: 20, permittedExpansion: 1.3})
 	noverlapListener.bind('stop', function(event){
 		$('#loadingText').text('Complete')
 		$('#circle').circleProgress({
@@ -271,7 +271,8 @@ $(document).ready(function(){
 		easing: 'cubicInOut',
 		autoStop: true,
 		alignNodeSiblings:true,
-		barnesHutOptimize: true
+		barnesHutOptimize: true,
+		scaleRatio: 30
 	});
 
 	// Set Noverlap to run when forcelink is run
@@ -642,7 +643,9 @@ $(document).ready(function(){
 	});
 
 	$('#play').on('click', function(event){
-		doQuery("MATCH (source {name:'" + $('#searchBar').val() + "'}), (target {name:'" + $('#endNode').val() + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p",$('#searchBar').val() ,$('#endNode').val());
+		start = $('#searchBar').val()
+		end = $('#endNode').val()
+		doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p",start ,end);
 	});
 
 	//Functions for the Export Box
@@ -941,7 +944,7 @@ function escapeRegExp(s) {
   return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\\\$&');
 }
 
-var path = function(nid){
+function path(nid){
 	n = sigmaInstance.graph.nodes(nid)
 	if (n.id != currentEndNode.id){
 		var ed = sigmaInstance.graph.adjacentEdges(n.id)
@@ -961,7 +964,7 @@ var path = function(nid){
 	}
 }
 
-var reversepath = function(nid){
+function reversepath(nid){
 	n = sigmaInstance.graph.nodes(nid)
 	if (n.id != currentStartNode.id){
 		var ed = sigmaInstance.graph.adjacentEdges(n.id)
@@ -1080,9 +1083,6 @@ function doQuery(query, start, end, preventCollapse){
 	if ($('#queryLoad').is(":hidden")){
 		$('#queryLoad').fadeToggle()	
 	}
-	
-	
-	design.deprecate()
 
 	sigma.layouts.stopForceLink();
 	
@@ -1151,6 +1151,7 @@ function doQuery(query, start, end, preventCollapse){
 				})
 
 				updateSpotlight()
+				design.deprecate()
 				sigmaInstance.refresh();
 				design.apply()
 				sigma.misc.animation.camera(sigmaInstance.camera, { x:0, y:0, ratio: 1.075 });
@@ -1906,8 +1907,13 @@ function evaluateSiblings(n){
 			})
 
 			$.each(parents, function(index, p){
+				
+				var j = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
+				while (sigmaInstance.graph.edges(j) != undefined){
+					j = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
+				}
 				sigmaInstance.graph.addEdge({
-					id: Math.floor(Math.random() * (100000 - 10 + 1)) + 10,
+					id: j,
 					source: p,
 					target: i,
 					label: "AdminTo",
