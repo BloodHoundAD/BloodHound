@@ -278,7 +278,7 @@
 						Pre-Built Analytics Queries
 					</h3>
 					<div style="padding: 0 .5em .5em .5em">
-						<a href="#" onclick="doQuery('MATCH (n:User), (target:Group {name:&quot;DOMAIN ADMINS&quot;}),p=allShortestPaths((n)-[*1..]->(target)) RETURN p',&quot;&quot;, &quot;DOMAIN ADMINS&quot;)">Find Shortest Paths to DA</a><br>
+						<a href="#" onclick="shortestPathsToDA()">Find Shortest Paths to DA</a><br>
 						<a href="#" onclick="doQuery('start n=node(*) match n<-[r:HasSession]-() WHERE NOT n.name=&quot;ANONYMOUS LOGON&quot; AND NOT n.name=&quot;&quot; with n, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)-[r:HasSession]->n RETURN n,r,m')">Find User with Most Sessions</a><br>
 						<a href="#" onclick="doQuery('MATCH (n:Domain) MATCH p=(n)-[r]-() RETURN p')">Map Domain Trusts</a><br>
 					</div>
@@ -773,6 +773,20 @@
 						</tr>
 					</thead>
 					<tbody id="nodeBody" class="searchable">
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div id="nodeSelector" class="spotlight">
+			<div class="nodeList">
+				<table id="nodeSelectorTable" data-role="table" class="table table-striped" data-filter="true" data-input="#spotlightBar">
+					<thead style="text-align:center">
+						<tr>
+							<td>Node Label</td>
+						</tr>
+					</thead>
+					<tbody id="nodeSelectorBody" class="searchable">
 					</tbody>
 				</table>
 			</div>

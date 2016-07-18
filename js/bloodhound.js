@@ -3,6 +3,7 @@ $(document).ready(function(){
 	$('#checkconnectionpanel').fadeToggle(0)
 	$('#logoutpanel').fadeToggle(0)
 	$('#spotlight').fadeToggle(0);
+	$('#nodeSelector').fadeToggle(0);
 	$('#queryLoad').fadeToggle(0);
 
 	$('#circle').circleProgress({
@@ -75,7 +76,7 @@ $(document).ready(function(){
 		if (e.data.leave.nodes.length > 0){
 			if (currentPath.length > 0){
 				$.each(currentPath, function(index, edge){
-					edge.color = '#356';	
+					edge.color = '#356';
 				});
 				currentPath = [];
 				sigmaInstance.refresh({'skipIndexation': true})
@@ -83,7 +84,7 @@ $(document).ready(function(){
 
 			if (reversePath.length > 0){
 				$.each(reversePath, function(index, edge){
-					edge.color = '#356';	
+					edge.color = '#356';
 				});
 				reversePath = [];
 				sigmaInstance.refresh({'skipIndexation': true})
@@ -114,7 +115,7 @@ $(document).ready(function(){
 				scale: 1.5,
 				color: '#DBE617'
 				//color: '#ffffff'
-			}, 
+			},
 			'Domain' : {
 				font: 'FontAwesome',
 				content: '\uF0AC',
@@ -150,12 +151,12 @@ $(document).ready(function(){
 	var activeState = sigma.plugins.activeState(sigmaInstance);
 
 	var kbd = sigma.plugins.keyboard(sigmaInstance, sigmaInstance.renderers[0]);
-	
+
 	kbd.bind('17', function(){
 		if (labelsVisible){
 			sigmaInstance.settings("labelThreshold", 15);
 			sigmaInstance.refresh( {'skipIndexation': true})
-			labelsVisible = false;	
+			labelsVisible = false;
 		}else{
 			sigmaInstance.settings("labelThreshold", 1);
 			sigmaInstance.refresh( {'skipIndexation': true})
@@ -194,7 +195,7 @@ $(document).ready(function(){
 				noanimate = false;
 			}
 		}
-		
+
 	})
 
 	// Initialize the tooltips plugin
@@ -207,27 +208,27 @@ $(document).ready(function(){
 				cssClass: 'new-tooltip',
 				template:
 				'<div class="header">' +
-				'	{{label}}' + 
-				'</div>' + 
-				'	<ul>' + 
-				'		{{#type_user}}' + 
-				'			<li onclick="setLabelAsStart(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node</li>' + 
-				'			<li onclick="setLabelAsEnd(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Ending Node</li>' + 
-				'			<li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})-[r:MemberOf]->m RETURN n,r,m\')"><i class="glyphicon glyphicon-screenshot"></i> Group Membership</li>' + 
-				'			<li onclick="doQuery(\'MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer),p=allShortestPaths((n)-[*]->(target)) RETURN p\', &quot;{{label}}&quot;)"><i class="glyphicon glyphicon-screenshot"></i> Admin To</li>' + 
-				'		{{/type_user}}' + 
-				'		{{#type_computer}}' + 
-				'			<li onclick="setLabelAsStart(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node</li>' + 
-				'			<li onclick="setLabelAsEnd(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Ending Node</li>' + 
-				'			<li onclick=""><i class="glyphicon glyphicon-screenshot"></i> Shortest Paths to Here</li>' + 
-				'			<li onclick="doQuery(\'MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer),p=allShortestPaths((n)-[*]->(target)) RETURN p\')"><i class="glyphicon glyphicon-screenshot"></i> Get Explicit Admins</li>' + 
-				'			<li onclick="doQuery(\'MATCH (m:Computer {name:&quot;{{label}}&quot;})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH &quot;$&quot; RETURN n,r,m\')"><i class="glyphicon glyphicon-screenshot"></i> Get User Sessions</li>' + 
+				'	{{label}}' +
+				'</div>' +
+				'	<ul>' +
+				'		{{#type_user}}' +
+				'			<li onclick="setLabelAsStart(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node</li>' +
+				'			<li onclick="setLabelAsEnd(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Ending Node</li>' +
+				'			<li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})-[r:MemberOf]->m RETURN n,r,m\')"><i class="glyphicon glyphicon-screenshot"></i> Group Membership</li>' +
+				'			<li onclick="doQuery(\'MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer),p=allShortestPaths((n)-[*]->(target)) RETURN p\', &quot;{{label}}&quot;)"><i class="glyphicon glyphicon-screenshot"></i> Admin To</li>' +
+				'		{{/type_user}}' +
+				'		{{#type_computer}}' +
+				'			<li onclick="setLabelAsStart(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node</li>' +
+				'			<li onclick="setLabelAsEnd(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Ending Node</li>' +
+				'			<li onclick=""><i class="glyphicon glyphicon-screenshot"></i> Shortest Paths to Here</li>' +
+				'			<li onclick="doQuery(\'MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer),p=allShortestPaths((n)-[*]->(target)) RETURN p\')"><i class="glyphicon glyphicon-screenshot"></i> Get Explicit Admins</li>' +
+				'			<li onclick="doQuery(\'MATCH (m:Computer {name:&quot;{{label}}&quot;})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH &quot;$&quot; RETURN n,r,m\')"><i class="glyphicon glyphicon-screenshot"></i> Get User Sessions</li>' +
 				'		{{/type_computer}}' +
-				'		{{#type_group}}' + 
-				'			<li onclick="setLabelAsStart(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node</li>' + 
-				'			<li onclick="setLabelAsEnd(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Ending Node</li>' + 
-				'			<li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})<-[r:MemberOf]-(m) RETURN n,r,m\')"><i class="glyphicon glyphicon-screenshot"></i> Get Members</li>' + 
-				'			<li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})-[r:AdminTo]->(m) RETURN n,r,m\', &quot;{{label}}&quot;)"><i class="glyphicon glyphicon-screenshot"></i> Admin To</li>' + 
+				'		{{#type_group}}' +
+				'			<li onclick="setLabelAsStart(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node</li>' +
+				'			<li onclick="setLabelAsEnd(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Ending Node</li>' +
+				'			<li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})<-[r:MemberOf]-(m) RETURN n,r,m\')"><i class="glyphicon glyphicon-screenshot"></i> Get Members</li>' +
+				'			<li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})-[r:AdminTo]->(m) RETURN n,r,m\', &quot;{{label}}&quot;)"><i class="glyphicon glyphicon-screenshot"></i> Admin To</li>' +
 				'		{{/type_group}}' +
 				'		{{#expand}}' +
 				'			<li onclick="unfold({{id}})"><i class="glyphicon glyphicon-screenshot"></i> Expand</li>' +
@@ -330,15 +331,15 @@ $(document).ready(function(){
 						$('#checkconnectionpanel').fadeToggle()
 						$('#overlay').fadeToggle(400, 'swing', function(){
 							$('#connectionstatus').html('Checking Stored Credentials <i class="fa fa-spinner fa-spin"></i>')
-						})
-					}, 1000)
+						});
+					}, 1000);
 				},
 				error: function(e){
-					$('#connectionstatus').html("Invalid Credentials!")
+					$('#connectionstatus').html("Invalid Credentials!");
 					setTimeout(function(){
 						$('#checkconnectionpanel').fadeToggle(400, 'swing', function(){
-							$('#loginpanel').fadeToggle()
-							$('#connectionstatus').html('Checking Stored Credentials <i class="fa fa-spinner fa-spin"></i>')
+							$('#loginpanel').fadeToggle();
+							$('#connectionstatus').html('Checking Stored Credentials <i class="fa fa-spinner fa-spin"></i>');
 						})
 					}, 1500)
 				}
@@ -358,7 +359,7 @@ $(document).ready(function(){
 				var start = $('#searchBar').val();
 				var end = $('#endNode').val();
 				if (start != "" &&  end != ""){
-					doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);	
+					doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);
 				}
 			}
 		}
@@ -369,7 +370,7 @@ $(document).ready(function(){
 			var start = $('#searchBar').val();
 			var end = $('#endNode').val();
 			if (start != "" &&  end != ""){
-				doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);	
+				doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);
 			}
 		}
 	});
@@ -465,9 +466,9 @@ $(document).ready(function(){
 	if (localStorage.getItem('collapseThreshold') == null){
 		localStorage.setItem('collapseThreshold', 5)
 	}
-	
+
 	if (localStorage.getItem('siblingThreshold') == null){
-		localStorage.setItem('siblingThreshold', 10)	
+		localStorage.setItem('siblingThreshold', 10)
 	}
 
 	if (localStorage.getItem('lowDetail') == null){
@@ -498,9 +499,9 @@ $(document).ready(function(){
 
 	$('#loginbutton').on('click', function(event){
 		if (!($('#loginbadpw').hasClass('hide'))){
-			$('#loginbadpw').addClass('hide')	
+			$('#loginbadpw').addClass('hide')
 		}
-		
+
 		if (!($(this).hasClass('activate')) && !($(this).hasClass('btn-success'))){
 			$(this).toggleClass('activate');
 			var url = $('#dburl').val()
@@ -552,7 +553,7 @@ $(document).ready(function(){
 	$('#spotlightTable').click( function(event) {
 	    var target = $(event.target);
 	    $tr = target.closest('tr');
-      
+
       	var tid = $tr.attr('data-id')
       	var pid = $tr.attr('data-parent-id')
 
@@ -606,6 +607,19 @@ $(document).ready(function(){
 
       	$('#spotlight').fadeToggle()
     });
+
+    $('#nodeSelectorTable').click(function(event) {
+	    var target = $(event.target);
+	    $tr = target.closest('tr');
+
+	  	var name = $tr.attr('data-node')
+	  	$.each(incompleteQuery, function(index, s){
+	  		incompleteQuery[index] = String(s).format(name)
+	  	})
+
+	  	doQuery(incompleteQuery[0],incompleteQuery[1], incompleteQuery[2], incompleteQuery[3])
+	  	$('#nodeSelector').fadeToggle()
+	});
 
 	$('#bottomSlide').on('click', function(event){
 		$('#rawQueryBox').slideToggle(400, function(e){
@@ -700,7 +714,7 @@ $(document).ready(function(){
 		$(this).html('<span class="glyphicon glyphicon-refresh rightspan"></span>')
 		$(this).stop().animate({
 			width: owrefresh
-		}, 100)	
+		}, 100)
 	})
 
 	if (ohexport == 0){
@@ -723,7 +737,7 @@ $(document).ready(function(){
 		$(this).html('<span class="glyphicon glyphicon-export rightspan"></span>')
 		$(this).stop().animate({
 			width: owexport
-		}, 100)	
+		}, 100)
 	})
 
 	if (ohimport == 0){
@@ -746,7 +760,7 @@ $(document).ready(function(){
 		$(this).html('<span class="glyphicon glyphicon-import rightspan"></span>')
 		$(this).stop().animate({
 			width: owimport
-		}, 100)	
+		}, 100)
 	})
 
 	if (ohupload == 0){
@@ -769,7 +783,7 @@ $(document).ready(function(){
 		$(this).html('<span class="glyphicon glyphicon-upload rightspan"></span>')
 		$(this).stop().animate({
 			width: owupload
-		}, 100)	
+		}, 100)
 	})
 
 	if (ohlayout == 0){
@@ -792,7 +806,7 @@ $(document).ready(function(){
 		$(this).html('<span style="width: 14px" class="fa fa-line-chart rightspan"></span>')
 		$(this).stop().animate({
 			width: owlayout
-		}, 100)	
+		}, 100)
 	})
 
 	if (ohsettings == 0){
@@ -815,7 +829,7 @@ $(document).ready(function(){
 		$(this).html('<span style="width: 14px" class="fa fa-cogs rightspan"></span>')
 		$(this).stop().animate({
 			width: owsettings
-		}, 100)	
+		}, 100)
 	})
 
 
@@ -891,7 +905,7 @@ $(document).ready(function(){
 				}
 			})
 		}
-		
+
 	})
 
 	// Make our export/ingest boxes draggable
@@ -939,6 +953,7 @@ var preventNextQuery = false;
 var fadeOutInProgress = false;
 var queryInProgress = false;
 var cancelQuery = null;
+var incompleteQuery = [];
 
 function escapeRegExp(s) {
   return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\\\$&');
@@ -989,11 +1004,11 @@ function makeWorker(script) {
     var URL = window.URL || window.webkitURL;
     var Blob = window.Blob;
     var Worker = window.Worker;
-    
+
     if (!URL || !Blob || !Worker || !script) {
         return null;
     }
-    
+
     var blob = new Blob([script]);
     var worker = new Worker(URL.createObjectURL(blob));
     return worker;
@@ -1073,7 +1088,7 @@ function doQuery(query, start, end, preventCollapse){
 	spotlightData = {}
 	firstquery = false;
 	if (currentTooltip != null){
-		currentTooltip.close();	
+		currentTooltip.close();
 	}
 
 	$('#loadingText').text('Querying Database')
@@ -1081,11 +1096,11 @@ function doQuery(query, start, end, preventCollapse){
 		value: 0
 	})
 	if ($('#queryLoad').is(":hidden")){
-		$('#queryLoad').fadeToggle()	
+		$('#queryLoad').fadeToggle()
 	}
 
 	sigma.layouts.stopForceLink();
-	
+
 	sigma.neo4j.cypher(
 		{url: localStorage.getItem("dbpath"), user:localStorage.getItem("uname"), password:localStorage.getItem("pwd")},
 		query,
@@ -1131,7 +1146,7 @@ function doQuery(query, start, end, preventCollapse){
 					if (node.neo4j_data.name == end){
 						endNode = node;
 						currentEndNode = node;
-					}					
+					}
 				})
 
 				if (!preventCollapse){
@@ -1143,7 +1158,7 @@ function doQuery(query, start, end, preventCollapse){
 						evaluateSiblings(node)
 					})
 				}
-				
+
 				$.each(sigmaInstance.graph.nodes(), function(index, node){
 					if (!spotlightData.hasOwnProperty(node.id)){
 						spotlightData[node.id] = [node.neo4j_data.name, 0, ""]
@@ -1198,8 +1213,8 @@ function doQuery(query, start, end, preventCollapse){
 				if (usedagre){
 					sigma.layouts.dagre.start(sigmaInstance);
 				}else{
-					sigma.layouts.startForceLink();	
-				}				
+					sigma.layouts.startForceLink();
+				}
 			}
 		}
 	);
@@ -1208,10 +1223,10 @@ function doQuery(query, start, end, preventCollapse){
 function redoLast(){
 	if (queryStack.length > 0){
 		if (currentTooltip != null){
-			currentTooltip.close();	
+			currentTooltip.close();
 		}
 		sigma.layouts.stopForceLink();
-		
+
 		query = queryStack.pop();
 		sigmaInstance.graph.clear();
 		sigmaInstance.graph.read({nodes:query[0], edges: query[1]});
@@ -1265,9 +1280,9 @@ function updateNodeData(node){
 	elem.html(rendered);
 	$('.nav-tabs a[href="#nodeinfo"]').tab('show')
 	if (elem.is(":hidden")){
-		$('#nodedatabox').slideToggle()	
+		$('#nodedatabox').slideToggle()
 	}
-	
+
 	if (node.data.node.type_user == true){
 		cancelQuery = $.ajax({
 			url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
@@ -1301,11 +1316,11 @@ function updateNodeData(node){
 				var group_delegated_admin_rights = json.results[3].data[0].row[0];
 				var derivative_admin = json.results[4].data[0].row[0];
 				var sessions = json.results[5].data[0].row[0];
-				
+
 				var template = $('#datatemplate').html();
 				var usernodetemplate = $('#usernodetemplate').html();
-				var usernodeinfo = Mustache.render(usernodetemplate, {label: node.data.node.label, first_degree_group:first_degree_group_membership, 
-					unrolled: unrolled_group_membership, first_degree_admin: direct_admin, type_user: true, dlar: group_delegated_admin_rights, 
+				var usernodeinfo = Mustache.render(usernodetemplate, {label: node.data.node.label, first_degree_group:first_degree_group_membership,
+					unrolled: unrolled_group_membership, first_degree_admin: direct_admin, type_user: true, dlar: group_delegated_admin_rights,
 					derivative:derivative_admin, sessions:sessions});
 				var rendered = Mustache.render(template, {dbinfo: dbinforendered, nodeinfo: usernodeinfo});
 				$('#nodedatabox').html(rendered);
@@ -1342,7 +1357,7 @@ function updateNodeData(node){
 				var c3 = json.results[2].data[0].row[0];
 				var c4 = json.results[3].data[0].row[0];
 				var c5 = json.results[4].data[0].row[0];
-				
+
 				var template = $('#datatemplate').html();
 				var compnodetemplate = $('#computertemplate').html();
 				var nodeinfo = Mustache.render(compnodetemplate, {label: node.data.node.label, explicit_admins: c1, sessions: c3,
@@ -1385,10 +1400,10 @@ function updateNodeData(node){
 				var c4 = json.results[3].data[0].row[0];
 				var c5 = json.results[4].data[0].row[0];
 				var c6 = json.results[5].data[0].row[0];
-				
+
 				var template = $('#datatemplate').html();
 				var groupnodetemplate = $('#grouptemplate').html();
-				var nodeinfo = Mustache.render(groupnodetemplate, {label: node.data.node.label, 
+				var nodeinfo = Mustache.render(groupnodetemplate, {label: node.data.node.label,
 					explicit_members: c1, unrolled_members: c2, adminto:c3, derivative_admin: c4,
 					 unrolled_member_of:c5, sessions: c6});
 				var rendered = Mustache.render(template, {dbinfo: dbinforendered, nodeinfo: nodeinfo});
@@ -1412,8 +1427,8 @@ function forceRelayout(){
 	if (usedagre){
 		sigma.layouts.dagre.start(sigmaInstance);
 	}else{
-		sigma.layouts.startForceLink();	
-	}	
+		sigma.layouts.startForceLink();
+	}
 }
 
 function ingestData(){
@@ -1468,9 +1483,9 @@ function ingestData(){
 							$('#uploadSelectDiv').fadeToggle(250, 'swing', function(){
 								$('#uploadSelectDiv').html(ingesthtml)
 								$('#uploadFileSelected').val("")
-								$('#uploadSelectDiv').fadeToggle(250)	
+								$('#uploadSelectDiv').fadeToggle(250)
 								$('#startingestbutton').prop('disabled', false)
-								
+
 								$('#ingestlocaladmin').on('click', function(event){
 									$('#ingestdomaingroup').removeClass('active');
 									$('#ingestlocaladmin').addClass('active');
@@ -1609,12 +1624,12 @@ function doInit(){
 		}, afterSelect: function(selected){
 			if (!preventNextQuery){
 				if (!pathfindingMode){
-					doQuery("MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(selected) + ".*' RETURN n");	
+					doQuery("MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(selected) + ".*' RETURN n");
 				}else{
 					var start = $('#searchBar').val();
 					var end = $('#endNode').val();
 					if (start != "" &&  end != ""){
-						doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);	
+						doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);
 					}
 				}
 			}
@@ -1646,7 +1661,7 @@ function doInit(){
 			var start = $('#searchBar').val();
 			var end = $('#endNode').val();
 			if (start != "" &&  end != ""){
-				doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);	
+				doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);
 			}
 		}, autoSelect: false
 	});
@@ -1753,7 +1768,7 @@ function deleteNodes(){
 				getDBInfo()
 			}
 		}
-	});	
+	});
 }
 
 function cancelIngest(){
@@ -1767,8 +1782,8 @@ function cancelIngest(){
 				$('#uploadSelectDiv').fadeToggle(250, 'swing', function(){
 					$('#uploadSelectDiv').html(ingesthtml)
 					$('#uploadFileSelected').val("")
-					$('#uploadSelectDiv').fadeToggle(250)	
-					
+					$('#uploadSelectDiv').fadeToggle(250)
+
 					$('#ingestlocaladmin').on('click', function(event){
 						$('#ingestdomaingroup').removeClass('active');
 						$('#ingestlocaladmin').addClass('active');
@@ -1816,9 +1831,9 @@ function unfold(id){
 	if (usedagre){
 		sigma.layouts.dagre.start(sigmaInstance);
 	}else{
-		sigma.layouts.startForceLink();	
+		sigma.layouts.startForceLink();
 	}
-	
+
 	design.apply();
 }
 
@@ -1834,7 +1849,7 @@ function collapse(id){
 	if (usedagre){
 		sigma.layouts.dagre.start(sigmaInstance);
 	}else{
-		sigma.layouts.startForceLink();	
+		sigma.layouts.startForceLink();
 	}
 
 	design.apply();
@@ -1853,7 +1868,7 @@ function ungroup(id){
 	if (usedagre){
 		sigma.layouts.dagre.start(sigmaInstance);
 	}else{
-		sigma.layouts.startForceLink();	
+		sigma.layouts.startForceLink();
 	}
 
 	design.apply();
@@ -1907,7 +1922,7 @@ function evaluateSiblings(n){
 			})
 
 			$.each(parents, function(index, p){
-				
+
 				var j = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
 				while (sigmaInstance.graph.edges(j) != undefined){
 					j = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
@@ -1939,7 +1954,7 @@ function evaluateSiblings(n){
 			})
 			x.folded = folded
 		}
-	}	
+	}
 }
 
 function evaluateCollapse(node, start, end){
@@ -2033,4 +2048,49 @@ Array.prototype.allEdgesSameType = function() {
     }
 
     return true;
+}
+
+String.prototype.format = function () {
+  var i = 0, args = arguments;
+  return this.replace(/{}/g, function () {
+    return typeof args[i] != 'undefined' ? args[i++] : '';
+  });
+};
+
+
+function shortestPathsToDA(){
+	$.ajax({
+		url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
+		type: 'POST',
+		accepts: {json: "application/json"},
+		dataType: "json",
+		contentType: "application/json",
+		headers: {
+			"Authorization": localStorage.getItem("auth")
+		},
+		data: JSON.stringify({
+			  "statements" : [ {
+			    "statement" : "MATCH (n:Group) WHERE n.name =~ '(?i).*DOMAIN ADMINS.*' RETURN n"
+			  } ]
+		}),
+		success: function(json) {
+			var groupsFound = []
+			$.each(json.results[0].data, function(index,group){
+				groupsFound.push(group.row[0].name)
+			})
+
+			if (groupsFound.length == 1){
+				doQuery('MATCH (n:User),(m:Group {name:"' + groupsFound[0] + '"}), p=allShortestPaths((n)-[*1..]->(m)) RETURN p', groupsFound[0])
+			}else{
+				$("#nodeSelectorBody").empty()
+				var template = "<tr data-node=\"{{NodeName}}\"><td>{{NodeName}}</td></tr>"
+				incompleteQuery = ['MATCH (n:User),(m:Group {name:"{}"}),p=allShortestPaths((n)-[*1..]->(m)) RETURN p', '{}', '', false]
+				$.each(groupsFound, function(index, data){
+					var h = Mustache.render(template, {NodeName: data})
+					$("#nodeSelectorBody").append(h);
+				})
+				$("#nodeSelector").fadeToggle();
+			}
+		}
+	});
 }
