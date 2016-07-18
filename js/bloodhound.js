@@ -1250,6 +1250,10 @@ function updateSpotlight(){
 }
 
 function updateNodeData(node){
+	if (node.data.node.label == "Grouped Computers"){
+		return
+	}
+
 	var template = $('#datatemplate').html();
 	var loading = Mustache.render(loadingString, {label: node.data.node.label})
 	var rendered = Mustache.render(template, {dbinfo: dbinforendered, nodeinfo: loading});
