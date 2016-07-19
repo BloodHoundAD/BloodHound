@@ -3,21 +3,14 @@
 	<head>
 		<title>Bloodhound</title>
 		<link rel="icon" href="img/favicon.ico">
-		<script type="text/javascript" src="js/jquery-2.2.1.min.js"></script>
+		<!--<script src="js/jquery-2.2.1.min.js" onload="$ = jQuery = module.exports;"></script>-->
+		<script>window.$ = window.jQuery = require('jquery');</script>
 		<script type="text/javascript" src="js/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="js/circle-progress/circle-progress.js"></script>
-		<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
-		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
-		<link type="text/css" rel="stylesheet" href="css/bootstrap-theme.min.css">
-		<link rel="stylesheet" type="text/css" href="css/styles.css">
-		<link rel="stylesheet" type="text/css" href="css/animation.css">
-		<link rel="stylesheet" type="text/css" href="css/tooltip.css">
-		<link rel="stylesheet" type="text/css" href="css/simple-slider.css">
-		<link rel="stylesheet" type="text/css" href="css/simple-slider-volume.css">
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap3-typeahead.min.js"></script>
 		<script type="text/javascript" src="js/sigma.min.js"></script>
 		<script type="text/javascript" src="js/plugins.min.js"></script>
-		<script type="text/javascript" src="js/bootstrap3-typeahead.min.js"></script>
 		<script type="text/javascript" src="js/mustache.min.js"></script>
 		<script type="text/javascript" src="js/bloodhound.js"></script>
 		<script type="text/javascript" src="js/sigma.renderers.linkurious.min.js"></script>
@@ -28,6 +21,14 @@
 		<script type="text/javascript" src="js/sigma.exporters.image.min.js"></script>
 		<script type="text/javascript" src="js/dagre.min.js"></script>
 		<script type="text/javascript" src="js/simple-slider.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap-theme.min.css">
+		<link rel="stylesheet" type="text/css" href="css/styles.css">
+		<link rel="stylesheet" type="text/css" href="css/animation.css">
+		<link rel="stylesheet" type="text/css" href="css/tooltip.css">
+		<link rel="stylesheet" type="text/css" href="css/simple-slider.css">
+		<link rel="stylesheet" type="text/css" href="css/simple-slider-volume.css">
 
 		<script type="javascript/worker" id="ingestworker">
 			function createXHR(url, auth){
@@ -311,35 +312,6 @@
 					</div>
 				</div>
 			</div>
-		</script>
-
-		<script id="usernodetemplate" type="text/template">
-			<dl class='dl-horizontal'>
-				<dt>Node:</dt>
-				<dd>{{label}}</dd>
-				<dt>SAMAccountName</dt>
-				<dd> None </dd>
-				<dt>Display Name</dt>
-				<dd> None </dd>
-				<dt>Password Last Changed</dt>
-				<dd> None </dd>
-				<br>
-				<dt>First Degree Group Memberships</dt>
-				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1]->(target)) RETURN p')">{{first_degree_group}}</a></dd>
-				<dt>Unrolled Group Memberships</dt>
-				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1..]->(target)) RETURN p', &quot;{{label}}&quot;)">{{unrolled}}</a></dd>
-				<dt>Foreign Group Memberships</dt>
-				<dd></dd>
-				<br>
-				<dt>First Degree Local Admin</dt>
-				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN p')">{{first_degree_admin}}</a></dd>
-				<dt>Group Delegated Local Admin Rights</dt>
-				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN n,m,r,s,p', &quot;{{label}}&quot;, &quot;&quot;)">{{dlar}}</a></dd>
-				<dt>Derivative Local Admin Rights</dt>
-				<dd><a href="#" onclick="doQuery('MATCH (n:User {name:&quot;{{label}}&quot;}), (m:Computer), p=allShortestPaths((n)-[r*]->(m)) RETURN p', &quot;{{label}}&quot;)">{{derivative}}</a></dd>
-				<dt>Sessions</dt>
-				<dd><a href="#" onclick="doQuery('MATCH (n:Computer)-[r:HasSession]->(m:User {name:&quot;{{label}}&quot;}) RETURN n,r,m')">{{sessions}}</a></dd>
-			</dl>
 		</script>
 
 		<script id="computertemplate" type="text/template">

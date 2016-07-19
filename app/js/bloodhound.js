@@ -1310,21 +1310,26 @@ function updateNodeData(node) {
                 var derivative_admin = json.results[4].data[0].row[0];
                 var sessions = json.results[5].data[0].row[0];
 
-                var template = $('#datatemplate').html();
-                var usernodetemplate = $('#usernodetemplate').html();
-                var usernodeinfo = Mustache.render(usernodetemplate, {
-                    label: node.data.node.label,
-                    first_degree_group: first_degree_group_membership,
-                    unrolled: unrolled_group_membership,
-                    first_degree_admin: direct_admin,
-                    type_user: true,
-                    dlar: group_delegated_admin_rights,
-                    derivative: derivative_admin,
-                    sessions: sessions
+                $.get('templates/usertemplate.html', function(temp){
+                    var template = $('#datatemplate').html();
+                    var usernodetemplate = $(temp).filter('#template').html();
+
+                    var usernodeinfo = Mustache.render(usernodetemplate, {
+                        label: node.data.node.label,
+                        first_degree_group: first_degree_group_membership,
+                        unrolled: unrolled_group_membership,
+                        first_degree_admin: direct_admin,
+                        type_user: true,
+                        dlar: group_delegated_admin_rights,
+                        derivative: derivative_admin,
+                        sessions: sessions
+                    });
+
+                    var rendered = Mustache.render(template, { dbinfo: dbinforendered, nodeinfo: usernodeinfo });
+                    $('#nodedatabox').html(rendered);
+                    $('.nav-tabs a[href="#nodeinfo"]').tab('show');
                 });
-                var rendered = Mustache.render(template, { dbinfo: dbinforendered, nodeinfo: usernodeinfo });
-                $('#nodedatabox').html(rendered);
-                $('.nav-tabs a[href="#nodeinfo"]').tab('show');
+                
             }
         });
     } else if (node.data.node.type_computer === true) {
