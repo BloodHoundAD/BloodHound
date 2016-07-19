@@ -382,7 +382,7 @@
 				<dt>Unrolled Member Of</dt>
 				<dd><a href="#" onclick="doQuery('MATCH (n:Group {name:&quot;{{label}}&quot;}), (target:Group), p=allShortestPaths((n)-[r:MemberOf*1..]->(target)) RETURN p', &quot;{{label}}&quot;)">{{unrolled_member_of}}</a></dd>
 				<dt>Sessions</dt>
-				<dd><a href="#" onclick="doQuery('MATCH (n:User), (m:Group {name: &quot;{{label}}&quot;}), p=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (n)-[s:HasSession]-(o:Computer) RETURN m,n,r,o,s', &quot;{{label}}&quot;)">{{sessions}}</a></dd>
+				<dd><a href="#" onclick="doQuery('MATCH (n:User), (m:Group {name: &quot;{{label}}&quot;}), p=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (n)-[s:HasSession]-(o:Computer) RETURN m,n,r,o,s',&quot;&quot;, &quot;{{label}}&quot;)">{{sessions}}</a></dd>
 			</dl>
 		</script>
 
