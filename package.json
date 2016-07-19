@@ -2,10 +2,23 @@
   "name": "bloodhound",
   "version": "0.1.0",
   "main": "./main.js",
+  "productName": "Bloodhound",
   "scripts": {
     "start": "electron ."
   },
   "devDependencies": {
+    "electron-packager": "^7.3.0",
     "electron-prebuilt": "^1.2.7"
-  }
+  },
+  "build": {
+	  "appId": "12345",
+	  "app-category-type": "your.app.category.type",
+	  "win": {
+	  }
+	},
+	"scripts": {
+	  "postinstall": "install-app-deps",
+	  "pack": "build --dir",
+	  "dist": "build"
+	}
 }
