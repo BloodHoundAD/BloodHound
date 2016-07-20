@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "main": "./main.js",
   "productName": "Bloodhound",
-  "scripts": {
-    "start": "electron ."
-  },
   "devDependencies": {
     "electron-packager": "^7.3.0",
     "electron-prebuilt": "^1.2.7"
@@ -19,6 +16,7 @@
 	"scripts": {
 	  "postinstall": "install-app-deps",
 	  "pack": "build --dir",
-	  "dist": "build"
+	  "dist": "build",
+	  "start": "electron ."
 	}
 }
