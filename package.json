@@ -1,22 +1,47 @@
 {
   "name": "bloodhound",
-  "version": "0.1.0",
-  "main": "./main.js",
-  "productName": "Bloodhound",
-  "devDependencies": {
-    "electron-packager": "^7.3.0",
-    "electron-prebuilt": "^1.2.7"
+  "version": "1.0.0",
+  "description": "Graph Theory for Active Directory",
+  "main": "main.js",
+  "scripts": {
+    "start": "set ENV=development & electron .",
+    "server": "babel-node server.js"
   },
-  "build": {
-	  "appId": "12345",
-	  "app-category-type": "your.app.category.type",
-	  "win": {
-	  }
-	},
-	"scripts": {
-	  "postinstall": "install-app-deps",
-	  "pack": "build --dir",
-	  "dist": "build",
-	  "start": "electron ."
-	}
+  "babel": {
+    "presets": [
+      "es2015",
+      "stage-0",
+      "react"
+    ]
+  },
+  "author": "@CptJesus",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-core": "^6.11.4",
+    "babel-loader": "^6.2.4",
+    "babel-polyfill": "^6.9.1",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-0": "^6.5.0",
+    "electron-prebuilt": "^1.2.8",
+    "express": "^4.14.0",
+    "webpack": "^1.13.1",
+    "webpack-dev-middleware": "^1.6.1",
+    "webpack-hot-middleware": "^2.12.1",
+    "webpack-target-electron-renderer": "^0.4.0"
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "bootstrap-3-typeahead": "^4.0.1",
+    "configstore": "^2.0.0",
+    "electron-json-storage": "^2.0.0",
+    "eventemitter2": "^2.0.0",
+    "jquery": "^2.2.4",
+    "linkurious": "^1.5.1",
+    "react": "^15.2.1",
+    "react-bootstrap": "^0.30.0",
+    "react-dom": "^15.2.1",
+    "react-if": "^2.1.0"
+  }
 }

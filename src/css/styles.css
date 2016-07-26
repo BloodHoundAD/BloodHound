@@ -1,5 +1,16 @@
 /* roboto-regular - latin */
 
+#root {
+    position: absolute;
+    width: 100%;
+    height: 100%;    
+}
+
+.max{
+    width: 100%;
+    height: 100%;
+}
+
 @font-face {
     font-family: 'Roboto';
     font-weight: 400;
@@ -70,6 +81,10 @@ body {
     outline: 0;
 }
 
+.query-box{
+    padding: 0 .5em .5em .5em
+}
+
 .graph {
     width: 100%;
     height: 97%;
@@ -78,6 +93,39 @@ body {
 
 .graph:focus {
     outline: 0;
+}
+
+.typeaheadfix{
+    border: 0;
+}
+
+.typeaheadfix .Select-menu-outer{
+    z-index: 99999;
+}
+
+.typeaheadfix .Select-control{
+    border: 0;
+    box-shadow: none !important;
+}
+
+.typeaheadfix .Select-control:focus{
+    border: 0;
+}
+
+.typeaheadfix .Select-arrow-zone{
+    display: none;
+}
+
+@media all and (min-width: 900px) {
+    .searchdiv {
+        position: absolute;
+        z-index: 10;
+        top: 1em;
+        left: 1em;
+        overflow: visible;
+        width: 45%;
+        background-color: white;
+    }
 }
 
 @media all and (min-width: 1000px) {
@@ -173,23 +221,11 @@ body {
     padding-bottom: 10px;
 }
 
-#abc li.active > a {
-    border-right: 1px solid lightgray;
-    border-left: 1px solid lightgray;
-}
 
 .hideme {
     position: absolute;
     top: 0;
     visibility: hidden;
-}
-
-#abc li > a {
-    border-top: 0;
-    border-right: 0;
-    border-bottom: 1px solid lightgray;
-    border-left: 0;
-    border-radius: 0;
 }
 
 .content {
@@ -346,9 +382,7 @@ body {
     opacity: 1;
 }
 
-.dbbuttons {
-    padding-bottom: 1em;
-}
+
 
 .modal {
     text-align: center;
@@ -407,7 +441,7 @@ body {
     border-bottom-left-radius: 2em;
 }
 
-@media all and (min-width: 1000px) {
+@media all and (min-width: 900px) {
     .spotlight {
         position: absolute;
         z-index: 30;
@@ -429,28 +463,22 @@ body {
     }
 }
 
-.nodeList {
+.spotlight-nodelist {
     overflow: auto;
     height: 11em;
     background-color: white;
 }
 
-.nodelist table {
-    height: 100%;
-    border: 1px solid black;
+.spotlight-nodelist table > thead {
+    text-align: center;
 }
 
-.unborder span {
+.no-border-radius span {
     border-radius: 0;
 }
 
-.unborder input {
+.no-border-radius input {
     border-radius: 0;
-}
-
-.nav-tabs li {
-    overflow: hidden;
-    white-space: nowrap;
 }
 
 .loadingIndicator {
@@ -492,4 +520,66 @@ body {
 
 .sliderfix .slideinline > .dragger {
     margin-top: -5px !important;
+}
+
+.center-align{
+    text-align: center;
+}
+
+#tab-style{
+    border-top: .5px solid lightgray;
+}
+
+#tab-style > ul{
+    display: table;
+    width: 100%;
+    border-bottom: 1px solid lightgray;
+}
+
+#tab-style > ul > li {
+    border-top: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    border-radius: 0;
+    display: table-cell;
+    width: 33%;
+    text-align: center;
+    color: #337AB7;
+}
+
+#tab-style > ul > li > a:focus {
+    background-color: #fff;
+    color: black;
+    outline: none;
+}
+
+#tab-style > ul > li > a:hover {
+    background-color: #fff;
+}
+
+#tab-style > ul > li.active > a {
+    background-color: #fff;
+    color: black;
+}
+
+#tab-style > ul > li > a[aria-selected='true']{
+    border-right: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+    color: black;
+}
+
+#tab-style > div{
+    padding: 0 10px 0 10px;
+}
+
+#tab-style h3{
+    text-align: center;
+}
+
+.dbbuttons {
+    padding-bottom: 1em;
+}
+
+.displaynone {
+    display: none;
 }
