@@ -6,6 +6,7 @@
   "scripts": {
     "start": "set ENV=development & electron .",
     "server": "babel-node server.js",
+    "build": "webpack --config webpack.config.production.js && electron-packager . Bloodhound --platform=all --arch=all --overwrite --prune"
   },
   "babel": {
     "presets": [
