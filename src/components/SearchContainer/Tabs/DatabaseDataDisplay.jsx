@@ -17,6 +17,9 @@ export default class DatabaseDataDisplay extends Component {
 
 	componentDidMount() {
 		this.refreshDBData()
+		setInterval(function(){
+			this.refreshDBData()
+		}.bind(this), 60000);
 	}
 
 	toggleLogoutModal(){
@@ -44,7 +47,7 @@ export default class DatabaseDataDisplay extends Component {
 
 				<div className="text-center">
 					<div className="btn-group dbbuttons">
-						<button type="button" className="btn btn-success" onClick={function(){emitter.emit('query')}}>Refresh DB Stats</button>
+						<button type="button" className="btn btn-success" onClick={function(){this.refreshDBData()}.bind(this)}>Refresh DB Stats</button>
 						<button type="button" className="btn btn-warning" onClick={this.toggleLogoutModal}>Log Out/Switch DB</button>
 						<button type="button" className="btn btn-danger" data-toggle="modal" data-target="#clearDBWarn">Clear Database</button>
 					</div>

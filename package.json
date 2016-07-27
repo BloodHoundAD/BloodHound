@@ -36,6 +36,7 @@
     "bootstrap": "^3.3.6",
     "bootstrap-3-typeahead": "^4.0.1",
     "configstore": "^2.0.0",
+    "css-loader": "^0.23.1",
     "electron-json-storage": "^2.0.0",
     "eventemitter2": "^2.0.0",
     "jquery": "^2.2.4",
@@ -43,6 +44,7 @@
     "react": "^15.2.1",
     "react-bootstrap": "^0.30.0",
     "react-dom": "^15.2.1",
-    "react-if": "^2.1.0"
+    "react-if": "^2.1.0",
+    "style-loader": "^0.13.1"
   }
 }
