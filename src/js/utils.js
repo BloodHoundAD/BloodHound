@@ -227,18 +227,22 @@ export function generateUniqueId(sigmaInstance, isNode){
 	return i
 }
 
+//Recursive function to highlight paths to start/end nodes
 export function findGraphPath(sigmaInstance, reverse, nodeid){
 	var target = reverse ? appStore.startNode : appStore.endNode
-
+	//This is our stop condition for recursing
 	if (nodeid !== target.id){
 		var edges = sigmaInstance.graph.adjacentEdges(nodeid)
 		var nodes = reverse ? sigmaInstance.graph.inboundNodes(nodeid) : sigmaInstance.graph.outboundNodes(nodeid)
+		//Loop over the nodes near us and the edges connecting to those nodes
 		$.each(nodes, function(index, node){
 			$.each(edges, function(index, edge){
 				var check = reverse ? edge.source : edge.target
+				//If an edge is pointing in the right direction, set its color
+				//Push the edge into our store and then 
 				if (check === node){
 					edge.color = reverse ? 'blue' : 'red';
-					appStore.reversePath.push(edge);
+					appStore.highlightedEdges.push(edge);
 					findGraphPath(sigmaInstance, reverse, node);
 				}
 			})
