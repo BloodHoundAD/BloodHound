@@ -53,7 +53,11 @@ export default class SearchContainer extends Component {
     }
 
     _onPlayClick(){
-        
+        var start = jQuery(this.refs.searchbar).val()
+        var end = jQuery(this.refs.pathbar).val()
+        if (start !== "" && end !== ""){
+            emitter.emit('pathQuery', start, end)
+        }
     }
 
     _onExpandClick(){
@@ -73,6 +77,13 @@ export default class SearchContainer extends Component {
         emitter.on('userNodeClicked', this.openNodeTab.bind(this))
         emitter.on('groupNodeClicked', this.openNodeTab.bind(this))
         emitter.on('computerNodeClicked', this.openNodeTab.bind(this))
+        emitter.on('setStart', function(payload){
+            jQuery(this.refs.searchbar).val(payload);
+        }.bind(this))
+
+        emitter.on('setEnd', function(payload){
+            jQuery(this.refs.pathbar).val(payload);
+        }.bind(this))
 
         jQuery(this.refs.searchbar).typeahead({
             source: function(query, process) {

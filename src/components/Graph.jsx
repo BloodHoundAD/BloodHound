@@ -51,6 +51,11 @@ export default class GraphContainer extends Component {
         params.statement,
         this.state.sigmaInstance,
         function(sigmaInstance){
+            if (sigmaInstance.graph.nodes().length === 0){
+                console.log('no nodes');
+                this.goBack()
+                return;
+            }
             appStore.spotlightData = {}
             var design = this.state.design;
             sigmaInstance = setNodeData(this.state.sigmaInstance, params.start, params.end);
@@ -124,15 +129,7 @@ export default class GraphContainer extends Component {
         }
     }
 
-    componentWillMount() {
-        emitter.on('searchQuery', this.doSearchQuery.bind(this));
-        emitter.on('pathQuery', this.doPathQuery.bind(this));
-        emitter.on('graphBack', this.goBack.bind(this));
-        emitter.on('query', this.doGenericQuery.bind(this));
-    }
-
-    componentDidMount() {
-        //Sigma Initialization
+    initializeSigma(){
         var sigmaInstance, design;
         sigma.renderers.def = sigma.renderers.canvas;
 
@@ -168,6 +165,7 @@ export default class GraphContainer extends Component {
             }
         )
 
+        //Bind sigma events
         sigmaInstance.renderers[0].bind('render', function(e) {
             sigmaInstance.renderers[0].glyphs();
         });
@@ -179,16 +177,6 @@ export default class GraphContainer extends Component {
                 sigmaInstance.settings('drawEdgeLabels', true);
             }
         })
-
-        var noverlapListener = sigmaInstance.configNoverlap({ nodeMargin: 20.0, easing: 'cubicInOut', gridSize: 20, permittedExpansion: 1.3 });
-        noverlapListener.bind('stop', function(event) {
-
-        });
-
-        var dragListener = sigma.plugins.dragNodes(sigmaInstance,
-                                sigmaInstance.renderers[0])
-
-        dragListener.bind('drag', this._nodeDragged.bind(this))
 
         sigmaInstance.bind('clickNode', this._nodeClicked.bind(this))
 
@@ -214,7 +202,24 @@ export default class GraphContainer extends Component {
             }
         }.bind(this))
 
-        var fa = sigma.layouts.configForceLink(sigmaInstance, {
+        //Some key binds
+        $(window).on('keyup', function(e){
+            var key = e.keyCode ? e.keyCode : e.which
+
+            if (document.activeElement === document.body){
+
+            }
+        }.bind(this))
+
+        //Plugin Configuration
+        var dragListener = sigma.plugins.dragNodes(sigmaInstance,
+                                sigmaInstance.renderers[0])
+
+        dragListener.bind('drag', this._nodeDragged.bind(this))
+        
+
+        //Layout Plugins
+        var forcelinkListener = sigma.layouts.configForceLink(sigmaInstance, {
             worker: true,
             background: true,
             easing: 'cubicInOut',
@@ -223,10 +228,31 @@ export default class GraphContainer extends Component {
             barnesHutOptimize: true
         });
 
-        fa.bind('stop', function(event) {
+        forcelinkListener.bind('stop', function(event) {
             sigmaInstance.startNoverlap();
         })
 
+        var dagreListener = sigma.layouts.dagre.configure(sigmaInstance, {
+            easing: 'cubicInOut',
+            boundingBox: true,
+            background: true
+        });
+
+        dagreListener.bind('stop', function(event){
+            sigmaInstance.startNoverlap();
+        })
+
+        var noverlapListener = sigmaInstance.configNoverlap({
+            nodeMargin: 20.0,
+            easing: 'cubicInOut',
+            gridSize: 20,
+            permittedExpansion: 1.3 
+        });
+        noverlapListener.bind('stop', function(event) {
+
+        });
+
+        
         var lowgfx = appStore.performance.lowGraphics
 
         design = sigma.plugins.design(sigmaInstance);
@@ -244,6 +270,18 @@ export default class GraphContainer extends Component {
 
         this.state.sigmaInstance = sigmaInstance;
         this.state.design = design;
+    }
+
+    componentWillMount() {
+        emitter.on('searchQuery', this.doSearchQuery.bind(this));
+        emitter.on('pathQuery', this.doPathQuery.bind(this));
+        emitter.on('graphBack', this.goBack.bind(this));
+        emitter.on('query', this.doGenericQuery.bind(this));
+    }
+
+    componentDidMount() {
+        this.initializeSigma();
+            
         this.doQueryNative({
             statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf]-(m) RETURN n,r,m',
             allowCollapse: false
