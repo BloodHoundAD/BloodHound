@@ -99,7 +99,7 @@ export function collapseEdgeNodes(sigmaInstance){
 }
 
 export function collapseSiblingNodes(sigmaInstance){
-	var threshold = appStore.performance.siblings
+	var threshold = appStore.performance.sibling
 
 	if (threshold === 0){
 		return;
@@ -123,6 +123,7 @@ export function collapseSiblingNodes(sigmaInstance){
 					return e.source
 				}
 			)
+
 			//Generate our string to compare other nodes to 
 			//by sorting the parents and turning it into a string
 			var checkString = parents.sort().join(',')
@@ -136,20 +137,14 @@ export function collapseSiblingNodes(sigmaInstance){
 						return e.source;
 					}
 				).sort().join(',')
-
 				if (testString === checkString){
-					siblings.push(node);
+					siblings.push(node2);
 				}
 			});
 
 			if (siblings.length >= threshold){
 				//Generate a new ID for our grouped node
 				var nodeId = generateUniqueId(sigmaInstance, true);
-
-				var folded = {
-					nodes: [],
-					edges: []
-				}
 
 				sigmaInstance.graph.addNode({
 					id: nodeId,
@@ -163,7 +158,11 @@ export function collapseSiblingNodes(sigmaInstance){
 					glyphs: [{
 						position: 'bottom-left',
 						content: siblings.length
-					}]
+					}],
+					folded: {
+						nodes: [],
+						edges: []
+					}
 				});
 
 				//Generate new edges for each parent going to our new node
@@ -201,11 +200,11 @@ export function collapseSiblingNodes(sigmaInstance){
 export function generateUniqueId(sigmaInstance, isNode){
 	var i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
 	if (isNode){
-		while (sigmaInstance.graph.nodes(i) !== 'undefined'){
+		while (typeof sigmaInstance.graph.nodes(i) !== 'undefined'){
 			i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
 		}
 	}else{
-		while (sigmaInstance.graph.edges(i) !== 'undefined'){
+		while (typeof sigmaInstance.graph.edges(i) !== 'undefined'){
 			i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
 		}
 	}

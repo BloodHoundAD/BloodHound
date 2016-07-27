@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import GlyphiconSpan from '../glyphiconspan'
 import Icon from '../icon'
-import { escapeRegExp } from 'utils';
+import { escapeRegExp, fullAjax } from 'utils';
 import TabContainer from './tabcontainer'
 
 export default class SearchContainer extends Component {
@@ -76,40 +76,60 @@ export default class SearchContainer extends Component {
 
         jQuery(this.refs.searchbar).typeahead({
             source: function(query, process) {
-                return $.ajax({
-                    url: localStorage.getItem("dbpath") + "/db/data/cypher",
-                    type: 'POST',
-                    accepts: { json: "application/json" },
-                    dataType: "json",
-                    contentType: "application/json",
-                    headers: {
-                        "Authorization": "Basic bmVvNGo6bmVvNGpq"
-                    },
-                    data: JSON.stringify({ "query": "MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(query) + ".*' RETURN n.name LIMIT 10" }),
-                    success: function(json) {
-                        var d = json.data;
-                        var l = d.length;
-                        for (var i = 0; i < l; i++) {
-                            d[i] = d[i].toString();
-                        }
-                        return process(json.data);
+                var options = fullAjax(
+                    "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n.name LIMIT 10".format(escapeRegExp(query)),
+                    function(json){
+                        var data = []
+                        $.each(json.results[0].data, function(index, d){
+                            data.push(d.row[0])
+                        })
+                        return process(data)
                     }
-                });
+                )
+                return $.ajax(options)
             },
             afterSelect: function(selected) {
                 if (!this.state.pathfindingIsOpen) {
-                    doQuery("MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(selected) + ".*' RETURN n");
+                    var statement = "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n".format(escapeRegExp(selected));
+                    emitter.emit('searchQuery', statement)
                 } else {
-                    var start = $('#searchBar').val();
-                    var end = $('#endNode').val();
+                    var start = jQuery(this.refs.searchbar).val();
+                    var end = jQuery(this.refs.pathbar).val();
                     if (start !== "" && end !== "") {
-                        doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);
+                        emitter.emit('pathQuery', start, end);
                     }
                 }
             }.bind(this),
             autoSelect: false,
             minLength: 3
-            })
+            }
+        )
+
+        jQuery(this.refs.pathbar).typeahead({
+            source: function(query, process) {
+                var options = fullAjax(
+                    "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n.name LIMIT 10".format(escapeRegExp(query)),
+                    function(json){
+                        var data = []
+                        $.each(json.results[0].data, function(index, d){
+                            data.push(d.row[0])
+                        })
+                        return process(data)
+                    }
+                )
+                return $.ajax(options)
+            },
+            afterSelect: function(selected) {
+                var start = jQuery(this.refs.searchbar).val();
+                var end = jQuery(this.refs.pathbar).val();
+                if (start !== "" && end !== "") {
+                    emitter.emit('pathQuery', start, end);
+                }
+            }.bind(this),
+            autoSelect: false,
+            minLength: 3
+            }
+        )
     }
 
     render(){
@@ -135,7 +155,10 @@ export default class SearchContainer extends Component {
                         tooltip={true} 
                         tooltipDir="bottom" 
                         tooltipTitle="Back" 
-                        classes="input-group-addon spanfix">
+                        classes="input-group-addon spanfix"
+                        click={function(){
+                            emitter.emit('graphBack')
+                        }}>
                         <Icon glyph="step-backward" extraClass="menuglyph" />
                     </GlyphiconSpan>
                 </div>
