@@ -43,6 +43,9 @@ export default class GraphContainer extends Component {
             })
         }
 
+        emitter.emit('showLoadingIndicator', true);
+        emitter.emit('updateLoadingText', "Querying Database")
+
         sigma.neo4j.cypher({
             url: appStore.databaseInfo.url,
             user: appStore.databaseInfo.user,
@@ -76,6 +79,7 @@ export default class GraphContainer extends Component {
             this.state.design = design;
             sigma.misc.animation.camera(sigmaInstance.camera, { x: 0, y: 0, ratio: 1.075 });
             sigma.layouts.startForceLink()
+            emitter.emit('updateLoadingText', 'Initial Layout')
         }.bind(this))
         if (this.state.firstDraw){
             setTimeout(function(){
@@ -229,6 +233,7 @@ export default class GraphContainer extends Component {
         });
 
         forcelinkListener.bind('stop', function(event) {
+            emitter.emit('updateLoadingText', "Fixing Overlap");
             sigmaInstance.startNoverlap();
         })
 
@@ -239,6 +244,7 @@ export default class GraphContainer extends Component {
         });
 
         dagreListener.bind('stop', function(event){
+            emitter.emit('updateLoadingText', "Fixing Overlap");
             sigmaInstance.startNoverlap();
         })
 
@@ -249,7 +255,11 @@ export default class GraphContainer extends Component {
             permittedExpansion: 1.3 
         });
         noverlapListener.bind('stop', function(event) {
-
+            emitter.emit('updateLoadingText', 'Done!');
+            setTimeout(function(){
+                emitter.emit('showLoadingIndicator', false);    
+            }, 3000)
+            
         });
 
         

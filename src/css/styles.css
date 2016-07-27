@@ -512,6 +512,12 @@ body {
 
 .loadingIndicator div:first-child {
     text-align: center;
+    font-weight: bold
+}
+
+.loadingIndicator img{
+    width: 80px;
+    height: auto;
 }
 
 .settingsDiv {
