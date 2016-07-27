@@ -8,7 +8,8 @@ export default class GraphContainer extends Component {
         this.state = {
             sigmaInstance : null,
             design: null,
-            dragged: false
+            dragged: false,
+            firstDraw: true
         }
     }
 
@@ -35,17 +36,23 @@ export default class GraphContainer extends Component {
             }
             this.state.sigmaInstance = sigmaInstance
             design.deprecate();
-            design.apply();
             sigmaInstance.refresh();
+            design.apply();
             this.state.design = design;
             sigma.misc.animation.camera(sigmaInstance.camera, { x: 0, y: 0, ratio: 1.075 });
             sigma.layouts.startForceLink()
         }.bind(this))
+        if (this.state.firstDraw){
+            setTimeout(function(){
+                this.state.sigmaInstance.refresh({skipIndexation: true})
+            }.bind(this), 250)
+            this.setState({firstDraw: false})
+        }
     }
 
     doQueryEvent(){
         this.doQueryNative({
-            statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf]-(m) RETURN n,r,m',
+            statement: 'MATCH (n:User {name:"DSW0018M"}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN n,m,r,s,p',
             allowCollapse: false
         })
     }
@@ -57,7 +64,7 @@ export default class GraphContainer extends Component {
     _nodeClicked(n){
         if (!this.state.dragged){
             if (n.data.node.type_user){
-                emitter.emit('userNodeClicked', n.data.node.label)  
+                emitter.emit('userNodeClicked', n.data.node.label)
             }
         }else{
             this.setState({dragged: false})
@@ -122,7 +129,7 @@ export default class GraphContainer extends Component {
 
         });
 
-        var dragListener = sigma.plugins.dragNodes(sigmaInstance, 
+        var dragListener = sigma.plugins.dragNodes(sigmaInstance,
                                 sigmaInstance.renderers[0])
 
         dragListener.bind('drag', this._nodeDragged.bind(this))

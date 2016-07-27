@@ -102,10 +102,14 @@ export default class UserNodeData extends Component {
 	render() {
 		return (
 			<div className={this.props.visible ? "" : "displaynone"}>
-				<h3>
-					{this.state.label}
-				</h3>
 				<dl className='dl-horizontal'>
+					<dt>
+						Node
+					</dt>
+					<dd>
+						{this.state.label}
+					</dd>
+					<br />
 					<dt>
 						SAMAccountName
 					</dt>
