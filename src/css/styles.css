@@ -255,15 +255,13 @@ body {
 }
 
 .loginwindow {
-    position: absolute;
-    z-index: 1000;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, .7);
 }
 
 @media all and (min-width: 1000px) {
-    .loginwindow > #loginpanel {
+    .loginwindow > div {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -278,7 +276,7 @@ body {
 }
 
 @media all and (min-width: 1500px) {
-    .loginwindow > #loginpanel {
+    .loginwindow > div {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -292,15 +290,20 @@ body {
     }
 }
 
-.loginwindow > #loginpanel img {
+.loginwindow > div img {
     display: block;
     height: 150px;
     margin: auto;
 }
 
-.loginwindow > #loginpanel form {
+.loginwindow > div form {
     margin-right: 2em;
     margin-left: 2em;
+}
+
+.loginwindow .input-group-addon {
+    min-width:115px;
+    text-align:left;
 }
 
 .loginwindow > #checkconnectionpanel {
@@ -365,6 +368,21 @@ body {
     display: block;
     margin: auto;
     margin-top: 5px;
+}
+
+.has-spinner.activate .button-spinner {
+    width: auto;
+    opacity: 1;
+}
+
+.button-spinner {
+    display: inline-block;
+    width: 0;
+    -webkit-transition: opacity .25s, width .25s;
+    -moz-transition: opacity .25s, width .25s;
+    -o-transition: opacity .25s, width .25s;
+    transition: opacity .25s, width .25s;
+    opacity: 0;
 }
 
 .spinner > div {

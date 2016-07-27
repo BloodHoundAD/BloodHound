@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import AppContainer from './components/appcontainer';
+import Login from './components/login'
 import { getStorageData, storageHasKey, storageSetKey } from './js/utils.js';
 
 const ConfigStore = require('configstore');
@@ -117,15 +118,10 @@ if (typeof conf.get('performance') === 'undefined'){
 	})
 }
 
-if (typeof conf.get('databaseInfo') === 'undefined'){
-	conf.set('databaseInfo', {
-		url: 'http://localhost:7474',
-		user: 'neo4j',
-		password: 'neo4jj'
-	})
-}
-
 appStore.performance = conf.get('performance')
-appStore.databaseInfo = conf.get('databaseInfo');
 
-ReactDOM.render(<AppContainer />, document.getElementById('root'))
+emitter.on('login', function(){
+	ReactDOM.render(<AppContainer />, document.getElementById('root'))	
+})
+
+ReactDOM.render(<Login />, document.getElementById('root'))
