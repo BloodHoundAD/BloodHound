@@ -4,21 +4,11 @@ import Icon from '../icon'
 import { escapeRegExp } from '../../js/utils.js';
 import TabContainer from './tabcontainer'
 
-require('bootstrap-3-typeahead')
-
 export default class SearchContainer extends Component {
     constructor(props){
         super(props)
 
         this.state = {
-            data : [
-              {id: 1, name: 'John'},
-              {id: 2, name: 'Miles'},
-              {id: 3, name: 'Charles'},
-              {id: 4, name: 'Herbie'},
-            ],
-            mainvalue : "",
-            pathvalue : "",
             mainPlaceholder:"Start typing to search for a node...",
             pathfindingIsOpen: false
         }
