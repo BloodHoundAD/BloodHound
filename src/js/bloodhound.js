@@ -984,7 +984,7 @@ function reversepath(nid) {
                     tedge = pos;
                 }
             });
-            tedge.color = 'blue';
+            tedge.color = reverse ? 'blue' : 'red';
             reversePath.push(tedge);
             reversepath(nextnode);
         });

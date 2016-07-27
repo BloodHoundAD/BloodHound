@@ -107,7 +107,9 @@ export default class GroupNodeData extends Component {
 						<NodeALink 
 							ready={this.state.directMembers !== -1}
 							value={this.state.directMembers}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query', "MATCH (n)-[r:MemberOf]->(m:Group {name:'{}'}) RETURN n,r,m".format(this.state.label))
+							}.bind(this)} />
 					</dd>
 					<dt>
 						Unrolled Members
@@ -116,7 +118,10 @@ export default class GroupNodeData extends Component {
 						<NodeALink
 							ready={this.state.unrolledMembers !== -1}
 							value={this.state.unrolledMembers}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query', "MATCH (n:User), (m:Group {name:'{}'}), p=allShortestPaths((n)-[:MemberOf*1..]->(m)) RETURN p".format(this.state.label),
+									this.state.label)
+							}.bind(this)} />
 					</dd>
 					<br />
 					<dt>
@@ -126,7 +131,10 @@ export default class GroupNodeData extends Component {
 						<NodeALink
 							ready={this.state.directAdminTo !== -1}
 							value={this.state.directAdminTo}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query', "MATCH (n:Group {name:'{}'})-[r:AdminTo]->(m:Computer) RETURN n,r,m".format(this.state.label),
+									this.state.label)
+							}.bind(this)} />
 					</dd>
 					<br />
 					<dt>
@@ -136,7 +144,10 @@ export default class GroupNodeData extends Component {
 						<NodeALink
 							ready={this.state.derivativeAdminTo !== -1}
 							value={this.state.derivativeAdminTo}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query', "MATCH (n:Group {name:'{}'}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN p".format(this.state.label),
+									this.state.label)
+							}.bind(this)} />
 					</dd>
 					<dt>
 						Unrolled Member Of
@@ -145,7 +156,10 @@ export default class GroupNodeData extends Component {
 						<NodeALink
 							ready={this.state.unrolledMemberOf !== -1}
 							value={this.state.unrolledMemberOf}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query', "MATCH (n:Group {name:'{}'}), (target:Group), p=allShortestPaths((n)-[r:MemberOf*1..]->(target)) RETURN p".format(this.state.label),
+									this.state.label)
+							}.bind(this)} />
 					</dd>
 					<dt>
 						Sessions
@@ -154,7 +168,10 @@ export default class GroupNodeData extends Component {
 						<NodeALink
 							ready={this.state.sessions !== -1}
 							value={this.state.sessions}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query', "MATCH (n:User), (m:Group {name: '{}'}), p=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (n)-[s:HasSession]-(o:Computer) RETURN m,n,r,o,s".format(this.state.label),
+									this.state.label)
+							}.bind(this)} />
 					</dd>
 				</dl>
 			</div>

@@ -33,6 +33,8 @@ Array.prototype.allEdgesSameType = function() {
 global.appStore = {
 	startNode: null,
 	endNode: null,
+	reversePath: [],
+	forwardPath: [],
 	spotlightData: {},
 	queryStack: [],
 	currentTooltip: null,
