@@ -13,7 +13,6 @@ export default class LoadingContainer extends Component {
 		}.bind(this))
 
 		emitter.on('showLoadingIndicator', function(payload){
-			console.log(payload);
 			if (payload){
 				jQuery(this.refs.load).fadeIn()
 			}else{
