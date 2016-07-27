@@ -204,19 +204,11 @@ export default class GraphContainer extends Component {
             }
 
             if (e.data.leave.nodes.length > 0) {
-                if (appStore.forwardPath.length > 0) {
-                    $.each(appStore.forwardPath, function(index, edge) {
-                        edge.color = '#356';
+                if (appStore.highlightedEdges.length > 0) {
+                    $.each(appStore.highlightedEdges, function(index, edge) {
+                        edge.color = sigmaInstance.settings.defaultEdgeColor;
                     });
-                    appStore.forwardPath = [];
-                    sigmaInstance.refresh({ 'skipIndexation': true });
-                }
-
-                if (appStore.reversePath.length > 0) {
-                    $.each(appStore.reversePath, function(index, edge) {
-                        edge.color = '#356';
-                    });
-                    appStore.reversePath = [];
+                    appStore.highlightedEdges = [];
                     sigmaInstance.refresh({ 'skipIndexation': true });
                 }
             }
