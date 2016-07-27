@@ -3,6 +3,7 @@ import DatabaseDataDisplay from './Tabs/databasedatadisplay'
 import PrebuiltQueriesDisplay from './Tabs/prebuiltqueriesdisplay'
 import NoNodeData from './Tabs/nonodedata'
 import UserNodeData from './Tabs/usernodedata'
+import GroupNodeData from './Tabs/groupnodedata';
 import { Tabs, Tab } from 'react-bootstrap';
 
 export default class TabContainer extends Component {
@@ -26,8 +27,18 @@ export default class TabContainer extends Component {
 		this.setState({selected: 2})
 	}
 
+	_groupNodeClicked(){
+		this.setState({
+			userVisible: false,
+			computerVisible: false,
+			groupVisible: true
+		})
+		this.setState({selected: 2})
+	}
+
 	componentDidMount() {
 		emitter.on('userNodeClicked', this._userNodeClicked.bind(this))
+		emitter.on('groupNodeClicked', this._groupNodeClicked.bind(this))
 	}
 
 	_handleSelect(index, last){
@@ -45,6 +56,7 @@ export default class TabContainer extends Component {
 					<Tab eventKey={2} title="Node Info">
 						<NoNodeData visible={!this.state.userVisible && !this.state.computerVisible && !this.state.groupVisible}/>
 						<UserNodeData visible={this.state.userVisible}/>
+						<GroupNodeData visible={this.state.groupVisible}/>
 					</Tab>
 
 					<Tab eventKey={3} title="Queries">

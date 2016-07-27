@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import NodeALink from './nodealink'
 import { fullAjax } from 'utils';
 
-export class GroupNodeData extends Component {
+export default class GroupNodeData extends Component {
 	propTypes: {
 		visible : React.PropTypes.bool.isRequired
-	},
+	}
+
 	constructor(){
 		super();
 
@@ -39,7 +41,7 @@ export class GroupNodeData extends Component {
 		var directMembers, 
 			unrolledMembers, 
 			directAdminTo,
-			derivateAdminTo,
+			derivativeAdminTo,
 			unrolledMemberOf,
 			sessions;
 
@@ -82,7 +84,7 @@ export class GroupNodeData extends Component {
 		$.ajax(directMembers);
 		$.ajax(unrolledMembers);
 		$.ajax(directAdminTo);
-		$.ajax(derivateAdminTo);
+		$.ajax(derivativeAdminTo);
 		$.ajax(unrolledMemberOf);
 		$.ajax(sessions);
 	}

@@ -60,6 +60,58 @@ export default class SearchContainer extends Component {
         jQuery(this.refs.tabs).slideToggle()
     }
 
+    openNodeTab(){
+        var e = jQuery(this.refs.tabs)
+        if (!(e.is(":visible"))){
+            e.slideToggle()
+        }
+    }
+
+    componentDidMount() {
+        jQuery(this.refs.pathfinding).slideToggle(0);
+        jQuery(this.refs.tabs).slideToggle(0);
+        emitter.on('userNodeClicked', this.openNodeTab.bind(this))
+        emitter.on('groupNodeClicked', this.openNodeTab.bind(this))
+        emitter.on('computerNodeClicked', this.openNodeTab.bind(this))
+
+        jQuery(this.refs.searchbar).typeahead({
+            source: function(query, process) {
+                return $.ajax({
+                    url: localStorage.getItem("dbpath") + "/db/data/cypher",
+                    type: 'POST',
+                    accepts: { json: "application/json" },
+                    dataType: "json",
+                    contentType: "application/json",
+                    headers: {
+                        "Authorization": "Basic bmVvNGo6bmVvNGpq"
+                    },
+                    data: JSON.stringify({ "query": "MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(query) + ".*' RETURN n.name LIMIT 10" }),
+                    success: function(json) {
+                        var d = json.data;
+                        var l = d.length;
+                        for (var i = 0; i < l; i++) {
+                            d[i] = d[i].toString();
+                        }
+                        return process(json.data);
+                    }
+                });
+            },
+            afterSelect: function(selected) {
+                if (!this.state.pathfindingIsOpen) {
+                    doQuery("MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(selected) + ".*' RETURN n");
+                } else {
+                    var start = $('#searchBar').val();
+                    var end = $('#endNode').val();
+                    if (start !== "" && end !== "") {
+                        doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);
+                    }
+                }
+            }.bind(this),
+            autoSelect: false,
+            minLength: 3
+            })
+    }
+
     render(){
         return (
             <div className="searchdiv">
@@ -115,55 +167,5 @@ export default class SearchContainer extends Component {
                 </div>
             </div>
         )
-    }
-
-    openNodeTab(){
-        var e = jQuery(this.refs.tabs)
-        if (!(e.is(":visible"))){
-            e.slideToggle()
-        }
-    }
-
-    componentDidMount() {
-        jQuery(this.refs.pathfinding).slideToggle(0);
-        jQuery(this.refs.tabs).slideToggle(0);
-        emitter.on('userNodeClicked', this.openNodeTab.bind(this))
-
-        jQuery(this.refs.searchbar).typeahead({
-            source: function(query, process) {
-                return $.ajax({
-                    url: localStorage.getItem("dbpath") + "/db/data/cypher",
-                    type: 'POST',
-                    accepts: { json: "application/json" },
-                    dataType: "json",
-                    contentType: "application/json",
-                    headers: {
-                        "Authorization": "Basic bmVvNGo6bmVvNGpq"
-                    },
-                    data: JSON.stringify({ "query": "MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(query) + ".*' RETURN n.name LIMIT 10" }),
-                    success: function(json) {
-                        var d = json.data;
-                        var l = d.length;
-                        for (var i = 0; i < l; i++) {
-                            d[i] = d[i].toString();
-                        }
-                        return process(json.data);
-                    }
-                });
-            },
-            afterSelect: function(selected) {
-                if (!this.state.pathfindingIsOpen) {
-                    doQuery("MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(selected) + ".*' RETURN n");
-                } else {
-                    var start = $('#searchBar').val();
-                    var end = $('#endNode').val();
-                    if (start !== "" && end !== "") {
-                        doQuery("MATCH (source {name:'" + start + "'}), (target {name:'" + end + "'}), p=allShortestPaths((source)-[*]->(target)) RETURN p", start, end);
-                    }
-                }
-            }.bind(this),
-            autoSelect: false,
-            minLength: 3
-            })
     }
 }

@@ -15,7 +15,11 @@ export default class NodeALink extends Component {
 			<If condition={this.props.ready}>
 				<Then><a href="#" onClick={this.props.click}>{this.props.value}</a></Then>
 				<Else>{() =>
-					<a style={{color:'black'}}>-</a>
+					<div className="spinner">
+					  <div className="bounce1"></div>
+					  <div className="bounce2"></div>
+					  <div className="bounce3"></div>
+					</div>
 				}</Else>
 			</If>
 		);

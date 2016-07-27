@@ -147,7 +147,7 @@ export default class UserNodeData extends Component {
 							value={this.state.unrolledGroupMembership}
 							click={this.placeholder} />
 					</dd>
-					<dt>
+					{/*<dt>
 						Foreign Group Membership
 					</dt>
 					<dd>
@@ -155,7 +155,7 @@ export default class UserNodeData extends Component {
 							ready={this.state.foreignGroupMembership !== -1}
 							value={this.state.foreignGroupMembership}
 							click={this.placeholder} />
-					</dd>
+					</dd> */}
 					<br />
 					<dt>
 						First Degree Local Admin

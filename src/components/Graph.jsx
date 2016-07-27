@@ -45,7 +45,7 @@ export default class GraphContainer extends Component {
         if (this.state.firstDraw){
             setTimeout(function(){
                 this.state.sigmaInstance.refresh({skipIndexation: true})
-            }.bind(this), 250)
+            }.bind(this), 500)
             this.setState({firstDraw: false})
         }
     }
@@ -65,6 +65,8 @@ export default class GraphContainer extends Component {
         if (!this.state.dragged){
             if (n.data.node.type_user){
                 emitter.emit('userNodeClicked', n.data.node.label)
+            }else if (n.data.node.type_group){
+                emitter.emit('groupNodeClicked', n.data.node.label)
             }
         }else{
             this.setState({dragged: false})
