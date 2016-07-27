@@ -170,7 +170,7 @@ export default class GroupNodeData extends Component {
 							value={this.state.sessions}
 							click={function(){
 								emitter.emit('query', "MATCH (n:User), (m:Group {name: '{}'}), p=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (n)-[s:HasSession]-(o:Computer) RETURN m,n,r,o,s".format(this.state.label),
-									this.state.label)
+									"",this.state.label)
 							}.bind(this)} />
 					</dd>
 				</dl>
