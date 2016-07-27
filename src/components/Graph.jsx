@@ -117,6 +117,11 @@ export default class GraphContainer extends Component {
             }
         })
 
+        var noverlapListener = sigmaInstance.configNoverlap({ nodeMargin: 20.0, easing: 'cubicInOut', gridSize: 20, permittedExpansion: 1.3 });
+        noverlapListener.bind('stop', function(event) {
+
+        });
+
         var dragListener = sigma.plugins.dragNodes(sigmaInstance, 
                                 sigmaInstance.renderers[0])
 
