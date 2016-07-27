@@ -67,7 +67,7 @@ export default class UserNodeData extends Component {
 			}.bind(this))
 
 		firstDegreeLocalAdmin = fullAjax(
-			"MATCH (n:User {name:'{}}'}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN count(target)".format(payload),
+			"MATCH (n:User {name:'{}'}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN count(target)".format(payload),
 			function(json){
 				this.setState({firstDegreeLocalAdmin: json.results[0].data[0].row[0]})
 			}.bind(this)
@@ -136,7 +136,9 @@ export default class UserNodeData extends Component {
 						<NodeALink 
 							ready={this.state.firstDegreeGroupMembership !== -1}
 							value={this.state.firstDegreeGroupMembership}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query', "MATCH (n:User {name:'{}'}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1]->(target)) RETURN p".format(this.state.label))
+							}.bind(this)} />
 					</dd>
 					<dt>
 						Unrolled Group Memberships
@@ -145,7 +147,10 @@ export default class UserNodeData extends Component {
 						<NodeALink
 							ready={this.state.unrolledGroupMembership !== -1}
 							value={this.state.unrolledGroupMembership}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query', "MATCH (n:User {name:'{}'}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1..]->(target)) RETURN p".format(this.state.label),
+									this.state.label)
+							}.bind(this)} />
 					</dd>
 					{/*<dt>
 						Foreign Group Membership
@@ -164,7 +169,9 @@ export default class UserNodeData extends Component {
 						<NodeALink
 							ready={this.state.firstDegreeLocalAdmin !== -1}
 							value={this.state.firstDegreeLocalAdmin}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query', "MATCH (n:User {name:'{}'}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN p".format(this.state.label))
+							}.bind(this)} />
 					</dd>
 					<dt>
 						Group Delegated Local Admin Rights
@@ -173,10 +180,13 @@ export default class UserNodeData extends Component {
 						<NodeALink
 							ready={this.state.groupDelegatedLocalAdmin !== -1}
 							value={this.state.groupDelegatedLocalAdmin}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query', "MATCH (n:User {name:'{}'}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN n,m,r,s,p".format(this.state.label)
+									,this.state.label)
+							}.bind(this)} />
 					</dd>
 					<dt>
-						Derivate Local Admin Rights
+						Derivative Local Admin Rights
 					</dt>
 					<dd>
 						<NodeALink

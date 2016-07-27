@@ -30,33 +30,12 @@ Array.prototype.allEdgesSameType = function() {
     return true;
 };
 
-global.PathfindingEvent = {
-  data: {
-    start: "",
-    end: ""
-  }
-}
-
-global.SearchEvent = {
-  data: {
-    label: ""
-  }
-}
-
-global.LogoutEvent = {
-
-}
-
-global.UserNodeClickEvent = {
-	data: {
-		label: ""
-	}
-}
-
 global.appStore = {
 	startNode: null,
 	endNode: null,
 	spotlightData: {},
+	queryStack: [],
+	currentTooltip: null,
 	highResPalette: {
 		iconScheme: {
 			'User': {

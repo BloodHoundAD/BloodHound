@@ -19,7 +19,30 @@ export default class GraphContainer extends Component {
         );
     }
 
+    goBack(){
+        if (appStore.queryStack.length > 0) {
+            if (appStore.currentTooltip !== null) {
+                appStore.currentTooltip.close();
+            }
+            sigma.layouts.stopForceLink();
+
+            var query = appStore.queryStack.pop();
+            this.state.sigmaInstance.graph.clear();
+            this.state.sigmaInstance.graph.read({ nodes: query.nodes, edges: query.edges });
+            this.state.sigmaInstance.refresh();
+            appStore.spotlightData = query.spotlight;
+        }
+    }
+
     doQueryNative(params){
+        if (!this.state.firstDraw){
+            appStore.queryStack.push({
+                nodes: this.state.sigmaInstance.graph.nodes(),
+                edges: this.state.sigmaInstance.graph.edges(),
+                spotlight: appStore.spotlightData
+            })
+        }
+
         sigma.neo4j.cypher({
             url: appStore.databaseInfo.url,
             user: appStore.databaseInfo.user,
@@ -28,12 +51,19 @@ export default class GraphContainer extends Component {
         params.statement,
         this.state.sigmaInstance,
         function(sigmaInstance){
+            appStore.spotlightData = {}
             var design = this.state.design;
             sigmaInstance = setNodeData(this.state.sigmaInstance);
             if (params.allowCollapse){
                 sigmaInstance = collapseEdgeNodes(sigmaInstance);
                 sigmaInstance = collapseSiblingNodes(sigmaInstance);
             }
+
+            $.each(sigmaInstance.graph.nodes(), function(index, node) {
+                if (!appStore.spotlightData.hasOwnProperty(node.id)) {
+                    appStore.spotlightData[node.id] = [node.neo4j_data.name, 0, ""];
+                }
+            });
             this.state.sigmaInstance = sigmaInstance
             design.deprecate();
             sigmaInstance.refresh();
@@ -50,10 +80,29 @@ export default class GraphContainer extends Component {
         }
     }
 
-    doQueryEvent(){
+    doSearchQuery(payload){
         this.doQueryNative({
-            statement: 'MATCH (n:User {name:"DSW0018M"}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN n,m,r,s,p',
-            allowCollapse: false
+            statement: payload,
+            allowCollapse: true
+        })
+    }
+
+    doPathQuery(start, end){
+        var statement = "MATCH (n {name:'{}'}), (m {name:'{}'}), p=allShortestPaths((n)-[*]->(m)) RETURN p".format(start,end)
+        appStore.startNode = start
+        appStore.endNode = end
+        this.doQueryNative({
+            statement: statement,
+            allowCollapse: true
+        })
+    }
+
+    doGenericQuery(statement, start, end, allowCollapse=true){
+        appStore.startNode = start
+        appStore.endNode = end
+        this.doQueryNative({
+            statement: statement,
+            allowCollapse: allowCollapse,
         })
     }
 
@@ -67,6 +116,8 @@ export default class GraphContainer extends Component {
                 emitter.emit('userNodeClicked', n.data.node.label)
             }else if (n.data.node.type_group){
                 emitter.emit('groupNodeClicked', n.data.node.label)
+            }else if (n.data.node.type_computer){
+                emitter.emit('computerNodeClicked', n.data.node.label)
             }
         }else{
             this.setState({dragged: false})
@@ -74,7 +125,10 @@ export default class GraphContainer extends Component {
     }
 
     componentWillMount() {
-        emitter.on('query', this.doQueryEvent.bind(this))
+        emitter.on('searchQuery', this.doSearchQuery.bind(this));
+        emitter.on('pathQuery', this.doPathQuery.bind(this));
+        emitter.on('graphBack', this.goBack.bind(this));
+        emitter.on('query', this.doGenericQuery.bind(this));
     }
 
     componentDidMount() {
