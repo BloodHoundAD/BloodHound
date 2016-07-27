@@ -42,26 +42,32 @@ export function setNodeData(sigmaInstance, startLabel, endLabel){
 
 		if (node.neo4j_data.name === startLabel){
 			appStore.startNode = node;
-			node.glyphs.push({
-				'position': 'bottom-right',
-                'font': 'FontAwesome',
-                'content': '\uF21D',
-                'fillColor': '#3399FF',
-                'fontScale': 1.5
-			})
 		}
 
 		if (node.neo4j_data.name === endLabel){
 			appStore.endNode = node;
-			node.glyphs.push({
-				'position': 'bottom-right',
-                'font': 'FontAwesome',
-                'fillColor': '#990000',
-                'content': '\uF05B',
-                'fontScale': 1.5
-			})
 		}
 	});
+
+	if (appStore.startNode !== null){
+		appStore.startNode.glyphs.push({
+			'position': 'bottom-right',
+            'font': 'FontAwesome',
+            'content': '\uF21D',
+            'fillColor': '#3399FF',
+            'fontScale': 1.5
+		})
+	}
+
+	if (appStore.endNode !== null){
+		appStore.endNode.glyphs.push({
+			'position': 'bottom-right',
+            'font': 'FontAwesome',
+            'fillColor': '#990000',
+            'content': '\uF05B',
+            'fontScale': 1.5
+		})
+	}
 	return sigmaInstance
 }
 
@@ -102,12 +108,12 @@ export function collapseEdgeNodes(sigmaInstance){
 				node.folded.edges.push(edge)
 				appStore.spotlightData[anode.id] = [anode.neo4j_data.name, node.id, node.neo4j_data.name];
 				sigmaInstance.graph.dropNode(anode.id);
-				node.glyphs.push({
-					'position': 'bottom-left',
-					'content': node.folded.nodes.length
-				})
 			}
 		});
+		node.glyphs.push({
+			'position': 'bottom-left',
+			'content': node.folded.nodes.length
+		})
 	})
 
 	return sigmaInstance
