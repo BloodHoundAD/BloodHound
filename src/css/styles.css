@@ -116,7 +116,7 @@ body {
     display: none;
 }
 
-@media all and (min-width: 900px) {
+@media all and (min-width: 600px) {
     .searchdiv {
         position: absolute;
         z-index: 10;

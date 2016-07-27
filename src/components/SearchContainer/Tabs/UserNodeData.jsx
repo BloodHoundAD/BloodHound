@@ -192,7 +192,10 @@ export default class UserNodeData extends Component {
 						<NodeALink
 							ready={this.state.derivativeLocalAdmin !== -1}
 							value={this.state.derivativeLocalAdmin}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query', "MATCH (n:User {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r*]->(m)) RETURN p".format(this.state.label)
+									,this.state.label)
+							}.bind(this)} />
 					</dd>
 					<dt>
 						Sessions
@@ -201,7 +204,10 @@ export default class UserNodeData extends Component {
 						<NodeALink
 							ready={this.state.sessions !== -1}
 							value={this.state.sessions}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query', "'MATCH (n:Computer)-[r:HasSession]->(m:User {name:'{}'}) RETURN n,r,m".format(this.state.label)
+									,this.state.label)
+							}.bind(this)} />
 					</dd>
 				</dl>
 			</div>
