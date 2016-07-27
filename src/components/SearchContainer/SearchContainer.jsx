@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import GlyphiconSpan from '../glyphiconspan'
 import Icon from '../icon'
-import { escapeRegExp } from '../../js/utils.js';
+import { escapeRegExp } from 'utils';
 import TabContainer from './tabcontainer'
 
 export default class SearchContainer extends Component {

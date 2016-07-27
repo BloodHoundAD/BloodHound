@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { defaultAjaxSettings } from '../../js/utils.js';
-import LogoutModal from '../Modals/logoutmodal';
+import { defaultAjaxSettings } from 'utils';
+import LogoutModal from 'modals/logoutmodal';
 
 export default class DatabaseDataDisplay extends Component {
 	constructor(){

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import NodeALink from './nodealink'
-import { fullAjax } from '../../js/utils.js'
+import { fullAjax } from 'utils'
 
 export default class UserNodeData extends Component {
 	propTypes: {

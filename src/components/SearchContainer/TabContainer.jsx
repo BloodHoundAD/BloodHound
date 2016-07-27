@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import DatabaseDataDisplay from './databasedatadisplay'
-import PrebuiltQueriesDisplay from './prebuiltqueriesdisplay'
-import NoNodeData from './nonodedata'
-import UserNodeData from './usernodedata'
+import DatabaseDataDisplay from './Tabs/databasedatadisplay'
+import PrebuiltQueriesDisplay from './Tabs/prebuiltqueriesdisplay'
+import NoNodeData from './Tabs/nonodedata'
+import UserNodeData from './Tabs/usernodedata'
 import { Tabs, Tab } from 'react-bootstrap';
 
 export default class TabContainer extends Component {

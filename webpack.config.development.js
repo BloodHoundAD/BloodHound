@@ -1,5 +1,6 @@
 var webpack = require('webpack');
 var webpackTargetElectronRenderer = require('webpack-target-electron-renderer');
+var path = require('path')
 
 var config = {
   entry: [
@@ -20,6 +21,10 @@ var config = {
   },
   resolve: {
     extensions: ['', '.js', '.jsx'],
+    alias: {
+      utils: path.resolve(__dirname, 'src', 'js', 'utils.js'),
+      modals: path.resolve(__dirname, 'src', 'components', 'Modals')
+    }
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
