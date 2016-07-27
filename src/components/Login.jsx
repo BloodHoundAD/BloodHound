@@ -143,6 +143,14 @@ export default class Login extends Component {
 		this.setState({password: event.target.value})	
 	}
 
+	_triggerLogin(e){
+		var key = e.keyCode ? e.keyCode : e.which
+
+		if (key === 13){
+			this.checkDBCreds()
+		}
+	}
+
 	render() {
 		return (
 			<div className="loginwindow">
@@ -163,11 +171,11 @@ export default class Login extends Component {
 							{this.state.dbHelpVisible ? <p className="help-block help-block-add">No Neo4j REST API Found</p> : null}
 							<div className="input-group spacing">
 								<span className="input-group-addon" id="dbuseraddon">DB Username</span>
-								<input ref="user" type="text" value={this.state.user} onChange={this._userChanged.bind(this)} className="form-control" placeholder="neo4j" aria-describedby="dbuseraddon" />
+								<input ref="user" type="text" value={this.state.user} onKeyUp={this._triggerLogin.bind(this)} onChange={this._userChanged.bind(this)} className="form-control" placeholder="neo4j" aria-describedby="dbuseraddon" />
 							</div>
 							<div className="input-group spacing">
 								<span className="input-group-addon" id="dbpwaddon">DB Password</span>
-								<input ref="password" value={this.state.password} onChange={this._passChanged.bind(this)} type="password" className="form-control" placeholder="neo4j" aria-describedby="dbpwaddon" />
+								<input ref="password" value={this.state.password} onKeyDown={this._triggerLogin.bind(this)} onChange={this._passChanged.bind(this)} type="password" className="form-control" placeholder="neo4j" aria-describedby="dbpwaddon" />
 							</div>
 							{this.state.loginHelpVisible ? <p className="help-block help-block-add" style={{color: "#d9534f"}}>Wrong username or password</p> : null}
 							<button ref="loginButton" disabled={!this.state.loginEnabled} type="button" onClick={this.checkDBCreds.bind(this)} className="btn btn-primary loginbutton has-spinner">
