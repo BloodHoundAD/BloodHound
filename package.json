@@ -37,6 +37,7 @@
     "bootstrap-3-typeahead": "^4.0.1",
     "configstore": "^2.0.0",
     "css-loader": "^0.23.1",
+    "dagre": "^0.7.4",
     "electron-json-storage": "^2.0.0",
     "eventemitter2": "^2.0.0",
     "jquery": "^2.2.4",
