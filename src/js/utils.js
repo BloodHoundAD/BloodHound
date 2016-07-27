@@ -10,14 +10,15 @@ export function buildAuthHeader(){
 
 //Graph Utils
 export function setNodeData(sigmaInstance, startLabel, endLabel){
-	var startNode = null;
-	var endNode = null;
+	appStore.startNode = null;
+	appStore.endNode = null;
 
-	startLabel = (typeof startLabel === 'undefined') ? "" : startLabel
-	endLabel = (typeof endLabel === 'undefined') ? "" : endLabel
+	startLabel = (typeof startLabel === 'undefined') ? undefined : startLabel
+	endLabel = (typeof endLabel === 'undefined') ? undefined : endLabel
 
 	$.each(sigmaInstance.graph.nodes(), function(index, node){
 		node.degree = sigmaInstance.graph.degree(node.id);
+		node.glyphs = []
 	});
 
 	$.each(sigmaInstance.graph.nodes(), function(index, node){
@@ -41,10 +42,24 @@ export function setNodeData(sigmaInstance, startLabel, endLabel){
 
 		if (node.neo4j_data.name === startLabel){
 			appStore.startNode = node;
+			node.glyphs.push({
+				'position': 'bottom-right',
+                'font': 'FontAwesome',
+                'content': '\uF21D',
+                'fillColor': '#3399FF',
+                'fontScale': 1.5
+			})
 		}
 
 		if (node.neo4j_data.name === endLabel){
 			appStore.endNode = node;
+			node.glyphs.push({
+				'position': 'bottom-right',
+                'font': 'FontAwesome',
+                'fillColor': '#990000',
+                'content': '\uF05B',
+                'fontScale': 1.5
+			})
 		}
 	});
 	return sigmaInstance
@@ -87,10 +102,10 @@ export function collapseEdgeNodes(sigmaInstance){
 				node.folded.edges.push(edge)
 				appStore.spotlightData[anode.id] = [anode.neo4j_data.name, node.id, node.neo4j_data.name];
 				sigmaInstance.graph.dropNode(anode.id);
-				node.glyphs = [{
+				node.glyphs.push({
 					'position': 'bottom-left',
 					'content': node.folded.nodes.length
-				}]
+				})
 			}
 		});
 	})
@@ -127,7 +142,7 @@ export function collapseSiblingNodes(sigmaInstance){
 			//Generate our string to compare other nodes to 
 			//by sorting the parents and turning it into a string
 			var checkString = parents.sort().join(',')
-			var testString;
+			var testString; 
 
 			//Loop back over nodes in the graph and look for any nodes
 			//with identical parents
@@ -212,6 +227,29 @@ export function generateUniqueId(sigmaInstance, isNode){
 	return i
 }
 
+export function findGraphPath(sigmaInstance, reverse, nodeid){
+	var target = reverse ? appStore.startNode : appStore.endNode
+
+	if (nodeid !== target.id){
+		var edges = sigmaInstance.graph.adjacentEdges(nodeid)
+		var nodes = reverse ? sigmaInstance.graph.inboundNodes(nodeid) : sigmaInstance.graph.outboundNodes(nodeid)
+		$.each(nodes, function(index, node){
+			$.each(edges, function(index, edge){
+				var check = reverse ? edge.source : edge.target
+				if (check === node){
+					edge.color = reverse ? 'blue' : 'red';
+					appStore.reversePath.push(edge);
+					findGraphPath(sigmaInstance, reverse, node);
+				}
+			})
+		})
+	}else{
+		sigmaInstance.refresh({'skipIndexation': true})
+	}
+}
+
+
+//Utilities for generating AJAX requests
 export function defaultAjaxSettings(){
 	return {
 		url: appStore.databaseInfo.url + '/db/data/transaction/commit',

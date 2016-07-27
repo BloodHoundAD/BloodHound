@@ -24,10 +24,6 @@ export default class ComputerNodeData extends Component {
 		emitter.on('computerNodeClicked', this.getNodeData.bind(this));
 	}
 
-	placeholder(){
-
-	}
-
 	getNodeData(payload){
 		this.setState({
 			label: payload,
@@ -114,7 +110,10 @@ export default class ComputerNodeData extends Component {
 						<NodeALink 
 							ready={this.state.explicitAdmins !== -1}
 							value={this.state.explicitAdmins}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query',
+									"MATCH (n)-[r:AdminTo]->(m:Computer {name:'{}'}) RETURN n,r,m".format(this.state.label))
+							}.bind(this)} />
 					</dd>
 					<dt>
 						Unrolled Admins
@@ -123,7 +122,10 @@ export default class ComputerNodeData extends Component {
 						<NodeALink
 							ready={this.state.unrolledAdmins !== -1}
 							value={this.state.unrolledAdmins}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query',
+									"MATCH (n:User),(m:Computer {name:'{}'}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(m)) RETURN p".format(this.state.label), this.state.label)
+							}.bind(this)} />
 					</dd>
 					<br />
 					<dt>
@@ -133,7 +135,10 @@ export default class ComputerNodeData extends Component {
 						<NodeALink
 							ready={this.state.firstDegreeGroupMembership !== -1}
 							value={this.state.firstDegreeGroupMembership}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query',
+									"MATCH (n:Computer {name:'{}'}),(m:Group), (n)-[r:MemberOf]->(m) RETURN n,r,m".format(this.state.label), this.state.label)
+							}.bind(this)} />
 					</dd>
 					<dt>
 						Unrolled Group Membership
@@ -142,7 +147,10 @@ export default class ComputerNodeData extends Component {
 						<NodeALink
 							ready={this.state.unrolledGroupMembership !== -1}
 							value={this.state.unrolledGroupMembership}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query',
+									"MATCH (n:Computer {name:'{}'}), (m:Group),p=allShortestPaths((n)-[:MemberOf*1..]->(m)) RETURN p".format(this.state.label), this.state.label)
+							}.bind(this)} />
 					</dd>
 					<dt>
 						Sessions
@@ -151,7 +159,10 @@ export default class ComputerNodeData extends Component {
 						<NodeALink
 							ready={this.state.sessions !== -1}
 							value={this.state.sessions}
-							click={this.placeholder} />
+							click={function(){
+								emitter.emit('query',
+									"MATCH (m:Computer {name:'{}'})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH '$' RETURN n,r,m".format(this.state.label))
+							}.bind(this)} />
 					</dd>
 				</dl>
 			</div>

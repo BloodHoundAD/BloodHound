@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes } from 'utils';
+import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes, findGraphPath } from 'utils';
 
 export default class GraphContainer extends Component {
     constructor(props){
@@ -53,7 +53,7 @@ export default class GraphContainer extends Component {
         function(sigmaInstance){
             appStore.spotlightData = {}
             var design = this.state.design;
-            sigmaInstance = setNodeData(this.state.sigmaInstance);
+            sigmaInstance = setNodeData(this.state.sigmaInstance, params.start, params.end);
             if (params.allowCollapse){
                 sigmaInstance = collapseEdgeNodes(sigmaInstance);
                 sigmaInstance = collapseSiblingNodes(sigmaInstance);
@@ -89,20 +89,20 @@ export default class GraphContainer extends Component {
 
     doPathQuery(start, end){
         var statement = "MATCH (n {name:'{}'}), (m {name:'{}'}), p=allShortestPaths((n)-[*]->(m)) RETURN p".format(start,end)
-        appStore.startNode = start
-        appStore.endNode = end
         this.doQueryNative({
             statement: statement,
-            allowCollapse: true
+            allowCollapse: true,
+            start: start,
+            end: end
         })
     }
 
     doGenericQuery(statement, start, end, allowCollapse=true){
-        appStore.startNode = start
-        appStore.endNode = end
         this.doQueryNative({
             statement: statement,
             allowCollapse: allowCollapse,
+            start: start,
+            end: end
         })
     }
 
@@ -191,6 +191,36 @@ export default class GraphContainer extends Component {
         dragListener.bind('drag', this._nodeDragged.bind(this))
 
         sigmaInstance.bind('clickNode', this._nodeClicked.bind(this))
+
+        sigmaInstance.bind('hovers', function(e){
+            if (e.data.enter.nodes.length > 0) {
+                if (appStore.endNode !== null) {
+                    findGraphPath(this.state.sigmaInstance, false, e.data.enter.nodes[0].id)
+                }
+
+                if (appStore.startNode !== null) {
+                    findGraphPath(this.state.sigmaInstance, true, e.data.enter.nodes[0].id)
+                }
+            }
+
+            if (e.data.leave.nodes.length > 0) {
+                if (appStore.forwardPath.length > 0) {
+                    $.each(appStore.forwardPath, function(index, edge) {
+                        edge.color = '#356';
+                    });
+                    appStore.forwardPath = [];
+                    sigmaInstance.refresh({ 'skipIndexation': true });
+                }
+
+                if (appStore.reversePath.length > 0) {
+                    $.each(appStore.reversePath, function(index, edge) {
+                        edge.color = '#356';
+                    });
+                    appStore.reversePath = [];
+                    sigmaInstance.refresh({ 'skipIndexation': true });
+                }
+            }
+        }.bind(this))
 
         var fa = sigma.layouts.configForceLink(sigmaInstance, {
             worker: true,

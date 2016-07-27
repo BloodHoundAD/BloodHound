@@ -27,10 +27,6 @@ export default class UserNodeData extends Component {
 		emitter.on('userNodeClicked', this.getNodeData.bind(this));
 	}
 
-	placeholder(){
-
-	}
-
 	getNodeData(payload){
 		this.setState({
 			label: payload,
