@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
 import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes, findGraphPath } from 'utils';
-import Tooltip from './tooltip'
 
 export default class GraphContainer extends Component {
     constructor(props){
