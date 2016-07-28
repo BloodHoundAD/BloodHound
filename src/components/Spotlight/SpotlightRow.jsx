@@ -2,17 +2,21 @@ import React, { Component } from 'react';
 
 export default class SpotlightRow extends Component {
 	propTypes: {
-	 	node-id : React.PropTypes.number.isRequired,
-	 	parent-node-id : React.PropTypes.number.isRequired,
-	 	node-label : React.PropTypes.string.isRequired,
-	 	parent-node-label : React.PropTypes.string.isRequired
+	 	nodeId : React.PropTypes.number.isRequired,
+	 	parentNodeId : React.PropTypes.number.isRequired,
+	 	nodeLabel : React.PropTypes.string.isRequired,
+	 	parentNodeLabel : React.PropTypes.string.isRequired
+	}
+
+	_handleClick(){
+		emitter.emit('spotlightClick', this.props.nodeId, this.props.parentNodeId)
 	}
 
 	render() {
 		return (
-			<tr data-id={this.props.node-id} data-parent-id={this.props.parent-node-id}>
-				<td>{this.props.node-label}</td>
-				<td>{this.props.parent-node-label}</td>
+			<tr onClick={this._handleClick.bind(this)} data-id={this.props.nodeId} data-parent-id={this.props.parentNodeId}>
+				<td>{this.props.nodeLabel}</td>
+				<td>{this.props.parentNodeLabel}</td>
 			</tr>
 		);
 	}

@@ -14,9 +14,9 @@ export default class AppContainer extends Component {
 		return (
 			<div className="max">
 				<LoadingContainer />
+				<SpotlightContainer/>
 				<GraphContainer />
 				<SearchContainer />
-				<SpotlightContainer/>
 				<LogoutModal/>
 			</div>
 		);
