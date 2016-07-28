@@ -204,39 +204,7 @@ $(document).ready(function() {
             node: [{
                 show: 'rightClickNode',
                 cssClass: 'new-tooltip',
-                template: '<div class="header">' +
-                    '   {{label}}' +
-                    '</div>' +
-                    '   <ul>' +
-                    '       {{#type_user}}' +
-                    '           <li onclick="setLabelAsStart(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node</li>' +
-                    '           <li onclick="setLabelAsEnd(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Ending Node</li>' +
-                    '           <li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})-[r:MemberOf]->m RETURN n,r,m\')"><i class="glyphicon glyphicon-screenshot"></i> Group Membership</li>' +
-                    '           <li onclick="doQuery(\'MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer),p=allShortestPaths((n)-[*]->(target)) RETURN p\', &quot;{{label}}&quot;)"><i class="glyphicon glyphicon-screenshot"></i> Admin To</li>' +
-                    '       {{/type_user}}' +
-                    '       {{#type_computer}}' +
-                    '           <li onclick="setLabelAsStart(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node</li>' +
-                    '           <li onclick="setLabelAsEnd(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Ending Node</li>' +
-                    '           <li onclick=""><i class="glyphicon glyphicon-screenshot"></i> Shortest Paths to Here</li>' +
-                    '           <li onclick="doQuery(\'MATCH (n:User {name:&quot;{{label}}&quot;}), (target:Computer),p=allShortestPaths((n)-[*]->(target)) RETURN p\')"><i class="glyphicon glyphicon-screenshot"></i> Get Explicit Admins</li>' +
-                    '           <li onclick="doQuery(\'MATCH (m:Computer {name:&quot;{{label}}&quot;})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH &quot;$&quot; RETURN n,r,m\')"><i class="glyphicon glyphicon-screenshot"></i> Get User Sessions</li>' +
-                    '       {{/type_computer}}' +
-                    '       {{#type_group}}' +
-                    '           <li onclick="setLabelAsStart(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node</li>' +
-                    '           <li onclick="setLabelAsEnd(\'{{label}}\')"><i class="glyphicon glyphicon-screenshot"></i> Set as Ending Node</li>' +
-                    '           <li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})<-[r:MemberOf]-(m) RETURN n,r,m\')"><i class="glyphicon glyphicon-screenshot"></i> Get Members</li>' +
-                    '           <li onclick="doQuery(\'MATCH (n {name:&quot;{{label}}&quot;})-[r:AdminTo]->(m) RETURN n,r,m\', &quot;{{label}}&quot;)"><i class="glyphicon glyphicon-screenshot"></i> Admin To</li>' +
-                    '       {{/type_group}}' +
-                    '       {{#expand}}' +
-                    '           <li onclick="unfold({{id}})"><i class="glyphicon glyphicon-screenshot"></i> Expand</li>' +
-                    '       {{/expand}}' +
-                    '       {{#collapse}}' +
-                    '           <li onclick="collapse({{id}})"><i class="glyphicon glyphicon-screenshot"></i> Collapse</li>' +
-                    '       {{/collapse}}' +
-                    '       {{#grouped}}' +
-                    '           <li onclick="ungroup({{id}})"><i class="glyphicon glyphicon-screenshot"></i> Expand</li>' +
-                    '       {{/grouped}}' +
-                    '   </ul>',
+                template: $.get('tooltip.html'),
                 autoadjust: true,
                 renderer: function(node, template) {
                     node.expand = false;
@@ -984,7 +952,7 @@ function reversepath(nid) {
                     tedge = pos;
                 }
             });
-            tedge.color = reverse ? 'blue' : 'red';
+            tedge.color = 'blue';
             reversePath.push(tedge);
             reversepath(nextnode);
         });

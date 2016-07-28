@@ -123,7 +123,8 @@ body {
         top: 1em;
         left: 1em;
         overflow: visible;
-        width: 52%;
+        min-width: 415px;
+        max-width: 45%;
         background-color: white;
     }
 }
@@ -135,7 +136,8 @@ body {
         top: 1em;
         left: 1em;
         overflow: visible;
-        width: 33%;
+        min-width: 415px;
+        max-width: 40%;
         background-color: white;
     }
 }
@@ -147,7 +149,8 @@ body {
         top: 1em;
         left: 1em;
         overflow: visible;
-        width: 25%;
+        min-width: 415px;
+        max-width: 30%;
         background-color: white;
     }
 }
@@ -258,6 +261,21 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, .7);
+}
+
+@media all and (min-width: 600px) {
+    .loginwindow > div {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        overflow: auto;
+        max-width: 70%;
+        transform: translate(-50%, -50%);
+        border: 5px solid rgba(0, 0, 0, .5);
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, .9);
+        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+    }
 }
 
 @media all and (min-width: 1000px) {

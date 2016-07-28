@@ -19,6 +19,10 @@ export function setNodeData(sigmaInstance, startLabel, endLabel){
 	$.each(sigmaInstance.graph.nodes(), function(index, node){
 		node.degree = sigmaInstance.graph.degree(node.id);
 		node.glyphs = []
+		node.folded = {
+			nodes: [],
+			edges: []
+		}
 	});
 
 	$.each(sigmaInstance.graph.nodes(), function(index, node){
@@ -88,7 +92,7 @@ export function collapseEdgeNodes(sigmaInstance){
 			}
 
 			var edges = sigmaInstance.graph.adjacentEdges(anode.id);
-			if ((edges.length > 1 || edges.length === 0) || (typeof anode.folded !== 'undefined')){
+			if ((edges.length > 1 || edges.length === 0) || (anode.folded.nodes.length > 0)){
 				return;
 			}
 
@@ -97,11 +101,6 @@ export function collapseEdgeNodes(sigmaInstance){
 			if ((anode.type_user && (edge.label === 'MemberOf' || edge.label === 'AdminTo')) 
 				|| (anode.type_computer && (edge.label === 'AdminTo' || edge.label === 'MemberOf')) 
 				|| (anode.type_group && edge.label === 'AdminTo')){
-				if (typeof node.folded === 'undefined'){
-					node.folded = {}
-					node.folded.nodes = []
-					node.folded.edges = []
-				}
 
 				node.isGrouped = true
 				node.folded.nodes.push(anode)
@@ -110,10 +109,12 @@ export function collapseEdgeNodes(sigmaInstance){
 				sigmaInstance.graph.dropNode(anode.id);
 			}
 		});
-		node.glyphs.push({
-			'position': 'bottom-left',
-			'content': node.folded.nodes.length
-		})
+		if (node.folded.nodes.length > 0){
+			node.glyphs.push({
+				'position': 'bottom-left',
+				'content': node.folded.nodes.length
+			})	
+		}
 	})
 
 	return sigmaInstance
@@ -128,7 +129,7 @@ export function collapseSiblingNodes(sigmaInstance){
 
 	$.each(sigmaInstance.graph.nodes(), function(index, node){
 		//Dont apply this logic to anything thats folded or isn't a computer
-		if (!node.type_computer || typeof node.folded !== 'undefined'){
+		if (!node.type_computer || node.folded.nodes.length > 0){
 			return
 		}
 

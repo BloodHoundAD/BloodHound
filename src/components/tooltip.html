@@ -1,0 +1,65 @@
+<div class="header">
+ {{label}}
+</div>
+<ul>
+     {{#type_user}}
+     <li onclick="emitter.emit('setStart', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node
+     </li>
+     <li onclick="emitter.emit('setEnd', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
+     </li>
+     <li onclick="emitter.emit('query', 'MATCH (n {name:\'{{label}}\'})-[r:MemberOf]->(m) RETURN n,r,m', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Group Membership
+     </li>
+     <li onclick="emitter.emit('query', 'MATCH (n:User {name:\'{{label}}\'}), (target:Computer),p=allShortestPaths((n)-[*]->(target)) RETURN p', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Admin To
+     </li>
+     {{/type_user}} 
+     {{#type_computer}}
+     <li onclick="emitter.emit('setStart', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Set as Starting Node
+     </li>
+     <li onclick="emitter.emit('setEnd', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
+     </li>
+     <li onclick="emitter.emit('query', 'MATCH (n:Computer {name:\'{{label}}\'}), (m), p=allShortestPaths((m)-[r*1..]->(n)) RETURN p', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
+     </li>
+     <li onclick="emitter.emit('query', 'MATCH (n:User {name:\'{{label}}\'}), (target:Computer),p=allShortestPaths((n)-[*]->(target)) RETURN p', '{{label}}')>
+          <i class="glyphicon glyphicon-screenshot"> </i> Get Explicit Admins
+     </li>
+     <li onclick="emitter.emit('query', 'MATCH (m:Computer {name:\'{{label}}\'})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH \'$\' RETURN n,r,m', '{{label}}')>
+          <i class="glyphicon glyphicon-screenshot"> </i> Get User Sessions
+     </li>
+     {{/type_computer}} 
+     {{#type_group}}
+     <li onclick="emitter.emit('setStart', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Set as Starting Node
+     </li>
+     <li onclick="emitter.emit('setEnd', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
+     </li>
+     <li onclick="emitter.emit('query', 'MATCH (n {name:\'{{label}}\'})<-[r:MemberOf]-(m) RETURN n,r,m)', '{{label}}')>
+          <i class="glyphicon glyphicon-screenshot"> </i> Get Members
+     </li>
+     <li onclick="emitter.emit('query', 'MATCH (n {name:\'{{label}}\'})-[r:AdminTo]->(m) RETURN n,r,m', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Admin To
+     </li>
+     {{/type_group}} 
+     {{#expand}}
+     <li onclick="unfold({{id}})">
+          <i class="glyphicon glyphicon-screenshot"> </i> Expand
+     </li>
+     {{/expand}} 
+     {{#collapse}}
+     <li onclick="collapse({{id}})">
+          <i class="glyphicon glyphicon-screenshot"> </i> Collapse
+     </li>
+     {{/collapse}} 
+     {{#grouped}}
+     <li onclick="ungroup({{id}})">
+          <i class="glyphicon glyphicon-screenshot"> </i> Expand
+     </li>
+     {{/grouped}}
+</ul>

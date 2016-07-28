@@ -43,6 +43,7 @@
     "eventemitter2": "^2.0.0",
     "jquery": "^2.2.4",
     "linkurious": "^1.5.1",
+    "mustache": "^2.2.1",
     "react": "^15.2.1",
     "react-bootstrap": "^0.30.0",
     "react-dom": "^15.2.1",
