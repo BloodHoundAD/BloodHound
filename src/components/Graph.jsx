@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
 import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes, findGraphPath } from 'utils';
+var fs = require('fs');
+const { dialog } = require('electron').remote
 
 export default class GraphContainer extends Component {
     constructor(props){
@@ -31,6 +33,69 @@ export default class GraphContainer extends Component {
         }
     }
 
+    export(payload){
+        if (payload === 'image'){
+            var size = $('#graph').outerWidth()
+            sigma.plugins.image(this.state.sigmaInstance,
+                this.state.sigmaInstance.renderers[0],
+                {
+                    download: true,
+                    size: size,
+                    background: 'lightgray',
+                    clip: true
+              });
+        }else{
+            var json = this.state.sigmaInstance.toJSON({
+                pretty: true,
+            })
+
+            json = JSON.parse(json)
+            json.spotlight = appStore.spotlightData
+
+            dialog.showSaveDialog({
+                defaultPath: 'graph.json'
+            }, function(loc){
+                fs.writeFile(loc, JSON.stringify(json, null, 2))
+            })
+        }
+    }
+
+    import(payload){
+        fs.readFile(payload, 'utf8', function(err, data){
+            var graph;
+            try{
+                graph = JSON.parse(data);
+            }catch (err){
+                emitter.emit('showAlert', 'Bad JSON File');
+                return
+            }
+
+            if (graph.nodes.length === 0){
+                emitter.emit('showAlert', "No data returned from query")
+            }else{
+                $.each(graph.nodes, function(i, node){
+                    node.glyphs = $.map(node.glyphs, function(value, index) {
+                        return [value];
+                    });
+                })
+                appStore.queryStack.push({
+                    nodes: this.state.sigmaInstance.graph.nodes(),
+                    edges: this.state.sigmaInstance.graph.edges(),
+                    spotlight: appStore.spotlightData,
+                    startNode: appStore.startNode,
+                    endNode: appStore.endNode
+                })
+
+                appStore.spotlightData = graph.spotlight;
+                this.state.sigmaInstance.graph.clear();
+                this.state.sigmaInstance.graph.read(graph);
+                this.state.sigmaInstance.refresh()
+                emitter.emit('spotlightUpdate');
+            }
+            
+        }.bind(this))
+    }
+
     componentWillMount() {
         emitter.on('searchQuery', this.doSearchQuery.bind(this));
         emitter.on('pathQuery', this.doPathQuery.bind(this));
@@ -38,6 +103,8 @@ export default class GraphContainer extends Component {
         emitter.on('query', this.doGenericQuery.bind(this));
         emitter.on('spotlightClick', this.spotlightClickHandler.bind(this))
         emitter.on('graphRefresh', this.relayout.bind(this))
+        emitter.on('export', this.export.bind(this))
+        emitter.on('import', this.import.bind(this))
     }
 
     componentDidMount() {
@@ -71,6 +138,7 @@ export default class GraphContainer extends Component {
             appStore.spotlightData = query.spotlight;
             appStore.startNode = query.startNode,
             appStore.endNode = query.endNode;
+            emitter.emit('spotlightUpdate');
         }
     }
 
