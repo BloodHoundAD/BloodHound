@@ -22,12 +22,22 @@ export default class GraphContainer extends Component {
         })
     }
 
+    relayout(){
+        sigma.layouts.stopForceLink()
+        if (appStore.dagre){
+            sigma.layouts.dagre.start(this.state.sigmaInstance);
+        }else{
+            sigma.layouts.startForceLink()
+        }
+    }
+
     componentWillMount() {
         emitter.on('searchQuery', this.doSearchQuery.bind(this));
         emitter.on('pathQuery', this.doPathQuery.bind(this));
         emitter.on('graphBack', this.goBack.bind(this));
         emitter.on('query', this.doGenericQuery.bind(this));
         emitter.on('spotlightClick', this.spotlightClickHandler.bind(this))
+        emitter.on('graphRefresh', this.relayout.bind(this))
     }
 
     componentDidMount() {
@@ -146,8 +156,11 @@ export default class GraphContainer extends Component {
             this.state.design = design;
             emitter.emit('spotlightUpdate');
             sigma.misc.animation.camera(sigmaInstance.camera, { x: 0, y: 0, ratio: 1.075 });
-            sigma.layouts.startForceLink()
-            emitter.emit('updateLoadingText', 'Initial Layout')
+            if (appStore.dagre){
+                sigma.layouts.dagre.start(this.state.sigmaInstance);
+            }else{
+                sigma.layouts.startForceLink()    
+            }
         }.bind(this))
         if (this.state.firstDraw){
             setTimeout(function(){
@@ -292,35 +305,35 @@ export default class GraphContainer extends Component {
         var tooltips = sigma.plugins.tooltips(
         sigmaInstance,
         sigmaInstance.renderers[0], 
-        {
-            node: [{
-                show: 'rightClickNode',
-                cssClass: 'new-tooltip',
-                autoadjust: true,
-                renderer: function(node) {
-                    var template = this.state.template;
-                    node.expand = false;
-                    node.collapse = false;
-                    // if (typeof node.folded != 'undefined' && !node.grouped) {
-                    //     if (typeof sigmaInstance.graph.nodes(node.folded.nodes[0].id) == 'undefined') {
-                    //         node.expand = true;
-                    //     } else {
-                    //         node.collapse = true;
-                    //     }
-                    // }
-                    return Mustache.render(template, node);
-                }.bind(this)
-            }]
-        }
-    );
+            {
+                node: [{
+                    show: 'rightClickNode',
+                    cssClass: 'new-tooltip',
+                    autoadjust: true,
+                    renderer: function(node) {
+                        var template = this.state.template;
+                        node.expand = false;
+                        node.collapse = false;
+                        // if (typeof node.folded != 'undefined' && !node.grouped) {
+                        //     if (typeof sigmaInstance.graph.nodes(node.folded.nodes[0].id) == 'undefined') {
+                        //         node.expand = true;
+                        //     } else {
+                        //         node.collapse = true;
+                        //     }
+                        // }
+                        return Mustache.render(template, node);
+                    }.bind(this)
+                }]
+            }
+        );
 
-    tooltips.bind('shown', function(event) {
-        appStore.currentTooltip = event.target;
-    });
+        tooltips.bind('shown', function(event) {
+            appStore.currentTooltip = event.target;
+        });
 
-    tooltips.bind('hidden', function(event) {
-        appStore.currentTooltip = null;
-    });
+        tooltips.bind('hidden', function(event) {
+            appStore.currentTooltip = null;
+        });
         
 
         //Layout Plugins
@@ -338,6 +351,11 @@ export default class GraphContainer extends Component {
             sigmaInstance.startNoverlap();
         })
 
+        forcelinkListener.bind('start', function(event){
+            emitter.emit('updateLoadingText', 'Initial Layout')
+            emitter.emit('showLoadingIndicator', true)
+        })
+
         var dagreListener = sigma.layouts.dagre.configure(sigmaInstance, {
             easing: 'cubicInOut',
             boundingBox: true,
@@ -347,6 +365,11 @@ export default class GraphContainer extends Component {
         dagreListener.bind('stop', function(event){
             emitter.emit('updateLoadingText', "Fixing Overlap");
             sigmaInstance.startNoverlap();
+        })
+
+        dagreListener.bind('start', function(event){
+            emitter.emit('updateLoadingText', 'Initial Layout')
+            emitter.emit('showLoadingIndicator', true)
         })
 
         var noverlapListener = sigmaInstance.configNoverlap({
