@@ -27,6 +27,7 @@ export default class GraphContainer extends Component {
         emitter.on('pathQuery', this.doPathQuery.bind(this));
         emitter.on('graphBack', this.goBack.bind(this));
         emitter.on('query', this.doGenericQuery.bind(this));
+        emitter.on('spotlightClick', this.spotlightClickHandler.bind(this))
     }
 
     componentDidMount() {
@@ -61,6 +62,41 @@ export default class GraphContainer extends Component {
             appStore.startNode = query.startNode,
             appStore.endNode = query.endNode;
         }
+    }
+
+    spotlightClickHandler(nodeId, parentId){
+        var sigmaInstance = this.state.sigmaInstance;
+        var parent = sigmaInstance.graph.nodes(nodeId)
+        var label, child;
+        if (typeof parent === 'undefined'){
+            child = sigmaInstance.graph.nodes(parentId).folded.nodes.filter(function(val){
+                return val.id == nodeId;
+            })[0]
+            parent = sigmaInstance.graph.nodes(parentId);
+        }else{
+            child = parent;
+        }
+        label = child.neo4j_data.name;
+        if (child.type_user){
+            emitter.emit('userNodeClicked', label)
+        }else if (child.type_group){
+            emitter.emit('groupNodeClicked', label)
+        }else if (child.type_computer){
+            emitter.emit('computerNodeClicked', label)
+        }
+        parent.color = "#2DC486"
+        sigma.misc.animation.camera(
+            sigmaInstance.camera, {
+                x: parent[sigmaInstance.camera.readPrefix + 'x'],
+                y: parent[sigmaInstance.camera.readPrefix + 'y'],
+                ratio: 0.5
+            }, { duration: sigmaInstance.settings('animationsTime') }
+        );
+
+        setTimeout(function(){
+            parent.color = "black";
+            sigmaInstance.refresh({skipIndexation: true});
+        }, 2000)
     }
 
     doQueryNative(params){
@@ -103,11 +139,12 @@ export default class GraphContainer extends Component {
                     appStore.spotlightData[node.id] = [node.neo4j_data.name, 0, ""];
                 }
             });
-            this.state.sigmaInstance = sigmaInstance
             design.deprecate();
             sigmaInstance.refresh();
             design.apply();
+            this.state.sigmaInstance = sigmaInstance
             this.state.design = design;
+            emitter.emit('spotlightUpdate');
             sigma.misc.animation.camera(sigmaInstance.camera, { x: 0, y: 0, ratio: 1.075 });
             sigma.layouts.startForceLink()
             emitter.emit('updateLoadingText', 'Initial Layout')
@@ -242,7 +279,7 @@ export default class GraphContainer extends Component {
             var key = e.keyCode ? e.keyCode : e.which
 
             if (document.activeElement === document.body){
-
+                
             }
         }.bind(this))
 

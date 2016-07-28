@@ -142,7 +142,7 @@ body {
     }
 }
 
-@media all and (min-width: 1500px) {
+@media all and (min-width: 1200px) {
     .searchdiv {
         position: absolute;
         z-index: 10;
@@ -151,6 +151,19 @@ body {
         overflow: visible;
         min-width: 415px;
         max-width: 30%;
+        background-color: white;
+    }
+}
+
+@media all and (min-width: 1600px) {
+    .searchdiv {
+        position: absolute;
+        z-index: 10;
+        top: 1em;
+        left: 1em;
+        overflow: visible;
+        min-width: 415px;
+        max-width: 25%;
         background-color: white;
     }
 }
