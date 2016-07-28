@@ -47,24 +47,6 @@ body {
     width: 100%;
 }
 
-.menudiv {
-    position: absolute;
-    z-index: 10;
-    top: 1em;
-    right: 1em;
-    overflow: visible;
-}
-
-.menudiv div {
-    float: right;
-    clear: right;
-    padding-top: 5px;
-}
-
-.menudiv div button {
-    white-space: inherit !important;
-    background-color: white;
-}
 
 .slideupbutton {
     position: relative;
@@ -658,4 +640,52 @@ body {
 
 .displaynone {
     display: none;
+}
+
+.menubutton{
+    border-radius: 4px;
+    background-color: #f4511e;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 28px;
+    padding: 20px;
+    width: 200px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.menudiv {
+    position: absolute;
+    z-index: 10;
+    top: 1em;
+    right: 1em;
+    overflow: visible;
+}
+
+.menudiv > div {
+
+}
+
+.menudiv > div > button{
+    overflow: hidden;
+    white-space: nowrap;
+    background-color: #fff;
+    margin-bottom: 5px;
+    float: right;
+    clear: right;
+}
+
+.menudiv > div > button > span{
+    vertical-align: middle;
+    top: -1px;
+    width: 15px;
+    height: 15px;
+}
+
+.fake-hidden{
+    width: 0;
+    height: 0;
+    overflow: hidden;
 }

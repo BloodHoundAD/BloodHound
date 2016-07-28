@@ -6,6 +6,7 @@ import LogoutModal from './components/Modals/logoutmodal'
 import LoadingContainer from './components/loadingcontainer'
 import GenericAlert from './components/alert'
 import RawQuery from './components/rawquery'
+import MenuContainer from './components/Menu/menucontainer'
 
 export default class AppContainer extends Component {
 	constructor(){
@@ -22,6 +23,7 @@ export default class AppContainer extends Component {
 				<SearchContainer />
 				<LogoutModal />
 				<RawQuery />
+				<MenuContainer />
 			</div>
 		);
 	};
