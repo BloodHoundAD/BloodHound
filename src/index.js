@@ -2,7 +2,7 @@ import 'babel-polyfill'; // generators
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import AppContainer from './components/appcontainer';
+import AppContainer from './appcontainer';
 import Login from './components/login'
 import { getStorageData, storageHasKey, storageSetKey } from './js/utils.js';
 

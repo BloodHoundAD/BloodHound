@@ -122,7 +122,7 @@ export default class GraphContainer extends Component {
         this.state.sigmaInstance,
         function(sigmaInstance){
             if (sigmaInstance.graph.nodes().length === 0){
-                console.log('no nodes');
+                emitter.emit('showAlert', "No data returned from query")
                 this.goBack()
                 return;
             }
