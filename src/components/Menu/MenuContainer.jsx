@@ -11,7 +11,12 @@ export default class MenuContainer extends Component {
 	}
 
 	_refreshClick(){
+		emitter.emit('graphRefresh')
+	}
 
+	_changeLayoutClick(){
+		appStore.dagre = !appStore.dagre
+		emitter.emit('graphRefresh')
 	}
 
 	render() {
@@ -30,7 +35,7 @@ export default class MenuContainer extends Component {
 					<MenuButton click={this._refreshClick.bind(this)} hoverVal="Upload Data" glyphicon="glyphicon glyphicon-upload" />
 				</div>
 				<div>
-					<MenuButton click={this._refreshClick.bind(this)} hoverVal="Change Layout Type" glyphicon="fa fa-line-chart" />
+					<MenuButton click={this._changeLayoutClick.bind(this)} hoverVal="Change Layout Type" glyphicon="fa fa-line-chart" />
 				</div>
 				<div>
 					<MenuButton click={this._refreshClick.bind(this)} hoverVal="Settings" glyphicon="fa fa-cogs" />

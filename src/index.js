@@ -14,7 +14,6 @@ global.emitter = new e({})
 
 global.Mustache = require('mustache')
 
-
 String.prototype.format = function () {
   var i = 0, args = arguments;
   return this.replace(/{}/g, function () {
@@ -34,6 +33,7 @@ Array.prototype.allEdgesSameType = function() {
 };
 
 global.appStore = {
+	dagre: false,
 	startNode: null,
 	endNode: null,
 	highlightedEdges: [],
