@@ -12,6 +12,8 @@ global.conf = new ConfigStore('bloodhound')
 var e = require('eventemitter2').EventEmitter2
 global.emitter = new e({})
 
+global.Mustache = require('mustache')
+
 
 String.prototype.format = function () {
   var i = 0, args = arguments;

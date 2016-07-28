@@ -10,7 +10,9 @@ export default class SearchContainer extends Component {
 
         this.state = {
             mainPlaceholder:"Start typing to search for a node...",
-            pathfindingIsOpen: false
+            pathfindingIsOpen: false,
+            mainValue: "",
+            pathfindValue: ""
         }
     }
 
@@ -83,6 +85,10 @@ export default class SearchContainer extends Component {
 
         emitter.on('setEnd', function(payload){
             jQuery(this.refs.pathbar).val(payload);
+            var e = jQuery(this.refs.pathfinding)
+            if (!(e.is(":visible"))){
+                e.slideToggle()
+            }
         }.bind(this))
 
         jQuery(this.refs.searchbar).typeahead({
@@ -143,6 +149,25 @@ export default class SearchContainer extends Component {
         )
     }
 
+    _inputKeyPress(e){
+        var key = e.keyCode ? e.keyCode : e.which
+        var start = jQuery(this.refs.searchbar).val();
+        var end = jQuery(this.refs.pathbar).val();
+
+        if (key === 13){
+            if (!this.state.pathfindingIsOpen) {
+                var statement = "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n".format(escapeRegExp(start));
+                emitter.emit('searchQuery', statement)
+            } else {
+                var start = jQuery(this.refs.searchbar).val();
+                var end = jQuery(this.refs.pathbar).val();
+                if (start !== "" && end !== "") {
+                    emitter.emit('pathQuery', start, end);
+                }
+            }
+        }
+    }
+
     render(){
         return (
             <div className="searchdiv">
@@ -155,7 +180,7 @@ export default class SearchContainer extends Component {
                         click={this._onExpandClick.bind(this)}>
                         <Icon glyph="menu-hamburger" extraClass="menuglyph" />
                     </GlyphiconSpan>
-                    <input ref="searchbar" type="search" className="form-control searchbox" autoComplete="off" placeholder={this.state.mainPlaceholder} />
+                    <input ref="searchbar" onKeyDown={this._inputKeyPress.bind(this)} type="search" className="form-control searchbox" autoComplete="off" placeholder={this.state.mainPlaceholder} />
                     <GlyphiconSpan tooltip={true} tooltipDir="bottom"
                     tooltipTitle="Pathfinding"
                     classes="input-group-addon spanfix"
@@ -180,7 +205,7 @@ export default class SearchContainer extends Component {
                             classes="input-group-addon spanfix invisible">
                             <Icon glyph="menu-hamburger" extraClass="menuglyph" />
                         </GlyphiconSpan>
-                        <input ref="pathbar" type="search" className="form-control searchbox" autoComplete="off" placeholder="Target Node" />
+                        <input ref="pathbar" onKeyDown={this._inputKeyPress.bind(this)} type="search" className="form-control searchbox" autoComplete="off" placeholder="Target Node" />
                         <GlyphiconSpan tooltip={false} 
                             classes="input-group-addon spanfix invisible">
                             <Icon glyph="road" extraClass="menuglyph" />

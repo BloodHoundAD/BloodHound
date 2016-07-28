@@ -99,7 +99,7 @@ export default class Login extends Component {
 					jQuery(this.refs.outer).fadeOut(400, function(){
 						emitter.emit('login');
 					});
-				}.bind(this), 2500)
+				}.bind(this), 1500)
 			}.bind(this),
 			error: function(e){
 				btn.toggleClass('activate');

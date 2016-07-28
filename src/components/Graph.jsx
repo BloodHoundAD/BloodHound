@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom'
 import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes, findGraphPath } from 'utils';
+import Tooltip from './tooltip'
 
 export default class GraphContainer extends Component {
     constructor(props){
@@ -9,13 +11,39 @@ export default class GraphContainer extends Component {
             sigmaInstance : null,
             design: null,
             dragged: false,
-            firstDraw: true
+            firstDraw: true,
+            template: null
         }
+        $.ajax({
+            url: 'src/components/tooltip.html',
+            type: 'GET',
+            success: function(response){
+                this.setState({template: response}) 
+            }.bind(this)
+        })
+    }
+
+    componentWillMount() {
+        emitter.on('searchQuery', this.doSearchQuery.bind(this));
+        emitter.on('pathQuery', this.doPathQuery.bind(this));
+        emitter.on('graphBack', this.goBack.bind(this));
+        emitter.on('query', this.doGenericQuery.bind(this));
+    }
+
+    componentDidMount() {
+        this.initializeSigma();
+            
+        this.doQueryNative({
+            statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf]-(m) RETURN n,r,m',
+            allowCollapse: false
+        })
     }
 
     render() {
         return (
-            <div id="graph" className="graph"></div>
+            <div className="graph">
+                <div id="graph" className="graph"></div>
+            </div>
         );
     }
 
@@ -31,6 +59,8 @@ export default class GraphContainer extends Component {
             this.state.sigmaInstance.graph.read({ nodes: query.nodes, edges: query.edges });
             this.state.sigmaInstance.refresh();
             appStore.spotlightData = query.spotlight;
+            appStore.startNode = query.startNode,
+            appStore.endNode = query.endNode;
         }
     }
 
@@ -39,7 +69,9 @@ export default class GraphContainer extends Component {
             appStore.queryStack.push({
                 nodes: this.state.sigmaInstance.graph.nodes(),
                 edges: this.state.sigmaInstance.graph.edges(),
-                spotlight: appStore.spotlightData
+                spotlight: appStore.spotlightData,
+                startNode: appStore.startNode,
+                endNode: appStore.endNode
             })
         }
 
@@ -61,7 +93,7 @@ export default class GraphContainer extends Component {
             }
             appStore.spotlightData = {}
             var design = this.state.design;
-            sigmaInstance = setNodeData(this.state.sigmaInstance, params.start, params.end);
+            sigmaInstance = setNodeData(sigmaInstance, params.start, params.end);
             if (params.allowCollapse){
                 sigmaInstance = collapseEdgeNodes(sigmaInstance);
                 sigmaInstance = collapseSiblingNodes(sigmaInstance);
@@ -220,6 +252,39 @@ export default class GraphContainer extends Component {
                                 sigmaInstance.renderers[0])
 
         dragListener.bind('drag', this._nodeDragged.bind(this))
+
+        var tooltips = sigma.plugins.tooltips(
+        sigmaInstance,
+        sigmaInstance.renderers[0], 
+        {
+            node: [{
+                show: 'rightClickNode',
+                cssClass: 'new-tooltip',
+                autoadjust: true,
+                renderer: function(node) {
+                    var template = this.state.template;
+                    node.expand = false;
+                    node.collapse = false;
+                    // if (typeof node.folded != 'undefined' && !node.grouped) {
+                    //     if (typeof sigmaInstance.graph.nodes(node.folded.nodes[0].id) == 'undefined') {
+                    //         node.expand = true;
+                    //     } else {
+                    //         node.collapse = true;
+                    //     }
+                    // }
+                    return Mustache.render(template, node);
+                }.bind(this)
+            }]
+        }
+    );
+
+    tooltips.bind('shown', function(event) {
+        appStore.currentTooltip = event.target;
+    });
+
+    tooltips.bind('hidden', function(event) {
+        appStore.currentTooltip = null;
+    });
         
 
         //Layout Plugins
@@ -258,7 +323,7 @@ export default class GraphContainer extends Component {
             emitter.emit('updateLoadingText', 'Done!');
             setTimeout(function(){
                 emitter.emit('showLoadingIndicator', false);    
-            }, 3000)
+            }, 1500)
             
         });
 
@@ -280,21 +345,5 @@ export default class GraphContainer extends Component {
 
         this.state.sigmaInstance = sigmaInstance;
         this.state.design = design;
-    }
-
-    componentWillMount() {
-        emitter.on('searchQuery', this.doSearchQuery.bind(this));
-        emitter.on('pathQuery', this.doPathQuery.bind(this));
-        emitter.on('graphBack', this.goBack.bind(this));
-        emitter.on('query', this.doGenericQuery.bind(this));
-    }
-
-    componentDidMount() {
-        this.initializeSigma();
-            
-        this.doQueryNative({
-            statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf]-(m) RETURN n,r,m',
-            allowCollapse: false
-        })
     }
 }
