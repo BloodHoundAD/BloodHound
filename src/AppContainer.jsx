@@ -5,6 +5,7 @@ import SpotlightContainer from './components/Spotlight/spotlightcontainer'
 import LogoutModal from './components/Modals/logoutmodal'
 import LoadingContainer from './components/loadingcontainer'
 import GenericAlert from './components/alert'
+import RawQuery from './components/rawquery'
 
 export default class AppContainer extends Component {
 	constructor(){
@@ -16,10 +17,11 @@ export default class AppContainer extends Component {
 			<div className="max">
 				<GenericAlert />
 				<LoadingContainer />
-				<SpotlightContainer/>
+				<SpotlightContainer />
 				<GraphContainer />
 				<SearchContainer />
-				<LogoutModal/>
+				<LogoutModal />
+				<RawQuery />
 			</div>
 		);
 	};
