@@ -2,9 +2,17 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <script type="text/javascript">
+      (function() {
+        var css = document.createElement('link');
+        css.href = 'src/css/font-awesome.min.css';
+        css.rel = 'stylesheet';
+        css.type = 'text/css';
+        document.getElementsByTagName('head')[0].appendChild(css);
+      })();
+    </script>
     <title>Bloodhound</title>
     <link rel="icon" href="src/img/favicon.ico">
-    <link type="text/css" rel="stylesheet" href="src/css/font-awesome.min.css">
     <link type="text/css" rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link type="text/css" rel="stylesheet" href="src/css/styles.css">
     <link type="text/css" rel="stylesheet" href="src/css/tooltip.css">
