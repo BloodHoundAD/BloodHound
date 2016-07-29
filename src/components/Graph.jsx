@@ -22,6 +22,12 @@ export default class GraphContainer extends Component {
                 this.setState({template: response}) 
             }.bind(this)
         })
+
+        emitter.on('doLogout', function(){
+            this.state.sigmaInstance.emptyGraph();
+            this.state.sigmaInstance.refresh();
+            this.setState({sigmaInstance: null})
+        })
     }
 
     relayout(){
@@ -201,6 +207,10 @@ export default class GraphContainer extends Component {
         function(sigmaInstance){
             if (sigmaInstance.graph.nodes().length === 0){
                 emitter.emit('showAlert', "No data returned from query")
+                emitter.emit('updateLoadingText', "Done!")
+                setTimeout(function(){
+                    emitter.emit('showLoadingIndicator', false);    
+                }, 1500)
                 this.goBack()
                 return;
             }
@@ -284,15 +294,6 @@ export default class GraphContainer extends Component {
 
     initializeSigma(){
         var sigmaInstance, design;
-        sigma.renderers.def = sigma.renderers.canvas;
-
-        sigma.classes.graph.addMethod('outboundNodes', function(id) {
-            return this.outNeighborsIndex.get(id).keyList();
-        });
-
-        sigma.classes.graph.addMethod('inboundNodes', function(id) {
-            return this.inNeighborsIndex.get(id).keyList();
-        });
 
         sigmaInstance = new sigma(
             {

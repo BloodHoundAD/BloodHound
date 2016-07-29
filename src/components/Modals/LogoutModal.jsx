@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+import Login from '../login'
 
 var Modal = require('react-bootstrap').Modal;
+
 
 export default class LogoutModal extends Component {
 	constructor(){
@@ -15,7 +18,10 @@ export default class LogoutModal extends Component {
 	}
 
 	closeAndLogout(){
+		conf.del('databaseInfo')
+		appStore.databaseInfo = null;
 		this.setState({ open: false })
+		ReactDOM.render(<Login />, document.getElementById('root'))
 	}
 
 	openModal(){
@@ -23,7 +29,7 @@ export default class LogoutModal extends Component {
 	}
 
 	componentDidMount() {
-		
+		emitter.on('showLogout', this.openModal.bind(this))		
 	}
 
 	render() {

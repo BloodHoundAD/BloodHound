@@ -97,7 +97,7 @@ export default class Login extends Component {
 				appStore.databaseInfo = conf.get('databaseInfo');
 				setTimeout(function(){
 					jQuery(this.refs.outer).fadeOut(400, function(){
-						emitter.emit('login');
+						renderEmit.emit('login');
 					});
 				}.bind(this), 1500)
 			}.bind(this),
