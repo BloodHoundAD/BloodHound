@@ -295,3 +295,38 @@ export function fullAjax(statements, callback){
 
 	return options
 }
+
+export function buildMergeQuery(rows, type){
+	var queries = []
+	var rawobj;
+
+	//query: QUERY
+
+	var userQuery, computerQuery, groupQuery, domainQuery;
+	if (type === 'sessions'){
+		userQuery = "MERGE (user:User {name:'{}'}) WITH user MERGE (computer:Computer {name: '{}'}) WITH user,computer MERGE (computer)-[:HasSession {Weight : '{}'}]-(user)"
+		$.each(rows, function(i, row){
+			rawobj = {
+				'method': 'POST',
+				'to': '/cypher',
+				'body' :{
+
+				}
+			}
+			rawobj.body.query = userQuery.format(row.UserName, row.ComputerName, row.Weight)
+			queries.push(rawobj)
+		})
+	}else if (type === 'groupmembership'){
+		userQuery = 'MERGE (user:User {name: "{}"}) WITH user MERGE (group:Group {name: "{}"}) WITH user,group MERGE (user)-[:MemberOf]->group)'
+		groupQuery = 'MERGE (group1:Group {name:"{}"}) WITH group1 MERGE (group2:Group {name: "{}"}) WITH group1,group2 MERGE (group1)-[:MemberOf]->(group2)'
+		computerQuery = 'MERGE (computer:Computer {name: "{}"}) WITH computer MERGE (group:Group {name: "{}"}) with computer,group MERGE (computer)-[:MemberOf]-(group)'
+				
+	}else if (type === 'localadmin'){
+		userQuery = 'MERGE (user:User {name: "{}"}) WITH user MERGE (computer:Computer {name: "{}"}) WITH user,computer MERGE (user)-[:AdminTo]->computer'
+		groupQuery = 'MERGE (group:Group {name: "{}"}) WITH group MERGE (computer:Computer {name: "{}"}) WITH group,computer MERGE (group)-[:AdminTo]->(computer)'
+		computerQuery = 'MERGE (computer1:Computer {name: "{}"}) WITH computer MERGE (computer2:Computer {name: "{}"}) WITH computer1,computer2 MERGE (computer1)-[:AdminTo]->(computer2)'
+	}else{
+		domainQuery = 'MERGE (domain1:Domain {name: "{}"}) WITH source MERGE (domain2:Domain {name: "{}"}) WITH source,target MERGE (domain1)-[:TrustedBy {TrustType : "FOREST", Transitive: {}}]->(domain2)'
+	}
+	return queries;
+}

@@ -11,6 +11,7 @@ const ConfigStore = require('configstore');
 global.conf = new ConfigStore('bloodhound')
 var e = require('eventemitter2').EventEmitter2
 global.emitter = new e({})
+global.renderEmit = new e({})
 
 global.Mustache = require('mustache')
 
@@ -31,6 +32,16 @@ Array.prototype.allEdgesSameType = function() {
 
     return true;
 };
+
+sigma.renderers.def = sigma.renderers.canvas;
+
+sigma.classes.graph.addMethod('outboundNodes', function(id) {
+    return this.outNeighborsIndex.get(id).keyList();
+});
+
+sigma.classes.graph.addMethod('inboundNodes', function(id) {
+    return this.inNeighborsIndex.get(id).keyList();
+});
 
 global.appStore = {
 	dagre: false,
@@ -122,7 +133,8 @@ if (typeof conf.get('performance') === 'undefined'){
 
 appStore.performance = conf.get('performance')
 
-emitter.on('login', function(){
+renderEmit.on('login', function(){
+	emitter.removeAllListeners()
 	ReactDOM.render(<AppContainer />, document.getElementById('root'))	
 })
 

@@ -11,19 +11,27 @@ export default class DatabaseDataDisplay extends Component {
 			num_users: 'Refreshing',
 			num_computers: 'Refreshing',
 			num_groups: 'Refreshing',
-			num_relationships: 'Refreshing'
+			num_relationships: 'Refreshing',
+			interval: null
 		}
 	}
 
 	componentDidMount() {
 		this.refreshDBData()
-		setInterval(function(){
+		var x = setInterval(function(){
+			console.log('interval')
 			this.refreshDBData()
-		}.bind(this), 60000);
+		}.bind(this), 5000);
+		this.setState({interval: x})
+	}
+
+	componentWillUnmount() {
+		clearInterval(this.state.interval)
+		this.setState({interval: null})
 	}
 
 	toggleLogoutModal(){
-		
+		emitter.emit('showLogout');
 	}
 
 	render() {

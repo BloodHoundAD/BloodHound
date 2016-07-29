@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import MenuButton from './menubutton';
+import { buildMergeQuery, defaultAjaxSettings } from 'utils';
 const { dialog } = require('electron').remote
 var fs = require('fs')
 
@@ -19,6 +20,8 @@ export default class MenuContainer extends Component {
 	_changeLayoutClick(){
 		appStore.dagre = !appStore.dagre
 		emitter.emit('graphRefresh')
+		var type = appStore.dagre ? 'Hierarchical' : 'Directed'
+		emitter.emit('showAlert', 'Changed Layout to ' + type)
 	}
 
 	_exportClick(){
@@ -44,13 +47,13 @@ export default class MenuContainer extends Component {
 		fs.readFile(filename, 'utf8', function(err, data){
 			var header = data.split('\n')[0]
 			var filetype;
-			if (header.includes('UserName') && header.includes('ComputerName') && header.include('Weight')){
-				filetype = 'session'
+			if (header.includes('UserName') && header.includes('ComputerName') && header.includes('Weight')){
+				filetype = 'sessions'
 			}else if (header.includes('AccountName') && header.includes('AccountType') && header.includes('GroupName')){
-				filetype = 'group'
+				filetype = 'groupmembership'
 			}else if (header.includes('AccountName') && header.includes('AccountType') && header.includes('ComputerName')){
 				filetype = 'localadmin'
-			}else if (header.includes('SourceDomain') && header.includes('TargetDomain') && header.includes('TrustDirection') && header.include('TrustType') && header.includes('Transitive')){
+			}else if (header.includes('SourceDomain') && header.includes('TargetDomain') && header.includes('TrustDirection') && header.includes('TrustType') && header.includes('Transitive')){
 				filetype = 'domain'
 			}
 
@@ -63,8 +66,12 @@ export default class MenuContainer extends Component {
 				worker: true,
 				header: true,
 				dynamicTyping: true,
-				chunk: function(row, parser){
-					console.log(row)
+				chunk: function(rows, parser){
+					var options = defaultAjaxSettings()
+					options.url = appStore.databaseInfo.url + '/db/data/batch'
+					var data = JSON.stringify(buildMergeQuery(rows.data, filetype), null, 2)
+					options.data = JSON.stringify(buildMergeQuery(rows.data, filetype))
+					$.ajax(options);
 				}
 			})
 		})
