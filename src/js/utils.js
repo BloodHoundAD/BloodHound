@@ -259,6 +259,35 @@ export function findGraphPath(sigmaInstance, reverse, nodeid){
 	}
 }
 
+export function clearDatabase(){
+	deleteEdges()
+}
+
+function deleteEdges(){
+	var a = fullAjax("MATCH ()-[r]-() WITH r LIMIT 50000 DELETE r RETURN count(r)",
+		function(json){
+			var d = json.results[0].data[0].row[0]
+			if (d === 0){
+				deleteNodes();
+			}else{
+				deleteEdges();
+			}
+		})
+	$.ajax(a);
+}
+
+function deleteNodes(){
+	var a = fullAjax("MATCH (n) WITH n LIMIT 50000 DELETE n RETURN count(n)",
+		function(json){
+			var d = json.results[0].data[0].row[0]
+			if (d === 0){
+				emitter.emit('hideDBClearModal')
+			}else{
+				deleteNodes();
+			}
+		})
+	$.ajax(a);
+}
 
 //Utilities for generating AJAX requests
 export function defaultAjaxSettings(){
@@ -297,6 +326,22 @@ export function fullAjax(statements, callback){
 }
 
 export function buildMergeQuery(rows, type){
+// PowerView.UserSession
+//        UserName,ComputerName,Weight
+//        "john@domain.local","computer2.domain.local",1
+
+//    PowerView.GroupMember/PowerView.User
+//        AccountName,AccountType,GroupName
+//        "john@domain.local","user","GROUP1"
+//        "computer3.testlab.local","computer","GROUP1"
+
+//    PowerView.LocalUserAPI/PowerView.GPOLocalGroup
+//        AccountName,AccountType,ComputerName
+//        "john@domain.local","user","computer2.domain.local"
+
+//    PowerView.DomainTrustLDAP/PowerView.DomainTrust/PowerView.ForestTrust (direction ->)
+//        SourceDomain,TargetDomain,TrustDirection,TrustType,Transitive
+//        "domain.local","dev.domain.local","Bidirectional","ParentChild","True"
 	var queries = []
 	var rawobj;
 
@@ -317,16 +362,95 @@ export function buildMergeQuery(rows, type){
 			queries.push(rawobj)
 		})
 	}else if (type === 'groupmembership'){
-		userQuery = 'MERGE (user:User {name: "{}"}) WITH user MERGE (group:Group {name: "{}"}) WITH user,group MERGE (user)-[:MemberOf]->group)'
+		userQuery = 'MERGE (user:User {name: "{}"}) WITH user MERGE (group:Group {name: "{}"}) WITH user,group MERGE (user)-[:MemberOf]->(group)'
 		groupQuery = 'MERGE (group1:Group {name:"{}"}) WITH group1 MERGE (group2:Group {name: "{}"}) WITH group1,group2 MERGE (group1)-[:MemberOf]->(group2)'
 		computerQuery = 'MERGE (computer:Computer {name: "{}"}) WITH computer MERGE (group:Group {name: "{}"}) with computer,group MERGE (computer)-[:MemberOf]-(group)'
-				
+		
+		$.each(rows, function(i, row){
+			rawobj = {
+				'method': 'POST',
+				'to': '/cypher',
+				'body' :{
+
+				}
+			}
+			switch(row.AccountType){
+				case 'user':
+					rawobj.body.query = userQuery.format(row.AccountName, row.GroupName)
+					queries.push(rawobj)
+					break;
+				case 'group':
+					rawobj.body.query = groupQuery.format(row.AccountName, row.GroupName)
+					queries.push(rawobj)
+					break;
+				case 'computer':
+					rawobj.body.query = computerQuery.format(row.AccountName, row.GroupName)
+					queries.push(rawobj)
+					break
+			}
+		})			
 	}else if (type === 'localadmin'){
-		userQuery = 'MERGE (user:User {name: "{}"}) WITH user MERGE (computer:Computer {name: "{}"}) WITH user,computer MERGE (user)-[:AdminTo]->computer'
+		userQuery = 'MERGE (user:User {name: "{}"}) WITH user MERGE (computer:Computer {name: "{}"}) WITH user,computer MERGE (user)-[:AdminTo]->(computer)'
 		groupQuery = 'MERGE (group:Group {name: "{}"}) WITH group MERGE (computer:Computer {name: "{}"}) WITH group,computer MERGE (group)-[:AdminTo]->(computer)'
-		computerQuery = 'MERGE (computer1:Computer {name: "{}"}) WITH computer MERGE (computer2:Computer {name: "{}"}) WITH computer1,computer2 MERGE (computer1)-[:AdminTo]->(computer2)'
+		computerQuery = 'MERGE (computer1:Computer {name: "{}"}) WITH computer1 MERGE (computer2:Computer {name: "{}"}) WITH computer1,computer2 MERGE (computer1)-[:AdminTo]->(computer2)'
+
+		$.each(rows, function(i, row){
+			rawobj = {
+				'method': 'POST',
+				'to': '/cypher',
+				'body' :{
+
+				}
+			}
+			switch(row.AccountType){
+				case 'user':
+					rawobj.body.query = userQuery.format(row.AccountName, row.ComputerName)
+					queries.push(rawobj)
+					break;
+				case 'group':
+					rawobj.body.query = groupQuery.format(row.AccountName, row.ComputerName)
+					queries.push(rawobj)
+					break;
+				case 'computer':
+					rawobj.body.query = computerQuery.format(row.AccountName, row.ComputerName)
+					queries.push(rawobj)
+					break
+			}
+		})
 	}else{
-		domainQuery = 'MERGE (domain1:Domain {name: "{}"}) WITH source MERGE (domain2:Domain {name: "{}"}) WITH source,target MERGE (domain1)-[:TrustedBy {TrustType : "FOREST", Transitive: {}}]->(domain2)'
+		domainQuery = 'MERGE (domain1:Domain {name: "{}"}) WITH source MERGE (domain2:Domain {name: "{}"}) WITH source,target MERGE (domain1)-[:TrustedBy {TrustType : "{}"}, Transitive: "{}"}]->(domain2)'
+		$.each(rows, function(i, row){
+			rawobj = {
+				'method': 'POST',
+				'to': '/cypher',
+				'body' :{
+
+				}
+			}
+			switch(row.TrustDirection){
+				case 'Inbound':
+					rawobj.body.query = domainQuery.format(row.TargetDomain, row.SourceDomain, row.TrustType, row.Transitive)
+					queries.push(rawobj)
+					break;
+				case 'Outbound':
+					rawobj.body.query = domainQuery.format(row.SourceDomain, row.TargetDomain, row.TrustType, row.Transitive)
+					queries.push(rawobj)
+					break;
+				case 'Bidirectional':
+					rawobj.body.query = domainQuery.format(row.TargetDomain, row.SourceDomain, row.TrustType, row.Transitive)
+					queries.push(rawobj)
+					rawobj = {
+						'method': 'POST',
+						'to': '/cypher',
+						'body' :{
+
+						}
+					}
+					rawobj.body.query = domainQuery.format(row.SourceDomain, row.TargetDomain, row.TrustType, row.Transitive)
+					queries.push(rawobj)
+					break
+			}
+		})
 	}
 	return queries;
 }

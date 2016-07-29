@@ -135,6 +135,7 @@ appStore.performance = conf.get('performance')
 
 renderEmit.on('login', function(){
 	emitter.removeAllListeners()
+	ReactDOM.unmountComponentAtNode(document.getElementById('root'))
 	ReactDOM.render(<AppContainer />, document.getElementById('root'))	
 })
 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { defaultAjaxSettings } from 'utils';
+import { fullAjax, defaultAjaxSettings } from 'utils';
 import LogoutModal from 'modals/logoutmodal';
 
 export default class DatabaseDataDisplay extends Component {
@@ -20,8 +20,10 @@ export default class DatabaseDataDisplay extends Component {
 		this.refreshDBData()
 		var x = setInterval(function(){
 			this.refreshDBData()
-		}.bind(this), 5000);
+		}.bind(this), 60000);
 		this.setState({interval: x})
+		emitter.on('hideDBClearModal', this.refreshDBData.bind(this))
+		emitter.on('refreshDBData', this.refreshDBData.bind(this))
 	}
 
 	componentWillUnmount() {
@@ -32,6 +34,11 @@ export default class DatabaseDataDisplay extends Component {
 	toggleLogoutModal(){
 		emitter.emit('showLogout');
 	}
+
+	toggleDBWarnModal(){
+		emitter.emit('openDBWarnModal')
+	}
+	
 
 	render() {
 		return (
@@ -56,7 +63,7 @@ export default class DatabaseDataDisplay extends Component {
 					<div className="btn-group dbbuttons">
 						<button type="button" className="btn btn-success" onClick={function(){this.refreshDBData()}.bind(this)}>Refresh DB Stats</button>
 						<button type="button" className="btn btn-warning" onClick={this.toggleLogoutModal}>Log Out/Switch DB</button>
-						<button type="button" className="btn btn-danger" data-toggle="modal" data-target="#clearDBWarn">Clear Database</button>
+						<button type="button" className="btn btn-danger" onClick={this.toggleDBWarnModal}>Clear Database</button>
 					</div>
 				</div>
 			</div>

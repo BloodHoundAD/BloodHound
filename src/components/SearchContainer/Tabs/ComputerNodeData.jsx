@@ -18,6 +18,9 @@ export default class ComputerNodeData extends Component {
 			unrolledAdmins: -1,
 			firstDegreeGroupMembership: -1,
 			unrolledGroupMembership: -1,
+			firstDegreeLocalAdmin: -1,
+			groupDelegatedLocalAdmin: -1,
+			derivativeLocalAdmin: -1,
 			sessions: -1
 		}
 
@@ -33,13 +36,19 @@ export default class ComputerNodeData extends Component {
 			unrolledAdmins: -1,
 			firstDegreeGroupMembership: -1,
 			unrolledGroupMembership: -1,
-			sessions: -1
+			sessions: -1,
+			firstDegreeLocalAdmin: -1,
+			groupDelegatedLocalAdmin: -1,
+			derivativeLocalAdmin: -1
 		})
 
 		var explicitAdmins, 
 			unrolledAdmins, 
 			firstDegreeGroupMembership,
 			unrolledGroupMembership,
+			firstDegreeLocalAdmin,
+			groupDelegatedLocalAdmin,
+			derivativeLocalAdmin,
 			sessions;
 
 		explicitAdmins = fullAjax(
@@ -52,6 +61,24 @@ export default class ComputerNodeData extends Component {
 			"MATCH (n:User),(target:Computer {name:'{}'}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(target)) WITH nodes(p) AS y RETURN count(distinct(filter(x in y WHERE labels(x)[0] = 'User')))".format(payload),
 			function(json){
 				this.setState({unrolledAdmins: json.results[0].data[0].row[0]})	
+			}.bind(this))
+
+		firstDegreeLocalAdmin = fullAjax(
+			"MATCH (n:Computer {name:'{}'}), (m:Computer), (n)-[r:AdminTo]-(m)  RETURN count(m)".format(payload),
+			function(json){
+				this.setState({firstDegreeLocalAdmin: json.results[0].data[0].row[0]})
+			}.bind(this))
+
+		groupDelegatedLocalAdmin = fullAjax(
+			"MATCH (n:Computer {name:'{}'}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN count(distinct(p))".format(payload),
+			function(json){
+				this.setState({groupDelegatedLocalAdmin: json.results[0].data[0].row[0]})
+			}.bind(this))
+
+		derivativeLocalAdmin = fullAjax(
+			"MATCH (n:Computer {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN count(m)".format(payload),
+			function(json){
+				this.setState({derivativeLocalAdmin: json.results[0].data[0].row[0]})
 			}.bind(this))
 
 		firstDegreeGroupMembership = fullAjax(
@@ -74,6 +101,9 @@ export default class ComputerNodeData extends Component {
 
 		$.ajax(explicitAdmins);
 		$.ajax(unrolledAdmins);
+		$.ajax(firstDegreeLocalAdmin);
+		$.ajax(groupDelegatedLocalAdmin);
+		$.ajax(derivativeLocalAdmin);
 		$.ajax(firstDegreeGroupMembership);
 		$.ajax(unrolledGroupMembership);
 		$.ajax(sessions);
@@ -150,6 +180,43 @@ export default class ComputerNodeData extends Component {
 							click={function(){
 								emitter.emit('query',
 									"MATCH (n:Computer {name:'{}'}), (m:Group),p=allShortestPaths((n)-[:MemberOf*1..]->(m)) RETURN p".format(this.state.label), this.state.label)
+							}.bind(this)} />
+					</dd>
+					<br />
+					<dt>
+						First Degree Local Admin
+					</dt>
+					<dd>
+						<NodeALink
+							ready={this.state.firstDegreeLocalAdmin !== -1}
+							value={this.state.firstDegreeLocalAdmin}
+							click={function(){
+								emitter.emit('query',
+									"MATCH (n:Computer {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r:MemberOf|AdminTo]->(m)) RETURN p".format(this.state.label), this.state.label)
+							}.bind(this)} />
+					</dd>
+					<dt>
+						Group Delegated Local Admin
+					</dt>
+					<dd>
+						<NodeALink
+							ready={this.state.groupDelegatedLocalAdmin !== -1}
+							value={this.state.groupDelegatedLocalAdmin}
+							click={function(){
+								emitter.emit('query',
+									"MATCH (n:Computer {name:'{}'}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN n,m,r,s,p".format(this.state.label), this.state.label)
+							}.bind(this)} />
+					</dd>
+					<dt>
+						Derivative Local Admin
+					</dt>
+					<dd>
+						<NodeALink
+							ready={this.state.derivativeLocalAdmin !== -1}
+							value={this.state.derivativeLocalAdmin}
+							click={function(){
+								emitter.emit('query',
+									"MATCH (n:Computer {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN p".format(this.state.label), this.state.label)
 							}.bind(this)} />
 					</dd>
 					<dt>

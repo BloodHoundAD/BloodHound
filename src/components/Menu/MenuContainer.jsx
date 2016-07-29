@@ -71,6 +71,9 @@ export default class MenuContainer extends Component {
 					options.url = appStore.databaseInfo.url + '/db/data/batch'
 					var data = JSON.stringify(buildMergeQuery(rows.data, filetype), null, 2)
 					options.data = JSON.stringify(buildMergeQuery(rows.data, filetype))
+					options.complete = function(){
+						emitter.emit('refreshDBData')
+					}
 					$.ajax(options);
 				}
 			})
