@@ -19,7 +19,6 @@ export default class DatabaseDataDisplay extends Component {
 	componentDidMount() {
 		this.refreshDBData()
 		var x = setInterval(function(){
-			console.log('interval')
 			this.refreshDBData()
 		}.bind(this), 5000);
 		this.setState({interval: x})
