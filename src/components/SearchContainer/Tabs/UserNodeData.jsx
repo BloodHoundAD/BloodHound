@@ -20,7 +20,7 @@ export default class UserNodeData extends Component {
 			foreignGroupMembership: -1,
 			firstDegreeLocalAdmin: -1,
 			groupDelegatedLocalAdmin: -1,
-			derivateLocalAdmin: -1,
+			derivativeLocalAdmin: -1,
 			sessions: -1
 		}
 
@@ -69,7 +69,7 @@ export default class UserNodeData extends Component {
 			}.bind(this)
 			)
 		groupDelegatedLocalAdmin = fullAjax(
-			"MATCH x=allShortestPaths((n:User {name:'{}'})-[r:MemberOf*1..]->(m:Group)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN count(distinct(p))".format(payload),
+			"MATCH (n:User {name:'{}'}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN count(distinct(p))".format(payload),
 			function(json){
 				this.setState({groupDelegatedLocalAdmin: json.results[0].data[0].row[0]})
 			}.bind(this)

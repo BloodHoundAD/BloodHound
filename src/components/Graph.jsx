@@ -24,10 +24,10 @@ export default class GraphContainer extends Component {
         })
 
         emitter.on('doLogout', function(){
-            this.state.sigmaInstance.emptyGraph();
+            this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.refresh();
             this.setState({sigmaInstance: null})
-        })
+        }.bind(this))
     }
 
     relayout(){
@@ -102,6 +102,10 @@ export default class GraphContainer extends Component {
         }.bind(this))
     }
 
+    clearGraph(){
+        this.state.sigmaInstance.graph.clear()
+    }
+
     componentWillMount() {
         emitter.on('searchQuery', this.doSearchQuery.bind(this));
         emitter.on('pathQuery', this.doPathQuery.bind(this));
@@ -111,6 +115,7 @@ export default class GraphContainer extends Component {
         emitter.on('graphRefresh', this.relayout.bind(this))
         emitter.on('export', this.export.bind(this))
         emitter.on('import', this.import.bind(this))
+        emitter.on('clearDB', this.clearGraph.bind(this))
     }
 
     componentDidMount() {

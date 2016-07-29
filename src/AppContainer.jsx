@@ -3,6 +3,8 @@ import GraphContainer from './components/graph';
 import SearchContainer from './components/SearchContainer/searchcontainer';
 import SpotlightContainer from './components/Spotlight/spotlightcontainer';
 import LogoutModal from './components/Modals/logoutmodal';
+import ClearWarnModal from './components/Modals/clearwarnmodal'
+import ClearConfirmModal from './components/Modals/clearconfirmmodal'
 import LoadingContainer from './components/loadingcontainer';
 import GenericAlert from './components/alert';
 import RawQuery from './components/rawquery';
@@ -24,6 +26,8 @@ export default class AppContainer extends Component {
 				<GraphContainer />
 				<SearchContainer />
 				<LogoutModal />
+				<ClearWarnModal />
+				<ClearConfirmModal />
 				<RawQuery />
 				<MenuContainer />
 			</div>

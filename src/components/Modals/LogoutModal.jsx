@@ -21,6 +21,8 @@ export default class LogoutModal extends Component {
 		conf.del('databaseInfo')
 		appStore.databaseInfo = null;
 		this.setState({ open: false })
+		emitter.emit('doLogout');
+		ReactDOM.unmountComponentAtNode(document.getElementById('root'))
 		ReactDOM.render(<Login />, document.getElementById('root'))
 	}
 
@@ -37,8 +39,7 @@ export default class LogoutModal extends Component {
 			<Modal
 				show={this.state.open}
 				onHide={this.closeModal}
-				aria-labelledby="LogoutModalHeader"
-				ref="logoutModal">
+				aria-labelledby="LogoutModalHeader">
 
 				<Modal.Header closeButton={true}>
 					<Modal.Title id="LogoutModalHeader">Logout</Modal.Title>
