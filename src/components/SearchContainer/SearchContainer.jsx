@@ -125,7 +125,7 @@ export default class SearchContainer extends Component {
         jQuery(this.refs.pathbar).typeahead({
             source: function(query, process) {
                 var options = fullAjax(
-                    "MATCH (n) WHERE n.name = '{}' RETURN n".format(escapeRegExp(query)),
+                    "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n.name LIMIT 10".format(escapeRegExp(query)),
                     function(json){
                         var data = []
                         $.each(json.results[0].data, function(index, d){
