@@ -570,6 +570,10 @@ body {
     margin-top: -5px !important;
 }
 
+.sliderfix i {
+    margin-left: 5px;
+}
+
 .center-align{
     text-align: center;
 }
