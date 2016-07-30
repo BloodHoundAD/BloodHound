@@ -5,11 +5,14 @@ import SpotlightContainer from './components/Spotlight/spotlightcontainer';
 import LogoutModal from './components/Modals/logoutmodal';
 import ClearWarnModal from './components/Modals/clearwarnmodal'
 import ClearConfirmModal from './components/Modals/clearconfirmmodal'
+import ClearingModal from './components/Modals/clearingmodal'
 import LoadingContainer from './components/loadingcontainer';
 import GenericAlert from './components/alert';
 import RawQuery from './components/rawquery';
 import MenuContainer from './components/Menu/menucontainer';
 import ExportContainer from './components/Float/exportcontainer';
+import Settings from './components/Float/settings'
+import ZoomContainer from './components/Zoom/zoomcontainer'
 
 export default class AppContainer extends Component {
 	constructor(){
@@ -28,8 +31,11 @@ export default class AppContainer extends Component {
 				<LogoutModal />
 				<ClearWarnModal />
 				<ClearConfirmModal />
+				<ClearingModal />
 				<RawQuery />
 				<MenuContainer />
+				<Settings />
+				<ZoomContainer />
 			</div>
 		);
 	};

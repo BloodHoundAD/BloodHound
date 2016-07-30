@@ -126,7 +126,7 @@ global.appStore = {
 if (typeof conf.get('performance') === 'undefined'){
 	conf.set('performance', {
 		edge: 5,
-		sibling: 5,
+		sibling: 10,
 		lowGraphics: false
 	})
 }

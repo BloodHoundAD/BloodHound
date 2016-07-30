@@ -107,7 +107,7 @@ export default class SearchContainer extends Component {
             },
             afterSelect: function(selected) {
                 if (!this.state.pathfindingIsOpen) {
-                    var statement = "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n".format(escapeRegExp(selected));
+                    var statement = "MATCH (n) WHERE n.name = '{}' RETURN n".format(escapeRegExp(selected));
                     emitter.emit('searchQuery', statement)
                 } else {
                     var start = jQuery(this.refs.searchbar).val();
@@ -125,7 +125,7 @@ export default class SearchContainer extends Component {
         jQuery(this.refs.pathbar).typeahead({
             source: function(query, process) {
                 var options = fullAjax(
-                    "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n.name LIMIT 10".format(escapeRegExp(query)),
+                    "MATCH (n) WHERE n.name = '{}' RETURN n".format(escapeRegExp(query)),
                     function(json){
                         var data = []
                         $.each(json.results[0].data, function(index, d){
@@ -153,8 +153,23 @@ export default class SearchContainer extends Component {
         var key = e.keyCode ? e.keyCode : e.which
         var start = jQuery(this.refs.searchbar).val();
         var end = jQuery(this.refs.pathbar).val();
+        var stop = false;
 
         if (key === 13){
+            $('.searchSelectorS > ul li').each(function(i){
+                if($(this).hasClass('active')){
+                    stop = true
+                }
+            })
+
+            $('.searchSelectorP > ul li').each(function(i){
+                if($(this).hasClass('active')){
+                    stop = true
+                }
+            })
+            if (stop){
+                return;
+            }
             if (!this.state.pathfindingIsOpen) {
                 var statement = "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n".format(escapeRegExp(start));
                 emitter.emit('searchQuery', statement)
@@ -171,7 +186,7 @@ export default class SearchContainer extends Component {
     render(){
         return (
             <div className="searchdiv">
-                <div className="input-group input-group-unstyled">
+                <div className="input-group input-group-unstyled searchSelectorS">
                     <GlyphiconSpan 
                         tooltip={true} 
                         tooltipDir="bottom" 
@@ -199,7 +214,7 @@ export default class SearchContainer extends Component {
                     </GlyphiconSpan>
                 </div>
                 <div ref="pathfinding">
-                    <div className="input-group input-group-unstyled">
+                    <div className="input-group input-group-unstyled searchSelectorP">
                         <GlyphiconSpan 
                             tooltip={false} 
                             classes="input-group-addon spanfix invisible">

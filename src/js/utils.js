@@ -260,6 +260,7 @@ export function findGraphPath(sigmaInstance, reverse, nodeid){
 }
 
 export function clearDatabase(){
+	emitter.emit('openClearingModal');
 	deleteEdges()
 }
 

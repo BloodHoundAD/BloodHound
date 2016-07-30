@@ -106,6 +106,26 @@ export default class GraphContainer extends Component {
         this.state.sigmaInstance.graph.clear()
     }
 
+    setGraphicsMode(){
+        var lowgfx = appStore.performance.lowGraphics
+        var sigmaInstance = this.state.sigmaInstance
+        this.state.design.clear()
+        if (lowgfx){
+            sigmaInstance.settings('defaultEdgeType', 'line');
+            sigmaInstance.settings('defaultEdgeColor', 'black');
+            this.state.design.setPalette(appStore.lowResPalette);
+            this.state.design.setStyles(appStore.lowResStyle);
+        }else{
+            sigmaInstance.settings('defaultEdgeType', 'tapered');
+            sigmaInstance.settings('defaultEdgeColor', '#356');
+            this.state.design.setPalette(appStore.highResPalette);
+            this.state.design.setStyles(appStore.highResStyle);
+        }
+        this.state.design.deprecate()
+        sigmaInstance.refresh()
+        this.state.design.apply()
+    }
+
     componentWillMount() {
         emitter.on('searchQuery', this.doSearchQuery.bind(this));
         emitter.on('pathQuery', this.doPathQuery.bind(this));
@@ -116,6 +136,44 @@ export default class GraphContainer extends Component {
         emitter.on('export', this.export.bind(this))
         emitter.on('import', this.import.bind(this))
         emitter.on('clearDB', this.clearGraph.bind(this))
+        emitter.on('changeGraphicsMode', this.setGraphicsMode.bind(this))
+        emitter.on('ungroupNode', this.ungroupNode.bind(this))
+        emitter.on('unfoldNode', this.unfoldEdgeNode.bind(this))
+        emitter.on('collapseNode', this.foldEdgeNode.bind(this))
+        emitter.on('resetZoom', this.resetZoom.bind(this))
+        emitter.on('zoomIn', this.zoomIn.bind(this))
+        emitter.on('zoomOut', this.zoomOut.bind(this))
+    }
+
+    resetZoom(){
+        sigma.misc.animation.camera(
+            this.state.sigmaInstance.camera,
+             { x: 0, y: 0, ratio: 1.075 })
+        ;
+    }
+
+    zoomOut(){
+        var sigmaInstance = this.state.sigmaInstance
+        var cam = sigmaInstance.camera;
+
+        sigma.misc.animation.camera(cam, {
+            ratio: cam.ratio * cam.settings('zoomingRatio')
+        }, {
+            duration: sigmaInstance.settings('animationsTime')
+        });
+    }
+
+    zoomIn(){
+        var sigmaInstance = this.state.sigmaInstance
+        var cam = sigmaInstance.camera;
+
+        sigma.misc.animation.camera(cam, 
+        {
+            ratio: cam.ratio / cam.settings('zoomingRatio')
+        }, 
+        {
+            duration: sigmaInstance.settings('animationsTime')
+        });
     }
 
     componentDidMount() {
@@ -242,7 +300,7 @@ export default class GraphContainer extends Component {
             if (appStore.dagre){
                 sigma.layouts.dagre.start(this.state.sigmaInstance);
             }else{
-                sigma.layouts.startForceLink()    
+                sigma.layouts.startForceLink()
             }
         }.bind(this))
         if (this.state.firstDraw){
@@ -251,6 +309,35 @@ export default class GraphContainer extends Component {
             }.bind(this), 500)
             this.setState({firstDraw: false})
         }
+    }
+
+    unfoldEdgeNode(id){
+        var sigmaInstance = this.state.sigmaInstance
+        sigmaInstance.graph.read(sigmaInstance.graph.nodes(id).folded)
+        this.state.design.deprecate()
+        this.state.design.apply();
+        this.relayout()
+    }
+
+    foldEdgeNode(id){
+        var sigmaInstance = this.state.sigmaInstance
+        $.each(sigmaInstance.graph.nodes(id).folded.nodes, function(index, node){
+            sigmaInstance.graph.dropNode(node.id)
+        })
+        sigmaInstance.refresh()
+        this.state.design.deprecate();
+        this.state.design.apply();
+        this.relayout();
+    }
+
+    ungroupNode(id){
+        var sigmaInstance = this.state.sigmaInstance
+        var node = sigmaInstance.graph.nodes(id)
+        sigmaInstance.graph.dropNode(id);
+        sigmaInstance.graph.read(node.folded)
+        this.state.design.deprecate()
+        this.state.design.apply()
+        this.relayout();
     }
 
     doSearchQuery(payload){
@@ -388,13 +475,13 @@ export default class GraphContainer extends Component {
                         var template = this.state.template;
                         node.expand = false;
                         node.collapse = false;
-                        // if (typeof node.folded != 'undefined' && !node.grouped) {
-                        //     if (typeof sigmaInstance.graph.nodes(node.folded.nodes[0].id) == 'undefined') {
-                        //         node.expand = true;
-                        //     } else {
-                        //         node.collapse = true;
-                        //     }
-                        // }
+                        if (node.folded.nodes.length > 0 && !node.groupedNode) {
+                            if (typeof this.state.sigmaInstance.graph.nodes(node.folded.nodes[0].id) == 'undefined') {
+                                node.expand = true;
+                            } else {
+                                node.collapse = true;
+                            }
+                        }
                         return Mustache.render(template, node);
                     }.bind(this)
                 }]

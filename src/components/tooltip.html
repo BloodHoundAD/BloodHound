@@ -40,7 +40,7 @@
      <li onclick="emitter.emit('setEnd', '{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
-     <li onclick="emitter.emit('query', 'MATCH (n {name:\'{{label}}\'})<-[r:MemberOf]-(m) RETURN n,r,m)', '{{label}}')>
+     <li onclick="emitter.emit('query', 'MATCH (n {name:\'{{label}}\'})<-[r:MemberOf]-(m) RETURN n,r,m)', '{{label}}')"">
           <i class="glyphicon glyphicon-screenshot"> </i> Get Members
      </li>
      <li onclick="emitter.emit('query', 'MATCH (n {name:\'{{label}}\'})-[r:AdminTo]->(m) RETURN n,r,m', '{{label}}')">
@@ -48,18 +48,18 @@
      </li>
      {{/type_group}} 
      {{#expand}}
-     <li onclick="unfold({{id}})">
+     <li onclick="emitter.emit('unfoldNode', {{id}}); appStore.currentTooltip.close()">
           <i class="glyphicon glyphicon-screenshot"> </i> Expand
      </li>
      {{/expand}} 
      {{#collapse}}
-     <li onclick="collapse({{id}})">
+     <li onclick="emitter.emit('collapseNode', {{id}}); appStore.currentTooltip.close()">
           <i class="glyphicon glyphicon-screenshot"> </i> Collapse
      </li>
      {{/collapse}} 
-     {{#grouped}}
-     <li onclick="ungroup({{id}})">
+     {{#groupedNode}}
+     <li onclick="emitter.emit('ungroupNode', {{id}}); appStore.currentTooltip.close()">
           <i class="glyphicon glyphicon-screenshot"> </i> Expand
      </li>
-     {{/grouped}}
+     {{/groupedNode}}
 </ul>

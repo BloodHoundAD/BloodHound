@@ -80,6 +80,10 @@ export default class MenuContainer extends Component {
 		})
 	}
 
+	_settingsClick(){
+		emitter.emit('openSettings')		
+	}
+
 	render() {
 		return (
 			<div className="menudiv">
@@ -99,7 +103,7 @@ export default class MenuContainer extends Component {
 					<MenuButton click={this._changeLayoutClick.bind(this)} hoverVal="Change Layout Type" glyphicon="fa fa-line-chart" />
 				</div>
 				<div>
-					<MenuButton click={this._refreshClick.bind(this)} hoverVal="Settings" glyphicon="fa fa-cogs" />
+					<MenuButton click={this._settingsClick.bind(this)} hoverVal="Settings" glyphicon="fa fa-cogs" />
 				</div>
 			</div>
 		);
