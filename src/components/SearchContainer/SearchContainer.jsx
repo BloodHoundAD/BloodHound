@@ -117,8 +117,7 @@ export default class SearchContainer extends Component {
                     }
                 }
             }.bind(this),
-            autoSelect: false,
-            minLength: 3
+            autoSelect: false
             }
         )
 
@@ -143,8 +142,7 @@ export default class SearchContainer extends Component {
                     emitter.emit('pathQuery', start, end);
                 }
             }.bind(this),
-            autoSelect: false,
-            minLength: 3
+            autoSelect: false
             }
         )
     }
