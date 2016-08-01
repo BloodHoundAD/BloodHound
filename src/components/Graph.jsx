@@ -602,6 +602,19 @@ export default class GraphContainer extends Component {
             design.setStyles(appStore.highResStyle);
         }
 
+        var mode = appStore.performance.nodeLabels
+
+        if (mode === 0){
+            sigmaInstance.settings('labelThreshold', 500);
+            emitter.emit('showAlert', 'Hiding Node Labels')
+        }else if (mode === 1){
+            sigmaInstance.settings('labelThreshold', 15);
+            emitter.emit('showAlert', 'Default Node Label Threshold')
+        }else{
+            sigmaInstance.settings('labelThreshold', 1);
+            emitter.emit('showAlert', 'Always Showing Node Labels')
+        }
+
         this.state.sigmaInstance = sigmaInstance;
         this.state.design = design;
     }
