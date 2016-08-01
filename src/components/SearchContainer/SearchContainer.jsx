@@ -107,7 +107,7 @@ export default class SearchContainer extends Component {
             },
             afterSelect: function(selected) {
                 if (!this.state.pathfindingIsOpen) {
-                    var statement = "MATCH (n) WHERE n.name = '{}' RETURN n".format(escapeRegExp(selected));
+                    var statement = "MATCH (n) WHERE n.name = '{}' RETURN n".format(selected);
                     emitter.emit('searchQuery', statement)
                 } else {
                     var start = jQuery(this.refs.searchbar).val();
@@ -156,17 +156,21 @@ export default class SearchContainer extends Component {
         var stop = false;
 
         if (key === 13){
-            $('.searchSelectorS > ul li').each(function(i){
-                if($(this).hasClass('active')){
-                    stop = true
-                }
-            })
+            if (!$('.searchSelectorS > ul').is(':hidden')){
+                $('.searchSelectorS > ul li').each(function(i){
+                    if($(this).hasClass('active')){
+                        stop = true
+                    }
+                })    
+            }
 
-            $('.searchSelectorP > ul li').each(function(i){
-                if($(this).hasClass('active')){
-                    stop = true
-                }
-            })
+            if (!$('.searchSelectorP > ul').is(':hidden')){
+                $('.searchSelectorP > ul li').each(function(i){
+                    if($(this).hasClass('active')){
+                        stop = true
+                    }
+                })
+            }
             if (stop){
                 return;
             }
