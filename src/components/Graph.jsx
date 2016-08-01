@@ -472,6 +472,7 @@ export default class GraphContainer extends Component {
         $(window).on('keyup', function(e){
             var key = e.keyCode ? e.keyCode : e.which
             var mode = appStore.performance.nodeLabels
+            var sigmaInstance = this.state.sigmaInstance
 
             if (document.activeElement === document.body && key === 17){
                 mode = mode + 1;
