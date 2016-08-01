@@ -76,7 +76,7 @@ export default class ComputerNodeData extends Component {
 			}.bind(this))
 
 		derivativeLocalAdmin = fullAjax(
-			"MATCH (n:Computer {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN count(m)".format(payload),
+			"MATCH (n:Computer {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN count(distinct(m))".format(payload),
 			function(json){
 				this.setState({derivativeLocalAdmin: json.results[0].data[0].row[0]})
 			}.bind(this))
