@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
 import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes, findGraphPath } from 'utils';
 var fs = require('fs');
+var child_process = require('child_process')
 const { dialog } = require('electron').remote
 
 export default class GraphContainer extends Component {
@@ -302,6 +303,25 @@ export default class GraphContainer extends Component {
             }else{
                 sigma.layouts.startForceLink()
             }
+
+            // var child = child_process.fork('src/js/worker.js', {silent:true});
+
+            // child.stdout.on('data', (data) => {
+            //   console.log(`stdout: ${data}`);
+            // });
+
+            // child.stderr.on('data', (data) => {
+            //     console.log(`error: ${data}`);
+            // });
+            
+
+            // child.on('message', function(m) {
+            //   // Receive results from child process
+            //   console.log(m)
+            // });
+
+            // // Send child process some work
+            // child.send(sigmaInstance);
         }.bind(this))
         if (this.state.firstDraw){
             setTimeout(function(){
@@ -451,9 +471,28 @@ export default class GraphContainer extends Component {
         //Some key binds
         $(window).on('keyup', function(e){
             var key = e.keyCode ? e.keyCode : e.which
+            var mode = appStore.performance.nodeLabels
 
-            if (document.activeElement === document.body){
-                
+            if (document.activeElement === document.body && key === 17){
+                mode = mode + 1;
+                if (mode > 2){
+                    mode = 0;
+                }
+                appStore.performance.nodeLabels = mode;
+                conf.set('performance', appStore.performance)
+
+                if (mode === 0){
+                    sigmaInstance.settings('labelThreshold', 500);
+                    emitter.emit('showAlert', 'Hiding Node Labels')
+                }else if (mode === 1){
+                    sigmaInstance.settings('labelThreshold', 15);
+                    emitter.emit('showAlert', 'Default Node Label Threshold')
+                }else{
+                    sigmaInstance.settings('labelThreshold', 1);
+                    emitter.emit('showAlert', 'Always Showing Node Labels')
+                }
+
+                sigmaInstance.refresh({'skipIndexation' : true})
             }
         }.bind(this))
 

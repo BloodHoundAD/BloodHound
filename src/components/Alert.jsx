@@ -6,7 +6,8 @@ export default class GenericAlert extends Component {
 		super()
 		this.state = {
 			visible: false,
-			text: "No data returned from query"
+			text: "No data returned from query",
+			timeout: null
 		}
 
 		emitter.on('showAlert', this._show.bind(this))
@@ -18,14 +19,17 @@ export default class GenericAlert extends Component {
 	}
 
 	_show(val){
-		this.setState({
-			visible: true,
-			text: val
-		})
-
-        setTimeout(function(){
+		clearTimeout(this.state.timeout)
+		var t = setTimeout(function(){
             this._dismiss()
         }.bind(this), 2500)
+		
+		this.setState({
+			visible: true,
+			text: val,
+			timeout: t
+		})
+        
 	}
 
 	render() {
