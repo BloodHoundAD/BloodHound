@@ -127,7 +127,8 @@ if (typeof conf.get('performance') === 'undefined'){
 	conf.set('performance', {
 		edge: 5,
 		sibling: 10,
-		lowGraphics: false
+		lowGraphics: false,
+		nodeLabels: 1
 	})
 }
 
