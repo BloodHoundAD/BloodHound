@@ -79,21 +79,21 @@ export function collapseEdgeNodes(sigmaInstance){
 	var threshold = appStore.performance.edge;
 
 	if (threshold == 0){
-		return;
+		return sigmaInstance;
 	}
 	$.each(sigmaInstance.graph.nodes(), function(index, node){
 		if (node.degree < threshold){
-			return;
+			return sigmaInstance;
 		}
 
 		$.each(sigmaInstance.graph.adjacentNodes(node.id), function(index, anode){
 			if (anode.neo4j_data.name === appStore.endNode || anode.neo4j_data.name === appStore.startNode){
-				return;
+				return sigmaInstance;
 			}
 
 			var edges = sigmaInstance.graph.adjacentEdges(anode.id);
 			if ((edges.length > 1 || edges.length === 0) || (anode.folded.nodes.length > 0)){
-				return;
+				return sigmaInstance;
 			}
 
 			var edge = edges[0];
@@ -124,13 +124,13 @@ export function collapseSiblingNodes(sigmaInstance){
 	var threshold = appStore.performance.sibling
 
 	if (threshold === 0){
-		return;
+		return sigmaInstance;
 	}
 
 	$.each(sigmaInstance.graph.nodes(), function(index, node){
 		//Dont apply this logic to anything thats folded or isn't a computer
 		if (!node.type_computer || node.folded.nodes.length > 0){
-			return
+			return sigmaInstance;
 		}
 
 		//Start by getting all the edges attached to this node
