@@ -201,7 +201,7 @@ export default class UserNodeData extends Component {
 							ready={this.state.sessions !== -1}
 							value={this.state.sessions}
 							click={function(){
-								emitter.emit('query', "'MATCH (n:Computer)-[r:HasSession]->(m:User {name:'{}'}) RETURN n,r,m".format(this.state.label)
+								emitter.emit('query', "MATCH (n:Computer)-[r:HasSession]->(m:User {name:'{}'}) RETURN n,r,m".format(this.state.label)
 									,this.state.label)
 							}.bind(this)} />
 					</dd>
