@@ -64,7 +64,7 @@ export default class ComputerNodeData extends Component {
 			}.bind(this))
 
 		firstDegreeLocalAdmin = fullAjax(
-			"MATCH (n:Computer {name:'{}'}), (m:Computer), (n)-[r:AdminTo]-(m)  RETURN count(m)".format(payload),
+			"MATCH (n:Computer {name:'{}'}), (m:Computer), (n)-[r:AdminTo]-(m) RETURN count(m)".format(payload),
 			function(json){
 				this.setState({firstDegreeLocalAdmin: json.results[0].data[0].row[0]})
 			}.bind(this))
@@ -82,7 +82,7 @@ export default class ComputerNodeData extends Component {
 			}.bind(this))
 
 		firstDegreeGroupMembership = fullAjax(
-			"MATCH (m:Computer {name:'{}'})-[r:HasSession]->(n:User) WITH n WHERE NOT n.name ENDS WITH '$' RETURN count(n)".format(payload),
+			"MATCH (n:Computer {name:'{}'}),(target:Group), (n)-[r:MemberOf]->(target) RETURN count(target)".format(payload),
 			function(json){
 				this.setState({firstDegreeGroupMembership: json.results[0].data[0].row[0]})	
 			}.bind(this))
@@ -94,7 +94,7 @@ export default class ComputerNodeData extends Component {
 			}.bind(this))
 
 		sessions = fullAjax(
-			"MATCH (n:Computer {name:'{}'}), (target:Group), p=allShortestPaths((n)-[r:MemberOf*1..]->(target)) RETURN count(target)".format(payload),
+			"MATCH (m:Computer {name:'{}'})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH '$' RETURN count(r)".format(payload),
 			function(json){
 				this.setState({sessions: json.results[0].data[0].row[0]})	
 			}.bind(this))
