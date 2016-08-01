@@ -14,7 +14,7 @@ export default class SpotlightRow extends Component {
 
 	render() {
 		return (
-			<tr onClick={this._handleClick.bind(this)} data-id={this.props.nodeId} data-parent-id={this.props.parentNodeId}>
+			<tr style={{cursor: 'pointer'}} onClick={this._handleClick.bind(this)} data-id={this.props.nodeId} data-parent-id={this.props.parentNodeId}>
 				<td>{this.props.nodeLabel}</td>
 				<td>{this.props.parentNodeLabel}</td>
 			</tr>

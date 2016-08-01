@@ -16,6 +16,10 @@ export default class SpotlightContainer extends Component {
 		emitter.on('spotlightUpdate', function(){
 			this.setState({data: appStore.spotlightData})
 		}.bind(this))
+
+		emitter.on('spotlightClick', function(){
+			$(this.refs.spotlight).fadeToggle(false)
+		}.bind(this))
 	}
 
 	_searchChanged(event){
