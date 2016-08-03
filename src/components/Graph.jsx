@@ -285,6 +285,7 @@ export default class GraphContainer extends Component {
 
         emitter.emit('showLoadingIndicator', true);
         emitter.emit('updateLoadingText', "Querying Database")
+        emitter.emit('resetSpotlight')
 
         sigma.neo4j.cypher({
             url: appStore.databaseInfo.url,
