@@ -6,8 +6,8 @@ import LogoutModal from './components/Modals/logoutmodal';
 import ClearWarnModal from './components/Modals/clearwarnmodal'
 import ClearConfirmModal from './components/Modals/clearconfirmmodal'
 import ClearingModal from './components/Modals/clearingmodal'
-import LoadingContainer from './components/loadingcontainer';
-import GenericAlert from './components/alert';
+import LoadingContainer from './components/Float/loadingcontainer';
+import GenericAlert from './components/Float/alert';
 import RawQuery from './components/rawquery';
 import MenuContainer from './components/Menu/menucontainer';
 import ExportContainer from './components/Float/exportcontainer';

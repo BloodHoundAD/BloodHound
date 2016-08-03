@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "set ENV=development & electron .",
-    "server": "babel-node server.js",
+    "dev": "concurrently -k \"babel-node server.js\" \"npm start\"",
     "build": "webpack --config webpack.config.production.js && electron-packager . Bloodhound --platform=all --arch=all --overwrite --prune",
     "winbuild": "webpack --config webpack.config.production.js && electron-packager . Bloodhound --platform=win32 --arch=all --overwrite --prune"
   },
@@ -26,6 +26,7 @@
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-0": "^6.5.0",
+    "concurrently": "^2.2.0",
     "electron-prebuilt": "^1.2.8",
     "express": "^4.14.0",
     "webpack": "^1.13.1",

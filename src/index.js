@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import AppContainer from './appcontainer';
-import Login from './components/login'
+import Login from './components/Float/login'
 import { getStorageData, storageHasKey, storageSetKey } from './js/utils.js';
 
 const ConfigStore = require('configstore');

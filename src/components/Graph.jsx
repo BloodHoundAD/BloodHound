@@ -67,6 +67,31 @@ export default class GraphContainer extends Component {
         }
     }
 
+    loadFromChildProcess(graph){
+        if (graph.nodes.length === 0){
+                emitter.emit('showAlert', "No data returned from query")
+        }else{
+            $.each(graph.nodes, function(i, node){
+                node.glyphs = $.map(node.glyphs, function(value, index) {
+                    return [value];
+                });
+            })
+            appStore.queryStack.push({
+                nodes: this.state.sigmaInstance.graph.nodes(),
+                edges: this.state.sigmaInstance.graph.edges(),
+                spotlight: appStore.spotlightData,
+                startNode: appStore.startNode,
+                endNode: appStore.endNode
+            })
+
+            appStore.spotlightData = graph.spotlightData;
+            this.state.sigmaInstance.graph.clear();
+            this.state.sigmaInstance.graph.read(graph);
+            this.state.sigmaInstance.refresh()
+            emitter.emit('spotlightUpdate');
+        } 
+    }
+
     import(payload){
         fs.readFile(payload, 'utf8', function(err, data){
             var graph;
@@ -317,11 +342,17 @@ export default class GraphContainer extends Component {
 
             // child.on('message', function(m) {
             //   // Receive results from child process
-            //   console.log(m)
-            // });
+            //   this.loadFromChildProcess(m)
+            // }.bind(this));
 
             // // Send child process some work
-            // child.send(sigmaInstance);
+            // child.send(JSON.stringify({nodes:sigmaInstance.graph.nodes(),
+            //      edges: sigmaInstance.graph.edges(),
+            //      edge: params.allowCollapse ? appStore.performance.edge : 0 ,
+            //      sibling: params.allowCollapse ? appStore.performance.sibling : 0,
+            //      start: appStore.startNode,
+            //      end: appStore.endNode
+            //  }))
         }.bind(this))
         if (this.state.firstDraw){
             setTimeout(function(){
@@ -427,7 +458,8 @@ export default class GraphContainer extends Component {
                 glyphFillColor: 'black',
                 glyphTextColor: 'white',
                 glyphTextThreshold: 1,
-                zoomingRatio: 1.4
+                zoomingRatio: 1.4,
+                scalingMode: 'inside'
             }
         )
 
@@ -560,7 +592,8 @@ export default class GraphContainer extends Component {
         var dagreListener = sigma.layouts.dagre.configure(sigmaInstance, {
             easing: 'cubicInOut',
             boundingBox: true,
-            background: true
+            background: true,
+            rankDir: 'LR'
         });
 
         dagreListener.bind('stop', function(event){
@@ -573,12 +606,16 @@ export default class GraphContainer extends Component {
             emitter.emit('showLoadingIndicator', true)
         })
 
-        var noverlapListener = sigmaInstance.configNoverlap({
-            nodeMargin: 20.0,
-            easing: 'cubicInOut',
-            gridSize: 20,
-            permittedExpansion: 1.3 
-        });
+        // var noverlapListener = sigmaInstance.configNoverlap({
+        //     nodeMargin: 5.0,
+        //     easing: 'cubicInOut',
+        //     gridSize: 20,
+        //     permittedExpansion: 1.3 
+        // });
+        // 
+        
+        var noverlapListener = sigmaInstance.configNoverlap({})
+
         noverlapListener.bind('stop', function(event) {
             emitter.emit('updateLoadingText', 'Done!');
             setTimeout(function(){
