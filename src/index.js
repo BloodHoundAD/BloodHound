@@ -94,7 +94,7 @@ global.appStore = {
 			},
 			size: {
 				by: 'degree',
-				bins: 10,
+				bins: 5,
 				min: 10,
 				max: 20
 			},

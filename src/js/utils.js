@@ -255,7 +255,7 @@ export function findGraphPath(sigmaInstance, reverse, nodeid){
 			})
 		})
 	}else{
-		sigmaInstance.refresh({'skipIndexation': true})
+		return
 	}
 }
 

@@ -8,7 +8,15 @@ export default class PrebuiltQueriesDisplay extends Component {
                     Pre-Built Analytics Queries
                 </h3>
                 <div className="query-box">
-                    <a href="#" >Find Shortest Paths to DA</a>
+                    <a href="#" onClick={function(){
+                        emitter.emit('nodeSelectQuery', {
+                            query:"MATCH (n:Group) WHERE n.name =~ '(?i).*DOMAIN ADMINS.*' RETURN n",
+                            onFinish: 'MATCH (n:User),(m:Group {name:"{}"}),p=allShortestPaths((n)-[*1..]->(m)) RETURN p',
+                            start:"{}",
+                            end: "",
+                            allowCollapse: false
+                        })
+                    }}>Find Shortest Paths to DA</a>
                     <br />
                     <a href="#" onClick={function(){
                         emitter.emit('query', 

@@ -69,7 +69,7 @@ body {
 
 .graph {
     width: 100%;
-    height: 97%;
+    height: 100%;
     background-color: lightgray;
 }
 
@@ -692,4 +692,20 @@ body {
     overflow: auto;
     background-color: rgba(255, 255, 255, .9);
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+}
+
+.queryNodeSelect {
+    position: absolute;
+    z-index: 50;
+    top: 15%;
+    left: 50%;
+    max-width: 30%;
+    transform: translate(-50%, 0);
+}
+
+.queryNodeSelect img{
+    width: auto;
+    height: 100px;
+    display: block;
+    margin:auto;
 }

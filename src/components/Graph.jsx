@@ -487,6 +487,8 @@ export default class GraphContainer extends Component {
                 if (appStore.startNode !== null) {
                     findGraphPath(this.state.sigmaInstance, true, e.data.enter.nodes[0].id)
                 }
+
+                sigmaInstance.refresh({'skipIndexation': true})
             }
 
             if (e.data.leave.nodes.length > 0) {
@@ -576,7 +578,8 @@ export default class GraphContainer extends Component {
             easing: 'cubicInOut',
             autoStop: true,
             alignNodeSiblings: true,
-            barnesHutOptimize: true
+            barnesHutOptimize: true,
+            randomize: 'globally'
         });
 
         forcelinkListener.bind('stop', function(event) {
@@ -591,7 +594,7 @@ export default class GraphContainer extends Component {
 
         var dagreListener = sigma.layouts.dagre.configure(sigmaInstance, {
             easing: 'cubicInOut',
-            boundingBox: true,
+            boundingBox: {minX: 0, minY: 0, maxX:$('#graph').outerWidth(), maxY:$('#graph').outerHeight() },
             background: true,
             rankDir: 'LR'
         });
