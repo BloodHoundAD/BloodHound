@@ -83,17 +83,17 @@ export function collapseEdgeNodes(sigmaInstance){
 	}
 	$.each(sigmaInstance.graph.nodes(), function(index, node){
 		if (node.degree < threshold){
-			return sigmaInstance;
+			return
 		}
 
 		$.each(sigmaInstance.graph.adjacentNodes(node.id), function(index, anode){
-			if (anode.neo4j_data.name === appStore.endNode || anode.neo4j_data.name === appStore.startNode){
-				return sigmaInstance;
+			if (anode.neo4j_data.name === appStore.endNode.neo4j_data.name || anode.neo4j_data.name === appStore.startNode.neo4j_data.name){
+				return
 			}
 
 			var edges = sigmaInstance.graph.adjacentEdges(anode.id);
 			if ((edges.length > 1 || edges.length === 0) || (anode.folded.nodes.length > 0)){
-				return sigmaInstance;
+				return
 			}
 
 			var edge = edges[0];

@@ -20,6 +20,10 @@ export default class SpotlightContainer extends Component {
 		emitter.on('spotlightClick', function(){
 			$(this.refs.spotlight).fadeToggle(false)
 		}.bind(this))
+
+		emitter.on('resetSpotlight', function(){
+			this.setState({searchVal: ""})
+		}.bind(this))
 	}
 
 	_searchChanged(event){
