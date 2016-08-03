@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import Login from '../login'
+import Login from '../Float/login'
 
 var Modal = require('react-bootstrap').Modal;
 
