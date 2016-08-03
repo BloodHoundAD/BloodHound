@@ -13,6 +13,7 @@ import MenuContainer from './components/Menu/menucontainer';
 import ExportContainer from './components/Float/exportcontainer';
 import Settings from './components/Float/settings'
 import ZoomContainer from './components/Zoom/zoomcontainer'
+import QueryNodeSelect from './components/Float/querynodeselect'
 
 export default class AppContainer extends Component {
 	constructor(){
@@ -36,6 +37,7 @@ export default class AppContainer extends Component {
 				<MenuContainer />
 				<Settings />
 				<ZoomContainer />
+				<QueryNodeSelect />
 			</div>
 		);
 	};
