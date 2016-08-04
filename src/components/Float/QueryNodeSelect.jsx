@@ -39,7 +39,7 @@ export default class QueryNodeSelect extends Component {
 			this.state.queryData.onFinish.format(event.target.text),
 			"", 
 			event.target.text,
-			false)
+			true)
 		$(this.refs.outer).fadeToggle(false)
 	}
 

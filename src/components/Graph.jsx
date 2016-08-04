@@ -88,7 +88,9 @@ export default class GraphContainer extends Component {
             appStore.spotlightData = graph.spotlightData;
             this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.graph.read(graph);
-            this.state.sigmaInstance.refresh()
+            this.state.design.deprecate();
+            this.state.sigmaInstance.refresh();
+            this.state.design.apply();
             emitter.emit('spotlightUpdate');
         } 
     }
@@ -318,9 +320,6 @@ export default class GraphContainer extends Component {
                     appStore.spotlightData[node.id] = [node.neo4j_data.name, 0, ""];
                 }
             });
-            design.deprecate();
-            sigmaInstance.refresh();
-            design.apply();
             this.state.sigmaInstance = sigmaInstance
             this.state.design = design;
             emitter.emit('spotlightUpdate');
@@ -355,6 +354,9 @@ export default class GraphContainer extends Component {
             //      start: appStore.startNode,
             //      end: appStore.endNode
             //  }))
+            this.state.design.deprecate();
+            this.state.sigmaInstance.refresh();
+            this.state.design.apply();
         }.bind(this))
         if (this.state.firstDraw){
             setTimeout(function(){

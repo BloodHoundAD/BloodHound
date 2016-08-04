@@ -701,6 +701,8 @@ body {
     left: 50%;
     max-width: 30%;
     transform: translate(-50%, 0);
+    max-height: 30%;
+    overflow: scroll;
 }
 
 .queryNodeSelect img{
