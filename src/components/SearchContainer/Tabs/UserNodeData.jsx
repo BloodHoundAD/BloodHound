@@ -50,6 +50,14 @@ export default class UserNodeData extends Component {
 			derivativeLocalAdmin,
 			sessions;
 
+		var domain = '@' + payload.split('@').last()
+
+		foreignGroupMembership = fullAjax(
+			"MATCH (n:Group) WHERE NOT n.name ENDS WITH '{}' WITH n MATCH (m:User {name:'{}'}) MATCH (m)-[r:MemberOf]->(n) RETURN count(n)".format(domain,payload),
+			function(json){
+				this.setState({foreignGroupMembership: json.results[0].data[0].row[0]})
+			}.bind(this))
+
 		firstDegreeGroupMembership = fullAjax(
 			"MATCH (n:User {name:'{}'}), (m:Group), p=allShortestPaths((n)-[:MemberOf*1]->(m)) RETURN count(m)".format(payload),
 			function(json){
@@ -93,9 +101,11 @@ export default class UserNodeData extends Component {
 		$.ajax(groupDelegatedLocalAdmin);
 		$.ajax(derivativeLocalAdmin);
 		$.ajax(sessions);
+		$.ajax(foreignGroupMembership);
 	}
 
 	render() {
+		var domain = '@' + this.state.label.split('@').last()
 		return (
 			<div className={this.props.visible ? "" : "displaynone"}>
 				<dl className='dl-horizontal'>
@@ -148,15 +158,17 @@ export default class UserNodeData extends Component {
 									this.state.label)
 							}.bind(this)} />
 					</dd>
-					{/*<dt>
+					<dt>
 						Foreign Group Membership
 					</dt>
 					<dd>
 						<NodeALink
 							ready={this.state.foreignGroupMembership !== -1}
 							value={this.state.foreignGroupMembership}
-							click={this.placeholder} />
-					</dd> */}
+							click={function(){
+								emitter.emit('query', "MATCH (n:Group) WHERE NOT n.name ENDS WITH '{}' WITH n MATCH (m:User {name:'{}'}) MATCH (m)-[r:MemberOf]->(n) RETURN m,r,n".format(domain, this.state.label))
+							}.bind(this)} />
+					</dd>
 					<br />
 					<dt>
 						First Degree Local Admin
@@ -189,7 +201,7 @@ export default class UserNodeData extends Component {
 							ready={this.state.derivativeLocalAdmin !== -1}
 							value={this.state.derivativeLocalAdmin}
 							click={function(){
-								emitter.emit('query', "MATCH (n:User {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r*]->(m)) RETURN p".format(this.state.label)
+								emitter.emit('query', "MATCH (n:User {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r*]->(m)) RETURN p".format(domain,this.state.label)
 									,this.state.label)
 							}.bind(this)} />
 					</dd>

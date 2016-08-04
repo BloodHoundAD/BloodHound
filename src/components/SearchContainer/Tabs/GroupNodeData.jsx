@@ -17,7 +17,8 @@ export default class GroupNodeData extends Component {
 			directAdminTo: -1,
 			derivativeAdminTo: -1,
 			unrolledMemberOf: -1,
-			sessions: -1
+			sessions: -1,
+			foreignGroupMembership: -1
 		}
 
 		emitter.on('groupNodeClicked', this.getNodeData.bind(this));
@@ -35,7 +36,8 @@ export default class GroupNodeData extends Component {
 			directAdminTo: -1,
 			derivativeAdminTo: -1,
 			unrolledMemberOf: -1,
-			sessions: -1
+			sessions: -1,
+			foreignGroupMembership: -1
 		})
 
 		var directMembers, 
@@ -43,8 +45,11 @@ export default class GroupNodeData extends Component {
 			directAdminTo,
 			derivativeAdminTo,
 			unrolledMemberOf,
-			sessions;
+			sessions,
+			foreignGroupMembership;
 
+
+		var domain = '@' + payload.split('@').last()
 		directMembers = fullAjax(
 			"MATCH (a)-[b:MemberOf]->(c:Group {name:'{}'}) RETURN count(a)".format(payload),
 			function(json){
@@ -81,15 +86,23 @@ export default class GroupNodeData extends Component {
 				this.setState({sessions: json.results[0].data[0].row[0]})	
 			}.bind(this))
 
+		foreignGroupMembership = fullAjax(
+			"MATCH (n:Group) WHERE NOT n.name ENDS WITH '{}' WITH n MATCH (m:Group {name:'{}'}) MATCH (m)-[r:MemberOf]->(n) RETURN count(n)".format(domain,payload),
+			function(json){
+				this.setState({foreignGroupMembership: json.results[0].data[0].row[0]})	
+			}.bind(this))		
+
 		$.ajax(directMembers);
 		$.ajax(unrolledMembers);
 		$.ajax(directAdminTo);
 		$.ajax(derivativeAdminTo);
 		$.ajax(unrolledMemberOf);
 		$.ajax(sessions);
+		$.ajax(foreignGroupMembership);
 	}
 
 	render() {
+		var domain = '@' + this.state.label.split('@')
 		return (
 			<div className={this.props.visible ? "" : "displaynone"}>
 				<dl className='dl-horizontal'>
@@ -159,6 +172,17 @@ export default class GroupNodeData extends Component {
 							click={function(){
 								emitter.emit('query', "MATCH (n:Group {name:'{}'}), (target:Group), p=allShortestPaths((n)-[r:MemberOf*1..]->(target)) RETURN p".format(this.state.label),
 									this.state.label)
+							}.bind(this)} />
+					</dd>
+					<dt>
+						Foreign Group Membership
+					</dt>
+					<dd>
+						<NodeALink
+							ready={this.state.foreignGroupMembership !== -1}
+							value={this.state.foreignGroupMembership}
+							click={function(){
+								emitter.emit('query', "MATCH (n:Group) WHERE NOT n.name ENDS WITH '{}' WITH n MATCH (m:Group {name:'{}'}) MATCH (m)-[r:MemberOf]->(n) RETURN m,r,n".format(domain, this.state.label))
 							}.bind(this)} />
 					</dd>
 					<dt>

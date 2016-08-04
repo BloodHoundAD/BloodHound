@@ -33,6 +33,12 @@ Array.prototype.allEdgesSameType = function() {
     return true;
 };
 
+if (!Array.prototype.last){
+    Array.prototype.last = function(){
+        return this[this.length - 1];
+    };
+};
+
 sigma.renderers.def = sigma.renderers.canvas;
 
 sigma.classes.graph.addMethod('outboundNodes', function(id) {
