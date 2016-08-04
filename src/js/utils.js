@@ -87,7 +87,11 @@ export function collapseEdgeNodes(sigmaInstance){
 		}
 
 		$.each(sigmaInstance.graph.adjacentNodes(node.id), function(index, anode){
-			if (anode.neo4j_data.name === appStore.endNode.neo4j_data.name || anode.neo4j_data.name === appStore.startNode.neo4j_data.name){
+			if (appStore.endNode !== null && anode.neo4j_data.name === appStore.endNode.neo4j_data.name){
+				return
+			}
+
+			if (appStore.startNode !== null && anode.neo4j_data.name === appStore.startNode.neo4j_data.name){
 				return
 			}
 
