@@ -33,7 +33,17 @@ export default class PrebuiltQueriesDisplay extends Component {
                             "MATCH (n:Domain) MATCH p=(n)-[r]-() RETURN p")
                     }}>Map Domain Trusts</a>
                     <br />
-                    
+                    <a href="#" onClick={
+                        function(){
+                            emitter.emit('query',
+                                "MATCH (n:User) WITH n,split(n.name,'@')[1] as domain MATCH (n)-[r:MemberOf*1..]->(m:Group) WHERE NOT m.name ENDS WITH domain RETURN n,r,m")
+                        }}>Users with Foreign Domain Membership</a>
+                    <br />
+                    <a href="#" onClick={
+                        function(){
+                            emitter.emit('query',
+                                "MATCH (n:Group) WITH n,split(n.name,'@')[1] as domain MATCH (n)-[r:MemberOf*1..]->(m:Group) WHERE NOT m.name ENDS WITH domain RETURN n,r,m")
+                        }}>Groups with Foreign Domain Membership</a>
                 </div>
             </div>
         );

@@ -391,6 +391,7 @@ export default class GraphContainer extends Component {
         sigmaInstance.graph.dropNode(id);
         sigmaInstance.graph.read(node.folded)
         this.state.design.deprecate()
+        sigmaInstance.refresh()
         this.state.design.apply()
         this.relayout();
     }
