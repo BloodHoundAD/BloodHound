@@ -27,6 +27,7 @@ export default class GraphContainer extends Component {
         emitter.on('doLogout', function(){
             this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.refresh();
+            sigma.layouts.killForceLink();
             this.setState({sigmaInstance: null})
         }.bind(this))
     }
@@ -648,13 +649,10 @@ export default class GraphContainer extends Component {
 
         if (mode === 0){
             sigmaInstance.settings('labelThreshold', 500);
-            emitter.emit('showAlert', 'Hiding Node Labels')
         }else if (mode === 1){
             sigmaInstance.settings('labelThreshold', 15);
-            emitter.emit('showAlert', 'Default Node Label Threshold')
         }else{
             sigmaInstance.settings('labelThreshold', 1);
-            emitter.emit('showAlert', 'Always Showing Node Labels')
         }
 
         this.state.sigmaInstance = sigmaInstance;
