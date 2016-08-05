@@ -22,7 +22,11 @@ export default class SpotlightContainer extends Component {
 		}.bind(this))
 
 		emitter.on('resetSpotlight', function(){
-			this.setState({searchVal: ""})
+			this.setState({
+				searchVal: "",
+				rex: new RegExp("", 'i')
+			})
+
 		}.bind(this))
 	}
 
