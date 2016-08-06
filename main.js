@@ -1,6 +1,8 @@
 const electron = require('electron')
+var platform = require('os').platform()
 // Module to control application life.
 const app = electron.app
+const Tray = electron.Tray
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
@@ -10,8 +12,16 @@ let mainWindow
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 1280, height: 800, icon:__dirname + '/src/img/favicon.ico'})
+  mainWindow = new BrowserWindow({width: 1280, height: 800, icon: __dirname + '/src/img/icon.ico'})
+  var trayIcon;
 
+  if (platform == 'darwin'){
+    trayIcon = __dirname + '/src/img/icon.png'
+  }else{
+    trayIcon = __dirname + '/src/img/icon.ico'  
+  }
+    
+  appIcon = new Tray(trayIcon)
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/index.html`)
 
