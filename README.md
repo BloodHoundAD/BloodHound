@@ -1,5 +1,4 @@
-# Bloodhound
-Six Degrees of Domain Admin
+# License
 
 BloodHound uses graph theory to reveal hidden relationships and
 attack paths in an Active Directory environment.
