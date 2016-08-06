@@ -1,0 +1,4 @@
+node_modules/*
+Bloodhound-*
+dist/
+npm-debug.log

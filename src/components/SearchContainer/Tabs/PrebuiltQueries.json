@@ -1,0 +1,64 @@
+{
+	"queries": [
+		{
+			"name": "Find all Domain Admins",
+			"requireNodeSelect": false,
+			"query": "MATCH (n:Group) WHERE n.name =~ '(?i).*DOMAIN ADMINS.*' WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m",
+			"allowCollapse": false
+		},
+		{
+			"name": "Find Shortest Paths to Domain Admins",
+			"requireNodeSelect": true,
+			"nodeSelectQuery":  {
+				"query":"MATCH (n:Group) WHERE n.name =~ '(?i).*DOMAIN ADMINS.*' RETURN n",
+                "onFinish": "MATCH (n:User),(m:Group {name:'{}'}),p=allShortestPaths((n)-[*1..]->(m)) RETURN p",
+                "start":"{}",
+                "end": "",
+                "allowCollapse": true,
+                "boxTitle": "Select domain to map..."
+			}
+		},
+		{
+			"name": "Find User with Most Sessions",
+			"requireNodeSelect": false,
+			"query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m",
+			"allowCollapse": false
+		},
+		{
+			"name": "Find Computer with Most Sessions",
+			"requireNodeSelect": false,
+			"query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH m, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m",
+			"allowCollapse": false
+		},
+		{
+			"name" : "Users with Foreign Domain Group Membership",
+			"requireNodeSelect": true,
+			"nodeSelectQuery": {
+				"query": "MATCH (n:Domain) RETURN n",
+				"onFinish": "MATCH (n:User) WHERE n.name ENDS WITH '{}' WITH n MATCH (n)-[r:MemberOf*1..]->(m:Group) WHERE NOT m.name ENDS WITH '{}' RETURN n,r,m",
+				"start": "{}",
+				"end": "",
+				"allowCollapse": false,
+				"boxTitle": "Select source domain..."
+			}
+		},
+		{
+			"name" : "Groups with Foreign Domain Group Membership",
+			"requireNodeSelect": true,
+			"nodeSelectQuery": {
+				"query": "MATCH (n:Domain) RETURN n",
+				"onFinish": "MATCH (n:Group) WHERE n.name ENDS WITH '{}' WITH n MATCH (n)-[r:MemberOf*1..]->(m:Group) WHERE NOT m.name ENDS WITH '{}' RETURN n,r,m",
+				"start": "{}",
+				"end": "",
+				"allowCollapse": false,
+				"boxTitle": "Select source domain..."
+			}
+		},
+		{
+			"name": "Map Domain Trusts",
+			"requireNodeSelect": false,
+			"query": "MATCH (n:Domain) MATCH p=(n)-[r]-() RETURN p",
+			"allowCollapse": false
+		}
+	]
+}

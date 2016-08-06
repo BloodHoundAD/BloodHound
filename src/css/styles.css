@@ -1,0 +1,722 @@
+/* roboto-regular - latin */
+
+#root {
+    position: absolute;
+    width: 100%;
+    height: 100%;    
+}
+
+.max{
+    width: 100%;
+    height: 100%;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    font-weight: 400;
+    font-style: normal;
+    src: url('../fonts/roboto-v15-latin-regular.eot');
+    /* IE9 Compat Modes */
+    src: local('Roboto'), local('Roboto-Regular'), url('../fonts/roboto-v15-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('../fonts/roboto-v15-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+    url('../fonts/roboto-v15-latin-regular.woff') format('woff'), /* Modern Browsers */
+    url('../fonts/roboto-v15-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('../fonts/roboto-v15-latin-regular.svg#Roboto') format('svg');
+    /* Legacy iOS */
+}
+
+html,
+body {
+    font-family: 'Roboto', sans-serif;
+    height: 100%;
+    background-color: lightgray;
+}
+
+.queryInput {
+    position: relative;
+    left: 50%;
+    width: 70%;
+    transform: translateX(-50%);
+}
+
+.bottomdiv {
+    position: absolute;
+    z-index: 10;
+    bottom: 0;
+    overflow: auto;
+    width: 100%;
+}
+
+
+.slideupbutton {
+    position: relative;
+    left: 50%;
+    display: block;
+    width: 200px;
+    height: 2em;
+    transform: translateX(-50%);
+    border-radius: 20px 20px 0 0;
+    background-color: white;
+}
+
+.slideupbutton:focus {
+    outline: 0;
+}
+
+.query-box{
+    padding: 0 .5em .5em .5em
+}
+
+.graph {
+    width: 100%;
+    height: 100%;
+    background-color: lightgray;
+}
+
+.graph:focus {
+    outline: 0;
+}
+
+.typeaheadfix{
+    border: 0;
+}
+
+.typeaheadfix .Select-menu-outer{
+    z-index: 99999;
+}
+
+.typeaheadfix .Select-control{
+    border: 0;
+    box-shadow: none !important;
+}
+
+.typeaheadfix .Select-control:focus{
+    border: 0;
+}
+
+.typeaheadfix .Select-arrow-zone{
+    display: none;
+}
+
+@media all and (min-width: 600px) {
+    .searchdiv {
+        position: absolute;
+        z-index: 10;
+        top: 1em;
+        left: 1em;
+        overflow: visible;
+        min-width: 415px;
+        max-width: 45%;
+        background-color: white;
+    }
+}
+
+@media all and (min-width: 1000px) {
+    .searchdiv {
+        position: absolute;
+        z-index: 10;
+        top: 1em;
+        left: 1em;
+        overflow: visible;
+        min-width: 415px;
+        max-width: 40%;
+        background-color: white;
+    }
+}
+
+@media all and (min-width: 1200px) {
+    .searchdiv {
+        position: absolute;
+        z-index: 10;
+        top: 1em;
+        left: 1em;
+        overflow: visible;
+        min-width: 415px;
+        max-width: 30%;
+        background-color: white;
+    }
+}
+
+@media all and (min-width: 1600px) {
+    .searchdiv {
+        position: absolute;
+        z-index: 10;
+        top: 1em;
+        left: 1em;
+        overflow: visible;
+        min-width: 415px;
+        max-width: 25%;
+        background-color: white;
+    }
+}
+
+.dl-horizontal-fix {
+    margin-bottom: 1em;
+}
+
+.dl-horizontal dt {
+    width: auto;
+    padding-right: 1em;
+    text-align: left;
+}
+
+.dl-horizontal dd {
+    margin-left: 0;
+    text-align: right;
+    border-bottom: 1px solid lightgray;
+}
+
+.dl-horizontal dd:last-child {
+    border-bottom: none;
+}
+
+.nodedatabox {
+    overflow: auto;
+    border-top: .5px solid lightgray;
+    background-color: white;
+}
+
+.searchbox {
+    border: 0;
+}
+
+.form-control:focus {
+    border: 0;
+    box-shadow: none;
+}
+
+.menuglyph {
+    top: 0;
+}
+
+.spanfix {
+    cursor: pointer;
+    border: none;
+    background-color: white;
+}
+
+.rightspan {
+    float: right;
+    clear: right;
+}
+
+.rightglyph {
+    padding-top: 3px;
+    padding-left: 5px;
+}
+
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus,
+.btn.focus,
+.btn:active.focus,
+.btn.active.focus {
+    outline: none;
+}
+
+.padvert {
+    overflow: visible;
+    padding-bottom: 10px;
+}
+
+
+.hideme {
+    position: absolute;
+    top: 0;
+    visibility: hidden;
+}
+
+.content {
+    padding: 0 10px 0 10px;
+}
+
+.alertdiv {
+    position: absolute;
+    z-index: 10;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.ingestinput {
+    max-width: 27em;
+}
+
+.loginwindow {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .7);
+}
+
+@media all and (min-width: 600px) {
+    .loginwindow > div {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        overflow: auto;
+        max-width: 70%;
+        transform: translate(-50%, -50%);
+        border: 5px solid rgba(0, 0, 0, .5);
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, .9);
+        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+    }
+}
+
+@media all and (min-width: 1000px) {
+    .loginwindow > div {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        overflow: auto;
+        max-width: 40%;
+        transform: translate(-50%, -50%);
+        border: 5px solid rgba(0, 0, 0, .5);
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, .9);
+        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+    }
+}
+
+@media all and (min-width: 1500px) {
+    .loginwindow > div {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        overflow: auto;
+        max-width: 25%;
+        transform: translate(-50%, -50%);
+        border: 5px solid rgba(0, 0, 0, .5);
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, .9);
+        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+    }
+}
+
+.loginwindow > div img {
+    display: block;
+    height: 150px;
+    margin: auto;
+}
+
+.loginwindow > div form {
+    margin-right: 2em;
+    margin-left: 2em;
+}
+
+.loginwindow .input-group-addon {
+    min-width:115px;
+    text-align:left;
+}
+
+.loginwindow > #checkconnectionpanel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    overflow: auto;
+    max-width: 30%;
+    transform: translate(-50%, -50%);
+    border: 5px solid rgba(0, 0, 0, .5);
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, .9);
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+}
+
+.loginwindow > #checkconnectionpanel span {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin: 8px;
+}
+
+.loginwindow > #logoutpanel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    overflow: auto;
+    max-width: 30%;
+    transform: translate(-50%, -50%);
+    border: 5px solid rgba(0, 0, 0, .5);
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, .9);
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+}
+
+.loginwindow > #logoutpanel span {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin: 8px;
+}
+
+.loginwindow > #logoutpanel div {
+    margin: .5em 1em .5em 1em;
+}
+
+.green-icon-color {
+    color: green;
+}
+
+.red-icon-color {
+    color: red;
+}
+
+.help-block-add {
+    margin-left: 3px;
+}
+
+.spacing {
+    margin-top: 5px;
+}
+
+.loginbutton {
+    display: block;
+    margin: auto;
+    margin-top: 5px;
+}
+
+.has-spinner.activate .button-spinner {
+    width: auto;
+    opacity: 1;
+}
+
+.button-spinner {
+    display: inline-block;
+    width: 0;
+    -webkit-transition: opacity .25s, width .25s;
+    -moz-transition: opacity .25s, width .25s;
+    -o-transition: opacity .25s, width .25s;
+    transition: opacity .25s, width .25s;
+    opacity: 0;
+}
+
+.spinner > div {
+  width: 12px;
+  height: 12px;
+  background-color: #333;
+
+  border-radius: 100%;
+  display: inline-block;
+  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+}
+
+.spinner .bounce1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+
+.spinner .bounce2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+
+@-webkit-keyframes sk-bouncedelay {
+  0%, 80%, 100% { -webkit-transform: scale(0) }
+  40% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bouncedelay {
+  0%, 80%, 100% { 
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  } 40% { 
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0);
+  }
+}
+
+
+
+.modal {
+    text-align: center;
+}
+
+@media screen and (min-width: 768px) {
+    .modal:before {
+        display: inline-block;
+        height: 100%;
+        content: ' ';
+        vertical-align: middle;
+    }
+}
+
+.modal-dialog {
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.progress {
+    position: relative;
+}
+
+.progress span {
+    position: absolute;
+    display: block;
+    width: 100%;
+    color: black;
+}
+
+.zoomBox {
+    position: absolute;
+    z-index: 20;
+    right: 1em;
+    bottom: 1%;
+}
+
+.zoomBox div {
+    float: right;
+    clear: right;
+    padding-top: 3px;
+}
+
+.zoomBox div button {
+    background-color: white;
+}
+
+.zoomIn {
+    border-top-left-radius: 2em;
+    border-top-right-radius: 2em;
+}
+
+.zoomOut {
+    border-bottom-right-radius: 2em;
+    border-bottom-left-radius: 2em;
+}
+
+@media all and (min-width: 900px) {
+    .spotlight {
+        position: absolute;
+        z-index: 30;
+        top: 15%;
+        left: 50%;
+        width: 60%;
+        transform: translate(-50%, 0);
+    }
+}
+
+@media all and (min-width: 1500px) {
+    .spotlight {
+        position: absolute;
+        z-index: 30;
+        top: 15%;
+        left: 50%;
+        width: 45%;
+        transform: translate(-50%, 0);
+    }
+}
+
+.spotlight-nodelist {
+    overflow: auto;
+    height: 11em;
+    background-color: white;
+}
+
+.spotlight-nodelist table > thead {
+    text-align: center;
+}
+
+.no-border-radius span {
+    border-radius: 0;
+}
+
+.no-border-radius input {
+    border-radius: 0;
+}
+
+.loadingIndicator {
+    position: absolute;
+    z-index: 25;
+    bottom: .5em;
+    left: 1em;
+    width: 80px;
+}
+
+.loadingIndicator div:first-child {
+    text-align: center;
+    font-weight: bold
+}
+
+.loadingIndicator img{
+    width: 80px;
+    height: auto;
+}
+
+.settingsDiv {
+    position: absolute;
+    z-index: 20;
+    top: 1em;
+    right: 10em;
+    overflow: auto;
+    min-width: 15%;
+    background-color: rgba(255, 255, 255, .9);
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+}
+
+.sliderinput {
+    float: left;
+    width: 3em;
+}
+
+.sliderfix .slideinline {
+    display: inline-block;
+    float: left;
+}
+
+.sliderfix .slideinline > .track {
+    margin-top: -2.5px !important;
+}
+
+.sliderfix .slideinline > .dragger {
+    margin-top: -5px !important;
+}
+
+.sliderfix i {
+    margin-left: 5px;
+}
+
+.center-align{
+    text-align: center;
+}
+
+#tab-style{
+    border-top: .5px solid lightgray;
+}
+
+#tab-style > ul{
+    display: table;
+    width: 100%;
+    border-bottom: 1px solid lightgray;
+}
+
+#tab-style > ul > li {
+    border-top: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    border-radius: 0;
+    display: table-cell;
+    width: 33%;
+    text-align: center;
+    color: #337AB7;
+}
+
+#tab-style > ul > li > a:focus {
+    background-color: #fff;
+    color: black;
+    outline: none;
+}
+
+#tab-style > ul > li > a:hover {
+    background-color: #fff;
+}
+
+#tab-style > ul > li.active > a {
+    background-color: #fff;
+    color: black;
+}
+
+#tab-style > ul > li > a[aria-selected='true']{
+    border-right: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+    color: black;
+}
+
+#tab-style > div{
+    padding: 0 10px 0 10px;
+}
+
+#tab-style h3{
+    text-align: center;
+}
+
+.dbbuttons {
+    padding-bottom: 1em;
+}
+
+.displaynone {
+    display: none;
+}
+
+.menubutton{
+    border-radius: 4px;
+    background-color: #f4511e;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 28px;
+    padding: 20px;
+    width: 200px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.menudiv {
+    position: absolute;
+    z-index: 10;
+    top: 1em;
+    right: 1em;
+    overflow: visible;
+}
+
+.menudiv > div {
+
+}
+
+.menudiv > div > button{
+    overflow: hidden;
+    white-space: nowrap;
+    background-color: #fff;
+    margin-bottom: 5px;
+    float: right;
+    clear: right;
+}
+
+.menudiv > div > button > span{
+    vertical-align: middle;
+    top: -1px;
+    width: 15px;
+    height: 15px;
+}
+
+.fake-hidden{
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+.floating-div {
+    position: absolute;
+    z-index: 20;
+    top: 1em;
+    right: 10em;
+    overflow: auto;
+    background-color: rgba(255, 255, 255, .9);
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+}
+
+.queryNodeSelect {
+    position: absolute;
+    z-index: 50;
+    top: 15%;
+    left: 50%;
+    max-width: 30%;
+    transform: translate(-50%, 0);
+    max-height: 30%;
+}
+
+.queryNodeSelect div.panel-body {
+    overflow-y: auto;
+    max-height: 16em;
+}
+
+.queryNodeSelect img{
+    width: auto;
+    height: 100px;
+    display: block;
+    margin:auto;
+}
+
+.tab-content > div:last-child > div{
+    max-height: 200px;
+    overflow-y: auto;
+}

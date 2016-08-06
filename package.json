@@ -1,0 +1,67 @@
+{
+  "name": "bloodhound",
+  "version": "1.0.0",
+  "description": "Graph Theory for Active Directory",
+  "keywords": [
+    "Graph",
+    "Active Directory"
+  ],
+  "homepage": "https://github.com/adaptivethreat/Bloodhound",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adaptivethreat/Bloodhound.git"
+  },
+  "bugs": "https://github.com/adaptivethreat/Bloodhound/issues",
+  "license": "GPL-3.0",
+  "author": "Rohan Vazarkar <rvazarkr@gmail.com> (https://www.twitter.com/cptjesus)",
+  "contributors": [
+    "Andy Robbins <robbins.andy@gmail.com> (https://www.wald0.com)",
+    "Will Schroeder <will@harmj0y.net> (https://www.harmj0y.net)"
+  ],
+  "main": "main.js",
+  "scripts": {
+    "start": "set ENV=development & electron .",
+    "dev": "concurrently -k \"babel-node server.js\" \"npm start\"",
+    "build": "webpack --config webpack.config.production.js && electron-packager . Bloodhound --platform=all --arch=all --overwrite --prune",
+    "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=x64 --overwrite --prune"
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "stage-0",
+      "react"
+    ]
+  },
+  "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-core": "^6.11.4",
+    "babel-loader": "^6.2.4",
+    "babel-polyfill": "^6.9.1",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-0": "^6.5.0",
+    "concurrently": "^2.2.0",
+    "electron-prebuilt": "^1.2.8",
+    "express": "^4.14.0",
+    "webpack": "^1.13.1",
+    "webpack-dev-middleware": "^1.6.1",
+    "webpack-hot-middleware": "^2.12.1",
+    "webpack-target-electron-renderer": "^0.4.0"
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "bootstrap-3-typeahead": "^4.0.1",
+    "configstore": "^2.0.0",
+    "css-loader": "^0.23.1",
+    "dagre": "^0.7.4",
+    "eventemitter2": "^2.0.0",
+    "jquery": "^2.2.4",
+    "linkurious": "^1.5.1",
+    "mustache": "^2.2.1",
+    "react": "^15.2.1",
+    "react-bootstrap": "^0.30.0",
+    "react-dom": "^15.2.1",
+    "react-if": "^2.1.0",
+    "style-loader": "^0.13.1"
+  }
+}
