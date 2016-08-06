@@ -14262,7 +14262,7 @@ function Get-BloodHoundData {
 
     .PARAMETER CollectionMethod
 
-        The method to collect data. 'Group', 'LocalGroup', 'GPOLocalGroup', 'Sesssion', 'LoggedOn', 'Trusts, 'TrustsLDAP', 'Stealth', or 'Default'.
+        The method to collect data. 'Group', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Trusts, 'TrustsLDAP', 'Stealth', or 'Default'.
         'TrustsLDAP' uses LDAP enumeration for trusts, while 'Trusts' using .NET methods.
         'Stealth' uses 'Group' collection, stealth user hunting ('Session' on certain servers), 'GPOLocalGroup' enumeration, and LDAP trust enumeration.
         'Default' uses 'Group' collection, regular user hunting with 'Session'/'LoggedOn', 'LocalGroup' enumeration, and 'Trusts' enumeration.
