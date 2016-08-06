@@ -23,7 +23,7 @@
     "start": "set ENV=development & electron .",
     "dev": "concurrently -k \"babel-node server.js\" \"npm start\"",
     "build": "webpack --config webpack.config.production.js && electron-packager . Bloodhound --platform=all --arch=all --overwrite --prune",
-    "winbuild": "webpack --config webpack.config.production.js && electron-packager . Bloodhound --platform=win32 --arch=all --overwrite --prune"
+    "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=x64 --overwrite --prune"
   },
   "babel": {
     "presets": [
