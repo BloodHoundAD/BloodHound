@@ -25,7 +25,10 @@ var config = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-  ]
+  ],
+  node: {
+    __dirname: true
+  }
 };
 
 config.target = webpackTargetElectronRenderer(config);
