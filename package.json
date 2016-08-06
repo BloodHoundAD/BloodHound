@@ -22,8 +22,9 @@
   "scripts": {
     "start": "set ENV=development & electron .",
     "dev": "concurrently -k \"babel-node server.js\" \"npm start\"",
-    "build": "webpack --config webpack.config.production.js && electron-packager . Bloodhound --platform=all --arch=all --overwrite --prune",
-    "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=x64 --overwrite --prune"
+    "build": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=all --arch=all --overwrite --prune --ignore=./BloodHound.*",
+    "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=all --overwrite --prune --ignore=./BloodHound.*",
+    "macbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=darwin --arch=all --overwrite --prune --ignore=./BloodHound.* --icon=src/img/icon.icns"
   },
   "babel": {
     "presets": [
