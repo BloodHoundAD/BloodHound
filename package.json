@@ -2,6 +2,22 @@
   "name": "bloodhound",
   "version": "1.0.0",
   "description": "Graph Theory for Active Directory",
+  "keywords": [
+    "Graph",
+    "Active Directory"
+  ],
+  "homepage": "https://github.com/adaptivethreat/Bloodhound",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adaptivethreat/Bloodhound.git"
+  },
+  "bugs": "https://github.com/adaptivethreat/Bloodhound/issues",
+  "license": "GPL-3.0",
+  "author": "@CptJesus",
+  "contributors": [
+    "Andy Robbins <robbins.andy@gmail.com> (https://www.wald0.com)",
+    "Will Schroeder <will@harmj0y.net> (https://www.harmj0y.net)"
+  ],
   "main": "main.js",
   "scripts": {
     "start": "set ENV=development & electron .",
@@ -16,8 +32,6 @@
       "react"
     ]
   },
-  "author": "@CptJesus",
-  "license": "CC0-1.0",
   "devDependencies": {
     "babel-cli": "^6.11.4",
     "babel-core": "^6.11.4",
@@ -40,7 +54,6 @@
     "configstore": "^2.0.0",
     "css-loader": "^0.23.1",
     "dagre": "^0.7.4",
-    "electron-json-storage": "^2.0.0",
     "eventemitter2": "^2.0.0",
     "jquery": "^2.2.4",
     "linkurious": "^1.5.1",
