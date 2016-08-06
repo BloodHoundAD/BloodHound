@@ -14,6 +14,8 @@ function createWindow () {
   // Create the browser window.
   if (platform == 'darwin'){
     mainWindow = new BrowserWindow({width: 1280, height: 800, icon: __dirname + '/src/img/icon.png'})
+  }else if (platform == 'linux'){
+    mainWindow = new BrowserWindow({width: 1280, height: 800, icon: __dirname + '/src/img/icon.png'})
   }else{
     mainWindow = new BrowserWindow({width: 1280, height: 800, icon: __dirname + '/src/img/icon.ico'})
   }
