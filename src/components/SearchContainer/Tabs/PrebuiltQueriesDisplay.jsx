@@ -12,16 +12,20 @@ export default class PrebuiltQueriesDisplay extends Component {
     }
 
     componentWillMount() {
-        fs.readFile('src/components/SearchContainer/Tabs/PrebuiltQueries.json', 'utf8', function(err, data){
-            var x = JSON.parse(data)
-            var y = []
+        $.ajax({
+            url: 'src/components/SearchContainer/Tabs/prebuiltqueries.json',
+            type: 'GET',
+            success: function(response){
+                var x = JSON.parse(response)
+                var y = []
 
-            $.each(x.queries, function(index, el) {
-                y.push(el)
-            });
+                $.each(x.queries, function(index, el) {
+                    y.push(el)
+                });
 
-            this.setState({queries: y})
-        }.bind(this))
+                this.setState({queries: y})    
+            }.bind(this)
+        })
     }
 
     render() {
