@@ -14163,21 +14163,21 @@ function Export-BloodHoundCSV {
         PS C:\> Get-BloodHoundData | Export-BloodHoundCSV
 
         Executes default collection options and exports the data to user_sessions.csv, group_memberships.csv,
-        local_admin.csv, and trusts.csv in the current directory.
+        local_admins.csv, and trusts.csv in the current directory.
     
     .EXAMPLE
 
         PS C:\> Get-BloodHoundData | Export-BloodHoundCSV -SkipGCDeconfliction
 
         Executes default collection options, skips the global catalog deconfliction, and exports the data
-        to user_sessions.csv, group_memberships.csv, local_admin.csv, and trusts.csv in the current directory.
+        to user_sessions.csv, group_memberships.csv, local_admins.csv, and trusts.csv in the current directory.
 
     .EXAMPLE
 
         PS C:\> Get-BloodHoundData | Export-BloodHoundCSV -CSVFolder C:\Temp\ -CSVPrefix "domainX"
 
         Executes default collection options and exports the data to domainX_user_sessions.csv, domainX_group_memberships.csv,
-        domainX_local_admin.csv, and tdomainX_rusts.csv in C:\Temp\.
+        domainX_local_admins.csv, and tdomainX_rusts.csv in C:\Temp\.
 
     .NOTES
 
@@ -14192,7 +14192,7 @@ function Export-BloodHoundCSV {
                 "john@domain.local","user","GROUP1"
                 "computer3.testlab.local","computer","GROUP1"
 
-            PowerView.LocalUserAPI/PowerView.GPOLocalGroup -> $($CSVExportPrefix)local_admin.csv
+            PowerView.LocalUserAPI/PowerView.GPOLocalGroup -> $($CSVExportPrefix)local_admins.csv
                 AccountName,AccountType,ComputerName
                 "john@domain.local","user","computer2.domain.local"
 
@@ -14480,7 +14480,7 @@ function Export-BloodHoundCSV {
                     AccountType = 'group'
                     ComputerName = $Object.ComputerName
                 }
-                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admin.csv"
+                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admins.csv"
             }
             else {
                 $Properties = @{
@@ -14488,7 +14488,7 @@ function Export-BloodHoundCSV {
                     AccountType = 'user'
                     ComputerName = $Object.ComputerName
                 }
-                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admin.csv"
+                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admins.csv"
             }
         }
         elseif($Object.PSObject.TypeNames -contains 'PowerView.LocalUserSpecified') {
@@ -14502,7 +14502,7 @@ function Export-BloodHoundCSV {
                     AccountType = 'group'
                     ComputerName = $Object.ComputerName
                 }
-                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admin.csv"
+                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admins.csv"
             }
             else {
                 $Properties = @{
@@ -14510,7 +14510,7 @@ function Export-BloodHoundCSV {
                     AccountType = 'user'
                     ComputerName = $Object.ComputerName
                 }
-                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admin.csv"
+                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admins.csv"
             }
         }
         elseif($Object.PSObject.TypeNames -contains 'PowerView.GPOLocalGroup') {
@@ -14531,7 +14531,7 @@ function Export-BloodHoundCSV {
                         AccountType = 'group'
                         ComputerName = $Computer
                     }
-                    New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admin.csv"
+                    New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admins.csv"
                 }
                 else {
                     $Properties = @{
@@ -14539,7 +14539,7 @@ function Export-BloodHoundCSV {
                         AccountType = 'user'
                         ComputerName = $Computer
                     }
-                    New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admin.csv"
+                    New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admins.csv"
                 }
             }
         }
