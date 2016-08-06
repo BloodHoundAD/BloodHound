@@ -2588,32 +2588,37 @@ function Get-NetUser {
                 $UserSearcher.filter="(&(samAccountType=805306368)$Filter)"
             }
 
-            $Results = $UserSearcher.FindAll()
-            $Results | Where-Object {$_} | ForEach-Object {
-                # convert/process the LDAP fields for each result
-                $User = Convert-LDAPProperty -Properties $_.Properties
+            try {
+                $Results = $UserSearcher.FindAll()
+                $Results | Where-Object {$_} | ForEach-Object {
+                    # convert/process the LDAP fields for each result
+                    $User = Convert-LDAPProperty -Properties $_.Properties
 
-                $User | Add-Member NoteProperty 'Domain' $TargetDomain
+                    $User | Add-Member NoteProperty 'Domain' $TargetDomain
 
-                $DomainSID = $User.objectsid.Substring(0, $User.objectsid.LastIndexOf('-'))
-                $PrimaryGroupSID = "$DomainSID-$($User.primarygroupid)"
+                    $DomainSID = $User.objectsid.Substring(0, $User.objectsid.LastIndexOf('-'))
+                    $PrimaryGroupSID = "$DomainSID-$($User.primarygroupid)"
 
-                $User | Add-Member NoteProperty 'PrimaryGroupSID' $PrimaryGroupSID
+                    $User | Add-Member NoteProperty 'PrimaryGroupSID' $PrimaryGroupSID
 
-                if($PrimaryGroups[$PrimaryGroupSID]) {
-                    $PrimaryGroupName = $PrimaryGroups[$PrimaryGroupSID]
+                    if($PrimaryGroups[$PrimaryGroupSID]) {
+                        $PrimaryGroupName = $PrimaryGroups[$PrimaryGroupSID]
+                    }
+                    else {
+                        $PrimaryGroupName = Get-ADObject -Domain $Domain -SID $PrimaryGroupSID | Select-Object -ExpandProperty samaccountname
+                        $PrimaryGroups[$PrimaryGroupSID] = $PrimaryGroupName
+                    }
+
+                    $User | Add-Member NoteProperty 'PrimaryGroupName' $PrimaryGroupName
+
+                    $User.PSObject.TypeNames.Add('PowerView.User')
+                    $User
                 }
-                else {
-                    $PrimaryGroupName = Get-ADObject -Domain $Domain -SID $PrimaryGroupSID | Select-Object -ExpandProperty samaccountname
-                    $PrimaryGroups[$PrimaryGroupSID] = $PrimaryGroupName
-                }
-
-                $User | Add-Member NoteProperty 'PrimaryGroupName' $PrimaryGroupName
-
-                $User.PSObject.TypeNames.Add('PowerView.User')
-                $User
+                $Results.dispose()
             }
-            $Results.dispose()
+            catch {
+                Write-Verbose "Error building the UserSearcher searcher object!"
+            }
             $UserSearcher.dispose()
         }
     }
@@ -4192,17 +4197,22 @@ function Get-ADObject {
                 $ObjectSearcher.filter = "(&(samAccountName=$SamAccountName)$Filter)"
             }
 
-            $Results = $ObjectSearcher.FindAll()
-            $Results | Where-Object {$_} | ForEach-Object {
-                if($ReturnRaw) {
-                    $_
+            try {
+                $Results = $ObjectSearcher.FindAll()
+                $Results | Where-Object {$_} | ForEach-Object {
+                    if($ReturnRaw) {
+                        $_
+                    }
+                    else {
+                        # convert/process the LDAP fields for each result
+                        Convert-LDAPProperty -Properties $_.Properties
+                    }
                 }
-                else {
-                    # convert/process the LDAP fields for each result
-                    Convert-LDAPProperty -Properties $_.Properties
-                }
+                $Results.dispose()
             }
-            $Results.dispose()
+            catch {
+                Write-Verbose "Error building the searcher object!"
+            }
             $ObjectSearcher.dispose()
         }
     }
@@ -13236,20 +13246,387 @@ function Invoke-MapDomainTrust {
 #
 ########################################################
 
-function Export-BloodHoundData {
+function Get-BloodHoundData {
 <#
     .SYNOPSIS
 
-        Exports PowerView object data to a BloodHound server instance.
+        This function automates the collection of the data needed for BloodHound.
 
         Author: @harmj0y
         License: BSD 3-Clause
         Required Dependencies: PowerView.ps1
         Optional Dependencies: None
 
+    .DESCRIPTION
+
+        This function collects the information needed to populate the BloodHound graph
+        database. It offers a varity of targeting and collection options.
+        By default, it will map all domain trusts, enumerate all groups and associated memberships,
+        enumerate all computers on the domain and execute session/loggedon/local admin enumeration
+        queries against each. Targeting options are modifiable with -CollectionMethod. The
+        -SearchForest searches all domains in the forest instead of just the current domain.
+
+    .PARAMETER ComputerName
+
+        Host array to enumerate, passable on the pipeline.
+
+    .PARAMETER Domain
+
+        Domain to query for machines, defaults to the current domain.
+
+    .PARAMETER DomainController
+
+        Domain controller to reflect LDAP queries through.
+
+    .PARAMETER CollectionMethod
+
+        The method to collect data. 'Group', 'LocalGroup', 'GPOLocalGroup', 'Sesssion', 'LoggedOn', 'Trusts, 'TrustsLDAP', 'Stealth', or 'Default'.
+        'TrustsLDAP' uses LDAP enumeration for trusts, while 'Trusts' using .NET methods.
+        'Stealth' uses 'Group' collection, stealth user hunting ('Session' on certain servers), 'GPOLocalGroup' enumeration, and LDAP trust enumeration.
+        'Default' uses 'Group' collection, regular user hunting with 'Session'/'LoggedOn', 'LocalGroup' enumeration, and 'Trusts' enumeration.
+
+    .PARAMETER SearchForest
+
+        Switch. Search all domains in the forest for target users instead of just
+        a single domain.
+
+    .PARAMETER Threads
+
+        The maximum concurrent threads to execute.
+
+    .EXAMPLE
+
+        PS C:\> Get-BloodHoundData | Export-BloodHoundData -URI http://SERVER:7474/ -UserPass "user:pass"
+
+        Executes default collection options and exports the data to a BloodHound neo4j RESTful API endpoint.
+
+    .EXAMPLE
+
+        PS C:\> Get-BloodHoundData | Export-BloodHoundData -URI http://SERVER:7474/ -UserPass "user:pass" -Threads 20
+
+        Executes default collection options and exports the data to a BloodHound neo4j RESTful API endpoint,
+        and use 20 threads for collection operations.
+
+    .EXAMPLE
+
+        PS C:\> Get-BloodHoundData | Export-BloodHoundCSV
+
+        Executes default collection options and exports the data to a CSVs in the current directory.
+
+    .EXAMPLE
+
+        PS C:\> Get-BloodHoundData -CollectionMethod 'Stealth' | Export-BloodHoundData -URI http://SERVER:7474/ -UserPass "user:pass"
+
+        Executes 'stealth' collection options and exports the data to a BloodHound neo4j RESTful API endpoint.
+        This includes 'stealth' user hunting and GPO object correlation for local admin membership.
+        This is significantly faster but the information is not as complete as the default options.
+#>
+
+    [CmdletBinding(DefaultParameterSetName = 'None')]
+    param(
+        [Parameter(Position=0, ValueFromPipeline=$True)]
+        [Alias('Hosts')]
+        [String[]]
+        $ComputerName,
+
+        [String]
+        $Domain,
+
+        [String]
+        $DomainController,
+
+        [String]
+        [ValidateSet('Group', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Stealth', 'Trusts', 'TrustsLDAP', 'Default')]
+        $CollectionMethod = 'Default',
+
+        [Switch]
+        $SearchForest,
+
+        [ValidateRange(1,100)]
+        [Int]
+        $Threads
+    )
+
+    begin {
+
+        Switch ($CollectionMethod) {
+            'Group'         { $UseGroup = $True; $SkipComputerEnumeration = $True }
+            'LocalGroup'    { $UseLocalGroup = $True }
+            'GPOLocalGroup' { $UseGPOGroup = $True; $SkipComputerEnumeration = $True }
+            'Session'       { $UseSession = $True }
+            'LoggedOn'      { $UseLoggedOn = $True }
+            'TrustsLDAP'    { $UseDomainTrustsLDAP = $True; $SkipComputerEnumeration = $True }
+            'Trusts'        { $UseDomainTrusts = $True; $SkipComputerEnumeration = $True }
+            'Stealth'       {
+                $UseGroup = $True
+                $UseGPOGroup = $True
+                $UseSession = $True
+                $UseDomainTrustsLDAP = $True
+            }
+            'Default'       {
+                $UseGroup = $True
+                $UseLocalGroup = $True
+                $UseSession = $True
+                $UseLoggedOn = $True
+                $UseDomainTrusts = $True
+            }
+        }
+
+        if($Domain) {
+            $TargetDomains = @($Domain)
+        }
+        elseif($SearchForest) {
+            # get ALL the domains in the forest to search
+            $TargetDomains = Get-NetForestDomain | ForEach-Object { $_.Name }
+        }
+        else {
+            # use the local domain
+            $TargetDomains = @( (Get-NetDomain).name )
+        }
+
+        if($UseGroup) {
+            ForEach ($TargetDomain in $TargetDomains) {
+                # enumerate all groups and all members of each group
+                Get-NetGroup -Domain $Domain -DomainController $DomainController | Get-NetGroupMember -Domain $Domain -DomainController $DomainController -FullData
+
+                # enumerate all user objects so we can extract out the primary group for each
+                Get-NetUser -Domain $Domain -DomainController $DomainController
+            }
+        }
+
+        if($UseDomainTrusts) {
+            Invoke-MapDomainTrust
+        }
+
+        if($UseDomainTrustsLDAP) {
+            Invoke-MapDomainTrust -LDAP -DomainController $DomainController
+        }
+
+        if (-not $SkipComputerEnumeration) {
+            if(-not $ComputerName) {
+                [Array]$TargetComputers = @()
+
+                ForEach ($Domain2 in $TargetDomains) {
+                    if($CollectionMethod -eq 'Stealth') {
+                        Write-Verbose "Querying domain $Domain2 for File Servers..."
+                        $TargetComputers += Get-NetFileServer -Domain $Domain2 -DomainController $DomainController
+
+                        Write-Verbose "Querying domain $Domain2 for DFS Servers..."
+                        $TargetComputers += Get-DFSshare -Domain $Domain2 -DomainController $DomainController | ForEach-Object {$_.RemoteServerName}
+
+                        Write-Verbose "Querying domain $Domain2 for Domain Controllers..."
+                        $TargetComputers += Get-NetDomainController -LDAP -Domain $Domain2 -DomainController $DomainController | ForEach-Object { $_.dnshostname}
+                    }
+                    else {
+                        Write-Verbose "Querying domain $Domain2 for hosts"
+
+                        $TargetComputers += Get-NetComputer -Domain $Domain2 -DomainController $DomainController
+                    }
+
+                    if($UseGPOGroup) {
+                        Write-Verbose "Enumerating GPO local group memberships for domain $Domain2"
+                        Find-GPOLocation -Domain $Domain2 -DomainController $DomainController
+
+                        # add in a local administrator relationship for "Domain Admins" -> every machine
+                        $DomainSID = Get-DomainSID -Domain $Domain2 -DomainController $DomainController
+                        $DomainAdminsSid = "$DomainSID-512"
+                        $Temp = Convert-SidToName -SID $DomainAdminsSid
+                        $DomainAdminsName = $Temp.Split('\')[1]
+
+                        Get-NetComputer -Domain $Domain2 -DomainController $DomainController | ForEach-Object {
+                            $LocalUser = New-Object PSObject
+                            $LocalUser | Add-Member Noteproperty 'MemberName' $DomainAdminsName
+                            $LocalUser | Add-Member Noteproperty 'MemberDomain' $Domain2
+                            $LocalUser | Add-Member Noteproperty 'IsGroup' $True
+                            $LocalUser | Add-Member Noteproperty 'ComputerName' $_
+                            $LocalUser.PSObject.TypeNames.Add('PowerView.LocalUserSpecified')
+                            $LocalUser
+                        }
+                    }
+                }
+
+                # remove any null target hosts, uniquify the list and shuffle it
+                $TargetComputers = $TargetComputers | Where-Object { $_ } | Sort-Object -Unique | Sort-Object { Get-Random }
+                if($($TargetComputers.Count) -eq 0) {
+                    Write-Warning "No hosts found!"
+                }
+            }
+            else {
+                $TargetComputers = $ComputerName
+            }
+        }
+
+        # get the current user so we can ignore it in the results
+        $CurrentUser = ([Environment]::UserName).toLower()
+
+        # script block that enumerates a server
+        $HostEnumBlock = {
+            param($ComputerName, $Ping, $CurrentUser2, $UseLocalGroup2, $UseSession2, $UseLoggedon2)
+
+            $Up = $True
+            if($Ping) {
+                $Up = Test-Connection -Count 1 -Quiet -ComputerName $ComputerName
+            }
+            if($Up) {
+
+                if($UseLocalGroup2) {
+                    # grab the users for the local admins on this server
+                    Get-NetLocalGroup -ComputerName $ComputerName -API | Where-Object {$_.IsDomain}
+                }
+
+                $IPAddress = @(Get-IPAddress -ComputerName $ComputerName)[0].IPAddress
+
+                if($UseSession2) {
+                    $Sessions = Get-NetSession -ComputerName $ComputerName
+                    ForEach ($Session in $Sessions) {
+                        $UserName = $Session.sesi10_username
+                        $CName = $Session.sesi10_cname
+
+                        if($CName -and $CName.StartsWith("\\")) {
+                            $CName = $CName.TrimStart("\")
+                        }
+
+                        # make sure we have a result
+                        if (($UserName) -and ($UserName.trim() -ne '') -and ($UserName -notmatch '\$') -and ($UserName -notmatch $CurrentUser2)) {
+
+                            $FoundUser = New-Object PSObject
+                            $FoundUser | Add-Member Noteproperty 'UserDomain' $Null
+                            $FoundUser | Add-Member Noteproperty 'UserName' $UserName
+                            $FoundUser | Add-Member Noteproperty 'ComputerName' $ComputerName
+                            $FoundUser | Add-Member Noteproperty 'IPAddress' $IPAddress
+                            $FoundUser | Add-Member Noteproperty 'SessionFrom' $CName
+
+                            # Try to resolve the DNS hostname of $Cname
+                            try {
+                                $CNameDNSName = [System.Net.Dns]::GetHostEntry($CName) | Select-Object -ExpandProperty HostName
+                            }
+                            catch {
+                                $CNameDNSName = $CName
+                            }
+                            $FoundUser | Add-Member NoteProperty 'SessionFromName' $CNameDNSName
+                            $FoundUser | Add-Member Noteproperty 'LocalAdmin' $Null
+                            $FoundUser.PSObject.TypeNames.Add('PowerView.UserSession')
+                            $FoundUser
+                        }
+                    }
+                }
+
+                if($UseLoggedon2) {
+                    $LoggedOn = Get-NetLoggedon -ComputerName $ComputerName
+                    ForEach ($User in $LoggedOn) {
+                        $UserName = $User.wkui1_username
+                        $UserDomain = $User.wkui1_logon_domain
+
+                        # ignore local account logons
+                        #   TODO: better way to determine if network logon or not
+                        if($ComputerName -notmatch "^$UserDomain") {
+                            if (($UserName) -and ($UserName.trim() -ne '') -and ($UserName -notmatch '\$')) {
+                                $FoundUser = New-Object PSObject
+                                $FoundUser | Add-Member Noteproperty 'UserDomain' $UserDomain
+                                $FoundUser | Add-Member Noteproperty 'UserName' $UserName
+                                $FoundUser | Add-Member Noteproperty 'ComputerName' $ComputerName
+                                $FoundUser | Add-Member Noteproperty 'IPAddress' $IPAddress
+                                $FoundUser | Add-Member Noteproperty 'SessionFrom' $Null
+                                $FoundUser | Add-Member Noteproperty 'SessionFromName' $Null
+                                $FoundUser | Add-Member Noteproperty 'LocalAdmin' $Null
+                                $FoundUser.PSObject.TypeNames.Add('PowerView.UserSession')
+                                $FoundUser
+                            }
+                        }
+                    }
+
+                    $LocalLoggedOn = Get-LoggedOnLocal -ComputerName $ComputerName
+                    ForEach ($User in $LocalLoggedOn) {
+                        $UserName = $User.UserName
+                        $UserDomain = $User.UserDomain
+
+                        # ignore local account logons ?
+                        if($ComputerName -notmatch "^$UserDomain") {
+                            $FoundUser = New-Object PSObject
+                            $FoundUser | Add-Member Noteproperty 'UserDomain' $UserDomain
+                            $FoundUser | Add-Member Noteproperty 'UserName' $UserName
+                            $FoundUser | Add-Member Noteproperty 'ComputerName' $ComputerName
+                            $FoundUser | Add-Member Noteproperty 'IPAddress' $IPAddress
+                            $FoundUser | Add-Member Noteproperty 'SessionFrom' $Null
+                            $FoundUser | Add-Member Noteproperty 'SessionFromName' $Null
+                            $FoundUser | Add-Member Noteproperty 'LocalAdmin' $Null
+                            $FoundUser.PSObject.TypeNames.Add('PowerView.UserSession')
+                            $FoundUser
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    process {
+        if (-not $SkipComputerEnumeration) {
+            if($Threads) {
+                Write-Verbose "Using threading with threads = $Threads"
+
+                # if we're using threading, kick off the script block with Invoke-ThreadedFunction
+                $ScriptParams = @{
+                    'Ping' = $True
+                    'CurrentUser2' = $CurrentUser
+                    'UseLocalGroup2' = $UseLocalGroup
+                    'UseSession2' = $UseSession
+                    'UseLoggedon2' = $UseLoggedon
+                }
+
+                Invoke-ThreadedFunction -ComputerName $TargetComputers -ScriptBlock $HostEnumBlock -ScriptParameters $ScriptParams -Threads $Threads
+            }
+
+            else {
+                if($TargetComputers.Count -ne 1) {
+                    # ping all hosts in parallel
+                    $Ping = {param($ComputerName2) if(Test-Connection -ComputerName $ComputerName2 -Count 1 -Quiet -ErrorAction Stop) { $ComputerName2 }}
+                    $TargetComputers2 = Invoke-ThreadedFunction -NoImports -ComputerName $TargetComputers -ScriptBlock $Ping -Threads 100
+                }
+                else {
+                    $TargetComputers2 = $TargetComputers
+                }
+
+                Write-Verbose "[*] Total number of active hosts: $($TargetComputers2.count)"
+                $Counter = 0
+
+                $TargetComputers2 | ForEach-Object {
+                    $Counter = $Counter + 1
+                    Write-Verbose "[*] Enumerating server $($_) ($Counter of $($TargetComputers2.count))"
+                    Invoke-Command -ScriptBlock $HostEnumBlock -ArgumentList @($_, $False, $CurrentUser, $UseLocalGroup, $UseSession, $UseLoggedon)
+                }
+            }
+        }
+    }
+}
+
+
+function Export-BloodHoundData {
+<#
+    .SYNOPSIS
+
+        Takes custom objects from Get-BloodHound data and exports everything to a BloodHound
+        neo4j RESTful API batch ingestion interface. 
+
+        Author: @harmj0y
+        License: BSD 3-Clause
+        Required Dependencies: PowerView.ps1
+        Optional Dependencies: None
+
+    .DESCRIPTION
+
+        This function takes custom tagged PowerView objects types from Get-BloodHoundData and packages/ingests
+        them into a neo4j RESTful API batch ingestion interface. For user session data without a logon
+        domain, by default the global catalog is used to attempt to deconflict what domain the user may be
+        located in. If the user exists in more than one domain in the forest, a series of weights is used to
+        modify the attack path likelihood.
+
+        Cypher queries are built for each appropriate relationship to ingest, and the set of queries is 'batched'
+        so '-Throttle X' queries are sent at a time in each batch request. All of the Cypher queries are
+        jsonified using System.Web.Script.Serialization.javascriptSerializer.
+
     .PARAMETER Object
 
-        The PowerView PSObject to insert into BloodHound.
+        The PowerView PSObject to export to the RESTful API interface.
 
     .PARAMETER URI
 
@@ -13278,9 +13655,16 @@ function Export-BloodHoundData {
 
     .EXAMPLE
 
-        PS C:\> Get-NetGroupMember | Export-BloodHoundData -URI http://host:80/ -UserPass "user:pass"
+        PS C:\> Get-BloodHoundData | Export-BloodHoundData -URI http://SERVER:7474/ -UserPass "user:pass"
 
-        Export the Domain Admins group members to the given BloodHound database.
+        Executes default collection options and exports the data to a BloodHound neo4j RESTful API endpoint.
+    
+    .EXAMPLE
+
+        PS C:\> Get-BloodHoundData | Export-BloodHoundData -URI http://SERVER:7474/ -UserPass "user:pass" -SkipGCDeconfliction
+
+        Executes default collection options and exports the data to a BloodHound neo4j RESTful API endpoint,
+        and skip the global catalog deconfliction process.
 
     .LINK
 
@@ -13288,7 +13672,7 @@ function Export-BloodHoundData {
         http://stackoverflow.com/questions/19839469/optimizing-high-volume-batch-inserts-into-neo4j-using-rest
 
 #>
-    [CmdletBinding(DefaultParameterSetName = 'None')]
+    [CmdletBinding(DefaultParameterSetName = 'PlaintextPW')]
     param(
         [Parameter(Position=0, ValueFromPipeline=$True, Mandatory = $True)]
         [PSObject]
@@ -13336,12 +13720,12 @@ function Export-BloodHoundData {
 
         # check auth to the BloodHound neo4j server
         try {
-            $Null = $WebClient.DownloadString($URI.AbsoluteUri + "user/neo4j")
+            $Null = $WebClient.DownloadString($URI.AbsoluteUri + 'user/neo4j')
             $Authorized = $True
         }
-        catch [Net.WebException] {
+        catch {
             $Authorized = $False
-            throw "Error connecting to Neo4j rest REST server at '$(URI.AbsoluteUri)' : $($_.Exception)"
+            throw "Error connecting to Neo4j rest REST server at '$($URI.AbsoluteUri)'"
         }
 
         Add-Type -Assembly System.Web.Extensions
@@ -13371,7 +13755,7 @@ function Export-BloodHoundData {
             Get-NetUser -ADSPath $ADSpath | ForEach-Object {
                 $UserName = $_.samaccountname.ToUpper()
                 $UserDN = $_.distinguishedname
-
+                
                 if (($UserDN -match 'ForeignSecurityPrincipals') -and ($UserDN -match 'S-1-5-21')) {
                     try {
                         if(-not $MemberSID) {
@@ -13738,12 +14122,21 @@ function Export-BloodHoundCSV {
 <#
     .SYNOPSIS
 
-        Exports PowerView object data to a BloodHound server instance.
+        Takes input from Get-BloodHound data and exports the objects to one custom CSV file
+        per object type (sessions, local admin, domain trusts, etc.).
 
         Author: @harmj0y
         License: BSD 3-Clause
         Required Dependencies: PowerView.ps1
         Optional Dependencies: None
+
+    .DESCRIPTION
+
+        This function takes custom tagged PowerView objects types from Get-BloodHoundData and exports
+        the data to one custom CSV file per object type (sessions, local admin, domain trusts, etc.).
+        For user session data without a logon domain, by default the global catalog is used to attempt to 
+        deconflict what domain the user may be located in. If the user exists in more than one domain in
+        the forest, a series of weights is used to modify the attack path likelihood.
 
     .PARAMETER Object
 
@@ -13767,26 +14160,45 @@ function Export-BloodHoundCSV {
 
     .EXAMPLE
 
-        PS C:\> Get-NetGroupMember | ...
+        PS C:\> Get-BloodHoundData | Export-BloodHoundCSV
+
+        Executes default collection options and exports the data to user_sessions.csv, group_memberships.csv,
+        local_admins.csv, and trusts.csv in the current directory.
+    
+    .EXAMPLE
+
+        PS C:\> Get-BloodHoundData | Export-BloodHoundCSV -SkipGCDeconfliction
+
+        Executes default collection options, skips the global catalog deconfliction, and exports the data
+        to user_sessions.csv, group_memberships.csv, local_admins.csv, and trusts.csv in the current directory.
+
+    .EXAMPLE
+
+        PS C:\> Get-BloodHoundData | Export-BloodHoundCSV -CSVFolder C:\Temp\ -CSVPrefix "domainX"
+
+        Executes default collection options and exports the data to domainX_user_sessions.csv, domainX_group_memberships.csv,
+        domainX_local_admins.csv, and tdomainX_rusts.csv in C:\Temp\.
 
     .NOTES
 
-        PowerView.UserSession
-            UserName,ComputerName,Weight
-            "john@domain.local","computer2.domain.local",1
+        CSV file types:
 
-        PowerView.GroupMember/PowerView.User
-            AccountName,AccountType,GroupName
-            "john@domain.local","user","GROUP1"
-            "computer3.testlab.local","computer","GROUP1"
+            PowerView.UserSession -> $($CSVExportPrefix)user_sessions.csv
+                UserName,ComputerName,Weight
+                "john@domain.local","computer2.domain.local",1
 
-        PowerView.LocalUserAPI/PowerView.GPOLocalGroup
-            AccountName,AccountType,ComputerName
-            "john@domain.local","user","computer2.domain.local"
+            PowerView.GroupMember/PowerView.User -> $($CSVExportPrefix)group_memberships.csv
+                AccountName,AccountType,GroupName
+                "john@domain.local","user","GROUP1"
+                "computer3.testlab.local","computer","GROUP1"
 
-        PowerView.DomainTrustLDAP/PowerView.DomainTrust/PowerView.ForestTrust (direction ->)
-            SourceDomain,TargetDomain,TrustDirection,TrustType,Transitive
-            "domain.local","dev.domain.local","Bidirectional","ParentChild","True"
+            PowerView.LocalUserAPI/PowerView.GPOLocalGroup -> $($CSVExportPrefix)local_admins.csv
+                AccountName,AccountType,ComputerName
+                "john@domain.local","user","computer2.domain.local"
+
+            PowerView.DomainTrustLDAP/PowerView.DomainTrust/PowerView.ForestTrust -> $($CSVExportPrefix)trusts.csv
+                SourceDomain,TargetDomain,TrustDirection,TrustType,Transitive
+                "domain.local","dev.domain.local","Bidirectional","ParentChild","True"
 #>
 
     [CmdletBinding()]
@@ -14068,7 +14480,7 @@ function Export-BloodHoundCSV {
                     AccountType = 'group'
                     ComputerName = $Object.ComputerName
                 }
-                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admin.csv"
+                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admins.csv"
             }
             else {
                 $Properties = @{
@@ -14076,7 +14488,7 @@ function Export-BloodHoundCSV {
                     AccountType = 'user'
                     ComputerName = $Object.ComputerName
                 }
-                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admin.csv"
+                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admins.csv"
             }
         }
         elseif($Object.PSObject.TypeNames -contains 'PowerView.LocalUserSpecified') {
@@ -14090,7 +14502,7 @@ function Export-BloodHoundCSV {
                     AccountType = 'group'
                     ComputerName = $Object.ComputerName
                 }
-                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admin.csv"
+                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admins.csv"
             }
             else {
                 $Properties = @{
@@ -14098,7 +14510,7 @@ function Export-BloodHoundCSV {
                     AccountType = 'user'
                     ComputerName = $Object.ComputerName
                 }
-                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admin.csv"
+                New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admins.csv"
             }
         }
         elseif($Object.PSObject.TypeNames -contains 'PowerView.GPOLocalGroup') {
@@ -14119,7 +14531,7 @@ function Export-BloodHoundCSV {
                         AccountType = 'group'
                         ComputerName = $Computer
                     }
-                    New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admin.csv"
+                    New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admins.csv"
                 }
                 else {
                     $Properties = @{
@@ -14127,7 +14539,7 @@ function Export-BloodHoundCSV {
                         AccountType = 'user'
                         ComputerName = $Computer
                     }
-                    New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admin.csv"
+                    New-Object PSObject -Property $Properties | Export-PowerViewCSV -OutFile "$OutputFolder\$($CSVExportPrefix)local_admins.csv"
                 }
             }
         }
@@ -14228,332 +14640,6 @@ function Export-BloodHoundCSV {
         }
         else {
             Write-Verbose "No matching type name"
-        }
-    }
-}
-
-
-function Get-BloodHoundData {
-<#
-    .SYNOPSIS
-
-        This function queries the domain for all active machines with
-        Get-NetComputer, then for each server it queries the local
-        Administrators with Get-NetLocalGroup and the users/sessions with
-        Get-NetSession/Get-NetLoggedOn. It will return only domain localgroup
-        data.
-
-        Author: @harmj0y
-        License: BSD 3-Clause
-        Required Dependencies: PowerView.ps1
-        Optional Dependencies: None
-
-    .PARAMETER ComputerName
-
-        Host array to enumerate, passable on the pipeline.
-
-    .PARAMETER Domain
-
-        Domain to query for machines, defaults to the current domain.
-
-    .PARAMETER DomainController
-
-        Domain controller to reflect LDAP queries through.
-
-    .PARAMETER CollectionMethod
-
-        The method to collect data. 'Group', 'LocalGroup', 'GPOLocalGroup', 'Sesssion', 'LoggedOn', 'Trusts, 'TrustsLDAP', 'Stealth', or 'Default'.
-        'TrustsLDAP' uses LDAP enumeration for trusts, while 'Trusts' using .NET methods.
-        'Stealth' uses 'Group' collection, stealth user hunting ('Session' on certain servers), 'GPOLocalGroup' enumeration, and LDAP trust enumeration.
-        'Default' uses 'Group' collection, regular user hunting with 'Session'/'LoggedOn', 'LocalGroup' enumeration, and 'Trusts' enumeration.
-
-    .PARAMETER SearchForest
-
-        Switch. Search all domains in the forest for target users instead of just
-        a single domain.
-
-    .PARAMETER Threads
-
-        The maximum concurrent threads to execute.
-
-    .EXAMPLE
-
-        PS C:\> Get-BloodHoundData | Export-BloodHoundData -URI http://host:80/ -UserPass "user:pass"
-#>
-
-    [CmdletBinding(DefaultParameterSetName = 'None')]
-    param(
-        [Parameter(Position=0, ValueFromPipeline=$True)]
-        [Alias('Hosts')]
-        [String[]]
-        $ComputerName,
-
-        [String]
-        $Domain,
-
-        [String]
-        $DomainController,
-
-        [String]
-        [ValidateSet('Group', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Stealth', 'Trusts', 'TrustsLDAP', 'Default')]
-        $CollectionMethod = 'Default',
-
-        [Switch]
-        $SearchForest,
-
-        [ValidateRange(1,100)]
-        [Int]
-        $Threads
-    )
-
-    begin {
-
-        Switch ($CollectionMethod) {
-            'Group'         { $UseGroup = $True; $SkipComputerEnumeration = $True }
-            'LocalGroup'    { $UseLocalGroup = $True }
-            'GPOLocalGroup' { $UseGPOGroup = $True; $SkipComputerEnumeration = $True }
-            'Session'       { $UseSession = $True }
-            'LoggedOn'      { $UseLoggedOn = $True }
-            'TrustsLDAP'    { $UseDomainTrustsLDAP = $True; $SkipComputerEnumeration = $True }
-            'Trusts'        { $UseDomainTrusts = $True; $SkipComputerEnumeration = $True }
-            'Stealth'       {
-                $UseGroup = $True
-                $UseGPOGroup = $True
-                $UseSession = $True
-                $UseDomainTrustsLDAP = $True
-            }
-            'Default'       {
-                $UseGroup = $True
-                $UseLocalGroup = $True
-                $UseSession = $True
-                $UseLoggedOn = $True
-                $UseDomainTrusts = $True
-            }
-        }
-
-        if($Domain) {
-            $TargetDomains = @($Domain)
-        }
-        elseif($SearchForest) {
-            # get ALL the domains in the forest to search
-            $TargetDomains = Get-NetForestDomain | ForEach-Object { $_.Name }
-        }
-        else {
-            # use the local domain
-            $TargetDomains = @( (Get-NetDomain).name )
-        }
-
-        if($UseGroup) {
-            ForEach ($TargetDomain in $TargetDomains) {
-                # enumerate all groups and all members of each group
-                Get-NetGroup -Domain $Domain -DomainController $DomainController | Get-NetGroupMember -Domain $Domain -DomainController $DomainController -FullData
-
-                # enumerate all user objects so we can extract out the primary group for each
-                Get-NetUser -Domain $Domain -DomainController $DomainController
-            }
-        }
-
-        if($UseDomainTrusts) {
-            Invoke-MapDomainTrust
-        }
-
-        if($UseDomainTrustsLDAP) {
-            Invoke-MapDomainTrust -LDAP -DomainController $DomainController
-        }
-
-        if (-not $SkipComputerEnumeration) {
-            if(-not $ComputerName) {
-                [Array]$TargetComputers = @()
-
-                ForEach ($Domain2 in $TargetDomains) {
-                    if($CollectionMethod -eq 'Stealth') {
-                        Write-Verbose "Querying domain $Domain2 for File Servers..."
-                        $TargetComputers += Get-NetFileServer -Domain $Domain2 -DomainController $DomainController
-
-                        Write-Verbose "Querying domain $Domain2 for DFS Servers..."
-                        $TargetComputers += Get-DFSshare -Domain $Domain2 -DomainController $DomainController | ForEach-Object {$_.RemoteServerName}
-
-                        Write-Verbose "Querying domain $Domain2 for Domain Controllers..."
-                        $TargetComputers += Get-NetDomainController -LDAP -Domain $Domain2 -DomainController $DomainController | ForEach-Object { $_.dnshostname}
-                    }
-                    else {
-                        Write-Verbose "Querying domain $Domain2 for hosts"
-
-                        $TargetComputers += Get-NetComputer -Domain $Domain2 -DomainController $DomainController
-                    }
-
-                    if($UseGPOGroup) {
-                        Write-Verbose "Enumerating GPO local group memberships for domain $Domain2"
-                        Find-GPOLocation -Domain $Domain2 -DomainController $DomainController
-
-                        # add in a local administrator relationship for "Domain Admins" -> every machine
-                        $DomainSID = Get-DomainSID -Domain $Domain2 -DomainController $DomainController
-                        $DomainAdminsSid = "$DomainSID-512"
-                        $Temp = Convert-SidToName -SID $DomainAdminsSid
-                        $DomainAdminsName = $Temp.Split('\')[1]
-
-                        Get-NetComputer -Domain $Domain2 -DomainController $DomainController | ForEach-Object {
-                            $LocalUser = New-Object PSObject
-                            $LocalUser | Add-Member Noteproperty 'MemberName' $DomainAdminsName
-                            $LocalUser | Add-Member Noteproperty 'MemberDomain' $Domain2
-                            $LocalUser | Add-Member Noteproperty 'IsGroup' $True
-                            $LocalUser | Add-Member Noteproperty 'ComputerName' $_
-                            $LocalUser.PSObject.TypeNames.Add('PowerView.LocalUserSpecified')
-                            $LocalUser
-                        }
-                    }
-                }
-
-                # remove any null target hosts, uniquify the list and shuffle it
-                $TargetComputers = $TargetComputers | Where-Object { $_ } | Sort-Object -Unique | Sort-Object { Get-Random }
-                if($($TargetComputers.Count) -eq 0) {
-                    Write-Warning "No hosts found!"
-                }
-            }
-            else {
-                $TargetComputers = $ComputerName
-            }
-        }
-
-        # get the current user so we can ignore it in the results
-        $CurrentUser = ([Environment]::UserName).toLower()
-
-        # script block that enumerates a server
-        $HostEnumBlock = {
-            param($ComputerName, $Ping, $CurrentUser2, $UseLocalGroup2, $UseSession2, $UseLoggedon2)
-
-            $Up = $True
-            if($Ping) {
-                $Up = Test-Connection -Count 1 -Quiet -ComputerName $ComputerName
-            }
-            if($Up) {
-
-                if($UseLocalGroup2) {
-                    # grab the users for the local admins on this server
-                    Get-NetLocalGroup -ComputerName $ComputerName -API | Where-Object {$_.IsDomain}
-                }
-
-                $IPAddress = @(Get-IPAddress -ComputerName $ComputerName)[0].IPAddress
-
-                if($UseSession2) {
-                    $Sessions = Get-NetSession -ComputerName $ComputerName
-                    ForEach ($Session in $Sessions) {
-                        $UserName = $Session.sesi10_username
-                        $CName = $Session.sesi10_cname
-
-                        if($CName -and $CName.StartsWith("\\")) {
-                            $CName = $CName.TrimStart("\")
-                        }
-
-                        # make sure we have a result
-                        if (($UserName) -and ($UserName.trim() -ne '') -and ($UserName -notmatch '\$') -and ($UserName -notmatch $CurrentUser2)) {
-
-                            $FoundUser = New-Object PSObject
-                            $FoundUser | Add-Member Noteproperty 'UserDomain' $Null
-                            $FoundUser | Add-Member Noteproperty 'UserName' $UserName
-                            $FoundUser | Add-Member Noteproperty 'ComputerName' $ComputerName
-                            $FoundUser | Add-Member Noteproperty 'IPAddress' $IPAddress
-                            $FoundUser | Add-Member Noteproperty 'SessionFrom' $CName
-
-                            # Try to resolve the DNS hostname of $Cname
-                            try {
-                                $CNameDNSName = [System.Net.Dns]::GetHostEntry($CName) | Select-Object -ExpandProperty HostName
-                            }
-                            catch {
-                                $CNameDNSName = $CName
-                            }
-                            $FoundUser | Add-Member NoteProperty 'SessionFromName' $CNameDNSName
-                            $FoundUser | Add-Member Noteproperty 'LocalAdmin' $Null
-                            $FoundUser.PSObject.TypeNames.Add('PowerView.UserSession')
-                            $FoundUser
-                        }
-                    }
-                }
-
-                if($UseLoggedon2) {
-                    $LoggedOn = Get-NetLoggedon -ComputerName $ComputerName
-                    ForEach ($User in $LoggedOn) {
-                        $UserName = $User.wkui1_username
-                        $UserDomain = $User.wkui1_logon_domain
-
-                        # ignore local account logons
-                        #   TODO: better way to determine if network logon or not
-                        if($ComputerName -notmatch "^$UserDomain") {
-                            if (($UserName) -and ($UserName.trim() -ne '') -and ($UserName -notmatch '\$')) {
-                                $FoundUser = New-Object PSObject
-                                $FoundUser | Add-Member Noteproperty 'UserDomain' $UserDomain
-                                $FoundUser | Add-Member Noteproperty 'UserName' $UserName
-                                $FoundUser | Add-Member Noteproperty 'ComputerName' $ComputerName
-                                $FoundUser | Add-Member Noteproperty 'IPAddress' $IPAddress
-                                $FoundUser | Add-Member Noteproperty 'SessionFrom' $Null
-                                $FoundUser | Add-Member Noteproperty 'SessionFromName' $Null
-                                $FoundUser | Add-Member Noteproperty 'LocalAdmin' $Null
-                                $FoundUser.PSObject.TypeNames.Add('PowerView.UserSession')
-                                $FoundUser
-                            }
-                        }
-                    }
-
-                    $LocalLoggedOn = Get-LoggedOnLocal -ComputerName $ComputerName
-                    ForEach ($User in $LocalLoggedOn) {
-                        $UserName = $User.UserName
-                        $UserDomain = $User.UserDomain
-
-                        # ignore local account logons ?
-                        if($ComputerName -notmatch "^$UserDomain") {
-                            $FoundUser = New-Object PSObject
-                            $FoundUser | Add-Member Noteproperty 'UserDomain' $UserDomain
-                            $FoundUser | Add-Member Noteproperty 'UserName' $UserName
-                            $FoundUser | Add-Member Noteproperty 'ComputerName' $ComputerName
-                            $FoundUser | Add-Member Noteproperty 'IPAddress' $IPAddress
-                            $FoundUser | Add-Member Noteproperty 'SessionFrom' $Null
-                            $FoundUser | Add-Member Noteproperty 'SessionFromName' $Null
-                            $FoundUser | Add-Member Noteproperty 'LocalAdmin' $Null
-                            $FoundUser.PSObject.TypeNames.Add('PowerView.UserSession')
-                            $FoundUser
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    process {
-        if (-not $SkipComputerEnumeration) {
-            if($Threads) {
-                Write-Verbose "Using threading with threads = $Threads"
-
-                # if we're using threading, kick off the script block with Invoke-ThreadedFunction
-                $ScriptParams = @{
-                    'Ping' = $True
-                    'CurrentUser2' = $CurrentUser
-                    'UseLocalGroup2' = $UseLocalGroup
-                    'UseSession2' = $UseSession
-                    'UseLoggedon2' = $UseLoggedon
-                }
-
-                Invoke-ThreadedFunction -ComputerName $TargetComputers -ScriptBlock $HostEnumBlock -ScriptParameters $ScriptParams -Threads $Threads
-            }
-
-            else {
-                if($TargetComputers.Count -ne 1) {
-                    # ping all hosts in parallel
-                    $Ping = {param($ComputerName2) if(Test-Connection -ComputerName $ComputerName2 -Count 1 -Quiet -ErrorAction Stop) { $ComputerName2 }}
-                    $TargetComputers2 = Invoke-ThreadedFunction -NoImports -ComputerName $TargetComputers -ScriptBlock $Ping -Threads 100
-                }
-                else {
-                    $TargetComputers2 = $TargetComputers
-                }
-
-                Write-Verbose "[*] Total number of active hosts: $($TargetComputers2.count)"
-                $Counter = 0
-
-                $TargetComputers2 | ForEach-Object {
-                    $Counter = $Counter + 1
-                    Write-Verbose "[*] Enumerating server $($_) ($Counter of $($TargetComputers2.count))"
-                    Invoke-Command -ScriptBlock $HostEnumBlock -ArgumentList @($_, $False, $CurrentUser, $UseLocalGroup, $UseSession, $UseLoggedon)
-                }
-            }
         }
     }
 }
