@@ -22,6 +22,10 @@ String.prototype.format = function () {
   });
 };
 
+String.prototype.formatAll = function () {
+  var args = arguments;
+  return this.replace(/{}/g, args[0]);
+};
 
 Array.prototype.allEdgesSameType = function() {
 

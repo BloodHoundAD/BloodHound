@@ -702,7 +702,11 @@ body {
     max-width: 30%;
     transform: translate(-50%, 0);
     max-height: 30%;
+}
+
+.queryNodeSelect div.panel-body {
     overflow-y: auto;
+    max-height: 16em;
 }
 
 .queryNodeSelect img{
@@ -710,4 +714,9 @@ body {
     height: 100px;
     display: block;
     margin:auto;
+}
+
+.tab-content > div:last-child > div{
+    max-height: 200px;
+    overflow-y: auto;
 }
