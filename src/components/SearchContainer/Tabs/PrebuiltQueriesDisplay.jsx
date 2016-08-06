@@ -1,6 +1,29 @@
 import React, { Component } from 'react';
+import PrebuiltQueryNode from './prebuiltquerynode'
+var fs = require('fs')
 
 export default class PrebuiltQueriesDisplay extends Component {
+    constructor(){
+        super();
+
+        this.state = {
+            queries: []
+        }
+    }
+
+    componentWillMount() {
+        fs.readFile('src/components/SearchContainer/Tabs/PrebuiltQueries.json', 'utf8', function(err, data){
+            var x = JSON.parse(data)
+            var y = []
+
+            $.each(x.queries, function(index, el) {
+                y.push(el)
+            });
+
+            this.setState({queries: y})
+        }.bind(this))
+    }
+
     render() {
         return (
             <div>
@@ -8,42 +31,9 @@ export default class PrebuiltQueriesDisplay extends Component {
                     Pre-Built Analytics Queries
                 </h3>
                 <div className="query-box">
-                    <a href="#" onClick={function(){
-                        emitter.emit('nodeSelectQuery', {
-                            query:"MATCH (n:Group) WHERE n.name =~ '(?i).*DOMAIN ADMINS.*' RETURN n",
-                            onFinish: 'MATCH (n:User),(m:Group {name:"{}"}),p=allShortestPaths((n)-[*1..]->(m)) RETURN p',
-                            start:"{}",
-                            end: "",
-                            allowCollapse: false
-                        })
-                    }}>Find Shortest Paths to DA</a>
-                    <br />
-                    <a href="#" onClick={function(){
-                        emitter.emit('query', 
-                            'MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH "ANONYMOUS LOGON" AND NOT n.name="" WITH n, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m')
-                    }}>Find User with Most Sessions</a>
-                    <br />
-                    <a href="#" onClick={function(){
-                        emitter.emit('query', 
-                            'MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH "ANONYMOUS LOGON" AND NOT n.name="" WITH m, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m')
-                    }}>Find Computer with Most Sessions</a>
-                    <br />
-                    <a href="#" onClick={function(){
-                        emitter.emit('query',
-                            "MATCH (n:Domain) MATCH p=(n)-[r]-() RETURN p")
-                    }}>Map Domain Trusts</a>
-                    <br />
-                    <a href="#" onClick={
-                        function(){
-                            emitter.emit('query',
-                                "MATCH (n:User) WITH n,split(n.name,'@')[1] as domain MATCH (n)-[r:MemberOf*1..]->(m:Group) WHERE NOT m.name ENDS WITH domain RETURN n,r,m")
-                        }}>Users with Foreign Domain Membership</a>
-                    <br />
-                    <a href="#" onClick={
-                        function(){
-                            emitter.emit('query',
-                                "MATCH (n:Group) WITH n,split(n.name,'@')[1] as domain MATCH (n)-[r:MemberOf*1..]->(m:Group) WHERE NOT m.name ENDS WITH domain RETURN n,r,m")
-                        }}>Groups with Foreign Domain Membership</a>
+                    {this.state.queries.map(function(a){
+                        return <PrebuiltQueryNode key={a.name} info={a} />
+                    })}
                 </div>
             </div>
         );

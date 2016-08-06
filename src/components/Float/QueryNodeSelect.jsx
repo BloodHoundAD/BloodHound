@@ -13,8 +13,7 @@ export default class QueryNodeSelect extends Component {
 			queryData: {}
 		}
 
-		emitter.on('nodeSelectQuery', this.getEventInfo.bind(this))
-		
+		emitter.on('nodeSelectQuery', this.getEventInfo.bind(this))		
 	}
 
 	getEventInfo(query){
@@ -36,17 +35,17 @@ export default class QueryNodeSelect extends Component {
 
 	handleClick(event){
 		emitter.emit('query',
-			this.state.queryData.onFinish.format(event.target.text),
+			this.state.queryData.onFinish.formatAll(event.target.text),
 			"", 
 			event.target.text,
-			true)
+			this.state.queryData.allowCollapse)
 		$(this.refs.outer).fadeToggle(false)
 	}
 
 	render() {
 		return (
 			<div className="queryNodeSelect" ref="outer">
-				<Panel header={this.state.data.length > 0 ? "Select a node for the query" : "Loading..."}>
+				<Panel header={this.state.data.length > 0 ? this.state.queryData.boxTitle : "Loading..."}>
 					<If condition={ this.state.data.length > 0 }>
 						<Then>
 							<ListGroup ref="list">
