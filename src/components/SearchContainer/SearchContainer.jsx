@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import GlyphiconSpan from '../glyphiconspan'
-import Icon from '../icon'
+import GlyphiconSpan from '../GlyphiconSpan'
+import Icon from '../Icon'
 import { escapeRegExp, fullAjax } from 'utils';
-import TabContainer from './tabcontainer'
+import TabContainer from './TabContainer'
 
 export default class SearchContainer extends Component {
     constructor(props){

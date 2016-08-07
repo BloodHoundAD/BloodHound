@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PrebuiltQueryNode from './prebuiltquerynode'
+import PrebuiltQueryNode from './PrebuiltQueryNode'
 var fs = require('fs')
 
 export default class PrebuiltQueriesDisplay extends Component {

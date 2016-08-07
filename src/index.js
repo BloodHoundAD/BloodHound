@@ -2,8 +2,8 @@ import 'babel-polyfill'; // generators
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import AppContainer from './appcontainer';
-import Login from './components/Float/login'
+import AppContainer from './AppContainer';
+import Login from './components/Float/Login'
 import { getStorageData, storageHasKey, storageSetKey } from './js/utils.js';
 
 const ConfigStore = require('configstore');

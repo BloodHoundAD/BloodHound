@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { fullAjax } from 'utils';
-import NodeALink from './nodealink'
+import NodeALink from './NodeALink'
 
 export default class ComputerNodeData extends Component {
 	propTypes: {

@@ -20,7 +20,7 @@
   ],
   "main": "main.js",
   "scripts": {
-    "start": "set ENV=development & electron .",
+    "start": "cross-env NODE_ENV=development electron .",
     "dev": "concurrently -k \"babel-node server.js\" \"npm start\"",
     "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=all --overwrite --prune --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --icon=src/img/icon.ico",
     "macbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=darwin --arch=all --overwrite --prune --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --icon=src/img/icon.icns",
@@ -42,6 +42,7 @@
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-0": "^6.5.0",
     "concurrently": "^2.2.0",
+    "cross-env": "^2.0.0",
     "electron-prebuilt": "^1.2.8",
     "express": "^4.14.0",
     "webpack": "^1.13.1",

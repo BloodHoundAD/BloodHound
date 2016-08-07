@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
-import GraphContainer from './components/graph';
-import SearchContainer from './components/SearchContainer/searchcontainer';
-import SpotlightContainer from './components/Spotlight/spotlightcontainer';
-import LogoutModal from './components/Modals/logoutmodal';
-import ClearWarnModal from './components/Modals/clearwarnmodal'
-import ClearConfirmModal from './components/Modals/clearconfirmmodal'
-import ClearingModal from './components/Modals/clearingmodal'
-import LoadingContainer from './components/Float/loadingcontainer';
-import GenericAlert from './components/Float/alert';
-import RawQuery from './components/rawquery';
-import MenuContainer from './components/Menu/menucontainer';
-import ExportContainer from './components/Float/exportcontainer';
-import Settings from './components/Float/settings'
-import ZoomContainer from './components/Zoom/zoomcontainer'
-import QueryNodeSelect from './components/Float/querynodeselect'
+import GraphContainer from './components/Graph';
+import SearchContainer from './components/SearchContainer/SearchContainer';
+import SpotlightContainer from './components/Spotlight/SpotlightContainer';
+import LogoutModal from './components/Modals/LogoutModal';
+import ClearWarnModal from './components/Modals/ClearWarnModal'
+import ClearConfirmModal from './components/Modals/ClearConfirmModal'
+import ClearingModal from './components/Modals/ClearingModal'
+import LoadingContainer from './components/Float/LoadingContainer';
+import GenericAlert from './components/Float/Alert';
+import RawQuery from './components/RawQuery';
+import MenuContainer from './components/Menu/MenuContainer';
+import ExportContainer from './components/Float/ExportContainer';
+import Settings from './components/Float/Settings'
+import ZoomContainer from './components/Zoom/ZoomContainer'
+import QueryNodeSelect from './components/Float/QueryNodeSelect'
 
 export default class AppContainer extends Component {
 	constructor(){
