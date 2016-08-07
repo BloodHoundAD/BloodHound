@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import GlyphiconSpan from '../glyphiconspan';
-import Icon from '../icon';
-import SpotlightRow from './spotlightrow'
+import GlyphiconSpan from '../GlyphiconSpan';
+import Icon from '../Icon';
+import SpotlightRow from './SpotlightRow'
 
 export default class SpotlightContainer extends Component {
 	constructor(props){

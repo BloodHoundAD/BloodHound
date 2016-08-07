@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import DatabaseDataDisplay from './Tabs/databasedatadisplay'
-import PrebuiltQueriesDisplay from './Tabs/prebuiltqueriesdisplay'
-import NoNodeData from './Tabs/nonodedata'
-import UserNodeData from './Tabs/usernodedata'
-import GroupNodeData from './Tabs/groupnodedata';
-import ComputerNodeData from './Tabs/computernodedata';
+import DatabaseDataDisplay from './Tabs/DatabaseDataDisplay'
+import PrebuiltQueriesDisplay from './Tabs/PrebuiltQueriesDisplay'
+import NoNodeData from './Tabs/NoNodeData'
+import UserNodeData from './Tabs/UserNodeData'
+import GroupNodeData from './Tabs/GroupNodeData';
+import ComputerNodeData from './Tabs/ComputerNodeData';
 import { Tabs, Tab } from 'react-bootstrap';
 
 export default class TabContainer extends Component {

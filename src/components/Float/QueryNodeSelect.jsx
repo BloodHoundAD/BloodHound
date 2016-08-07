@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap'
 import { fullAjax } from 'utils'
 import { If, Then, Else } from 'react-if';
-import QueryNodeSelectItem from './querynodeselectitem'
+import QueryNodeSelectItem from './QueryNodeSelectItem'
 
 export default class QueryNodeSelect extends Component {
 	constructor(){
@@ -24,6 +24,8 @@ export default class QueryNodeSelect extends Component {
 				var y = $.map(data.results[0].data, function(x){
 					return x.row[0].name
 				})
+
+				y.sort()
 				this.setState({data: y})
 			}.bind(this))
 		$.ajax(o)

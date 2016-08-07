@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import MenuButton from './menubutton';
+import MenuButton from './MenuButton';
 import { buildMergeQuery, defaultAjaxSettings } from 'utils';
 const { dialog } = require('electron').remote
 var fs = require('fs')
