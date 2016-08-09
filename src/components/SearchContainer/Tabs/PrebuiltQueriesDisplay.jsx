@@ -13,7 +13,7 @@ export default class PrebuiltQueriesDisplay extends Component {
 
     componentWillMount() {
         $.ajax({
-            url: 'src/components/SearchContainer/Tabs/prebuiltqueries.json',
+            url: 'src/components/SearchContainer/Tabs/PrebuiltQueries.json',
             type: 'GET',
             success: function(response){
                 var x = JSON.parse(response)
