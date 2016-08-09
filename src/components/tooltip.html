@@ -40,7 +40,7 @@
      <li onclick="emitter.emit('setEnd', '{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
-     <li onclick="emitter.emit('query', 'MATCH (n {name:\'{{label}}\'})<-[r:MemberOf]-(m) RETURN n,r,m)', '{{label}}')"">
+     <li onclick="emitter.emit('query', 'MATCH (n {name:\'{{label}}\'})<-[r:MemberOf]-(m) RETURN n,r,m', '{{label}}')"">
           <i class="glyphicon glyphicon-screenshot"> </i> Get Members
      </li>
      <li onclick="emitter.emit('query', 'MATCH (n {name:\'{{label}}\'})-[r:AdminTo]->(m) RETURN n,r,m', '{{label}}')">
