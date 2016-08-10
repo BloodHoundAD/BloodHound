@@ -7793,18 +7793,23 @@ function Get-NetLocalGroup {
 
                     # try to extract out the machine SID by using the -500 account as a reference
                     $MachineSid = $LocalUsers | Where-Object {$_.SID -like '*-500'}
-                    $Parts = $MachineSid.SID.Split('-')
-                    $MachineSid = $Parts[0..($Parts.Length -2)] -join '-'
+                    try {
+                        $Parts = $MachineSid.SID.Split('-')
+                        $MachineSid = $Parts[0..($Parts.Length -2)] -join '-'
 
-                    $LocalUsers | ForEach-Object {
-                        if($_.SID -match $MachineSid) {
-                            $_ | Add-Member Noteproperty 'IsDomain' $False
+                        $LocalUsers | ForEach-Object {
+                            if($_.SID -match $MachineSid) {
+                                $_ | Add-Member Noteproperty 'IsDomain' $False
+                            }
+                            else {
+                                $_ | Add-Member Noteproperty 'IsDomain' $True
+                            }
                         }
-                        else {
-                            $_ | Add-Member Noteproperty 'IsDomain' $True
-                        }
+                        $LocalUsers
                     }
-                    $LocalUsers
+                    catch {
+                        Write-Verbose "Error retrieving machine SID for $Server"
+                    }
                 }
                 else {
                     Write-Verbose "Error: $(([ComponentModel.Win32Exception] $Result).Message)"
