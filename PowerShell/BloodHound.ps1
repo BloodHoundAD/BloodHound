@@ -13737,7 +13737,7 @@ function Export-BloodHoundData {
         }
 
         $Authorized = $True
-        $ObjectBuffer = New-Object System.Collections.ArrayList
+        $Statements = New-Object System.Collections.ArrayList
 
         $UserDomainMappings = @{}
         if(-not $SkipGCDeconfliction) {
@@ -14088,20 +14088,14 @@ function Export-BloodHoundData {
                 Write-Verbose "No matching type name"
             }
 
-            # built the batch object submission object for each query
             ForEach($Query in $Queries) {
-                $BatchObject = @{
-                    "method" = "POST";
-                    "to" = "/cypher";
-                    "body" = @{"query"=$Query};
-                }
-                $Null = $ObjectBuffer.Add($BatchObject)
+                $Null = $Statements.Add( @{ "statement"=$Query } )
             }
-
-            if ($ObjectBuffer.Count -ge $Throttle) {
-                $JsonRequest = ConvertTo-Json20 $ObjectBuffer
-                $Null = $WebClient.UploadString($URI.AbsoluteUri + "db/data/batch", $JsonRequest)
-                $ObjectBuffer.Clear()
+            if ($Statements.Count -ge $Throttle) {
+                $Json = @{ "statements"=[System.Collections.Hashtable[]]$Statements }
+                $JsonRequest = ConvertTo-Json20 $Json
+                $Null = $WebClient.UploadStrin($URI.AbsoluteUri + "db/data/transaction/commit", $JsonRequest)
+                $Statements.Clear()
             }
         }
         else {
@@ -14110,9 +14104,10 @@ function Export-BloodHoundData {
     }
     end {
         if($Authorized) {
-            $JsonRequest = ConvertTo-Json20 $ObjectBuffer
-            $Null = $WebClient.UploadString($URI.AbsoluteUri + "db/data/batch", $JsonRequest)
-            $ObjectBuffer.Clear()
+           $Json = @{ "statements"=[System.Collections.Hashtable[]]$Statements }
+           $JsonRequest = ConvertTo-Json20 $Json
+           $Null = $WebClient.UploadStrin($URI.AbsoluteUri + "db/data/transaction/commit", $JsonRequest)
+           $Statements.Clear()
         }
     }
 }
