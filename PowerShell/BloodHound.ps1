@@ -5559,6 +5559,8 @@ function Get-NetGroupMember {
                     $GroupMember | Add-Member Noteproperty 'MemberSID' $MemberSID
                     $GroupMember | Add-Member Noteproperty 'IsGroup' $IsGroup
                     $GroupMember | Add-Member Noteproperty 'MemberDN' $MemberDN
+                    $GroupMember | Add-Member Noteproperty 'ObjectClass' $Properties.objectclass -Force
+                    $GroupMember | Add-Member Noteproperty 'DNSHostName' $Properties.dnshostname -Force
                     $GroupMember.PSObject.TypeNames.Add('PowerView.GroupMember')
                     $GroupMember
 
@@ -13387,10 +13389,36 @@ function Get-BloodHoundData {
         if($UseGroup) {
             ForEach ($TargetDomain in $TargetDomains) {
                 # enumerate all groups and all members of each group
-                Get-NetGroup -Domain $Domain -DomainController $DomainController | Get-NetGroupMember -Domain $Domain -DomainController $DomainController -FullData
+                Get-NetGroup -Domain $TargetDomain -DomainController $DomainController | Get-NetGroupMember -Domain $TargetDomain -DomainController $DomainController
 
                 # enumerate all user objects so we can extract out the primary group for each
-                Get-NetUser -Domain $Domain -DomainController $DomainController
+                # Get-NetUser -Domain $Domain -DomainController $DomainController
+                $DomainSID = Get-DomainSID -Domain $TargetDomain -DomainController $DomainController
+                $UserSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController
+                $UserSearcher.filter = '(samAccountType=805306368)'
+                $UserSearcher.PropertiesToLoad.AddRange(('samaccountname','primarygroupid'))
+                $PrimaryGroups = @{}
+
+                ForEach($UserResult in $UserSearcher.FindAll()) {
+                    $User = Convert-LDAPProperty -Properties $UserResult.Properties
+                    $User | Add-Member NoteProperty 'Domain' $TargetDomain
+
+                    $PrimaryGroupSID = "$DomainSID-$($User.primarygroupid)"
+
+                    if($PrimaryGroups[$PrimaryGroupSID]) {
+                        $PrimaryGroupName = $PrimaryGroups[$PrimaryGroupSID]
+                    }
+                    else {
+                        $PrimaryGroupName = Get-ADObject -Domain $Domain -SID $PrimaryGroupSID | Select-Object -ExpandProperty samaccountname
+                        $PrimaryGroups[$PrimaryGroupSID] = $PrimaryGroupName
+                    }
+
+                    $User | Add-Member NoteProperty 'PrimaryGroupName' $PrimaryGroupName
+                    $User.PSObject.TypeNames.Add('PowerView.User')
+                    $User
+                }
+
+                $UserSearcher.Dispose()
             }
         }
 
@@ -13600,6 +13628,83 @@ function Get-BloodHoundData {
 }
 
 
+function Get-GlobalCatalogUserMapping {
+<#
+    .SYNOPSIS
+
+        Returns a hashtable for all users in the global catalog, format of {username->domain}.
+        This is used for user session deconfliction in the Export-BloodHound* functions for
+        when a user session doesn't have a login domain.
+    
+    .PARAMETER GlobalCatalog
+
+        The global catalog location to resole user memberships from, form of GC://global.catalog.
+#>
+    [CmdletBinding()]
+    param(
+        [ValidatePattern('^GC://')]
+        [String]
+        $GlobalCatalog
+    )
+
+    if(-not $PSBoundParameters['GlobalCatalog']) {
+        $GCPath = ([ADSI]'LDAP://RootDSE').dnshostname
+        $ADSPath = "GC://$GCPath"
+        Write-Verbose "Enumerated global catalog location: $ADSPath"
+    }
+    else {
+        $ADSpath = $GlobalCatalog
+    }
+
+    $UserDomainMappings = @{}
+
+    $UserSearcher = Get-DomainSearcher -ADSpath $ADSpath
+    $UserSearcher.filter = '(samAccountType=805306368)'
+    $UserSearcher.PropertiesToLoad.AddRange(('samaccountname','distinguishedname', 'cn', 'objectsid'))
+
+    ForEach($User in $UserSearcher.FindAll()) {
+        $UserName = $User.Properties['samaccountname'][0].ToUpper()
+        $UserDN = $User.Properties['distinguishedname'][0]
+
+        if (($UserDN -match 'ForeignSecurityPrincipals') -and ($UserDN -match 'S-1-5-21')) {
+            try {
+                if(-not $MemberSID) {
+                    $MemberSID = $User.Properties['cn'][0]
+                }
+                $UserSid = (New-Object System.Security.Principal.SecurityIdentifier($User.Properties['objectsid'][0],0)).Value
+                $MemberSimpleName = Convert-SidToName -SID $UserSid | Convert-ADName -InputType 'NT4' -OutputType 'Canonical'
+                if($MemberSimpleName) {
+                    $UserDomain = $MemberSimpleName.Split('/')[0]
+                }
+                else {
+                    Write-Verbose "Error converting $UserDN"
+                    $UserDomain = $Null
+                }
+            }
+            catch {
+                Write-Verbose "Error converting $UserDN"
+                $UserDomain = $Null
+            }
+        }
+        else {
+            # extract the FQDN from the Distinguished Name
+            $UserDomain = ($UserDN.subString($UserDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.').ToUpper()
+        }
+        if($UserDomain) {
+            if(-not $UserDomainMappings[$UserName]) {
+                $UserDomainMappings[$UserName] = @($UserDomain)
+            }
+            elseif($UserDomainMappings[$UserName] -notcontains $UserDomain) {
+                $UserDomainMappings[$UserName] += $UserDomain
+            }
+        }
+    }
+    
+    $UserSearcher.dispose()
+    $UserDomainMappings
+}
+
+
 function Export-BloodHoundData {
 <#
     .SYNOPSIS
@@ -13721,13 +13826,14 @@ function Export-BloodHoundData {
         # check auth to the BloodHound neo4j server
         try {
             $Null = $WebClient.DownloadString($URI.AbsoluteUri + 'user/neo4j')
+            Write-Verbose "Connection established with neo4j ingestion interface at $($URI.AbsoluteUri)"
             $Authorized = $True
         }
         catch {
             $Authorized = $False
             throw "Error connecting to Neo4j rest REST server at '$($URI.AbsoluteUri)'"
         }
-
+        
         Add-Type -Assembly System.Web.Extensions
 
         # from http://stackoverflow.com/questions/28077854/powershell-2-0-convertfrom-json-and-convertto-json-implementation
@@ -13743,49 +13849,12 @@ function Export-BloodHoundData {
         if(-not $SkipGCDeconfliction) {
             # if we're doing session enumeration, create a {user : @(domain,..)} from a global catalog
             #   in order to do user domain deconfliction for sessions
+            
             if(-not $PSBoundParameters['GlobalCatalog']) {
-                $ForestRoot = Get-NetForest | Select-Object -ExpandProperty RootDomain
-                $ADSPath = "GC://$ForestRoot"
-                Write-Verbose "Global catalog string from enumerated forest root: $ADSPath"
+                $UserDomainMappings = Get-GlobalCatalogUserMapping
             }
             else {
-                $ADSpath = $GlobalCatalog
-            }
-
-            Get-NetUser -ADSPath $ADSpath | ForEach-Object {
-                $UserName = $_.samaccountname.ToUpper()
-                $UserDN = $_.distinguishedname
-                
-                if (($UserDN -match 'ForeignSecurityPrincipals') -and ($UserDN -match 'S-1-5-21')) {
-                    try {
-                        if(-not $MemberSID) {
-                            $MemberSID = $_.cn[0]
-                        }
-                        $MemberSimpleName = Convert-SidToName -SID $_.objectsid | Convert-ADName -InputType 'NT4' -OutputType 'Canonical'
-                        if($MemberSimpleName) {
-                            $UserDomain = $MemberSimpleName.Split('/')[0]
-                        }
-                        else {
-                            Write-Verbose "Error converting $UserDN"
-                            $UserDomain = $Null
-                        }
-                    }
-                    catch {
-                        Write-Verbose "Error converting $UserDN"
-                        $UserDomain = $Null
-                    }
-                }
-                else {
-                    # extract the FQDN from the Distinguished Name
-                    $UserDomain = ($UserDN.subString($UserDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.').ToUpper()
-                }
-
-                if(-not $UserDomainMappings[$UserName]) {
-                    $UserDomainMappings[$UserName] = @($UserDomain)
-                }
-                elseif($UserDomainMappings[$UserName] -notcontains $UserDomain) {
-                    $UserDomainMappings[$UserName] += $UserDomain
-                }
+                $UserDomainMappings = Get-GlobalCatalogUserMapping -GlobalCatalog $GlobalCatalog
             }
         }
     }
@@ -13797,10 +13866,11 @@ function Export-BloodHoundData {
 
             if($Object.PSObject.TypeNames -contains 'PowerView.UserSession') {
                 if($Object.SessionFromName) {
+                    # implying a result from Get-NetSession
                     try {
-                        # $SessionFromDomain = $Object.SessionFromName.SubString($Object.SessionFromName.IndexOf('.')+1)
                         $UserName = $Object.UserName.ToUpper()
                         $SessionFromName = $Object.SessionFromName
+                        $ComputerDomain = $Object.SessionFromName.SubString($Object.SessionFromName.IndexOf('.')+1).ToUpper()
 
                         if($UserDomainMappings) {
                             $UserDomain = $Null
@@ -13812,8 +13882,6 @@ function Export-BloodHoundData {
                                     $Queries += "MERGE (user:User { name: UPPER('$LoggedOnUser') }) MERGE (computer:Computer { name: UPPER('$SessionFromName') }) MERGE (computer)-[:HasSession {Weight: '1'}]->(user)"
                                 }
                                 else {
-                                    $ComputerDomain = $Object.SessionFromName.SubString($Object.SessionFromName.IndexOf('.')+1).ToUpper()
-
                                     $UserDomainMappings[$UserName] | ForEach-Object {
                                         if($_ -eq $ComputerDomain) {
                                             $UserDomain = $_
@@ -13837,7 +13905,7 @@ function Export-BloodHoundData {
                             }
                         }
                         else {
-                            $LoggedOnUser = "$UserName@UNKNOWN"
+                            $LoggedOnUser = "$UserName@$ComputerDomain"
                             $Queries += "MERGE (user:User { name: UPPER('$LoggedOnUser') }) MERGE (computer:Computer { name: UPPER('$SessionFromName') }) MERGE (computer)-[:HasSession {Weight: '2'}]->(user)"
                         }
                     }
@@ -13883,7 +13951,6 @@ function Export-BloodHoundData {
                     $Queries += "MERGE (group1:Group { name: UPPER('$AccountName') }) MERGE (group2:Group { name: UPPER('$GroupName') }) MERGE (group1)-[:MemberOf]->(group2)"
                 }
                 else {
-                    # check if -FullData objects are returned, and if so check if the group member is a computer object
                     if($Object.ObjectClass -and ($Object.ObjectClass -contains 'computer')) {
                         $Queries += "MERGE (computer:Computer { name: UPPER('$($Object.dnshostname)') }) MERGE (group:Group { name: UPPER('$GroupName') }) MERGE (computer)-[:MemberOf]->(group)"
                     }
@@ -14239,49 +14306,12 @@ function Export-BloodHoundCSV {
         if(-not $SkipGCDeconfliction) {
             # if we're doing session enumeration, create a {user : @(domain,..)} from a global catalog
             #   in order to do user domain deconfliction for sessions
+            
             if(-not $PSBoundParameters['GlobalCatalog']) {
-                $ForestRoot = Get-NetForest | Select-Object -ExpandProperty RootDomain
-                $ADSPath = "GC://$ForestRoot"
-                Write-Verbose "Global catalog string from enumerated forest root: $ADSPath"
+                $UserDomainMappings = Get-GlobalCatalogUserMapping
             }
             else {
-                $ADSpath = $GlobalCatalog
-            }
-
-            Get-NetUser -ADSPath $ADSpath | ForEach-Object {
-                $UserName = $_.samaccountname.ToUpper()
-                $UserDN = $_.distinguishedname
-
-                if (($UserDN -match 'ForeignSecurityPrincipals') -and ($UserDN -match 'S-1-5-21')) {
-                    try {
-                        if(-not $MemberSID) {
-                            $MemberSID = $_.cn[0]
-                        }
-                        $MemberSimpleName = Convert-SidToName -SID $_.objectsid | Convert-ADName -InputType 'NT4' -OutputType 'Canonical'
-                        if($MemberSimpleName) {
-                            $UserDomain = $MemberSimpleName.Split('/')[0]
-                        }
-                        else {
-                            Write-Verbose "Error converting $UserDN"
-                            $UserDomain = $Null
-                        }
-                    }
-                    catch {
-                        Write-Verbose "Error converting $UserDN"
-                        $UserDomain = $Null
-                    }
-                }
-                else {
-                    # extract the FQDN from the Distinguished Name
-                    $UserDomain = ($UserDN.subString($UserDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.').ToUpper()
-                }
-
-                if(-not $UserDomainMappings[$UserName]) {
-                    $UserDomainMappings[$UserName] = @($UserDomain)
-                }
-                elseif($UserDomainMappings[$UserName] -notcontains $UserDomain) {
-                    $UserDomainMappings[$UserName] += $UserDomain
-                }
+                $UserDomainMappings = Get-GlobalCatalogUserMapping -GlobalCatalog $GlobalCatalog
             }
         }
     }
@@ -14292,9 +14322,9 @@ function Export-BloodHoundCSV {
 
             if($Object.SessionFromName) {
                 try {
-                    # $SessionFromDomain = $Object.SessionFromName.SubString($Object.SessionFromName.IndexOf('.')+1)
                     $UserName = $Object.UserName.ToUpper()
                     $SessionFromName = $Object.SessionFromName
+                    $ComputerDomain = $Object.SessionFromName.SubString($Object.SessionFromName.IndexOf('.')+1).ToUpper()
 
                     if($UserDomainMappings) {
                         $UserDomain = $Null
@@ -14352,8 +14382,7 @@ function Export-BloodHoundCSV {
                         }
                     }
                     else {
-                        $LoggedOnUser = "$UserName@UNKNOWN"
-                        # $Queries += "MERGE (user:User { name: UPPER('$LoggedOnUser') }) MERGE (computer:Computer { name: UPPER('$SessionFromName') }) MERGE (computer)-[:HasSession {Weight: '2'}]->(user)"
+                        $LoggedOnUser = "$UserName@$ComputerDomain"
                         $Properties = @{
                             UserName = $LoggedOnUser
                             ComputerName = $SessionFromName
