@@ -14094,7 +14094,7 @@ function Export-BloodHoundData {
             if ($Statements.Count -ge $Throttle) {
                 $Json = @{ "statements"=[System.Collections.Hashtable[]]$Statements }
                 $JsonRequest = ConvertTo-Json20 $Json
-                $Null = $WebClient.UploadStrin($URI.AbsoluteUri + "db/data/transaction/commit", $JsonRequest)
+                $Null = $WebClient.UploadString($URI.AbsoluteUri + "db/data/transaction/commit", $JsonRequest)
                 $Statements.Clear()
             }
         }
@@ -14106,7 +14106,7 @@ function Export-BloodHoundData {
         if($Authorized) {
            $Json = @{ "statements"=[System.Collections.Hashtable[]]$Statements }
            $JsonRequest = ConvertTo-Json20 $Json
-           $Null = $WebClient.UploadStrin($URI.AbsoluteUri + "db/data/transaction/commit", $JsonRequest)
+           $Null = $WebClient.UploadString($URI.AbsoluteUri + "db/data/transaction/commit", $JsonRequest)
            $Statements.Clear()
         }
     }
