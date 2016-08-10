@@ -5420,17 +5420,23 @@ function Get-NetGroupMember {
                     $GroupSearcher.filter = "(&(objectCategory=group)(objectSID=$SID)$Filter)"
                 }
 
+                $Members = @()
                 try {
                     $Result = $GroupSearcher.FindOne()
                 }
                 catch {
-                    $Members = @()
+                    Write-Verbose "Error retrieving group searcher results: $_"
                 }
 
                 $GroupFoundName = ''
 
-                if ($Result) {
-                    $Members = $Result.properties.item("member")
+                if ($Result -and $Result.properties) {
+                    try {
+                        $Members = $Result.properties.item("member")
+                    }
+                    catch {
+                        Write-Verbose "Error retrieving members property."
+                    }
 
                     if($Members.count -eq 0) {
 
