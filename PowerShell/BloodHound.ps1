@@ -13679,36 +13679,38 @@ function Get-GlobalCatalogUserMapping {
         $UserName = $User.Properties['samaccountname'][0].ToUpper()
         $UserDN = $User.Properties['distinguishedname'][0]
 
-        if (($UserDN -match 'ForeignSecurityPrincipals') -and ($UserDN -match 'S-1-5-21')) {
-            try {
-                if(-not $MemberSID) {
-                    $MemberSID = $User.Properties['cn'][0]
+        if($UserDN -and ($UserDN -ne '')) {
+            if (($UserDN -match 'ForeignSecurityPrincipals') -and ($UserDN -match 'S-1-5-21')) {
+                try {
+                    if(-not $MemberSID) {
+                        $MemberSID = $User.Properties['cn'][0]
+                    }
+                    $UserSid = (New-Object System.Security.Principal.SecurityIdentifier($User.Properties['objectsid'][0],0)).Value
+                    $MemberSimpleName = Convert-SidToName -SID $UserSid | Convert-ADName -InputType 'NT4' -OutputType 'Canonical'
+                    if($MemberSimpleName) {
+                        $UserDomain = $MemberSimpleName.Split('/')[0]
+                    }
+                    else {
+                        Write-Verbose "Error converting $UserDN"
+                        $UserDomain = $Null
+                    }
                 }
-                $UserSid = (New-Object System.Security.Principal.SecurityIdentifier($User.Properties['objectsid'][0],0)).Value
-                $MemberSimpleName = Convert-SidToName -SID $UserSid | Convert-ADName -InputType 'NT4' -OutputType 'Canonical'
-                if($MemberSimpleName) {
-                    $UserDomain = $MemberSimpleName.Split('/')[0]
-                }
-                else {
+                catch {
                     Write-Verbose "Error converting $UserDN"
                     $UserDomain = $Null
                 }
             }
-            catch {
-                Write-Verbose "Error converting $UserDN"
-                $UserDomain = $Null
+            else {
+                # extract the FQDN from the Distinguished Name
+                $UserDomain = ($UserDN.subString($UserDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.').ToUpper()
             }
-        }
-        else {
-            # extract the FQDN from the Distinguished Name
-            $UserDomain = ($UserDN.subString($UserDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.').ToUpper()
-        }
-        if($UserDomain) {
-            if(-not $UserDomainMappings[$UserName]) {
-                $UserDomainMappings[$UserName] = @($UserDomain)
-            }
-            elseif($UserDomainMappings[$UserName] -notcontains $UserDomain) {
-                $UserDomainMappings[$UserName] += $UserDomain
+            if($UserDomain) {
+                if(-not $UserDomainMappings[$UserName]) {
+                    $UserDomainMappings[$UserName] = @($UserDomain)
+                }
+                elseif($UserDomainMappings[$UserName] -notcontains $UserDomain) {
+                    $UserDomainMappings[$UserName] += $UserDomain
+                }
             }
         }
     }
