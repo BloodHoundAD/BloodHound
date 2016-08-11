@@ -5421,6 +5421,8 @@ function Get-NetGroupMember {
                 }
 
                 $Members = @()
+                $GroupSearcher.PropertiesToLoad.Clear()
+                $Result = $False
                 try {
                     $Result = $GroupSearcher.FindOne()
                 }
