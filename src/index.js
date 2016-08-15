@@ -87,6 +87,12 @@ global.appStore = {
                 scale: 1.5,
                 color: '#17E6B9'
             }
+        },
+        edgeScheme: {
+        	'AdminTo': 'tapered',
+        	'MemberOf': 'tapered',
+        	'HasSession': 'tapered',
+        	'TrustedBy' : 'curvedArrow'
         }
 	},
 	lowResPalette: {
@@ -95,7 +101,13 @@ global.appStore = {
 			'Computer' : '#E67873',
 			'Group' : '#DBE617',
 			'Domain' : '#17E6B9'
-		}
+		},
+        edgeScheme: {
+        	'AdminTo': 'line',
+        	'MemberOf': 'line',
+        	'HasSession': 'line',
+        	'TrustedBy' : 'curvedArrow'
+        }
 	},
 	highResStyle: {
 		nodes: {
@@ -111,6 +123,12 @@ global.appStore = {
 			icon: {
 				by: 'neo4j_labels.0',
 				scheme: 'iconScheme'
+			}
+		},
+		edges: {
+			type : {
+				by : 'neo4j_type',
+				scheme: 'edgeScheme'
 			}
 		}
 	},
@@ -129,7 +147,13 @@ global.appStore = {
 				by: 'neo4j_labels.0',
 				scheme: 'colorScheme'
 			}
-		}	
+		},
+		edges: {
+			type : {
+				by : 'neo4j_type',
+				scheme: 'edgeScheme'
+			}
+		}
 	}
 }
 

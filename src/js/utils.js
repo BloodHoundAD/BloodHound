@@ -423,7 +423,7 @@ export function buildMergeQuery(rows, type){
 			}
 		})
 	}else{
-		domainQuery = 'MERGE (domain1:Domain {name: "{}"}) WITH source MERGE (domain2:Domain {name: "{}"}) WITH source,target MERGE (domain1)-[:TrustedBy {TrustType : "{}"}, Transitive: "{}"}]->(domain2)'
+		domainQuery = 'MERGE (domain1:Domain {name: "{}"}) WITH domain1 MERGE (domain2:Domain {name: "{}"}) WITH domain1,domain2 MERGE (domain1)-[:TrustedBy {TrustType : "{}", Transitive: "{}"}]->(domain2)'
 		$.each(rows, function(i, row){
 			rawobj = {
 				'method': 'POST',
@@ -456,6 +456,7 @@ export function buildMergeQuery(rows, type){
 					break
 			}
 		})
+
 	}
 	return queries;
 }
