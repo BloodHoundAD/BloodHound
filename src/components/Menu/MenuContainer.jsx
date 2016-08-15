@@ -58,7 +58,7 @@ export default class MenuContainer extends Component {
 			}
 
 			if (typeof filetype === 'undefined'){
-				emitter.emit('showAlert', 'Unreconized CSV Type');
+				emitter.emit('showAlert', 'Unrecognized CSV Type');
 				return;
 			}
 
