@@ -74,6 +74,11 @@ export default class MenuContainer extends Component {
 					options.complete = function(){
 						emitter.emit('refreshDBData')
 					}
+					options.error = function(xhr, status, error){
+						console.log(xhr)
+						console.log(status)
+						console.log(error)
+					}
 					$.ajax(options);
 				}
 			})
