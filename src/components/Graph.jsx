@@ -27,11 +27,11 @@ export default class GraphContainer extends Component {
         var a = defaultAjaxSettings()
         a.data = JSON.stringify({
             "statements": [{
-                "statement": "CREATE CONSTRAINT ON (c:User) ASSERT c.UserName IS UNIQUE"
+                "statement": "CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE"
             }, {
-                "statement": "CREATE CONSTRAINT ON (c:Computer) ASSERT c.ComputerName IS UNIQUE"
+                "statement": "CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE"
             }, {
-                "statement": "CREATE CONSTRAINT ON (c:Group) ASSERT c.GroupName IS UNIQUE"
+                "statement": "CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE"
             }, {
                 "statement": "CREATE INDEX ON :User(name)"
             }, {
@@ -39,7 +39,7 @@ export default class GraphContainer extends Component {
             }, {
                 "statement": "CREATE INDEX ON :Group(name)"
             }, {
-                "statement": "CREATE CONSTRAINT ON (c:Domain) ASSERT c.DomainName IS UNIQUE"
+                "statement": "CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE"
             }, {
                 "statement": "CREATE INDEX ON :Domain(name)"
             }]
