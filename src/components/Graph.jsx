@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
-import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes, findGraphPath } from 'utils';
+import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes, findGraphPath, defaultAjaxSettings } from 'utils';
 var fs = require('fs');
 var child_process = require('child_process')
 const { dialog } = require('electron').remote
@@ -23,6 +23,29 @@ export default class GraphContainer extends Component {
                 this.setState({template: response}) 
             }.bind(this)
         })
+
+        var a = defaultAjaxSettings()
+        a.data = JSON.stringify({
+            "statements": [{
+                "statement": "CREATE CONSTRAINT ON (c:User) ASSERT c.UserName IS UNIQUE"
+            }, {
+                "statement": "CREATE CONSTRAINT ON (c:Computer) ASSERT c.ComputerName IS UNIQUE"
+            }, {
+                "statement": "CREATE CONSTRAINT ON (c:Group) ASSERT c.GroupName IS UNIQUE"
+            }, {
+                "statement": "CREATE INDEX ON :User(name)"
+            }, {
+                "statement": "CREATE INDEX ON :Computer(name)"
+            }, {
+                "statement": "CREATE INDEX ON :Group(name)"
+            }, {
+                "statement": "CREATE CONSTRAINT ON (c:Domain) ASSERT c.DomainName IS UNIQUE"
+            }, {
+                "statement": "CREATE INDEX ON :Domain(name)"
+            }]
+        })
+
+        $.ajax(a)
 
         emitter.on('doLogout', function(){
             this.state.sigmaInstance.graph.clear();
