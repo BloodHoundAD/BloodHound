@@ -13648,7 +13648,7 @@ function Get-GlobalCatalogUserMapping {
         Returns a hashtable for all users in the global catalog, format of {username->domain}.
         This is used for user session deconfliction in the Export-BloodHound* functions for
         when a user session doesn't have a login domain.
-    
+
     .PARAMETER GlobalCatalog
 
         The global catalog location to resole user memberships from, form of GC://global.catalog.
@@ -13714,7 +13714,7 @@ function Get-GlobalCatalogUserMapping {
             }
         }
     }
-    
+
     $UserSearcher.dispose()
     $UserDomainMappings
 }
@@ -13725,7 +13725,7 @@ function Export-BloodHoundData {
     .SYNOPSIS
 
         Takes custom objects from Get-BloodHound data and exports everything to a BloodHound
-        neo4j RESTful API batch ingestion interface. 
+        neo4j RESTful API batch ingestion interface.
 
         Author: @harmj0y
         License: BSD 3-Clause
@@ -13778,7 +13778,7 @@ function Export-BloodHoundData {
         PS C:\> Get-BloodHoundData | Export-BloodHoundData -URI http://SERVER:7474/ -UserPass "user:pass"
 
         Executes default collection options and exports the data to a BloodHound neo4j RESTful API endpoint.
-    
+
     .EXAMPLE
 
         PS C:\> Get-BloodHoundData | Export-BloodHoundData -URI http://SERVER:7474/ -UserPass "user:pass" -SkipGCDeconfliction
@@ -13848,7 +13848,7 @@ function Export-BloodHoundData {
             $Authorized = $False
             throw "Error connecting to Neo4j rest REST server at '$($URI.AbsoluteUri)'"
         }
-        
+
         Add-Type -Assembly System.Web.Extensions
 
         # from http://stackoverflow.com/questions/28077854/powershell-2-0-convertfrom-json-and-convertto-json-implementation
@@ -13864,7 +13864,7 @@ function Export-BloodHoundData {
         if(-not $SkipGCDeconfliction) {
             # if we're doing session enumeration, create a {user : @(domain,..)} from a global catalog
             #   in order to do user domain deconfliction for sessions
-            
+
             if(-not $PSBoundParameters['GlobalCatalog']) {
                 $UserDomainMappings = Get-GlobalCatalogUserMapping
             }
@@ -14019,7 +14019,9 @@ function Export-BloodHoundData {
                 }
             }
             elseif($Object.PSObject.TypeNames -contains 'PowerView.GPOLocalGroup') {
-                $MemberSimpleName = Convert-SidToName -SID $Object.ObjectSID | Convert-ADName -InputType 'NT4' -OutputType 'Canonical'
+                 if(![string]::IsNullOrEmpty($Object.SID)){
+                    $MemberSimpleName = Convert-SidToName -SID $Object.SID | Convert-ADName -InputType 'NT4' -OutputType 'Canonical'
+                 }
 
                 if($MemberSimpleName) {
                     $MemberDomain = $MemberSimpleName.Split('/')[0]
@@ -14211,7 +14213,7 @@ function Export-BloodHoundCSV {
 
         This function takes custom tagged PowerView objects types from Get-BloodHoundData and exports
         the data to one custom CSV file per object type (sessions, local admin, domain trusts, etc.).
-        For user session data without a logon domain, by default the global catalog is used to attempt to 
+        For user session data without a logon domain, by default the global catalog is used to attempt to
         deconflict what domain the user may be located in. If the user exists in more than one domain in
         the forest, a series of weights is used to modify the attack path likelihood.
 
@@ -14241,7 +14243,7 @@ function Export-BloodHoundCSV {
 
         Executes default collection options and exports the data to user_sessions.csv, group_memberships.csv,
         local_admins.csv, and trusts.csv in the current directory.
-    
+
     .EXAMPLE
 
         PS C:\> Get-BloodHoundData | Export-BloodHoundCSV -SkipGCDeconfliction
@@ -14321,7 +14323,7 @@ function Export-BloodHoundCSV {
         if(-not $SkipGCDeconfliction) {
             # if we're doing session enumeration, create a {user : @(domain,..)} from a global catalog
             #   in order to do user domain deconfliction for sessions
-            
+
             if(-not $PSBoundParameters['GlobalCatalog']) {
                 $UserDomainMappings = Get-GlobalCatalogUserMapping
             }
