@@ -157,7 +157,7 @@ body {
 
 .mainfade-appear.mainfade-appear-active {
   opacity: 1;
-  transition: opacity .75s ease-in;
+  transition: opacity 1s ease-in;
 }
 
 .dl-horizontal-fix {

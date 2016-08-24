@@ -25,7 +25,7 @@ export default class AppContainer extends Component {
 		return (
 			 <ReactCSSTransitionGroup transitionName="mainfade" 
 			 	transitionAppear={true} 
-			 	transitionAppearTimeout={750}
+			 	transitionAppearTimeout={1000}
 			 	transitionEnter={false}
 			 	transitionLeave={false}>
 				<div className="max">
