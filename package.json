@@ -59,9 +59,10 @@
     "jquery": "^2.2.4",
     "linkurious": "^1.5.1",
     "mustache": "^2.2.1",
-    "react": "^15.2.1",
-    "react-bootstrap": "^0.30.0",
-    "react-dom": "^15.2.1",
+    "react": "^15.3.1",
+    "react-addons-css-transition-group": "^15.3.1",
+    "react-bootstrap": "^0.30.3",
+    "react-dom": "^15.3.1",
     "react-if": "^2.1.0"
   }
 }
