@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import MenuButton from './MenuButton';
+import ProgressBarMenuButton from './ProgressBarMenuButton';
 import { buildMergeQuery, defaultAjaxSettings } from 'utils';
+import { If, Then, Else } from 'react-if';
 const { dialog } = require('electron').remote
 var fs = require('fs')
 
@@ -9,8 +11,22 @@ export default class MenuContainer extends Component {
 		super()
 
 		this.state = {
-			refreshHover: false
+			refreshHover: false,
+			uploading: false,
+			progress: 0,
+			parser: null,
+			currentAjax: null
 		}
+
+		emitter.on('cancelUpload', this.cancelUpload.bind(this))
+	}
+
+	cancelUpload(){
+		this.state.parser.abort()
+		this.state.currentAjax.abort()
+		setTimeout(function(){
+			this.setState({uploading: false})
+		}.bind(this), 1000)
 	}
 
 	_refreshClick(){
@@ -44,7 +60,10 @@ export default class MenuContainer extends Component {
 			properties: ['openFile']
 		})[0]
 
+		var i;
+
 		fs.readFile(filename, 'utf8', function(err, data){
+			var count = data.split('\n').length;
 			var header = data.split('\n')[0]
 			var filetype;
 			if (header.includes('UserName') && header.includes('ComputerName') && header.includes('Weight')){
@@ -62,31 +81,53 @@ export default class MenuContainer extends Component {
 				return;
 			}
 
+			this.setState({
+				uploading: true,
+				progress: 0
+			})
+			var completed = -1;
 			Papa.parse(data,{
-				worker: true,
 				header: true,
 				dynamicTyping: true,
+				chunkSize: 131072,
 				chunk: function(rows, parser){
+					parser.pause()
+					this.setState({parser: parser})
 					var options = defaultAjaxSettings()
 					options.url = appStore.databaseInfo.url + '/db/data/batch'
-					var data = JSON.stringify(buildMergeQuery(rows.data, filetype), null, 2)
+					//var data = JSON.stringify(buildMergeQuery(rows.data, filetype), null, 2)
 					options.data = JSON.stringify(buildMergeQuery(rows.data, filetype))
-					options.complete = function(){
+					options.success = function(){
+						completed += rows.data.length
+						this.setState({progress: Math.floor((completed / count) * 100)})
+						if (completed === count){
+							setTimeout(function(){
+								this.setState({uploading: false})
+							}.bind(this), 3000)
+						}
+						parser.resume()
 						emitter.emit('refreshDBData')
-					}
+					}.bind(this)
 					options.error = function(xhr, status, error){
-						console.log(xhr)
-						console.log(status)
-						console.log(error)
+						if (xhr.statusText !== 'abort'){
+							console.log(xhr)
+							console.log(status)
+							console.log(error)	
+						}
 					}
-					$.ajax(options);
-				}
+					var a = $.ajax(options);
+					this.setState({currentAjax: a})
+				}.bind(this)
 			})
-		})
+		}.bind(this))
 	}
 
 	_settingsClick(){
-		emitter.emit('openSettings')		
+		emitter.emit('openSettings')
+	}
+
+	_cancelUploadClick(){
+		emitter.emit('showCancelUpload')
 	}
 
 	render() {
@@ -102,7 +143,14 @@ export default class MenuContainer extends Component {
 					<MenuButton click={this._importClick.bind(this)} hoverVal="Import Graph" glyphicon="glyphicon glyphicon-import" />
 				</div>
 				<div>
-					<MenuButton click={this._uploadClick.bind(this)} hoverVal="Upload Data" glyphicon="glyphicon glyphicon-upload" />
+					<If condition={this.state.uploading}>
+						<Then>
+							<ProgressBarMenuButton click={this._cancelUploadClick.bind(this)} progress={this.state.progress}/>
+						</Then>
+						<Else>{ () =>
+							<MenuButton click={this._uploadClick.bind(this)} hoverVal="Upload Data" glyphicon="glyphicon glyphicon-upload" />		
+						}</Else>
+					</If>		
 				</div>
 				<div>
 					<MenuButton click={this._changeLayoutClick.bind(this)} hoverVal="Change Layout Type" glyphicon="fa fa-line-chart" />

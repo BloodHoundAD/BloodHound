@@ -3,6 +3,7 @@ import GraphContainer from './components/Graph';
 import SearchContainer from './components/SearchContainer/SearchContainer';
 import SpotlightContainer from './components/Spotlight/SpotlightContainer';
 import LogoutModal from './components/Modals/LogoutModal';
+import CancelUploadModal from './components/Modals/CancelUploadModal';
 import ClearWarnModal from './components/Modals/ClearWarnModal'
 import ClearConfirmModal from './components/Modals/ClearConfirmModal'
 import ClearingModal from './components/Modals/ClearingModal'
@@ -39,6 +40,7 @@ export default class AppContainer extends Component {
 					<ClearWarnModal />
 					<ClearConfirmModal />
 					<ClearingModal />
+					<CancelUploadModal />
 					<RawQuery />
 					<MenuContainer />
 					<Settings />
