@@ -150,6 +150,16 @@ body {
     }
 }
 
+
+.mainfade-appear {
+  opacity: 0.01;
+}
+
+.mainfade-appear.mainfade-appear-active {
+  opacity: 1;
+  transition: opacity 1s ease-in;
+}
+
 .dl-horizontal-fix {
     margin-bottom: 1em;
 }

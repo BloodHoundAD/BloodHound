@@ -14,6 +14,7 @@ import ExportContainer from './components/Float/ExportContainer';
 import Settings from './components/Float/Settings'
 import ZoomContainer from './components/Zoom/ZoomContainer'
 import QueryNodeSelect from './components/Float/QueryNodeSelect'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 export default class AppContainer extends Component {
 	constructor(){
@@ -22,23 +23,29 @@ export default class AppContainer extends Component {
 
 	render() {
 		return (
-			<div className="max">
-				<GenericAlert />
-				<ExportContainer />
-				<LoadingContainer />
-				<SpotlightContainer />
-				<GraphContainer />
-				<SearchContainer />
-				<LogoutModal />
-				<ClearWarnModal />
-				<ClearConfirmModal />
-				<ClearingModal />
-				<RawQuery />
-				<MenuContainer />
-				<Settings />
-				<ZoomContainer />
-				<QueryNodeSelect />
-			</div>
+			 <ReactCSSTransitionGroup transitionName="mainfade" 
+			 	transitionAppear={true} 
+			 	transitionAppearTimeout={1000}
+			 	transitionEnter={false}
+			 	transitionLeave={false}>
+				<div className="max">
+					<GenericAlert />
+					<ExportContainer />
+					<LoadingContainer />
+					<SpotlightContainer />
+					<GraphContainer />
+					<SearchContainer />
+					<LogoutModal />
+					<ClearWarnModal />
+					<ClearConfirmModal />
+					<ClearingModal />
+					<RawQuery />
+					<MenuContainer />
+					<Settings />
+					<ZoomContainer />
+					<QueryNodeSelect />
+				</div>
+			</ReactCSSTransitionGroup>
 		);
 	};
 }
