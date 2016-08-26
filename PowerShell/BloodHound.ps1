@@ -14555,7 +14555,9 @@ function Export-BloodHoundCSV {
             }
         }
         elseif($Object.PSObject.TypeNames -contains 'PowerView.GPOLocalGroup') {
-            $MemberSimpleName = Convert-SidToName -SID $Object.ObjectSID | Convert-ADName -InputType 'NT4' -OutputType 'Canonical'
+            if(![string]::IsNullOrEmpty($Object.SID)){
+                $MemberSimpleName = Convert-SidToName -SID $Object.ObjectSID | Convert-ADName -InputType 'NT4' -OutputType 'Canonical'
+            }
 
             if($MemberSimpleName) {
                 $MemberDomain = $MemberSimpleName.Split('/')[0]
