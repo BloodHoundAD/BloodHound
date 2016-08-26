@@ -64,8 +64,10 @@ export default class MenuContainer extends Component {
 
 		fs.readFile(filename, 'utf8', function(err, data){
 			var count = data.split('\n').length;
+			count = count - 2
 			var header = data.split('\n')[0]
 			var filetype;
+			console.log(count)
 			if (header.includes('UserName') && header.includes('ComputerName') && header.includes('Weight')){
 				filetype = 'sessions'
 			}else if (header.includes('AccountName') && header.includes('AccountType') && header.includes('GroupName')){
@@ -83,30 +85,79 @@ export default class MenuContainer extends Component {
 
 			this.setState({
 				uploading: true,
-				progress: 0
+				progress: 0,
+				committed: 0
 			})
 			var completed = -1;
+			var sent = -1;
+			var committed = 0;
+			var transactionID = 0;
+			var openTransaction = defaultAjaxSettings()
+			openTransaction.url = appStore.databaseInfo.url + '/db/data/transaction'
+			openTransaction.async = false
+			openTransaction.data = JSON.stringify(
+			{
+				"statements": []
+			}
+			)
+			openTransaction.success = function(data){
+				var frag = data.commit.split('/')
+				transactionID = frag[frag.length - 2]
+			}
+			$.ajax(openTransaction)
+
+			var closeTransaction = defaultAjaxSettings()
+
 			Papa.parse(data,{
 				header: true,
 				dynamicTyping: true,
-				chunkSize: 131072,
+				chunkSize: 25600,
 				chunk: function(rows, parser){
+					if (rows.data.length === 0){
+						parser.abort()
+						if (committed !== count){
+							closeTransaction.url = appStore.databaseInfo.url + '/db/data/transaction/' + transactionID + '/commit'
+							closeTransaction.success = function(){
+								committed += sent
+								this.setState({committed: Math.floor((committed / count) * 100)})
+								setTimeout(function(){
+									this.setState({uploading: false})
+								}.bind(this), 3000)
+								emitter.emit('refreshDBData')
+							}.bind(this)
+							$.ajax(closeTransaction)
+						}
+						return
+					}
 					parser.pause()
 					this.setState({parser: parser})
 					var options = defaultAjaxSettings()
-					options.url = appStore.databaseInfo.url + '/db/data/batch'
+					options.url = appStore.databaseInfo.url + '/db/data/transaction/' + transactionID
 					//var data = JSON.stringify(buildMergeQuery(rows.data, filetype), null, 2)
 					options.data = JSON.stringify(buildMergeQuery(rows.data, filetype))
 					options.success = function(){
 						completed += rows.data.length
+						sent += rows.data.length
 						this.setState({progress: Math.floor((completed / count) * 100)})
-						if (completed === count){
-							setTimeout(function(){
-								this.setState({uploading: false})
-							}.bind(this), 3000)
+						if (sent > 20000){
+							closeTransaction.url = appStore.databaseInfo.url + '/db/data/transaction/' + transactionID + '/commit'
+							closeTransaction.success = function(){
+								committed += sent
+								sent = 0
+								if (committed < count){
+									$.ajax(openTransaction)	
+								}else{
+									setTimeout(function(){
+										this.setState({uploading: false})
+									}.bind(this), 3000)
+								}
+								this.setState({committed: Math.floor((committed / count) * 100)})
+								parser.resume()
+							}.bind(this)
+							$.ajax(closeTransaction)
+						}else{
+							parser.resume()
 						}
-						parser.resume()
-						emitter.emit('refreshDBData')
 					}.bind(this)
 					options.error = function(xhr, status, error){
 						if (xhr.statusText !== 'abort'){
@@ -145,7 +196,7 @@ export default class MenuContainer extends Component {
 				<div>
 					<If condition={this.state.uploading}>
 						<Then>
-							<ProgressBarMenuButton click={this._cancelUploadClick.bind(this)} progress={this.state.progress}/>
+							<ProgressBarMenuButton click={this._cancelUploadClick.bind(this)} progress={this.state.progress} committed={this.state.committed}/>
 						</Then>
 						<Else>{ () =>
 							<MenuButton click={this._uploadClick.bind(this)} hoverVal="Upload Data" glyphicon="glyphicon glyphicon-upload" />		
