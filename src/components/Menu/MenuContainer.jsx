@@ -67,7 +67,6 @@ export default class MenuContainer extends Component {
 			count = count - 2
 			var header = data.split('\n')[0]
 			var filetype;
-			console.log(count)
 			if (header.includes('UserName') && header.includes('ComputerName') && header.includes('Weight')){
 				filetype = 'sessions'
 			}else if (header.includes('AccountName') && header.includes('AccountType') && header.includes('GroupName')){
