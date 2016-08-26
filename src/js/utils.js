@@ -347,24 +347,19 @@ export function buildMergeQuery(rows, type){
 //    PowerView.DomainTrustLDAP/PowerView.DomainTrust/PowerView.ForestTrust (direction ->)
 //        SourceDomain,TargetDomain,TrustDirection,TrustType,Transitive
 //        "domain.local","dev.domain.local","Bidirectional","ParentChild","True"
-	var queries = []
-	var rawobj;
-
+	var queries = {
+		"statements": []
+	}
 	//query: QUERY
 
 	var userQuery, computerQuery, groupQuery, domainQuery;
 	if (type === 'sessions'){
 		userQuery = "MERGE (user:User {name:'{}'}) WITH user MERGE (computer:Computer {name: '{}'}) WITH user,computer MERGE (computer)-[:HasSession {Weight : '{}'}]-(user)"
 		$.each(rows, function(i, row){
-			rawobj = {
-				'method': 'POST',
-				'to': '/cypher',
-				'body' :{
-
-				}
-			}
-			rawobj.body.query = userQuery.format(row.UserName, row.ComputerName, row.Weight)
-			queries.push(rawobj)
+			// if (row.UserName === 'ANONYMOUS LOGON' || row.UserName === ''){
+			// 	return
+			// }
+			queries.statements.push({"statement": userQuery.format(row.UserName, row.ComputerName, row.Weight)})
 		})
 	}else if (type === 'groupmembership'){
 		userQuery = 'MERGE (user:User {name: "{}"}) WITH user MERGE (group:Group {name: "{}"}) WITH user,group MERGE (user)-[:MemberOf]->(group)'
@@ -372,25 +367,15 @@ export function buildMergeQuery(rows, type){
 		computerQuery = 'MERGE (computer:Computer {name: "{}"}) WITH computer MERGE (group:Group {name: "{}"}) with computer,group MERGE (computer)-[:MemberOf]-(group)'
 		
 		$.each(rows, function(i, row){
-			rawobj = {
-				'method': 'POST',
-				'to': '/cypher',
-				'body' :{
-
-				}
-			}
 			switch(row.AccountType){
 				case 'user':
-					rawobj.body.query = userQuery.format(row.AccountName, row.GroupName)
-					queries.push(rawobj)
+					queries.statements.push({"statement":  userQuery.format(row.AccountName, row.GroupName)})
 					break;
 				case 'group':
-					rawobj.body.query = groupQuery.format(row.AccountName, row.GroupName)
-					queries.push(rawobj)
+					queries.statements.push({"statement": groupQuery.format(row.AccountName, row.GroupName)})
 					break;
 				case 'computer':
-					rawobj.body.query = computerQuery.format(row.AccountName, row.GroupName)
-					queries.push(rawobj)
+					queries.statements.push({"statement": computerQuery.format(row.AccountName, row.GroupName)})
 					break
 			}
 		})			
@@ -400,59 +385,31 @@ export function buildMergeQuery(rows, type){
 		computerQuery = 'MERGE (computer1:Computer {name: "{}"}) WITH computer1 MERGE (computer2:Computer {name: "{}"}) WITH computer1,computer2 MERGE (computer1)-[:AdminTo]->(computer2)'
 
 		$.each(rows, function(i, row){
-			rawobj = {
-				'method': 'POST',
-				'to': '/cypher',
-				'body' :{
-
-				}
-			}
 			switch(row.AccountType){
 				case 'user':
-					rawobj.body.query = userQuery.format(row.AccountName, row.ComputerName)
-					queries.push(rawobj)
+					queries.statements.push({"statement": userQuery.format(row.AccountName, row.ComputerName)})
 					break;
 				case 'group':
-					rawobj.body.query = groupQuery.format(row.AccountName, row.ComputerName)
-					queries.push(rawobj)
+					queries.statements.push({"statement": groupQuery.format(row.AccountName, row.ComputerName)})
 					break;
 				case 'computer':
-					rawobj.body.query = computerQuery.format(row.AccountName, row.ComputerName)
-					queries.push(rawobj)
+					queries.statements.push({"statement": computerQuery.format(row.AccountName, row.ComputerName)})
 					break
 			}
 		})
 	}else{
 		domainQuery = 'MERGE (domain1:Domain {name: "{}"}) WITH domain1 MERGE (domain2:Domain {name: "{}"}) WITH domain1,domain2 MERGE (domain1)-[:TrustedBy {TrustType : "{}", Transitive: "{}"}]->(domain2)'
 		$.each(rows, function(i, row){
-			rawobj = {
-				'method': 'POST',
-				'to': '/cypher',
-				'body' :{
-
-				}
-			}
 			switch(row.TrustDirection){
 				case 'Inbound':
-					rawobj.body.query = domainQuery.format(row.TargetDomain, row.SourceDomain, row.TrustType, row.Transitive)
-					queries.push(rawobj)
+					queries.statements.push({"statement": domainQuery.format(row.TargetDomain, row.SourceDomain, row.TrustType, row.Transitive)})
 					break;
 				case 'Outbound':
-					rawobj.body.query = domainQuery.format(row.SourceDomain, row.TargetDomain, row.TrustType, row.Transitive)
-					queries.push(rawobj)
+					queries.statements.push({"statement": domainQuery.format(row.SourceDomain, row.TargetDomain, row.TrustType, row.Transitive)})
 					break;
 				case 'Bidirectional':
-					rawobj.body.query = domainQuery.format(row.TargetDomain, row.SourceDomain, row.TrustType, row.Transitive)
-					queries.push(rawobj)
-					rawobj = {
-						'method': 'POST',
-						'to': '/cypher',
-						'body' :{
-
-						}
-					}
-					rawobj.body.query = domainQuery.format(row.SourceDomain, row.TargetDomain, row.TrustType, row.Transitive)
-					queries.push(rawobj)
+					queries.statements.push({"statement": domainQuery.format(row.TargetDomain, row.SourceDomain, row.TrustType, row.Transitive)})
+					queries.statements.push({"statement": domainQuery.format(row.SourceDomain, row.TargetDomain, row.TrustType, row.Transitive)})
 					break
 			}
 		})
