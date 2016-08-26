@@ -12,6 +12,7 @@ export default class DatabaseDataDisplay extends Component {
 			num_computers: 'Refreshing',
 			num_groups: 'Refreshing',
 			num_relationships: 'Refreshing',
+			num_sessions: 'Refreshing',
 			interval: null
 		}
 	}
@@ -55,6 +56,8 @@ export default class DatabaseDataDisplay extends Component {
 					<dd>{this.state.num_computers}</dd>
 					<dt>Groups</dt>
 					<dd>{this.state.num_groups}</dd>
+					<dt>Sessions</dt>
+					<dd>{this.state.num_sessions}</dd>
 					<dt>Relationships</dt>
 					<dd>{this.state.num_relationships}</dd>
 				</dl>
@@ -71,11 +74,12 @@ export default class DatabaseDataDisplay extends Component {
 	}
 
 	refreshDBData(){
-		var user,computer,group,relationship;
+		var user,computer,group,sessions,relationship;
 		user = defaultAjaxSettings();
 		computer = defaultAjaxSettings();
 		group = defaultAjaxSettings();
 		relationship = defaultAjaxSettings();
+		sessions = defaultAjaxSettings();
 
 		user.data = JSON.stringify({
 			'statements': [{
@@ -113,9 +117,19 @@ export default class DatabaseDataDisplay extends Component {
 			this.setState({num_relationships:json.results[0].data[0].row[0] })
 		}.bind(this)
 
+		sessions.data = JSON.stringify({
+			'statements': [{
+				'statement': "MATCH ()-[r:HasSession]->() RETURN count(r)"
+			}]
+		})
+		sessions.success = function(json){
+			this.setState({num_sessions:json.results[0].data[0].row[0] })
+		}.bind(this)
+
 		$.ajax(user);
 		$.ajax(computer);
 		$.ajax(group);
 		$.ajax(relationship);
+		$.ajax(sessions);
 	}
 }
