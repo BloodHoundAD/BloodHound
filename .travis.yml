@@ -1,9 +1,14 @@
 language: node_js
+node_js:
+  - "6"
+
+os:
+  - linux
+  - osx
 
 install:
   - npm install
   - npm install -g electron-packager
 
 script:
-  - npm run linuxbuild
-  - npm run macbuild
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run macbuild; else npm run linuxbuild; fi
