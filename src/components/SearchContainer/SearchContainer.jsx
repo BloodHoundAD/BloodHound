@@ -173,8 +173,10 @@ export default class SearchContainer extends Component {
                 return;
             }
             if (!this.state.pathfindingIsOpen) {
-                var statement = "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n".format(escapeRegExp(start));
-                emitter.emit('searchQuery', statement)
+                if (start !== ""){
+                    var statement = "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n".format(escapeRegExp(start));
+                    emitter.emit('searchQuery', statement)    
+                }
             } else {
                 var start = jQuery(this.refs.searchbar).val();
                 var end = jQuery(this.refs.pathbar).val();
