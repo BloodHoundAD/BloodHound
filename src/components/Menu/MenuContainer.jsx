@@ -3,7 +3,7 @@ import MenuButton from './MenuButton';
 import ProgressBarMenuButton from './ProgressBarMenuButton';
 import { buildMergeQuery, defaultAjaxSettings } from 'utils';
 import { If, Then, Else } from 'react-if';
-const { dialog } = require('electron').remote
+const { dialog, clipboard } = require('electron').remote
 var fs = require('fs')
 
 export default class MenuContainer extends Component {
@@ -111,6 +111,7 @@ export default class MenuContainer extends Component {
 				header: true,
 				dynamicTyping: true,
 				chunkSize: 25600,
+				skipEmptyLines: true,
 				chunk: function(rows, parser){
 					if (rows.data.length === 0){
 						parser.abort()
@@ -134,7 +135,15 @@ export default class MenuContainer extends Component {
 					options.url = appStore.databaseInfo.url + '/db/data/transaction/' + transactionID
 					//var data = JSON.stringify(buildMergeQuery(rows.data, filetype), null, 2)
 					options.data = JSON.stringify(buildMergeQuery(rows.data, filetype))
-					options.success = function(){
+					options.success = function(json){
+						if (json.errors.length > 0){
+							parser.abort()
+							fs.writeFile("error.log", JSON.stringify(json.errors, null, 2))
+							clipboard.writeText(JSON.stringify(json.errors, null, 2))
+							dialog.showErrorBox("Ingestion Error", "An error occurred in ingestion.\nIf possible please post the error.log file to a git issue (check for sensitive data first!) or contact cptjesus directly on the BloodHound Slack Channel.\nThe error has also been copied to your clipboard.")
+							this.cancelUpload()							
+							return
+						}
 						completed += rows.data.length
 						sent += rows.data.length
 						this.setState({progress: Math.floor((completed / count) * 100)})
@@ -158,13 +167,6 @@ export default class MenuContainer extends Component {
 							parser.resume()
 						}
 					}.bind(this)
-					options.error = function(xhr, status, error){
-						if (xhr.statusText !== 'abort'){
-							console.log(xhr)
-							console.log(status)
-							console.log(error)	
-						}
-					}
 					var a = $.ajax(options);
 					this.setState({currentAjax: a})
 				}.bind(this)
