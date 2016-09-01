@@ -22,7 +22,7 @@ artifacts:
     name: BloodHound-win32-x64
 
 deploy:
-  - provider: Github
+  - provider: GitHub
     release: BloodHound Rolling
     description: 'Rolling release of BloodHound compiled from Source'
     artifact: BloodHound-win32-ia32.zip,BloodHound-win32-x64.zip
