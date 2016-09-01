@@ -363,7 +363,7 @@ export function buildMergeQuery(rows, type){
 			if (row.UserName === 'ANONYMOUS LOGON@UNKNOWN' || row.UserName === ''){
 				return
 			}
-			row.UserName = row.UserName.toUpperCase()
+			row.UserName = escapeSingleQuotes(row.UserName.toUpperCase())
 			row.ComputerName = escapeSingleQuotes(row.ComputerName.toUpperCase())
 			queries.statements.push({"statement": userQuery.format(row.UserName, row.ComputerName, row.Weight)})
 		})
