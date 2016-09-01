@@ -12,6 +12,8 @@ test_script:
   - node --version
   - npm --version
   - npm run winbuild
+  - 7z a -tzip -mx9 BloodHound-win32-ia32.zip BloodHound-win32-ia32
+  - 7z a -tzip -mx9 BloodHound-win32-x64.zip BloodHound-win32-x64
 
 # Don't actually build.
 build: off
