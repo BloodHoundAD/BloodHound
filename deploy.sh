@@ -11,7 +11,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 	fi
 
 	if [[ ! $x64id == "" ]]; then
-		curl -s -X DELETE --user "${GH_USER}" https://api.github.com/repos/adaptivethreat/BloodHound/releases/assets/$win32id
+		curl -s -X DELETE --user "${GH_USER}" https://api.github.com/repos/adaptivethreat/BloodHound/releases/assets/$x64id
 	fi
 
 	 curl -X POST -# --header 'Content-Type:application/zip' --data-binary @BloodHound-linux-ia32.zip --user "${GH_USER}" https://uploads.github.com/repos/adaptivethreat/BloodHound/releases/4033842/assets?name=BloodHound-linux-ia32.zip
@@ -20,7 +20,7 @@ fi
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
 	if [[ ! $macid == "" ]]; then
-		curl -s -X DELETE --user "${GH_USER}" https://api.github.com/repos/adaptivethreat/BloodHound/releases/assets/$win32id
+		curl -s -X DELETE --user "${GH_USER}" https://api.github.com/repos/adaptivethreat/BloodHound/releases/assets/$macid
 	fi
 
 	curl -X POST -# --header 'Content-Type:application/zip' --data-binary @BloodHound-darwin-x64.zip --user "${GH_USER}" https://uploads.github.com/repos/adaptivethreat/BloodHound/releases/4033842/assets?name=BloodHound-darwin-x64.zip
