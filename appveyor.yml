@@ -12,8 +12,8 @@ test_script:
   - node --version
   - npm --version
   - npm run winbuild
-  - 7z a -tzip -mx9 BloodHound-win32-ia32-$(APPVEYOR_REPO_COMMIT).zip BloodHound-win32-ia32
-  - 7z a -tzip -mx9 BloodHound-win32-x64-$(APPVEYOR_REPO_COMMIT).zip BloodHound-win32-x64
+  - 7z a -tzip -mx9 BloodHound-win32-ia32-%APPVEYOR_REPO_COMMIT%.zip BloodHound-win32-ia32
+  - 7z a -tzip -mx9 BloodHound-win32-x64-%APPVEYOR_REPO_COMMIT%.zip BloodHound-win32-x64
 
 artifacts:
   - path: BloodHound-win32-ia32-$(APPVEYOR_REPO_COMMIT).zip
