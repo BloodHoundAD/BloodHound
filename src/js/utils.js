@@ -2,10 +2,6 @@ export function escapeRegExp(s) {
     return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\\\$&');
 }
 
-export function escapeSingleQuotes(s){
-	return s.replace("'", "\\'")
-}
-
 export function buildAuthHeader(){
 	db = storage.get('database-info', function(error, data){
 		return "Basic " + btoa(db.user + ":" + db.password)	
@@ -358,13 +354,13 @@ export function buildMergeQuery(rows, type){
 
 	var userQuery, computerQuery, groupQuery, domainQuery;
 	if (type === 'sessions'){
-		userQuery = "MERGE (user:User {name:'{}'}) WITH user MERGE (computer:Computer {name: '{}'}) WITH user,computer MERGE (computer)-[:HasSession {Weight : '{}'}]-(user)"
+		userQuery = 'MERGE (user:User {name:"{}"}) WITH user MERGE (computer:Computer {name: "{}"}) WITH user,computer MERGE (computer)-[:HasSession {Weight : "{}"}]-(user)'
 		$.each(rows, function(i, row){
 			if (row.UserName === 'ANONYMOUS LOGON@UNKNOWN' || row.UserName === ''){
 				return
 			}
-			row.UserName = escapeSingleQuotes(row.UserName.toUpperCase())
-			row.ComputerName = escapeSingleQuotes(row.ComputerName.toUpperCase())
+			row.UserName = row.UserName.toUpperCase()
+			row.ComputerName = row.ComputerName.toUpperCase()
 			queries.statements.push({"statement": userQuery.format(row.UserName, row.ComputerName, row.Weight)})
 		})
 	}else if (type === 'groupmembership'){
@@ -373,8 +369,8 @@ export function buildMergeQuery(rows, type){
 		computerQuery = 'MERGE (computer:Computer {name: "{}"}) WITH computer MERGE (group:Group {name: "{}"}) with computer,group MERGE (computer)-[:MemberOf]-(group)'
 		
 		$.each(rows, function(i, row){
-			row.AccountName = escapeSingleQuotes(row.AccountName.toUpperCase())
-			row.GroupName = escapeSingleQuotes(row.GroupName.toUpperCase())
+			row.AccountName = row.AccountName.toUpperCase()
+			row.GroupName = row.GroupName.toUpperCase()
 			switch(row.AccountType){
 				case 'user':
 					queries.statements.push({"statement":  userQuery.format(row.AccountName, row.GroupName)})
@@ -393,8 +389,8 @@ export function buildMergeQuery(rows, type){
 		computerQuery = 'MERGE (computer1:Computer {name: "{}"}) WITH computer1 MERGE (computer2:Computer {name: "{}"}) WITH computer1,computer2 MERGE (computer1)-[:AdminTo]->(computer2)'
 
 		$.each(rows, function(i, row){
-			row.AccountName = escapeSingleQuotes(row.AccountName.toUpperCase())
-			row.ComputerName = escapeSingleQuotes(row.ComputerName.toUpperCase())
+			row.AccountName = row.AccountName.toUpperCase()
+			row.ComputerName = row.ComputerName.toUpperCase()
 			if (row.AccountName.startsWith('@')){
 				return
 			}
@@ -413,8 +409,8 @@ export function buildMergeQuery(rows, type){
 	}else{
 		domainQuery = 'MERGE (domain1:Domain {name: "{}"}) WITH domain1 MERGE (domain2:Domain {name: "{}"}) WITH domain1,domain2 MERGE (domain1)-[:TrustedBy {TrustType : "{}", Transitive: "{}"}]->(domain2)'
 		$.each(rows, function(i, row){
-			row.TargetDomain = escapeSingleQuotes(row.TargetDomain.toUpperCase())
-			row.SourceDomain = escapeSingleQuotes(row.SourceDomain.toUpperCase())
+			row.TargetDomain = row.TargetDomain.toUpperCase()
+			row.SourceDomain = row.SourceDomain.toUpperCase()
 			switch(row.TrustDirection){
 				case 'Inbound':
 					queries.statements.push({"statement": domainQuery.format(row.TargetDomain, row.SourceDomain, row.TrustType, row.Transitive)})

@@ -49,9 +49,12 @@ function createWindow () {
           { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
           { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
           { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" },
+          { label: "Open Developer Tools", accelerator: "CmdOrCtrl+Shift+I", click (item, focusedWindow){
+            mainWindow.webContents.openDevTools()
+          }},
           { label: "Reload", accelerator: 'CmdOrCtrl+R', click (item, focusedWindow){
             if (focusedWindow) focusedWindow.reload()
-          }}
+          },}
       ]}
   ];
 
