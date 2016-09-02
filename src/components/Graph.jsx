@@ -33,15 +33,7 @@ export default class GraphContainer extends Component {
             }, {
                 "statement": "CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE"
             }, {
-                "statement": "CREATE INDEX ON :User(name)"
-            }, {
-                "statement": "CREATE INDEX ON :Computer(name)"
-            }, {
-                "statement": "CREATE INDEX ON :Group(name)"
-            }, {
                 "statement": "CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE"
-            }, {
-                "statement": "CREATE INDEX ON :Domain(name)"
             }]
         })
 
@@ -437,6 +429,9 @@ export default class GraphContainer extends Component {
     }
 
     doGenericQuery(statement, start, end, allowCollapse=true){
+        if (appStore.currentTooltip !== null) {
+            appStore.currentTooltip.close();
+        }
         this.doQueryNative({
             statement: statement,
             allowCollapse: allowCollapse,
