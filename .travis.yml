@@ -34,7 +34,7 @@ deploy:
   script: /bin/bash deploy.sh
   skip_cleanup: true
   on:
-    branch: CI-Test
+    branch: master
 
 notifications:
   email: false
