@@ -119,7 +119,7 @@ export default class MenuContainer extends Component {
 							closeTransaction.url = appStore.databaseInfo.url + '/db/data/transaction/' + transactionID + '/commit'
 							closeTransaction.success = function(){
 								committed += sent
-								this.setState({committed: Math.floor((committed / count) * 100)})
+								this.setState({committed: 100, progress: 100})
 								setTimeout(function(){
 									this.setState({uploading: false})
 								}.bind(this), 3000)
@@ -134,6 +134,7 @@ export default class MenuContainer extends Component {
 					var options = defaultAjaxSettings()
 					options.url = appStore.databaseInfo.url + '/db/data/transaction/' + transactionID
 					//var data = JSON.stringify(buildMergeQuery(rows.data, filetype), null, 2)
+					options.headers['X-Stream'] = true
 					options.data = JSON.stringify(buildMergeQuery(rows.data, filetype))
 					options.success = function(json){
 						if (json.errors.length > 0){
