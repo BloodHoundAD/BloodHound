@@ -8,6 +8,7 @@ env:
 
 os:
   - linux
+  - osx
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
@@ -24,7 +25,10 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run linuxbuild; fi
 
 after_script:
-  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 7z a -tzip -mx9 BloodHound-darwin-x64.zip BloodHound-darwin-x64 > /dev/null; fi
-  #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then 7z a -tzip -mx9 BloodHound-linux-ia32.zip BloodHound-linux-ia32 > /dev/null; fi
-  #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then 7z a -tzip -mx9 BloodHound-linux-x64.zip BloodHound-linux-x64 > /dev/null; fi
-  - curl --user "${GH_USER}" https://api.github.com/repos/adaptivethreat/BloodHound/releases
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 7z a -tzip -mx9 BloodHound-darwin-x64.zip BloodHound-darwin-x64 > /dev/null; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then 7z a -tzip -mx9 BloodHound-linux-ia32.zip BloodHound-linux-ia32 > /dev/null; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then 7z a -tzip -mx9 BloodHound-linux-x64.zip BloodHound-linux-x64 > /dev/null; fi
+
+deploy:
+  provider: script
+  script: deploy.sh
