@@ -24,7 +24,7 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run macbuild; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run linuxbuild; fi
 
-after_script:
+before_deploy:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 7z a -tzip -mx9 BloodHound-darwin-x64.zip BloodHound-darwin-x64 > /dev/null; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then 7z a -tzip -mx9 BloodHound-linux-ia32.zip BloodHound-linux-ia32 > /dev/null; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then 7z a -tzip -mx9 BloodHound-linux-x64.zip BloodHound-linux-x64 > /dev/null; fi
@@ -32,5 +32,6 @@ after_script:
 deploy:
   provider: script
   script: deploy.sh
+  skip_cleanup: true
   on:
     branch: CI-Test
