@@ -5,6 +5,8 @@ win32id="$(echo "$response" | grep -B 1 \"BloodHound-linux-ia32 | head -n1 | cut
 x64id="$(echo "$response" | grep -B 1 \"BloodHound-linux-x64 | head -n1 | cut -d ":" -f 2 | cut -c 2- | sed 's/.$//')"
 macid="$(echo "$response" | grep -B 1 \"BloodHound-darwin-x64 | head -n1 | cut -d ":" -f 2 | cut -c 2- | sed 's/.$//')"
 
+echo $response
+
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 	if [[ ! $win32id == "" ]]; then
 		curl -s -X DELETE --user "${GH_USER}" https://api.github.com/repos/adaptivethreat/BloodHound/releases/assets/$win32id
