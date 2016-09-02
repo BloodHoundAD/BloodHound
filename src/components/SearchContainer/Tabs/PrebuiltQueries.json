@@ -47,7 +47,7 @@
 			"requireNodeSelect": true,
 			"nodeSelectQuery": {
 				"query": "MATCH (n:Domain) RETURN n",
-				"onFinish": "MATCH (n:User) WHERE n.name ENDS WITH '{}' WITH n MATCH (n)-[r:MemberOf*1..]->(m:Group) WHERE NOT m.name ENDS WITH '{}' RETURN n,r,m",
+				"onFinish": "MATCH (n:User) WHERE n.name ENDS WITH ('@' + '{}') WITH n MATCH (n)-[r:MemberOf]->(m:Group) WHERE NOT m.name ENDS WITH ('@' + '{}') RETURN n,r,m",
 				"start": "{}",
 				"end": "",
 				"allowCollapse": false,
@@ -59,7 +59,7 @@
 			"requireNodeSelect": true,
 			"nodeSelectQuery": {
 				"query": "MATCH (n:Domain) RETURN n",
-				"onFinish": "MATCH (n:Group) WHERE n.name ENDS WITH '{}' WITH n MATCH (n)-[r:MemberOf*1..]->(m:Group) WHERE NOT m.name ENDS WITH '{}' RETURN n,r,m",
+				"onFinish": "MATCH (n:Group) WHERE n.name ENDS WITH ('@' + '{}') WITH n MATCH (n)-[r:MemberOf*1..]->(m:Group) WHERE NOT m.name ENDS WITH ('@' + '{}') RETURN n,r,m",
 				"start": "{}",
 				"end": "",
 				"allowCollapse": false,
