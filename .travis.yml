@@ -18,7 +18,7 @@ before_install:
 
 install:
   - npm install
-   npm install -g electron-packager
+  - npm install -g electron-packager
 
 script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run macbuild; fi
