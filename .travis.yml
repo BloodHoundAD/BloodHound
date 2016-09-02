@@ -32,3 +32,5 @@ after_script:
 deploy:
   provider: script
   script: deploy.sh
+  on:
+    branch: CI-Test
