@@ -1,6 +1,6 @@
 {
   "name": "bloodhound",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Graph Theory for Active Directory",
   "keywords": [
     "Graph",
@@ -22,9 +22,9 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development electron .",
     "dev": "concurrently -k \"babel-node server.js\" \"npm start\"",
-    "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=all --overwrite --prune --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --icon=src/img/icon.ico",
-    "macbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=darwin --arch=all --overwrite --prune --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --icon=src/img/icon.icns",
-    "linuxbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=linux --arch=all --overwrite --prune --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb"
+    "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --icon=src/img/icon.ico",
+    "macbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=darwin --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --icon=src/img/icon.icns",
+    "linuxbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=linux --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb"
   },
   "babel": {
     "presets": [
