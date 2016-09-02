@@ -35,3 +35,6 @@ deploy:
   skip_cleanup: true
   on:
     branch: CI-Test
+
+notifications:
+  email: false
