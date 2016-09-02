@@ -14,8 +14,8 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 		curl -s -X DELETE --user "${GH_USER}" https://api.github.com/repos/adaptivethreat/BloodHound/releases/assets/$x64id
 	fi
 
-	 curl -X POST -# --header 'Content-Type:application/zip' --data-binary @BloodHound-linux-ia32-$(TRAVIS_COMMIT).zip --user "${GH_USER}" https://uploads.github.com/repos/adaptivethreat/BloodHound/releases/4033842/assets?name=BloodHound-linux-ia32-$(TRAVIS_COMMIT).zip
-	 curl -X POST -# --header 'Content-Type:application/zip' --data-binary @BloodHound-linux-x64-$(TRAVIS_COMMIT).zip --user "${GH_USER}" https://uploads.github.com/repos/adaptivethreat/BloodHound/releases/4033842/assets?name=BloodHound-linux-x64-$(TRAVIS_COMMIT).zip
+	 curl -X POST -# --header 'Content-Type:application/zip' --data-binary @BloodHound-linux-ia32-$TRAVIS_COMMIT.zip --user "${GH_USER}" https://uploads.github.com/repos/adaptivethreat/BloodHound/releases/4033842/assets?name=BloodHound-linux-ia32-$TRAVIS_COMMIT.zip
+	 curl -X POST -# --header 'Content-Type:application/zip' --data-binary @BloodHound-linux-x64-$TRAVIS_COMMIT.zip --user "${GH_USER}" https://uploads.github.com/repos/adaptivethreat/BloodHound/releases/4033842/assets?name=BloodHound-linux-x64-$TRAVIS_COMMIT.zip
 fi
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
@@ -23,5 +23,5 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
 		curl -s -X DELETE --user "${GH_USER}" https://api.github.com/repos/adaptivethreat/BloodHound/releases/assets/$macid
 	fi
 
-	curl -X POST -# --header 'Content-Type:application/zip' --data-binary @BloodHound-darwin-x64-$(TRAVIS_COMMIT).zip --user "${GH_USER}" https://uploads.github.com/repos/adaptivethreat/BloodHound/releases/4033842/assets?name=BloodHound-darwin-x64-$(TRAVIS_COMMIT).zip
+	curl -X POST -# --header 'Content-Type:application/zip' --data-binary @BloodHound-darwin-x64-$TRAVIS_COMMIT.zip --user "${GH_USER}" https://uploads.github.com/repos/adaptivethreat/BloodHound/releases/4033842/assets?name=BloodHound-darwin-x64-$TRAVIS_COMMIT.zip
 fi
