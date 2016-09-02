@@ -24,7 +24,7 @@ artifacts:
 deploy:
   - provider: GitHub
     release: BloodHound Rolling
-    description: 'Rolling release of BloodHound compiled from Source'
+    description: 'Rolling release of BloodHound compiled from source ($(APPVEYOR_REPO_COMMIT)). Not necessarily stable'
     artifact: BloodHound-win32-ia32.zip,BloodHound-win32-x64.zip
     force_update: true
     auth_token:
