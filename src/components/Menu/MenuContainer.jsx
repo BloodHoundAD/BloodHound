@@ -110,7 +110,7 @@ export default class MenuContainer extends Component {
 			Papa.parse(data,{
 				header: true,
 				dynamicTyping: true,
-				chunkSize: 25600,
+				chunkSize: 50000,
 				skipEmptyLines: true,
 				chunk: function(rows, parser){
 					if (rows.data.length === 0){
