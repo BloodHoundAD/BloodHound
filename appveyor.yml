@@ -33,3 +33,7 @@ deploy:
 
 # Don't actually build.
 build: off
+
+branches:
+  only:
+    - master
