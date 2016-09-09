@@ -452,6 +452,8 @@ export default class GraphContainer extends Component {
                 emitter.emit('groupNodeClicked', n.data.node.label)
             }else if (n.data.node.type_computer){
                 emitter.emit('computerNodeClicked', n.data.node.label)
+            }else if (n.data.node.type_domain){
+                emitter.emit('domainNodeClicked', n.data.node.label)
             }
         }else{
             this.setState({dragged: false})

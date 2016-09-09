@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# DO NOT RUN THIS SCRIPT, THIS IS A SCRIPT FOR TRAVIS TO DO STUFF
 response="$(curl -s --user "${GH_USER}" https://api.github.com/repos/adaptivethreat/BloodHound/releases/4033842/assets)"
 
 win32id="$(echo "$response" | grep -B 1 \"BloodHound-linux-ia32 | head -n1 | cut -d ":" -f 2 | cut -c 2- | sed 's/.$//')"
