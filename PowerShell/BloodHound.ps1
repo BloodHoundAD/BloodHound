@@ -4590,6 +4590,10 @@ function Invoke-BloodHound {
 
         The maximum concurrent threads to execute, default of 20.
 
+    .PARAMETER Throttle
+
+        The number of cypher queries to queue up for neo4j RESTful API ingestion.
+
     .EXAMPLE
 
         PS C:\> Invoke-BloodHound
@@ -4656,7 +4660,11 @@ function Invoke-BloodHound {
 
         [ValidateRange(1,50)]
         [Int]
-        $Threads = 20
+        $Threads = 20,
+
+        [ValidateRange(1,5000)]
+        [Int]
+        $Throttle = 1000
     )
 
     BEGIN {
@@ -4679,7 +4687,7 @@ function Invoke-BloodHound {
                 $UseGroup = $True
                 $UseLocalGroup = $True
                 $UseSession = $True
-                $UseLoggedOn = $True
+                $UseLoggedOn = $False
                 $UseDomainTrusts = $True
                 $SkipGCDeconfliction = $False
             }
@@ -4754,7 +4762,6 @@ function Invoke-BloodHound {
         else {
             # otherwise we're doing ingestion straight to the neo4j RESTful API interface
 
-            $Throttle = 1000
             $WebClient = New-Object System.Net.WebClient
 
             $Base64UserPass = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($UserPass))
@@ -4823,80 +4830,122 @@ function Invoke-BloodHound {
         }
 
         if($UseGroup -and $TargetDomains) {
+            $Title = (Get-Culture).TextInfo
             ForEach ($TargetDomain in $TargetDomains) {
                 # enumerate all groups and all members of each group
 
                 Write-Verbose "Enumerating group memberships for domain $TargetDomain"
 
-                $GroupSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController
-
-                # only search for security groups for a speedup (we don't care about distribution groups)
-                $GroupSearcher.filter = "(&(groupType:1.2.840.113556.1.4.803:=2147483648)(member=*))"
-                $Null = $GroupSearcher.PropertiesToLoad.AddRange(('samaccountname', 'member'))
                 $PrimaryGroups = @{}
                 $DomainSID = Get-DomainSID -Domain $TargetDomain -DomainController $DomainController
-                $GroupCounter = 0
 
-                ForEach($GroupResult in $GroupSearcher.FindAll()) {
-                    ForEach($Member in $GroupResult.properties['member']) {
-                        $Properties = ([adsi]"LDAP://$Member").Properties
-                        $IsGroup = @('268435456','268435457','536870912','536870913') -contains $Properties.samaccounttype
-
-                        if($GroupCounter % 100 -eq 0) {
-                            Write-Verbose "Group counter: $GroupCounter"
+                $ObjectSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController
+                $ObjectSearcher.Filter = '(memberof=*)'
+                $Null = $ObjectSearcher.PropertiesToLoad.AddRange(('samaccountname', 'distinguishedname', 'cn', 'dnshostname', 'samaccounttype', 'primarygroupid', 'memberof'))
+                $Counter = 0
+                $ObjectSearcher.FindAll() | ForEach-Object {
+                    if($Counter % 1000 -eq 0) {
+                        Write-Verbose "Group object counter: $Counter"
+                        if($GroupWriter) {
+                            $GroupWriter.Flush()
                         }
+                        [GC]::Collect()
+                    }
+                    $Properties = $_.Properties
 
-                        $MemberDN = $Null
-                        $MemberDomain = $Null
+                    $MemberDN = $Null
+                    $MemberDomain = $Null
+                    try {
+                        $MemberDN = $Properties['distinguishedname'][0]
 
-                        try {
-                            $MemberDN = $Properties.distinguishedname[0]
-
-                            if (($MemberDN -match 'ForeignSecurityPrincipals') -and ($MemberDN -match 'S-1-5-21')) {
-                                try {
-                                    if(-not $MemberSID) {
-                                        $MemberSID = $Properties.cn[0]
-                                    }
-                                    $MemberSimpleName = Convert-SidToName -SID $MemberSID | Convert-ADName -InputType 'NT4' -OutputType 'Canonical'
-                                    if($MemberSimpleName) {
-                                        $MemberDomain = $MemberSimpleName.Split('/')[0]
-                                    }
-                                    else {
-                                        Write-Verbose "Error converting $MemberDN"
-                                    }
+                        if (($MemberDN -match 'ForeignSecurityPrincipals') -and ($MemberDN -match 'S-1-5-21')) {
+                            try {
+                                if(-not $MemberSID) {
+                                    $MemberSID = $Properties.cn[0]
                                 }
-                                catch {
+                                $MemberSimpleName = Convert-SidToName -SID $MemberSID | Convert-ADName -InputType 'NT4' -OutputType 'Canonical'
+                                if($MemberSimpleName) {
+                                    $MemberDomain = $MemberSimpleName.Split('/')[0]
+                                }
+                                else {
                                     Write-Verbose "Error converting $MemberDN"
                                 }
                             }
-                            else {
-                                # extract the FQDN from the Distinguished Name
-                                $MemberDomain = $MemberDN.subString($MemberDN.IndexOf("DC=")) -replace 'DC=','' -replace ',','.'
+                            catch {
+                                Write-Verbose "Error converting $MemberDN"
                             }
                         }
-                        catch {}
+                        else {
+                            # extract the FQDN from the Distinguished Name
+                            $MemberDomain = $MemberDN.subString($MemberDN.IndexOf("DC=")) -replace 'DC=','' -replace ',','.'
+                        }
+                    }
+                    catch {}
 
-                        if ($Properties.samaccountname) {
-                            # forest users have the samAccountName set
-                            $MemberName = $Properties.samaccountname[0]
+                    if (@('268435456','268435457','536870912','536870913') -contains $Properties['samaccounttype']) {
+                        $ObjectType = 'group'
+                        if($Properties['samaccountname']) {
+                            $MemberName = $Properties['samaccountname'][0]
                         }
                         else {
                             # external trust users have a SID, so convert it
                             try {
-                                $MemberName = Convert-SidToName $Properties.cn[0]
+                                $MemberName = Convert-SidToName $Properties['cn'][0]
                             }
                             catch {
                                 # if there's a problem contacting the domain to resolve the SID
-                                $MemberName = $Properties.cn
+                                $MemberName = $Properties['cn'][0]
                             }
                         }
+                        if ($MemberName -Match "\\") {
+                            # if the membername itself contains a backslash, get the trailing section
+                            #   TODO: later preserve this once BloodHound can properly display these characters
+                            $AccountName = $MemberName.split('\')[1] + '@' + $MemberDomain
+                        }
+                        else {
+                            $AccountName = "$MemberName@$MemberDomain"
+                        }
+                    }
+                    elseif (@('805306369') -contains $Properties['samaccounttype']) {
+                        $ObjectType = 'computer'
+                        $AccountName = $Properties['dnshostname'][0]
+                    }
+                    elseif (@('805306368') -contains $Properties['samaccounttype']) {
+                        $ObjectType = 'user'
+                        if($Properties['samaccountname']) {
+                            $MemberName = $Properties['samaccountname'][0]
+                        }
+                        else {
+                            # external trust users have a SID, so convert it
+                            try {
+                                $MemberName = Convert-SidToName $Properties['cn'][0]
+                            }
+                            catch {
+                                # if there's a problem contacting the domain to resolve the SID
+                                $MemberName = $Properties['cn'][0]
+                            }
+                        }
+                        if ($MemberName -Match "\\") {
+                            # if the membername itself contains a backslash, get the trailing section
+                            #   TODO: later preserve this once BloodHound can properly display these characters
+                            $AccountName = $MemberName.split('\')[1] + '@' + $MemberDomain
+                        }
+                        else {
+                            $AccountName = "$MemberName@$MemberDomain"
+                        }
+                    }
+                    else {
+                        Write-Verbose "Unknown account type for object $($Properties['distinguishedname']) : $($Properties['samaccounttype'])"
+                    }
+
+                    if($AccountName -and (-not $AccountName.StartsWith('@'))) {
 
                         $MemberPrimaryGroupName = $Null
                         try {
-                            if($MemberDomain -eq $TargetDomain) {
-                                # also retrieve the primary group name for this user
-                                if($Properties.primaryGroupID -and $Properties.primaryGroupID -ne '') {
-                                    $PrimaryGroupSID = "$DomainSID-$($Properties.primaryGroupID)"
+                            if($AccountName -match $TargetDomain) {
+                                # also retrieve the primary group name for this object, if it exists
+                                if($Properties['primarygroupid'] -and $Properties['primarygroupid'][0] -ne '') {
+                                    $PrimaryGroupSID = "$DomainSID-$($Properties['primarygroupid'][0])"
                                     if($PrimaryGroups[$PrimaryGroupSID]) {
                                         $PrimaryGroupName = $PrimaryGroups[$PrimaryGroupSID]
                                     }
@@ -4911,78 +4960,39 @@ function Invoke-BloodHound {
                         }
                         catch { }
 
-                        $GroupName = $GroupResult.properties['samaccountname'][0]
-                        $GroupDomain = $TargetDomain
-                        $GroupName = "$GroupName@$GroupDomain"
+                        ForEach($GroupDN in $_.properties['memberof']) {
+                            # iterate through each membership for this object
+                            $GroupDomain = $GroupDN.subString($GroupDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'
+                            $GroupName = $GroupDN.SubString(0, $GroupDN.IndexOf(',')).Split('=')[-1]
 
-                        if ($MemberName -Match "\\") {
-                            # if the membername itself contains a backslash, get the trailing section
-                            # TODO: later preserve this once BloodHound can properly display these characters
-                            $AccountName = $MemberName.split('\')[1] + '@' + $MemberDomain
-                        }
-                        else {
-                            $AccountName = "$MemberName@$MemberDomain"
-                        }
+                            if ($PSCmdlet.ParameterSetName -eq 'CSVExport') {
+                                $GroupWriter.WriteLine("`"$GroupName@$GroupDomain`",`"$AccountName`",`"$ObjectType`"")
 
-                        if ($PSCmdlet.ParameterSetName -eq 'CSVExport') {
-                            if($IsGroup) {
-                                $GroupWriter.WriteLine("`"$GroupName`",`"$AccountName`",`"group`"")
                                 if($MemberPrimaryGroupName) {
-                                    $GroupWriter.WriteLine("`"$MemberPrimaryGroupName`",`"$AccountName`",`"group`"")
+                                    $GroupWriter.WriteLine("`"$MemberPrimaryGroupName`",`"$AccountName`",`"$ObjectType`"")
                                 }
                             }
                             else {
-                                if($Properties.objectclass -contains 'computer') {
-                                    $AccountName = $Properties.dnshostname
-                                    $GroupWriter.WriteLine("`"$GroupName`",`"$AccountName`",`"computer`"")
-                                    if($MemberPrimaryGroupName) {
-                                        $GroupWriter.WriteLine("`"$MemberPrimaryGroupName`",`"$AccountName`",`"computer`"")
-                                    }
-                                }
-                                else {
-                                    # otherwise there's no way to determine if this is a computer object or not
-                                    $GroupWriter.WriteLine("`"$GroupName`",`"$AccountName`",`"user`"")
-                                    if($MemberPrimaryGroupName) {
-                                        $GroupWriter.WriteLine("`"$MemberPrimaryGroupName`",`"$AccountName`",`"user`"")
-                                    }
-                                }
-                            }
-                        }
-                        else {
-                            # otherwise we're exporting to the neo4j RESTful API
-                            if($IsGroup) {
-                                $Null = $Statements.Add( @{ "statement"="MERGE (group1:Group { name: UPPER('$AccountName') }) MERGE (group2:Group { name: UPPER('$GroupName') }) MERGE (group1)-[:MemberOf]->(group2)" } )
+                                # otherwise we're exporting to the neo4j RESTful API
+                                $ObjectTypeCap = $Title.ToTitleCase($ObjectType)
+
+                                $Null = $Statements.Add( @{ "statement"="MERGE ($($ObjectType)1:$ObjectTypeCap { name: UPPER('$AccountName') }) MERGE (group2:Group { name: UPPER('$GroupName@$GroupDomain') }) MERGE ($($ObjectType)1)-[:MemberOf]->(group2)" } )
                                 if($MemberPrimaryGroupName) {
-                                    $Null = $Statements.Add( @{ "statement"="MERGE (group1:Group { name: UPPER('$AccountName') }) MERGE (group2:Group { name: UPPER('$MemberPrimaryGroupName') }) MERGE (group1)-[:MemberOf]->(group2)" } )
+                                    $Null = $Statements.Add( @{ "statement"="MERGE ($($ObjectType)1:$ObjectTypeCap { name: UPPER('$AccountName') }) MERGE (group2:Group { name: UPPER('$MemberPrimaryGroupName') }) MERGE ($($ObjectType)1)-[:MemberOf]->(group2)" } )
                                 }
-                            }
-                            else {
-                                if($Properties.objectclass -contains 'computer') {
-                                    $AccountName = $Properties.dnshostname
-                                    $Null = $Statements.Add( @{ "statement"="MERGE (computer:Computer { name: UPPER('$AccountName') }) MERGE (group:Group { name: UPPER('$GroupName') }) MERGE (computer)-[:MemberOf]->(group)" } )
-                                    if($MemberPrimaryGroupName) {
-                                        $Null = $Statements.Add( @{ "statement"="MERGE (computer:Computer { name: UPPER('$AccountName') }) MERGE (group:Group { name: UPPER('$MemberPrimaryGroupName') }) MERGE (computer)-[:MemberOf]->(group)" } )
-                                    }
+
+                                if ($Statements.Count -ge $Throttle) {
+                                    $Json = @{ "statements"=[System.Collections.Hashtable[]]$Statements }
+                                    $JsonRequest = ConvertTo-Json20 $Json
+                                    $Null = $WebClient.UploadString($URI.AbsoluteUri + "db/data/transaction/commit", $JsonRequest)
+                                    $Statements.Clear()
                                 }
-                                else {
-                                    # otherwise there's no way to determine if this is a computer object or not...
-                                    $Null = $Statements.Add( @{ "statement"="MERGE (user:User { name: UPPER('$AccountName') }) MERGE (group:Group { name: UPPER('$GroupName') }) MERGE (user)-[:MemberOf]->(group)" } )
-                                    if($MemberPrimaryGroupName) {
-                                        $Null = $Statements.Add( @{ "statement"="MERGE (user:User { name: UPPER('$AccountName') }) MERGE (group:Group { name: UPPER('$MemberPrimaryGroupName') }) MERGE (user)-[:MemberOf]->(group)" } )
-                                    }
-                                }
-                            }
-                            if ($Statements.Count -ge $Throttle) {
-                                $Json = @{ "statements"=[System.Collections.Hashtable[]]$Statements }
-                                $JsonRequest = ConvertTo-Json20 $Json
-                                $Null = $WebClient.UploadString($URI.AbsoluteUri + "db/data/transaction/commit", $JsonRequest)
-                                $Statements.Clear()
                             }
                         }
-                        $GroupCounter += 1
+                        $Counter += 1
                     }
                 }
-                $GroupSearcher.Dispose()
+                $ObjectSearcher.Dispose()
 
                 if ($PSCmdlet.ParameterSetName -eq 'RESTAPI') {
                     $Json = @{ "statements"=[System.Collections.Hashtable[]]$Statements }
@@ -4992,7 +5002,6 @@ function Invoke-BloodHound {
                 }
                 Write-Verbose "Done with group enumeration for domain $TargetDomain"
             }
-            Write-Verbose "Enumerating group enumeration"
             [GC]::Collect()
         }
 
