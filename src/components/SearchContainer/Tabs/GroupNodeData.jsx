@@ -24,10 +24,6 @@ export default class GroupNodeData extends Component {
 		emitter.on('groupNodeClicked', this.getNodeData.bind(this));
 	}
 
-	placeholder(){
-
-	}
-
 	getNodeData(payload){
 		this.setState({
 			label: payload,

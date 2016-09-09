@@ -5,6 +5,7 @@ import NoNodeData from './Tabs/NoNodeData'
 import UserNodeData from './Tabs/UserNodeData'
 import GroupNodeData from './Tabs/GroupNodeData';
 import ComputerNodeData from './Tabs/ComputerNodeData';
+import DomainNodeData from './Tabs/DomainNodeData';
 import { Tabs, Tab } from 'react-bootstrap';
 
 export default class TabContainer extends Component {
@@ -15,6 +16,7 @@ export default class TabContainer extends Component {
 			userVisible: false,
 			computerVisible: false,
 			groupVisible: false,
+			domainVisible: false,
 			selected: 1
 		}
 	}
@@ -23,7 +25,8 @@ export default class TabContainer extends Component {
 		this.setState({
 			userVisible: true,
 			computerVisible: false,
-			groupVisible: false
+			groupVisible: false,
+			domainVisible: false
 		})
 		this.setState({selected: 2})
 	}
@@ -32,7 +35,8 @@ export default class TabContainer extends Component {
 		this.setState({
 			userVisible: false,
 			computerVisible: false,
-			groupVisible: true
+			groupVisible: true,
+			domainVisible: false
 		})
 		this.setState({selected: 2})
 	}
@@ -41,15 +45,28 @@ export default class TabContainer extends Component {
 		this.setState({
 			userVisible: false,
 			computerVisible: true,
-			groupVisible: false
+			groupVisible: false,
+			domainVisible: false
 		})
 		this.setState({selected: 2})
 	}
+
+	_domainNodeClicked(){
+		this.setState({
+			userVisible: false,
+			computerVisible: false,
+			groupVisible: false,
+			domainVisible: true
+		})
+		this.setState({selected: 2})
+	}
+
 
 	componentDidMount() {
 		emitter.on('userNodeClicked', this._userNodeClicked.bind(this))
 		emitter.on('groupNodeClicked', this._groupNodeClicked.bind(this))
 		emitter.on('computerNodeClicked', this._computerNodeClicked.bind(this))
+		emitter.on('domainNodeClicked', this._domainNodeClicked.bind(this))
 	}
 
 	_handleSelect(index, last){
@@ -65,10 +82,11 @@ export default class TabContainer extends Component {
 					</Tab>
 
 					<Tab eventKey={2} title="Node Info">
-						<NoNodeData visible={!this.state.userVisible && !this.state.computerVisible && !this.state.groupVisible}/>
+						<NoNodeData visible={!this.state.userVisible && !this.state.computerVisible && !this.state.groupVisible && !this.state.domainVisible}/>
 						<UserNodeData visible={this.state.userVisible}/>
 						<GroupNodeData visible={this.state.groupVisible}/>
 						<ComputerNodeData visible={this.state.computerVisible}/>
+						<DomainNodeData visible={this.state.domainVisible}/>
 					</Tab>
 
 					<Tab eventKey={3} title="Queries">
