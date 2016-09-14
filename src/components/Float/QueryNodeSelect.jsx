@@ -35,6 +35,10 @@ export default class QueryNodeSelect extends Component {
 		$(this.refs.outer).fadeToggle(0)
 	}
 
+	_dismiss(){
+		$(this.refs.outer).fadeToggle(false)
+	}
+
 	handleClick(event){
 		emitter.emit('query',
 			this.state.queryData.onFinish.formatAll(event.target.text),
@@ -45,9 +49,10 @@ export default class QueryNodeSelect extends Component {
 	}
 
 	render() {
+		var header = <QueryNodeSelectHeader length={this.state.data.length} title={this.state.queryData.boxTitle} dismiss={this._dismiss.bind(this)}/>
 		return (
 			<div className="queryNodeSelect" ref="outer">
-				<Panel header={this.state.data.length > 0 ? this.state.queryData.boxTitle : "Loading..."}>
+				<Panel header={header}>
 					<If condition={ this.state.data.length > 0 }>
 						<Then>
 							<ListGroup ref="list">
@@ -66,6 +71,20 @@ export default class QueryNodeSelect extends Component {
 					</If>
 				</Panel>
 				
+			</div>
+		);
+	}
+}
+
+class QueryNodeSelectHeader extends Component {
+	render() {
+		var title = this.props.length > 0 ? this.props.title : "Loading..."
+		return (
+			<div>
+				{title}
+				<button type="button" className="close" onClick={this.props.dismiss} aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
 			</div>
 		);
 	}
