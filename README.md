@@ -1,3 +1,8 @@
+#Downloading BloodHound Binaries
+Pre-Compiled BloodHound binaries can be found [here](https://github.com/adaptivethreat/BloodHound/releases). 
+
+The rolling release will always be updated to the most recent source. Tagged releases are considered "stable" but will likely not have new features or fixes.
+
 #About BloodHound
 
 To get started with BloodHound, check out the [BloodHound Github Wiki.](https://github.com/adaptivethreat/Bloodhound/wiki)
