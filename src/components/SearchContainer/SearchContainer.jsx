@@ -79,6 +79,7 @@ export default class SearchContainer extends Component {
         emitter.on('userNodeClicked', this.openNodeTab.bind(this))
         emitter.on('groupNodeClicked', this.openNodeTab.bind(this))
         emitter.on('computerNodeClicked', this.openNodeTab.bind(this))
+        emitter.on('domainNodeClicked', this.openNodeTab.bind(this))
         emitter.on('setStart', function(payload){
             jQuery(this.refs.searchbar).val(payload);
         }.bind(this))
