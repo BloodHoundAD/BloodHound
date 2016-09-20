@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
-import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes, findGraphPath, defaultAjaxSettings } from 'utils';
+import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes, findGraphPath, defaultAjaxSettings} from 'utils';
 var fs = require('fs');
 var child_process = require('child_process')
 const { dialog } = require('electron').remote
@@ -14,7 +14,8 @@ export default class GraphContainer extends Component {
             design: null,
             dragged: false,
             firstDraw: true,
-            template: null
+            template: null,
+            session: driver.session()
         }
         $.ajax({
             url: 'src/components/tooltip.html',
@@ -24,21 +25,41 @@ export default class GraphContainer extends Component {
             }.bind(this)
         })
 
-        var a = defaultAjaxSettings()
-        a.data = JSON.stringify({
-            "statements": [{
-                "statement": "CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE"
-            }, {
-                "statement": "CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE"
-            }, {
-                "statement": "CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE"
-            }, {
-                "statement": "CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE"
-            }]
-        })
+        var s1 = driver.session()
+        var s2 = driver.session()
+        var s3 = driver.session()
+        var s4 = driver.session()
 
-        $.ajax(a)
+        s1.run("CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE")
+            .then(function(){
+                s1.close()
+            })
+            .catch(function(){
+                s1.close()
+            })
+        s2.run("CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE")
+            .then(function(){
+                s2.close()
+            })
+            .catch(function(){
+                s2.close()
+            })
+        s3.run("CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE")
+            .then(function(){
+                s3.close()
+            })
+            .catch(function(){
+                s3.close()
+            })
+        s4.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE")
+            .then(function(){
+                s4.close()
+            })
+            .catch(function(){
+                s4.close()
+            })
 
+        
         emitter.on('doLogout', function(){
             this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.refresh();
@@ -222,10 +243,11 @@ export default class GraphContainer extends Component {
 
     componentDidMount() {
         this.initializeSigma();
-            
+        
         this.doQueryNative({
             statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
-            allowCollapse: false
+            allowCollapse: false,
+            props: {}
         })
     }
 
@@ -290,95 +312,221 @@ export default class GraphContainer extends Component {
         }, 2000)
     }
 
+    bakdoQueryNative(params){
+
+        // if (!this.state.firstDraw){
+        //     appStore.queryStack.push({
+        //         nodes: this.state.sigmaInstance.graph.nodes(),
+        //         edges: this.state.sigmaInstance.graph.edges(),
+        //         spotlight: appStore.spotlightData,
+        //         startNode: appStore.startNode,
+        //         endNode: appStore.endNode
+        //     })
+        // }
+
+        // emitter.emit('showLoadingIndicator', true);
+        // emitter.emit('updateLoadingText', "Querying Database")
+        // emitter.emit('resetSpotlight')
+
+        // sigma.neo4j.cypher({
+        //     url: appStore.databaseInfo.url,
+        //     user: appStore.databaseInfo.user,
+        //     password: appStore.databaseInfo.password
+        // },
+        // params.statement,
+        // this.state.sigmaInstance,
+        // function(sigmaInstance){
+        //     if (sigmaInstance.graph.nodes().length === 0){
+        //         emitter.emit('showAlert', "No data returned from query")
+        //         emitter.emit('updateLoadingText', "Done!")
+        //         setTimeout(function(){
+        //             emitter.emit('showLoadingIndicator', false);    
+        //         }, 1500)
+        //         this.goBack()
+        //         return;
+        //     }
+        //     appStore.spotlightData = {}
+        //     var design = this.state.design;
+        //     sigmaInstance = setNodeData(sigmaInstance, params.start, params.end);
+        //     if (params.allowCollapse){
+        //         sigmaInstance = collapseEdgeNodes(sigmaInstance);
+        //         sigmaInstance = collapseSiblingNodes(sigmaInstance);
+        //     }
+
+        //     $.each(sigmaInstance.graph.nodes(), function(index, node) {
+        //         if (!appStore.spotlightData.hasOwnProperty(node.id)) {
+        //             appStore.spotlightData[node.id] = [node.neo4j_data.name, 0, ""];
+        //         }
+        //     });
+        //     this.state.sigmaInstance = sigmaInstance
+        //     this.state.design = design;
+        //     emitter.emit('spotlightUpdate');
+        //     sigma.misc.animation.camera(sigmaInstance.camera, { x: 0, y: 0, ratio: 1.075 });
+        //     if (appStore.dagre){
+        //         sigma.layouts.dagre.start(this.state.sigmaInstance);
+        //     }else{
+        //         sigma.layouts.startForceLink()
+        //     }
+
+        //     // var child = child_process.fork('src/js/worker.js', {silent:true});
+
+        //     // child.stdout.on('data', (data) => {
+        //     //   console.log(`stdout: ${data}`);
+        //     // });
+
+        //     // child.stderr.on('data', (data) => {
+        //     //     console.log(`error: ${data}`);
+        //     // });
+            
+
+        //     // child.on('message', function(m) {
+        //     //   // Receive results from child process
+        //     //   this.loadFromChildProcess(m)
+        //     // }.bind(this));
+
+        //     // // Send child process some work
+        //     // child.send(JSON.stringify({nodes:sigmaInstance.graph.nodes(),
+        //     //      edges: sigmaInstance.graph.edges(),
+        //     //      edge: params.allowCollapse ? appStore.performance.edge : 0 ,
+        //     //      sibling: params.allowCollapse ? appStore.performance.sibling : 0,
+        //     //      start: appStore.startNode,
+        //     //      end: appStore.endNode
+        //     //  }))
+        //     this.state.design.deprecate();
+        //     this.state.sigmaInstance.refresh();
+        //     this.state.design.apply();
+        // }.bind(this))
+        // if (this.state.firstDraw){
+        //     setTimeout(function(){
+        //         this.state.sigmaInstance.refresh({skipIndexation: true})
+        //     }.bind(this), 500)
+        //     this.setState({firstDraw: false})
+        // }
+    }
+
     doQueryNative(params){
-        if (!this.state.firstDraw){
-            appStore.queryStack.push({
-                nodes: this.state.sigmaInstance.graph.nodes(),
-                edges: this.state.sigmaInstance.graph.edges(),
-                spotlight: appStore.spotlightData,
-                startNode: appStore.startNode,
-                endNode: appStore.endNode
+        var sigmaInstance = this.state.sigmaInstance
+        var nodes = {}
+        var edges = {}
+        var session = driver.session()
+        console.log(params.statement)
+        session.run(params.statement, params.props)
+            .subscribe({
+                onNext: function(result){
+                    console.log(result)
+                    if (result._fields[0].hasOwnProperty('segments')){
+                        console.log('path')
+                    }else{
+                        $.each(result._fields, function(val){
+                            if ($.isArray(result._fields[val])){
+                                var id = result._fields[val][0].identity.low
+                                if (!edges.hasOwnProperty(id)){
+                                    edges[id] = this.createEdgeFromRow(result._fields[val][0])
+                                }
+                            }else{
+                                var id = result._fields[val].identity.low
+                                if (!nodes.hasOwnProperty(id)){
+                                    nodes[id] = this.createNodeFromRow(result._fields[val], params)
+                                }
+                            }
+                        }.bind(this))
+                    }
+                }.bind(this),
+                onError: function(error){
+                    console.log(error)
+                },
+                onCompleted: function(){
+                    var graph = {nodes:[],edges:[]}
+                    $.each(nodes, function(node){
+                        graph.nodes.push(nodes[node])
+                    })
+
+                    $.each(edges, function(edge){
+                        graph.edges.push(edges[edge])
+                    })
+                    sigmaInstance.graph.clear()
+                    sigmaInstance.graph.read(graph)
+                    $.each(sigmaInstance.graph.nodes(), function(index,node){
+                        node.degree = sigmaInstance.graph.degree(node.id)
+                    })
+                    this.state.design.deprecate();
+                    this.state.sigmaInstance.refresh();
+                    this.state.design.apply();
+                    session.close()
+                }.bind(this)
+            })
+    }
+
+    createEdgeFromRow(data){
+        var id = data.identity.low
+        var type = data.type
+        var source = data.start.low
+        var target = data.end.low
+        var edge = {
+            id: id,
+            type: type,
+            source: source,
+            target:target
+        }
+
+        return edge
+    }
+
+    createNodeFromRow(data, params){
+        var id = data.identity.low
+        var type = data.labels[0]
+        var label = data.properties.name
+        var node = {
+            id: id,
+            type: type,
+            label: label,
+            glyphs: [],
+            folded: {
+                nodes: [],
+                edges: []
+            },
+            x: Math.random(),
+            y: Math.random()
+        }
+
+        if (label === params.start){
+            node.start = true
+            node.glyphs.push({
+                'position': 'bottom-right',
+                'font': 'FontAwesome',
+                'content': '\uF21D',
+                'fillColor': '#3399FF',
+                'fontScale': 1.5
             })
         }
 
-        emitter.emit('showLoadingIndicator', true);
-        emitter.emit('updateLoadingText', "Querying Database")
-        emitter.emit('resetSpotlight')
-
-        sigma.neo4j.cypher({
-            url: appStore.databaseInfo.url,
-            user: appStore.databaseInfo.user,
-            password: appStore.databaseInfo.password
-        },
-        params.statement,
-        this.state.sigmaInstance,
-        function(sigmaInstance){
-            if (sigmaInstance.graph.nodes().length === 0){
-                emitter.emit('showAlert', "No data returned from query")
-                emitter.emit('updateLoadingText', "Done!")
-                setTimeout(function(){
-                    emitter.emit('showLoadingIndicator', false);    
-                }, 1500)
-                this.goBack()
-                return;
-            }
-            appStore.spotlightData = {}
-            var design = this.state.design;
-            sigmaInstance = setNodeData(sigmaInstance, params.start, params.end);
-            if (params.allowCollapse){
-                sigmaInstance = collapseEdgeNodes(sigmaInstance);
-                sigmaInstance = collapseSiblingNodes(sigmaInstance);
-            }
-
-            $.each(sigmaInstance.graph.nodes(), function(index, node) {
-                if (!appStore.spotlightData.hasOwnProperty(node.id)) {
-                    appStore.spotlightData[node.id] = [node.neo4j_data.name, 0, ""];
-                }
-            });
-            this.state.sigmaInstance = sigmaInstance
-            this.state.design = design;
-            emitter.emit('spotlightUpdate');
-            sigma.misc.animation.camera(sigmaInstance.camera, { x: 0, y: 0, ratio: 1.075 });
-            if (appStore.dagre){
-                sigma.layouts.dagre.start(this.state.sigmaInstance);
-            }else{
-                sigma.layouts.startForceLink()
-            }
-
-            // var child = child_process.fork('src/js/worker.js', {silent:true});
-
-            // child.stdout.on('data', (data) => {
-            //   console.log(`stdout: ${data}`);
-            // });
-
-            // child.stderr.on('data', (data) => {
-            //     console.log(`error: ${data}`);
-            // });
-            
-
-            // child.on('message', function(m) {
-            //   // Receive results from child process
-            //   this.loadFromChildProcess(m)
-            // }.bind(this));
-
-            // // Send child process some work
-            // child.send(JSON.stringify({nodes:sigmaInstance.graph.nodes(),
-            //      edges: sigmaInstance.graph.edges(),
-            //      edge: params.allowCollapse ? appStore.performance.edge : 0 ,
-            //      sibling: params.allowCollapse ? appStore.performance.sibling : 0,
-            //      start: appStore.startNode,
-            //      end: appStore.endNode
-            //  }))
-            this.state.design.deprecate();
-            this.state.sigmaInstance.refresh();
-            this.state.design.apply();
-        }.bind(this))
-        if (this.state.firstDraw){
-            setTimeout(function(){
-                this.state.sigmaInstance.refresh({skipIndexation: true})
-            }.bind(this), 500)
-            this.setState({firstDraw: false})
+        if (label === params.end){
+            node.end = true
+            node.glyphs.push({
+                'position': 'bottom-right',
+                'font': 'FontAwesome',
+                'fillColor': '#990000',
+                'content': '\uF05B',
+                'fontScale': 1.5
+            })
         }
+
+        switch (type) {
+            case "Group":
+                node.type_group = true;
+                break;
+            case "User":
+                node.type_user = true;
+                break;
+            case "Computer":
+                node.type_computer = true;
+                break;
+            case "Domain":
+                node.type_domain = true;
+                break;
+        }
+
+        return node
     }
 
     unfoldEdgeNode(id){

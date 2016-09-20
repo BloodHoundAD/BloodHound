@@ -103,6 +103,7 @@ export default class Login extends Component {
 					}.bind(this), 1500)
 				}.bind(this),
 				onError: function(error){
+					console.log(error)
 					btn.toggleClass('activate');
 					this.setState({
 						loginHelpVisible: true,

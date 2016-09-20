@@ -112,7 +112,7 @@ global.appStore = {
 	highResStyle: {
 		nodes: {
 			label: {
-				by: 'neo4j_data.name'
+				by: 'label'
 			},
 			size: {
 				by: 'degree',
@@ -121,13 +121,13 @@ global.appStore = {
 				max: 20
 			},
 			icon: {
-				by: 'neo4j_labels.0',
+				by: 'type',
 				scheme: 'iconScheme'
 			}
 		},
 		edges: {
 			type : {
-				by : 'neo4j_type',
+				by : 'type',
 				scheme: 'edgeScheme'
 			}
 		}
