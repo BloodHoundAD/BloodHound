@@ -13,7 +13,8 @@ export default class DatabaseDataDisplay extends Component {
 			num_groups: 'Refreshing',
 			num_relationships: 'Refreshing',
 			num_sessions: 'Refreshing',
-			interval: null
+			interval: null,
+			session: driver.session()
 		}
 	}
 
@@ -22,14 +23,20 @@ export default class DatabaseDataDisplay extends Component {
 		var x = setInterval(function(){
 			this.refreshDBData()
 		}.bind(this), 60000);
-		this.setState({interval: x})
+		this.setState({
+			interval: x
+		})
 		emitter.on('hideDBClearModal', this.refreshDBData.bind(this))
 		emitter.on('refreshDBData', this.refreshDBData.bind(this))
 	}
 
 	componentWillUnmount() {
 		clearInterval(this.state.interval)
-		this.setState({interval: null})
+		this.state.session.close()
+		this.setState({
+			interval: null,
+			session: null
+		})
 	}
 
 	toggleLogoutModal(){
@@ -74,62 +81,42 @@ export default class DatabaseDataDisplay extends Component {
 	}
 
 	refreshDBData(){
-		var user,computer,group,sessions,relationship;
-		user = defaultAjaxSettings();
-		computer = defaultAjaxSettings();
-		group = defaultAjaxSettings();
-		relationship = defaultAjaxSettings();
-		sessions = defaultAjaxSettings();
+		var session = this.state.session;
 
-		user.data = JSON.stringify({
-			'statements': [{
-				'statement': "MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)"
-			}]
-		})
-		user.success = function(json){
-			this.setState({num_users:json.results[0].data[0].row[0] })
-		}.bind(this)
-
-		group.data = JSON.stringify({
-			'statements': [{
-				'statement': "MATCH (n:Group) RETURN count(n)"
-			}]
-		})
-		group.success = function(json){
-			this.setState({num_groups:json.results[0].data[0].row[0] })
-		}.bind(this)
-
-		computer.data = JSON.stringify({
-			'statements': [{
-				'statement': "MATCH (n:Computer) RETURN count(n)"
-			}]
-		})
-		computer.success = function(json){
-			this.setState({num_computers:json.results[0].data[0].row[0] })
-		}.bind(this)
-
-		relationship.data = JSON.stringify({
-			'statements': [{
-				'statement': "MATCH ()-[r]->() RETURN count(r)"
-			}]
-		})
-		relationship.success = function(json){
-			this.setState({num_relationships:json.results[0].data[0].row[0] })
-		}.bind(this)
-
-		sessions.data = JSON.stringify({
-			'statements': [{
-				'statement': "MATCH ()-[r:HasSession]->() RETURN count(r)"
-			}]
-		})
-		sessions.success = function(json){
-			this.setState({num_sessions:json.results[0].data[0].row[0] })
-		}.bind(this)
-
-		$.ajax(user);
-		$.ajax(computer);
-		$.ajax(group);
-		$.ajax(relationship);
-		$.ajax(sessions);
+		session.run("MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)")
+			.subscribe({
+				onNext: function(next){
+					this.setState({'num_users': next._fields[0].low})
+				}.bind(this),
+				onCompleted: function(){}
+			})
+		session.run("MATCH (n:Group) RETURN count(n)")
+			.subscribe({
+				onNext: function(next){
+					this.setState({'num_groups': next._fields[0].low})
+				}.bind(this),
+				onCompleted: function(){}
+			})
+		session.run("MATCH (n:Computer) RETURN count(n)")
+			.subscribe({
+				onNext: function(next){
+					this.setState({'num_computers': next._fields[0].low})
+				}.bind(this),
+				onCompleted: function(){}
+			})
+		session.run("MATCH ()-[r:HasSession]->() RETURN count(r)")
+			.subscribe({
+				onNext: function(next){
+					this.setState({'num_sessions': next._fields[0].low})
+				}.bind(this),
+				onCompleted: function(){}
+			})
+		session.run("MATCH ()-[r]->() RETURN count(r)")
+			.subscribe({
+				onNext: function(next){
+					this.setState({'num_relationships': next._fields[0].low})
+				}.bind(this),
+				onCompleted: function(){}
+			})
 	}
 }

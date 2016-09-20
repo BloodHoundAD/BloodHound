@@ -76,7 +76,7 @@ export default class Login extends Component {
 		var header = "Basic " + btoa(this.state.user + ":" + this.state.password)
 		var btn = jQuery(this.refs.loginButton)
 
-		var driver = neo4j.v1.driver(this.state.url, neo4j.v1.auth.basic(this.state.user, this.state.password))
+		var driver = neo4j.v1.driver(this.state.url, neo4j.v1.auth.basic(this.state.user, this.state.password),{knownHosts: 'known_hosts'})
 		var session = driver.session()
 
 		session.run('MATCH (n) RETURN (n) LIMIT 1')
@@ -94,7 +94,7 @@ export default class Login extends Component {
 						user: this.state.user,
 						password: this.state.password
 					})
-
+					global.driver = driver
 					appStore.databaseInfo = conf.get('databaseInfo');
 					setTimeout(function(){
 						jQuery(this.refs.outer).fadeOut(400, function(){
@@ -109,8 +109,9 @@ export default class Login extends Component {
 						loginInProgress: false,
 						loginEnabled: true
 					})
+					
 				}.bind(this),
-				onComplete: function(){
+				onCompleted: function(){
 					session.close()
 				}
 			})
