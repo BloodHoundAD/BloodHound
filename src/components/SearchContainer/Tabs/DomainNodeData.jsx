@@ -21,14 +21,15 @@ export default class DomainNodeData extends Component {
 			firstDegreeOutboundTrusts: -1,
 			effectiveOutboundTrusts: -1,
 			firstDegreeInboundTrusts: -1,
-			effectiveInboundTrusts: -1
+			effectiveInboundTrusts: -1,
+			session: driver.session()
 		}
 
 		emitter.on('domainNodeClicked', this.getNodeData.bind(this));
 	}
 
 	getNodeData(payload){
-		this.state = {
+		this.setState({
 			label: payload,
 			users: -1,
 			groups: -1,
@@ -39,81 +40,54 @@ export default class DomainNodeData extends Component {
 			effectiveOutboundTrusts: -1,
 			firstDegreeInboundTrusts: -1,
 			effectiveInboundTrusts: -1
-		}
+		})
 
-		var users,
-		groups,
-		computers,
-		foreignGroups,
-		foreignUsers,
-		firstDegreeInboundTrusts,
-		firstDegreeOutboundTrusts,
-		effectiveInboundTrusts,
-		effectiveOutboundTrusts;
+		var session = this.state.session
 
-		users = fullAjax(
-			"MATCH (a:User) WHERE a.name ENDS WITH ('@' + '{}') RETURN COUNT(a)".format(payload),
-			function(json){
-				this.setState({users: json.results[0].data[0].row[0]})
+		session.run("MATCH (a:User) WHERE a.name ENDS WITH ('@' + {name}) RETURN COUNT(a)", {name:payload})
+			.then(function(result){
+				this.setState({'users':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		groups = fullAjax(
-			"MATCH (a:Group) WHERE a.name ENDS WITH ('@' + '{}') RETURN COUNT(a)".format(payload),
-			function(json){
-				this.setState({groups: json.results[0].data[0].row[0]})
+		session.run("MATCH (a:Group) WHERE a.name ENDS WITH ('@' + {name}) RETURN COUNT(a)", {name:payload})
+			.then(function(result){
+				this.setState({'groups':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		computers = fullAjax(
-			"MATCH (n:Computer) WHERE n.name ENDS WITH '{}' WITH n WHERE size(split(n.name,'.')) - size(split('{}}','.')) = 1 RETURN count(n)".formatAll(payload),
-			function(json){
-				this.setState({computers: json.results[0].data[0].row[0]})
+		session.run("MATCH (n:Computer) WHERE n.name ENDS WITH {name} WITH n WHERE size(split(n.name,'.')) - size(split('{}}','.')) = 1 RETURN count(n)", {name:payload})
+			.then(function(result){
+				this.setState({'computers':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		foreignGroups = fullAjax(
-			"MATCH (a:Group) WHERE NOT a.name ENDS WITH ('@' + '{}') WITH a MATCH (b:Group) WHERE b.name ENDS WITH ('@' + '{}') WITH a,b MATCH (a)-[r:MemberOf]->(b) RETURN count(a)".formatAll(payload),
-			function(json){
-				this.setState({foreignGroups: json.results[0].data[0].row[0]})
+		session.run("MATCH (a:Group) WHERE NOT a.name ENDS WITH ('@' + {name}) WITH a MATCH (b:Group) WHERE b.name ENDS WITH ('@' + {name}) WITH a,b MATCH (a)-[r:MemberOf]->(b) RETURN count(a)", {name:payload})
+			.then(function(result){
+				this.setState({'foreignGroups':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		foreignUsers = fullAjax(
-			"MATCH (a:User) WHERE NOT a.name ENDS WITH ('@' + '{}') WITH a MATCH (b:Group) WHERE b.name ENDS WITH ('@' + '{}') WITH a,b MATCH (a)-[r:MemberOf]->(b) RETURN count(a)".formatAll(payload),
-			function(json){
-				this.setState({foreignUsers: json.results[0].data[0].row[0]})
+		session.run("MATCH (a:User) WHERE NOT a.name ENDS WITH ('@' + {name}) WITH a MATCH (b:Group) WHERE b.name ENDS WITH ('@' + {name}) WITH a,b MATCH (a)-[r:MemberOf]->(b) RETURN count(a)", {name:payload})
+			.then(function(result){
+				this.setState({'foreignUsers':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		firstDegreeInboundTrusts = fullAjax(
-			"MATCH (a:Domain {name:'{}'})<-[r:TrustedBy]-(b:Domain) RETURN count(b)".format(payload),
-			function(json){
-				this.setState({firstDegreeInboundTrusts: json.results[0].data[0].row[0]})
+		session.run("MATCH (a:Domain {name:{name}})<-[r:TrustedBy]-(b:Domain) RETURN count(b)", {name:payload})
+			.then(function(result){
+				this.setState({'firstDegreeInboundTrusts':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		firstDegreeOutboundTrusts = fullAjax(
-			"MATCH (a:Domain {name:'{}'})-[r:TrustedBy]->(b:Domain) RETURN count(b)".format(payload),
-			function(json){
-				this.setState({firstDegreeOutboundTrusts: json.results[0].data[0].row[0]})
+		session.run("MATCH (a:Domain {name:{name}})-[r:TrustedBy]->(b:Domain) RETURN count(b)", {name:payload})
+			.then(function(result){
+				this.setState({'firstDegreeOutboundTrusts':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		effectiveInboundTrusts = fullAjax(
-			"MATCH (a:Domain {name:'{}'})<-[r:TrustedBy*1..]-(b:Domain) RETURN count(b)".format(payload),
-			function(json){
-				this.setState({effectiveInboundTrusts: json.results[0].data[0].row[0]})
+		session.run("MATCH (a:Domain {name:{name}})<-[r:TrustedBy*1..]-(b:Domain) RETURN count(b)", {name:payload})
+			.then(function(result){
+				this.setState({'effectiveInboundTrusts':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		effectiveOutboundTrusts = fullAjax(
-			"MATCH (a:Domain {name:'{}'})-[r:TrustedBy*1..]->(b:Domain) RETURN count(b)".format(payload),
-			function(json){
-				this.setState({effectiveOutboundTrusts: json.results[0].data[0].row[0]})
+		session.run("MATCH (a:Domain {name:{name}})-[r:TrustedBy*1..]->(b:Domain) RETURN count(b)", {name:payload})
+			.then(function(result){
+				this.setState({'effectiveOutboundTrusts':result.records[0]._fields[0].low})
 			}.bind(this))
-
-		$.ajax(users)
-		$.ajax(groups)
-		$.ajax(computers)
-		$.ajax(foreignGroups)
-		$.ajax(foreignUsers)
-		$.ajax(firstDegreeInboundTrusts)
-		$.ajax(firstDegreeOutboundTrusts)
-		$.ajax(effectiveInboundTrusts)
-		$.ajax(effectiveOutboundTrusts)
 	}
 
 	render() {
