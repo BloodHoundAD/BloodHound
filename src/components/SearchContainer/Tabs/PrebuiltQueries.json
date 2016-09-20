@@ -19,28 +19,28 @@
 			}
 		},
 		{
-			"name": "Find User with Most Sessions",
+			"name": "Find Top 10 Users with Most Sessions",
 			"requireNodeSelect": false,
-			"query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m",
-			"allowCollapse": false
-		},
-		{
-			"name": "Find Computer with Most Sessions",
-			"requireNodeSelect": false,
-			"query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH m, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m",
-			"allowCollapse": false
-		},
-		{
-			"name": "Find User with Most Local Admin Rights",
-			"requireNodeSelect": false,
-			"query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)<-[r:AdminTo]-(n) RETURN n,r,m",
+			"query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m",
 			"allowCollapse": true
 		},
 		{
-			"name": "Find Computer with Most Admins",
+			"name": "Find Top 10 Computers with Most Sessions",
 			"requireNodeSelect": false,
-			"query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH m, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)<-[r:AdminTo]-(n) RETURN n,r,m",
-			"allowCollapse": false
+			"query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH m, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m",
+			"allowCollapse": true
+		},
+		{
+			"name": "Find Top 10 Users with Most Local Admin Rights",
+			"requireNodeSelect": false,
+			"query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH (m)<-[r:AdminTo]-(n) RETURN n,r,m",
+			"allowCollapse": true
+		},
+		{
+			"name": "Find Top 10 Computers with Most Admins",
+			"requireNodeSelect": false,
+			"query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH m, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH (m)<-[r:AdminTo]-(n) RETURN n,r,m",
+			"allowCollapse": true
 		},
 		{
 			"name" : "Users with Foreign Domain Group Membership",

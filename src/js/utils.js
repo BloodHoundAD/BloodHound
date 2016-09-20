@@ -102,8 +102,8 @@ export function collapseEdgeNodes(sigmaInstance){
 
 			var edge = edges[0];
 
-			if ((anode.type_user && (edge.label === 'MemberOf' || edge.label === 'AdminTo')) 
-				|| (anode.type_computer && (edge.label === 'AdminTo' || edge.label === 'MemberOf')) 
+			if ((anode.type_user) 
+				|| (anode.type_computer) 
 				|| (anode.type_group && edge.label === 'AdminTo')){
 
 				node.isGrouped = true
@@ -350,7 +350,6 @@ export function buildMergeQuery(rows, type){
 	var queries = {
 		"statements": []
 	}
-	//query: QUERY
 
 	var userQuery, computerQuery, groupQuery, domainQuery;
 	if (type === 'sessions'){
