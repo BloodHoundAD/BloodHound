@@ -21,7 +21,8 @@ export default class ComputerNodeData extends Component {
 			firstDegreeLocalAdmin: -1,
 			groupDelegatedLocalAdmin: -1,
 			derivativeLocalAdmin: -1,
-			sessions: -1
+			sessions: -1,
+			session: driver.session()
 		}
 
 		emitter.on('computerNodeClicked', this.getNodeData.bind(this));
@@ -42,71 +43,47 @@ export default class ComputerNodeData extends Component {
 			derivativeLocalAdmin: -1
 		})
 
-		var explicitAdmins, 
-			unrolledAdmins, 
-			firstDegreeGroupMembership,
-			unrolledGroupMembership,
-			firstDegreeLocalAdmin,
-			groupDelegatedLocalAdmin,
-			derivativeLocalAdmin,
-			sessions;
+		var session = this.state.session
 
-		explicitAdmins = fullAjax(
-			"MATCH (a)-[b:AdminTo]->(c:Computer {name:'{}'}) RETURN count(a)".format(payload),
-			function(json){
-				this.setState({explicitAdmins: json.results[0].data[0].row[0]})	
+		session.run("MATCH (a)-[b:AdminTo]->(c:Computer {name:{name}}) RETURN count(a)", {name:payload})
+			.then(function(result){
+				this.setState({'explicitAdmins':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		unrolledAdmins = fullAjax(
-			"MATCH (n:User),(target:Computer {name:'{}'}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(target)) WITH nodes(p) AS y RETURN count(distinct(filter(x in y WHERE labels(x)[0] = 'User')))".format(payload),
-			function(json){
-				this.setState({unrolledAdmins: json.results[0].data[0].row[0]})	
+		session.run("MATCH (n:User),(target:Computer {name:{name}}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(target)) WITH nodes(p) AS y RETURN count(distinct(filter(x in y WHERE labels(x)[0] = 'User')))", {name:payload})
+			.then(function(result){
+				this.setState({'unrolledAdmins':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		firstDegreeLocalAdmin = fullAjax(
-			"MATCH (n:Computer {name:'{}'}), (m:Computer), (n)-[r:AdminTo]-(m) RETURN count(m)".format(payload),
-			function(json){
-				this.setState({firstDegreeLocalAdmin: json.results[0].data[0].row[0]})
+		session.run("MATCH (n:Computer {name:{name}}), (m:Computer), (n)-[r:AdminTo]-(m) RETURN count(m)", {name:payload})
+			.then(function(result){
+				this.setState({'firstDegreeLocalAdmin':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		groupDelegatedLocalAdmin = fullAjax(
-			"MATCH (n:Computer {name:'{}'}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN count(distinct(p))".format(payload),
-			function(json){
-				this.setState({groupDelegatedLocalAdmin: json.results[0].data[0].row[0]})
+		session.run("MATCH (n:Computer {name:{name}}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN count(distinct(p))", {name:payload})
+			.then(function(result){
+				this.setState({'groupDelegatedLocalAdmin':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		derivativeLocalAdmin = fullAjax(
-			"MATCH (n:Computer {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN count(distinct(m))".format(payload),
-			function(json){
-				this.setState({derivativeLocalAdmin: json.results[0].data[0].row[0]})
+		session.run("MATCH (n:Computer {name:{name}}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN count(distinct(m))", {name:payload})
+			.then(function(result){
+				this.setState({'derivativeLocalAdmin':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		firstDegreeGroupMembership = fullAjax(
-			"MATCH (n:Computer {name:'{}'}),(target:Group), (n)-[r:MemberOf]->(target) RETURN count(target)".format(payload),
-			function(json){
-				this.setState({firstDegreeGroupMembership: json.results[0].data[0].row[0]})	
+		session.run("MATCH (n:Computer {name:{name}}),(target:Group), (n)-[r:MemberOf]->(target) RETURN count(target)", {name:payload})
+			.then(function(result){
+				this.setState({'firstDegreeGroupMembership':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		unrolledGroupMembership = fullAjax(
-			"MATCH (n:Computer {name:'{}'}), (target:Group), (n)-[r:MemberOf]->(target) RETURN count(target)".format(payload),
-			function(json){
-				this.setState({unrolledGroupMembership: json.results[0].data[0].row[0]})	
+		session.run("MATCH (n:Computer {name:{name}}), (target:Group), (n)-[r:MemberOf]->(target) RETURN count(target)", {name:payload})
+			.then(function(result){
+				this.setState({'unrolledGroupMembership':result.records[0]._fields[0].low})
 			}.bind(this))
 
-		sessions = fullAjax(
-			"MATCH (m:Computer {name:'{}'})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH '$' RETURN count(r)".format(payload),
-			function(json){
-				this.setState({sessions: json.results[0].data[0].row[0]})	
+		session.run("MATCH (m:Computer {name:{name}})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH '$' RETURN count(r)", {name:payload})
+			.then(function(result){
+				this.setState({'sessions':result.records[0]._fields[0].low})
 			}.bind(this))
-
-		$.ajax(explicitAdmins);
-		$.ajax(unrolledAdmins);
-		$.ajax(firstDegreeLocalAdmin);
-		$.ajax(groupDelegatedLocalAdmin);
-		$.ajax(derivativeLocalAdmin);
-		$.ajax(firstDegreeGroupMembership);
-		$.ajax(unrolledGroupMembership);
-		$.ajax(sessions);
 	}
 
 	render() {
