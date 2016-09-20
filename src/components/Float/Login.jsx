@@ -26,37 +26,41 @@ export default class Login extends Component {
 
 		jQuery(this.refs.urlspinner).toggle(true)
 
-		if (!url.startsWith('http://')){
-			url = 'http://' + url
+		url = url.replace(/\/$/, "");
+
+		if (!url.includes(':')){
+			url = url + ':7687'
 		}
 
-		url = url.replace(/\/$/, "");
+		if (!url.startsWith('bolt://')){
+			url = 'bolt://' + url
+		}
 
 		icon.removeClass();
 		icon.addClass("fa fa-spinner fa-spin form-control-feedback");
 		icon.toggle(true);
+		var driver = neo4j.v1.driver(url)
+		var session = driver.session()
 
-		$.ajax({
-			url: url,
-			type: 'GET',
-			success: function(e){
-				if (e.data.endsWith('/db/data/')){
-					icon.removeClass();
-					icon.addClass("fa fa-check-circle green-icon-color form-control-feedback");
-				}else{
-					this.setState({dbHelpVisible: true})
-					icon.removeClass();
-                    icon.addClass("fa fa-times-circle red-icon-color form-control-feedback");
+		session.run('MATCH (n) RETURN (n) LIMIT 1')
+			.subscribe({
+				onNext: function(next){
+				},
+				onError: function(error){
+					if (error.code){
+						this.setState({dbHelpVisible: true})
+						icon.removeClass();
+                    	icon.addClass("fa fa-times-circle red-icon-color form-control-feedback");
+					}else{
+						icon.removeClass();
+						icon.addClass("fa fa-check-circle green-icon-color form-control-feedback");
+						this.setState({loginEnabled: true, url: url})
+					}
+				}.bind(this),
+				onComplete: function(){
+					session.close()
 				}
-
-				this.setState({loginEnabled: true, url: url})
-			}.bind(this),
-			error: function(e){
-				icon.removeClass();
-                icon.addClass("fa fa-times-circle red-icon-color form-control-feedback");
-              	this.setState({loginEnabled: false, dbHelpVisible: true})  
-			}.bind(this)
-		})
+			})
 	}
 
 	checkDBCreds(){
@@ -72,44 +76,47 @@ export default class Login extends Component {
 		var header = "Basic " + btoa(this.state.user + ":" + this.state.password)
 		var btn = jQuery(this.refs.loginButton)
 
+		var driver = neo4j.v1.driver(this.state.url, neo4j.v1.auth.basic(this.state.user, this.state.password))
+		var session = driver.session()
+
+		session.run('MATCH (n) RETURN (n) LIMIT 1')
+			.subscribe({
+				onNext: function(next){
+					btn.toggleClass('activate');
+					btn.removeClass('btn-default')
+					btn.addClass('btn-success')
+					btn.html('Success!')
+					this.setState({
+						loginInProgress: false
+					})
+					conf.set('databaseInfo',{
+						url: this.state.url,
+						user: this.state.user,
+						password: this.state.password
+					})
+
+					appStore.databaseInfo = conf.get('databaseInfo');
+					setTimeout(function(){
+						jQuery(this.refs.outer).fadeOut(400, function(){
+							renderEmit.emit('login');
+						});
+					}.bind(this), 1500)
+				}.bind(this),
+				onError: function(error){
+					btn.toggleClass('activate');
+					this.setState({
+						loginHelpVisible: true,
+						loginInProgress: false,
+						loginEnabled: true
+					})
+				}.bind(this),
+				onComplete: function(){
+					session.close()
+				}
+			})
+
 		btn.toggleClass('activate');
 
-		$.ajax({
-			url: this.state.url + '/db/data/',
-			type: 'GET',
-			headers: {
-				Authorization: header
-			},
-			success: function(e){
-				btn.toggleClass('activate');
-				btn.removeClass('btn-default')
-				btn.addClass('btn-success')
-				btn.html('Success!')
-				this.setState({
-					loginInProgress: false
-				})
-				conf.set('databaseInfo',{
-					url: this.state.url,
-					user: this.state.user,
-					password: this.state.password
-				})
-
-				appStore.databaseInfo = conf.get('databaseInfo');
-				setTimeout(function(){
-					jQuery(this.refs.outer).fadeOut(400, function(){
-						renderEmit.emit('login');
-					});
-				}.bind(this), 1500)
-			}.bind(this),
-			error: function(e){
-				btn.toggleClass('activate');
-				this.setState({
-					loginHelpVisible: true,
-					loginInProgress: false,
-					loginEnabled: true
-				})
-			}.bind(this)
-		})
 	}
 
 	componentWillMount() {
@@ -168,7 +175,7 @@ export default class Login extends Component {
 								<input ref="url" onFocus={function(){this.setState({dbHelpVisible: false})}.bind(this)} onBlur={this.checkDBPresence.bind(this)} onChange={this._urlChanged.bind(this)} type="text" className="form-control" value={this.state.url} placeholder="http://db-ip:dp-port" aria-describedby="dburladdon" />
 								<i ref="urlspinner" className="fa fa-spinner fa-spin form-control-feedback" />
 							</div>
-							{this.state.dbHelpVisible ? <p className="help-block help-block-add">No Neo4j REST API Found</p> : null}
+							{this.state.dbHelpVisible ? <p className="help-block help-block-add">No Neo4j Database Found</p> : null}
 							<div className="input-group spacing">
 								<span className="input-group-addon" id="dbuseraddon">DB Username</span>
 								<input ref="user" type="text" value={this.state.user} onKeyUp={this._triggerLogin.bind(this)} onChange={this._userChanged.bind(this)} className="form-control" placeholder="neo4j" aria-describedby="dbuseraddon" />
