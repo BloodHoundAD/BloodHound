@@ -84,39 +84,28 @@ export default class DatabaseDataDisplay extends Component {
 		var session = this.state.session;
 
 		session.run("MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)")
-			.subscribe({
-				onNext: function(next){
-					this.setState({'num_users': next._fields[0].low})
-				}.bind(this),
-				onCompleted: function(){}
-			})
+			.then(function(result){
+				this.setState({'num_users':result.records[0]._fields[0].low})
+			}.bind(this))
+		
 		session.run("MATCH (n:Group) RETURN count(n)")
-			.subscribe({
-				onNext: function(next){
-					this.setState({'num_groups': next._fields[0].low})
-				}.bind(this),
-				onCompleted: function(){}
-			})
+			.then(function(result){
+				this.setState({'num_groups':result.records[0]._fields[0].low})
+			}.bind(this))
+		
 		session.run("MATCH (n:Computer) RETURN count(n)")
-			.subscribe({
-				onNext: function(next){
-					this.setState({'num_computers': next._fields[0].low})
-				}.bind(this),
-				onCompleted: function(){}
-			})
+			.then(function(result){
+				this.setState({'num_computers':result.records[0]._fields[0].low})
+			}.bind(this))
+
 		session.run("MATCH ()-[r:HasSession]->() RETURN count(r)")
-			.subscribe({
-				onNext: function(next){
-					this.setState({'num_sessions': next._fields[0].low})
-				}.bind(this),
-				onCompleted: function(){}
-			})
+			.then(function(result){
+				this.setState({'num_sessions':result.records[0]._fields[0].low})
+			}.bind(this))
+
 		session.run("MATCH ()-[r]->() RETURN count(r)")
-			.subscribe({
-				onNext: function(next){
-					this.setState({'num_relationships': next._fields[0].low})
-				}.bind(this),
-				onCompleted: function(){}
-			})
+			.then(function(result){
+				this.setState({'num_relationships':result.records[0]._fields[0].low})
+			}.bind(this))
 	}
 }

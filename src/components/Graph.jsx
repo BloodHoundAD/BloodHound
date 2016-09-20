@@ -413,20 +413,25 @@ export default class GraphContainer extends Component {
         session.run(params.statement, params.props)
             .subscribe({
                 onNext: function(result){
-                    console.log(result)
                     if (result._fields[0].hasOwnProperty('segments')){
                         console.log('path')
                     }else{
-                        $.each(result._fields, function(val){
-                            if ($.isArray(result._fields[val])){
-                                var id = result._fields[val][0].identity.low
-                                if (!edges.hasOwnProperty(id)){
-                                    edges[id] = this.createEdgeFromRow(result._fields[val][0])
-                                }
+                        $.each(result._fields, function(index, value){
+                            if ($.isArray(value)){
+                                $.each(value, function(index, subval){
+                                    var id = subval.identity.low
+                                    if (subval.end && !edges.id){
+                                        edges[id] = this.createEdgeFromRow(subval)
+                                    }else if (!nodes.id){
+                                        nodes[id] = this.createNodeFromRow(subval, params)
+                                    }
+                                }.bind(this))
                             }else{
-                                var id = result._fields[val].identity.low
-                                if (!nodes.hasOwnProperty(id)){
-                                    nodes[id] = this.createNodeFromRow(result._fields[val], params)
+                                var id = value.identity.low
+                                if (value.end && !edges.id){
+                                    edges[id] = this.createEdgeFromRow(value)
+                                }else if (!nodes.id){
+                                    nodes[id] = this.createNodeFromRow(value, params)
                                 }
                             }
                         }.bind(this))
