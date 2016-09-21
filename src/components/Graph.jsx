@@ -409,12 +409,15 @@ export default class GraphContainer extends Component {
         var nodes = {}
         var edges = {}
         var session = driver.session()
-        console.log(params.statement)
+        if (typeof params.props === 'undefined'){
+            params.props = {}
+        }
         session.run(params.statement, params.props)
             .subscribe({
                 onNext: function(result){
                     if (result._fields[0].hasOwnProperty('segments')){
                         console.log('path')
+                        console.log(result)
                     }else{
                         $.each(result._fields, function(index, value){
                             if ($.isArray(value)){
@@ -581,15 +584,20 @@ export default class GraphContainer extends Component {
         })
     }
 
-    doGenericQuery(statement, start, end, allowCollapse=true){
+    doGenericQuery(statement, props, start, end, allowCollapse=true){
         if (appStore.currentTooltip !== null) {
             appStore.currentTooltip.close();
+        }
+
+        if (typeof props === 'undefined'){
+            props = {}
         }
         this.doQueryNative({
             statement: statement,
             allowCollapse: allowCollapse,
             start: start,
-            end: end
+            end: end,
+            props: props
         })
     }
 
