@@ -18,30 +18,35 @@ export default class SearchContainer extends Component {
 
     _getSearchOptions(e, callback){
         var x = []
-        var promise = $.ajax({
-            url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
-            type: 'POST',
-            accepts: { json: "application/json" },
-            dataType: "json",
-            contentType: "application/json",
-            headers: {
-                "Authorization": localStorage.getItem("auth")
-            },
-            data: JSON.stringify({
-                "statements": [{
-                    "statement" : "MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(e) + ".*' RETURN n.name LIMIT 10"
-                }]
-            }),
-            success: function(json) {
-                $.each(json.results[0].data, function(index, d){
-                    x.push({id:index, label:d.row[0]})
-                })
-                callback(null, {
-                    options: x,
-                    complete: false
-                })
-            }.bind(this)
-        })
+        var session = driver.session()
+        session.run("MATCH (n) WHERE n.name =~ '(?i).*{name}.*' RETURN n.name LIMIT 10", {name: e})
+            .then(function(results){
+                console.log(results)
+            })
+        // var promise = $.ajax({
+        //     url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
+        //     type: 'POST',
+        //     accepts: { json: "application/json" },
+        //     dataType: "json",
+        //     contentType: "application/json",
+        //     headers: {
+        //         "Authorization": localStorage.getItem("auth")
+        //     },
+        //     data: JSON.stringify({
+        //         "statements": [{
+        //             "statement" : "MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(e) + ".*' RETURN n.name LIMIT 10"
+        //         }]
+        //     }),
+        //     success: function(json) {
+        //         $.each(json.results[0].data, function(index, d){
+        //             x.push({id:index, label:d.row[0]})
+        //         })
+        //         callback(null, {
+        //             options: x,
+        //             complete: false
+        //         })
+        //     }.bind(this)
+        // })
     }
 
     _onPathfindClick(){
@@ -94,17 +99,17 @@ export default class SearchContainer extends Component {
 
         jQuery(this.refs.searchbar).typeahead({
             source: function(query, process) {
-                var options = fullAjax(
-                    "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n.name LIMIT 10".format(escapeRegExp(query)),
-                    function(json){
-                        var data = []
-                        $.each(json.results[0].data, function(index, d){
-                            data.push(d.row[0])
+                var session = driver.session()
+                var t = '(?i).*' + query + '.*'
+                var data = []
+                session.run("MATCH (n) WHERE n.name =~ {name} RETURN n.name LIMIT 10", {name:t})
+                    .then(function(results){
+                        $.each(results.records, function(index, record){
+                            data.push(record._fields[0])
                         })
+                        session.close()
                         return process(data)
-                    }
-                )
-                return $.ajax(options)
+                    })
             },
             afterSelect: function(selected) {
                 if (!this.state.pathfindingIsOpen) {
@@ -124,17 +129,17 @@ export default class SearchContainer extends Component {
 
         jQuery(this.refs.pathbar).typeahead({
             source: function(query, process) {
-                var options = fullAjax(
-                    "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n.name LIMIT 10".format(escapeRegExp(query)),
-                    function(json){
-                        var data = []
-                        $.each(json.results[0].data, function(index, d){
-                            data.push(d.row[0])
+                var session = driver.session()
+                var t = '(?i).*' + query + '.*'
+                var data = []
+                session.run("MATCH (n) WHERE n.name =~ {name} RETURN n.name LIMIT 10", {name:t})
+                    .then(function(results){
+                        $.each(results.records, function(index, record){
+                            data.push(record._fields[0])
                         })
+                        session.close()
                         return process(data)
-                    }
-                )
-                return $.ajax(options)
+                    })
             },
             afterSelect: function(selected) {
                 var start = jQuery(this.refs.searchbar).val();
