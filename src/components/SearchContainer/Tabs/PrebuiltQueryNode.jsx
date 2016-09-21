@@ -9,7 +9,7 @@ export default class PrebuiltQueryNode extends Component {
 			}.bind(this)
 		}else{
 			c = function(){
-				emitter.emit('query', this.props.info.query, "", "", this.props.info.allowCollapse)
+				emitter.emit('query', this.props.info.query, this.props.info.props, "", "", this.props.info.allowCollapse)
 			}.bind(this)
 		}
 		return (

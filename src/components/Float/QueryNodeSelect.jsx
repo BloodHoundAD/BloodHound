@@ -19,16 +19,16 @@ export default class QueryNodeSelect extends Component {
 	getEventInfo(query){
 		$(this.refs.outer).fadeToggle(true)
 		this.state.queryData = query
-		var o = fullAjax(query.query,
-			function(data){
-				var y = $.map(data.results[0].data, function(x){
-					return x.row[0].name
+		var session = driver.session()
+		session.run(query.query, query.queryProps)
+			.then(function(results){
+				var y = $.map(results.records, function(x){
+					return x._fields[0]
 				})
-
 				y.sort()
 				this.setState({data: y})
+				session.close()
 			}.bind(this))
-		$.ajax(o)
 	}
 
 	componentDidMount() {
@@ -42,8 +42,9 @@ export default class QueryNodeSelect extends Component {
 	handleClick(event){
 		emitter.emit('query',
 			this.state.queryData.onFinish.formatAll(event.target.text),
-			"", 
-			event.target.text,
+			{result:event.target.text},
+			this.state.queryData.start.format(event.target.text),
+			this.state.queryData.end.format(event.target.text),
 			this.state.queryData.allowCollapse)
 		$(this.refs.outer).fadeToggle(false)
 	}
