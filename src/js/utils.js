@@ -270,10 +270,10 @@ export function clearDatabase(){
 
 function deleteEdges(){
 	var session = driver.session()
-	session.run("MATCH ()-[r]-() WITH r LIMIT 50000 DELETE r RETURN count(r)")
+	session.run("MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)")
 		.then(function(results){
 			session.close()
-			var count = result.records[0]._fields[0].low
+			var count = results.records[0]._fields[0].low
 			if (count === 0){
 				deleteNodes()
 			}else{
@@ -284,10 +284,10 @@ function deleteEdges(){
 
 function deleteNodes(){
 	var session = driver.session()
-	session.run("MATCH (n) WITH n LIMIT 50000 DELETE n RETURN count(n)")
+	session.run("MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)")
 		.then(function(results){
 			session.close()
-			var count = result.records[0]._fields[0].low
+			var count = results.records[0]._fields[0].low
 			if (count === 0){
 				emitter.emit('hideDBClearModal')
 			}else{
