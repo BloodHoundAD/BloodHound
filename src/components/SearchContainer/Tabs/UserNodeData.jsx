@@ -41,67 +41,58 @@ export default class UserNodeData extends Component {
 			derivativeLocalAdmin: -1,
 			sessions: -1
 		})
-		var firstDegreeGroupMembership, 
-			unrolledGroupMembership,
-			unrolledGroupMembership,
-			foreignGroupMembership,
-			firstDegreeLocalAdmin,
-			groupDelegatedLocalAdmin,
-			derivativeLocalAdmin,
-			sessions;
 
 		var domain = '@' + payload.split('@').last()
-
-		foreignGroupMembership = fullAjax(
-			"MATCH (n:Group) WHERE NOT n.name ENDS WITH '{}' WITH n MATCH (m:User {name:'{}'}) MATCH (m)-[r:MemberOf*1..]->(n) RETURN count(n)".format(domain,payload),
-			function(json){
-				this.setState({foreignGroupMembership: json.results[0].data[0].row[0]})
-			}.bind(this))
-
-		firstDegreeGroupMembership = fullAjax(
-			"MATCH (n:User {name:'{}'}), (m:Group), p=allShortestPaths((n)-[:MemberOf*1]->(m)) RETURN count(m)".format(payload),
-			function(json){
-				this.setState({firstDegreeGroupMembership: json.results[0].data[0].row[0]})	
-			}.bind(this))
 		
-		unrolledGroupMembership = fullAjax(
-			"MATCH (n:User {name:'{}'}), (target:Group), p=allShortestPaths((n)-[:MemberOf*1..]->(target)) RETURN count(target)".format(payload),
-			function(json){
-				this.setState({unrolledGroupMembership: json.results[0].data[0].row[0]})
+		var s1 = driver.session()
+		var s2 = driver.session()
+		var s3 = driver.session()
+		var s4 = driver.session()
+		var s5 = driver.session()
+		var s6 = driver.session()
+		var s7 = driver.session()
+
+		s1.run("MATCH (n:Group) WHERE NOT n.name ENDS WITH {domain} WITH n MATCH (m:User {name:{name}}) MATCH (m)-[r:MemberOf*1..]->(n) RETURN count(n)", {name:payload, domain: domain})
+			.then(function(result){
+				this.setState({'foreignGroupMembership':result.records[0]._fields[0].low})
+				s1.close()
 			}.bind(this))
 
-		firstDegreeLocalAdmin = fullAjax(
-			"MATCH (n:User {name:'{}'}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN count(target)".format(payload),
-			function(json){
-				this.setState({firstDegreeLocalAdmin: json.results[0].data[0].row[0]})
-			}.bind(this)
-			)
-		groupDelegatedLocalAdmin = fullAjax(
-			"MATCH (n:User {name:'{}'}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN count(distinct(p))".format(payload),
-			function(json){
-				this.setState({groupDelegatedLocalAdmin: json.results[0].data[0].row[0]})
-			}.bind(this)
-			)
-		derivativeLocalAdmin = fullAjax(
-			"MATCH (n:User {name:'{}'}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN count(distinct(target))".format(payload),
-			function(json){
-				this.setState({derivativeLocalAdmin: json.results[0].data[0].row[0]})
-			}.bind(this)
-			)
-		sessions = fullAjax(
-			"MATCH (n:Computer)-[r:HasSession]->(m:User {name:'{}'}) RETURN count(n)".format(payload),
-			function(json){
-				this.setState({sessions: json.results[0].data[0].row[0]})
-			}.bind(this)
-			)
+		s2.run("MATCH (n:User {name:{name}}), (m:Group), p=allShortestPaths((n)-[:MemberOf*1]->(m)) RETURN count(m)", {name:payload})
+			.then(function(result){
+				this.setState({'firstDegreeGroupMembership':result.records[0]._fields[0].low})
+				s2.close()
+			}.bind(this))
 
-		$.ajax(firstDegreeGroupMembership);
-		$.ajax(unrolledGroupMembership);
-		$.ajax(firstDegreeLocalAdmin);
-		$.ajax(groupDelegatedLocalAdmin);
-		$.ajax(derivativeLocalAdmin);
-		$.ajax(sessions);
-		$.ajax(foreignGroupMembership);
+		s3.run("MATCH (n:User {name:{name}}), (target:Group), p=allShortestPaths((n)-[:MemberOf*1..]->(target)) RETURN count(target)", {name:payload})
+			.then(function(result){
+				this.setState({'unrolledGroupMembership':result.records[0]._fields[0].low})
+				s3.close()
+			}.bind(this))
+
+		s4.run("MATCH (n:User {name:{name}}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN count(target)", {name:payload})
+			.then(function(result){
+				this.setState({'firstDegreeLocalAdmin':result.records[0]._fields[0].low})
+				s4.close()
+			}.bind(this))
+
+		s5.run("MATCH (n:User {name:{name}}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN count(distinct(p))", {name:payload})
+			.then(function(result){
+				this.setState({'groupDelegatedLocalAdmin':result.records[0]._fields[0].low})
+				s5.close()
+			}.bind(this))
+
+		s6.run("MATCH (n:User {name:{name}}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN count(distinct(target))", {name:payload})
+			.then(function(result){
+				this.setState({'derivativeLocalAdmin':result.records[0]._fields[0].low})
+				s6.close()
+			}.bind(this))
+
+		s7.run("MATCH (n:Computer)-[r:HasSession]->(m:User {name:{name}}) RETURN count(n)", {name:payload})
+			.then(function(result){
+				this.setState({'sessions':result.records[0]._fields[0].low})
+				s7.close()
+			}.bind(this))
 	}
 
 	render() {
@@ -143,7 +134,10 @@ export default class UserNodeData extends Component {
 							ready={this.state.firstDegreeGroupMembership !== -1}
 							value={this.state.firstDegreeGroupMembership}
 							click={function(){
-								emitter.emit('query', "MATCH (n:User {name:'{}'}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1]->(target)) RETURN p".format(this.state.label))
+								emitter.emit(
+									'query',
+									"MATCH (n:User {name:{name}}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1]->(target)) RETURN p", {name:this.state.label}
+									)
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -154,7 +148,7 @@ export default class UserNodeData extends Component {
 							ready={this.state.unrolledGroupMembership !== -1}
 							value={this.state.unrolledGroupMembership}
 							click={function(){
-								emitter.emit('query', "MATCH (n:User {name:'{}'}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1..]->(target)) RETURN p".format(this.state.label),
+								emitter.emit('query', "MATCH (n:User {name:{name}}), (target:Group),p=allShortestPaths((n)-[:MemberOf*1..]->(target)) RETURN p", {name:this.state.label},
 									this.state.label)
 							}.bind(this)} />
 					</dd>
@@ -167,7 +161,7 @@ export default class UserNodeData extends Component {
 							value={this.state.foreignGroupMembership}
 							click={function(){
 								emitter.emit('query', 
-									"MATCH (n:Group) WHERE NOT n.name ENDS WITH '{}' WITH n MATCH (m:User {name:'{}'}) MATCH (m)-[r:MemberOf*1..]->(n) RETURN m,r,n".format(domain, this.state.label))
+									"MATCH (n:Group) WHERE NOT n.name ENDS WITH {domain} WITH n MATCH (m:User {name:{name}}) MATCH (m)-[r:MemberOf*1..]->(n) RETURN m,r,n", {name: this.state.label, domain: domain})
 							}.bind(this)} />
 					</dd>
 					<br />
@@ -179,7 +173,7 @@ export default class UserNodeData extends Component {
 							ready={this.state.firstDegreeLocalAdmin !== -1}
 							value={this.state.firstDegreeLocalAdmin}
 							click={function(){
-								emitter.emit('query', "MATCH (n:User {name:'{}'}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN p".format(this.state.label))
+								emitter.emit('query', "MATCH (n:User {name:{name}}), (target:Computer), p=allShortestPaths((n)-[:AdminTo*1]->(target)) RETURN p", {name:this.state.label})
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -190,7 +184,7 @@ export default class UserNodeData extends Component {
 							ready={this.state.groupDelegatedLocalAdmin !== -1}
 							value={this.state.groupDelegatedLocalAdmin}
 							click={function(){
-								emitter.emit('query', "MATCH (n:User {name:'{}'}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN n,m,r,s,p".format(this.state.label)
+								emitter.emit('query', "MATCH (n:User {name:{name}}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN n,m,r,s,p", {name:this.state.label}
 									,this.state.label)
 							}.bind(this)} />
 					</dd>
@@ -202,7 +196,7 @@ export default class UserNodeData extends Component {
 							ready={this.state.derivativeLocalAdmin !== -1}
 							value={this.state.derivativeLocalAdmin}
 							click={function(){
-								emitter.emit('query', "MATCH (n:User {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r*]->(m)) RETURN p".format(this.state.label)
+								emitter.emit('query', "MATCH (n:User {name:{name}}), (m:Computer), p=allShortestPaths((n)-[r*]->(m)) RETURN p", {name:this.state.label}
 									,this.state.label)
 							}.bind(this)} />
 					</dd>
@@ -214,7 +208,7 @@ export default class UserNodeData extends Component {
 							ready={this.state.sessions !== -1}
 							value={this.state.sessions}
 							click={function(){
-								emitter.emit('query', "MATCH (n:Computer)-[r:HasSession]->(m:User {name:'{}'}) RETURN n,r,m".format(this.state.label)
+								emitter.emit('query', "MATCH (n:Computer)-[r:HasSession]->(m:User {name:{name}}) RETURN n,r,m", {name:this.state.label}
 									,this.state.label)
 							}.bind(this)} />
 					</dd>

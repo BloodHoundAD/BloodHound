@@ -13,8 +13,7 @@ export default class DatabaseDataDisplay extends Component {
 			num_groups: 'Refreshing',
 			num_relationships: 'Refreshing',
 			num_sessions: 'Refreshing',
-			interval: null,
-			session: driver.session()
+			interval: null
 		}
 	}
 
@@ -32,7 +31,6 @@ export default class DatabaseDataDisplay extends Component {
 
 	componentWillUnmount() {
 		clearInterval(this.state.interval)
-		this.state.session.close()
 		this.setState({
 			interval: null,
 			session: null
@@ -81,31 +79,40 @@ export default class DatabaseDataDisplay extends Component {
 	}
 
 	refreshDBData(){
-		var session = this.state.session;
+		var s1 = driver.session()
+		var s2 = driver.session()
+		var s3 = driver.session()
+		var s4 = driver.session()
+		var s5 = driver.session()
 
-		session.run("MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)")
+		s1.run("MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)")
 			.then(function(result){
 				this.setState({'num_users':result.records[0]._fields[0].low})
+				s1.close()
 			}.bind(this))
 		
-		session.run("MATCH (n:Group) RETURN count(n)")
+		s2.run("MATCH (n:Group) RETURN count(n)")
 			.then(function(result){
 				this.setState({'num_groups':result.records[0]._fields[0].low})
+				s2.close()
 			}.bind(this))
 		
-		session.run("MATCH (n:Computer) RETURN count(n)")
+		s3.run("MATCH (n:Computer) RETURN count(n)")
 			.then(function(result){
 				this.setState({'num_computers':result.records[0]._fields[0].low})
+				s3.close()
 			}.bind(this))
 
-		session.run("MATCH ()-[r:HasSession]->() RETURN count(r)")
+		s4.run("MATCH ()-[r:HasSession]->() RETURN count(r)")
 			.then(function(result){
 				this.setState({'num_sessions':result.records[0]._fields[0].low})
+				s4.close()
 			}.bind(this))
 
-		session.run("MATCH ()-[r]->() RETURN count(r)")
+		s5.run("MATCH ()-[r]->() RETURN count(r)")
 			.then(function(result){
 				this.setState({'num_relationships':result.records[0]._fields[0].low})
+				s5.close()
 			}.bind(this))
 	}
 }
