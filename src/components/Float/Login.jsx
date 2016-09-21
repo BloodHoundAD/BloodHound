@@ -78,10 +78,18 @@ export default class Login extends Component {
 
 		var driver = neo4j.v1.driver(this.state.url, neo4j.v1.auth.basic(this.state.user, this.state.password),{knownHosts: 'known_hosts'})
 		var session = driver.session()
-
 		session.run('MATCH (n) RETURN (n) LIMIT 1')
 			.subscribe({
-				onNext: function(next){
+				onError: function(error){
+					btn.toggleClass('activate');
+					this.setState({
+						loginHelpVisible: true,
+						loginInProgress: false,
+						loginEnabled: true
+					})
+					
+				}.bind(this),
+				onCompleted: function(){
 					btn.toggleClass('activate');
 					btn.removeClass('btn-default')
 					btn.addClass('btn-success')
@@ -101,20 +109,8 @@ export default class Login extends Component {
 							renderEmit.emit('login');
 						});
 					}.bind(this), 1500)
-				}.bind(this),
-				onError: function(error){
-					console.log(error)
-					btn.toggleClass('activate');
-					this.setState({
-						loginHelpVisible: true,
-						loginInProgress: false,
-						loginEnabled: true
-					})
-					
-				}.bind(this),
-				onCompleted: function(){
 					session.close()
-				}
+				}.bind(this)
 			})
 
 		btn.toggleClass('activate');
