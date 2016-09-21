@@ -89,6 +89,9 @@ export default class Login extends Component {
 					})
 					
 				}.bind(this),
+				onNext: function(){
+
+				},
 				onCompleted: function(){
 					btn.toggleClass('activate');
 					btn.removeClass('btn-default')
