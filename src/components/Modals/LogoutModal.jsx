@@ -22,6 +22,7 @@ export default class LogoutModal extends Component {
 		appStore.databaseInfo = null;
 		this.setState({ open: false })
 		emitter.emit('doLogout');
+		driver.close()
 		ReactDOM.unmountComponentAtNode(document.getElementById('root'))
 		ReactDOM.render(<Login />, document.getElementById('root'))
 	}
