@@ -416,8 +416,23 @@ export default class GraphContainer extends Component {
             .subscribe({
                 onNext: function(result){
                     if (result._fields[0].hasOwnProperty('segments')){
-                        console.log('path')
-                        console.log(result)
+                        $.each(result._fields[0].segments,function(index, segment){
+                            var end = this.createNodeFromRow(segment.end, params)
+                            var start = this.createNodeFromRow(segment.start, params)
+                            var edge = this.createEdgeFromRow(segment.relationship)
+
+                            if (!edges[edge.id]){
+                                edges[edge.id] = edge
+                            }
+
+                            if (!nodes[end.id]){
+                                nodes[end.id] = end
+                            }
+
+                            if (!nodes[start.id]){
+                                nodes[start.id] = start
+                            }
+                        }.bind(this))
                     }else{
                         $.each(result._fields, function(index, value){
                             if ($.isArray(value)){
@@ -474,7 +489,8 @@ export default class GraphContainer extends Component {
             id: id,
             type: type,
             source: source,
-            target:target
+            target:target,
+            label: type
         }
 
         return edge
