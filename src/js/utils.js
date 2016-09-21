@@ -269,29 +269,31 @@ export function clearDatabase(){
 }
 
 function deleteEdges(){
-	var a = fullAjax("MATCH ()-[r]-() WITH r LIMIT 50000 DELETE r RETURN count(r)",
-		function(json){
-			var d = json.results[0].data[0].row[0]
-			if (d === 0){
-				deleteNodes();
+	var session = driver.session()
+	session.run("MATCH ()-[r]-() WITH r LIMIT 50000 DELETE r RETURN count(r)")
+		.then(function(results){
+			session.close()
+			var count = result.records[0]._fields[0].low
+			if (count === 0){
+				deleteNodes()
 			}else{
-				deleteEdges();
+				deleteEdges()
 			}
 		})
-	$.ajax(a);
 }
 
 function deleteNodes(){
-	var a = fullAjax("MATCH (n) WITH n LIMIT 50000 DELETE n RETURN count(n)",
-		function(json){
-			var d = json.results[0].data[0].row[0]
-			if (d === 0){
+	var session = driver.session()
+	session.run("MATCH (n) WITH n LIMIT 50000 DELETE n RETURN count(n)")
+		.then(function(results){
+			session.close()
+			var count = result.records[0]._fields[0].low
+			if (count === 0){
 				emitter.emit('hideDBClearModal')
 			}else{
-				deleteNodes();
+				deleteNodes()
 			}
 		})
-	$.ajax(a);
 }
 
 //Utilities for generating AJAX requests
