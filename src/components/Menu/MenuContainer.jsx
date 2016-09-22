@@ -14,8 +14,7 @@ export default class MenuContainer extends Component {
 			refreshHover: false,
 			uploading: false,
 			progress: 0,
-			parser: null,
-			currentAjax: null
+			parser: null
 		}
 
 		emitter.on('cancelUpload', this.cancelUpload.bind(this))
@@ -23,7 +22,6 @@ export default class MenuContainer extends Component {
 
 	cancelUpload(){
 		this.state.parser.abort()
-		this.state.currentAjax.abort()
 		setTimeout(function(){
 			this.setState({uploading: false})
 		}.bind(this), 1000)
@@ -88,6 +86,7 @@ export default class MenuContainer extends Component {
 				chunkSize: 50000,
 				skipEmptyLines: true,
 				chunk: function(rows, parser){
+					this.setState({parser: parser})
 					if (rows.data.length === 0){
 						parser.abort()
 						this.setState({progress:100})
@@ -134,47 +133,43 @@ export default class MenuContainer extends Component {
 								}.bind(this))
 							}.bind(this))
 						}.bind(this))
+					}else if (filetype === 'localadmin'){
+						var props = buildLocalAdminProps(rows.data)
+						var userQuery = 'UNWIND {props} AS prop MERGE (user:User {name: prop.account}) WITH user,prop MERGE (computer:Computer {name: prop.computer}) WITH user,computer MERGE (user)-[:AdminTo]->(computer)'
+						var groupQuery = 'UNWIND {props} AS prop MERGE (group:Group {name: prop.account}) WITH group,prop MERGE (computer:Computer {name: prop.computer}) WITH group,computer MERGE (group)-[:AdminTo]->(computer)'
+						var computerQuery = 'UNWIND {props} AS prop MERGE (computer1:Computer {name: prop.account}) WITH computer1,prop MERGE (computer2:Computer {name: prop.computer}) WITH computer1,computer2 MERGE (computer1)-[:AdminTo]->(computer2)'
+
+						var s1 = driver.session()
+						var s2 = driver.session()
+						var s3 = driver.session()
+						var p1
+						var p2
+						var p3
+						p1 = s1.run(userQuery, {props: props.users})
+						p1.then(function(){
+							s1.close()
+							p2 = s2.run(computerQuery, {props: props.computers})
+							p2.then(function(){
+								s2.close()
+								p3 = s3.run(groupQuery, {props: props.groups})
+								p3.then(function(){
+									s3.close()
+									this.setState({progress: Math.floor((sent / count) * 100)})
+									parser.resume()
+								}.bind(this))
+							}.bind(this))
+						}.bind(this))
+					}else{
+						var props = buildDomainProps(rows.data)
+						var query = "UNWIND {props} AS prop MERGE (domain1:Domain {name: prop.domain1}) WITH domain1,prop MERGE (domain2:Domain {name: prop.domain2}) WITH domain1,domain2,prop MERGE (domain1)-[:TrustedBy {TrustType : prop.trusttype, Transitive: prop.transitive}]->(domain2)"
+						var session = driver.session()
+						session.run(query, {props: props})
+							.then(function(){
+								this.setState({progress: Math.floor((sent / count) * 100)})
+								session.close()
+								parser.resume()
+							}.bind(this))
 					}
-					// this.setState({parser: parser})
-					// var options = defaultAjaxSettings()
-					// options.url = appStore.databaseInfo.url + '/db/data/transaction/' + transactionID
-					// //var data = JSON.stringify(buildMergeQuery(rows.data, filetype), null, 2)
-					// options.headers['X-Stream'] = true
-					// options.data = JSON.stringify(buildMergeQuery(rows.data, filetype))
-					// options.success = function(json){
-					// 	if (json.errors.length > 0){
-					// 		parser.abort()
-					// 		fs.writeFile("error.log", JSON.stringify(json.errors, null, 2))
-					// 		clipboard.writeText(JSON.stringify(json.errors, null, 2))
-					// 		dialog.showErrorBox("Ingestion Error", "An error occurred in ingestion.\nIf possible please post the error.log file to a git issue (check for sensitive data first!) or contact cptjesus directly on the BloodHound Slack Channel.\nThe error has also been copied to your clipboard.")
-					// 		this.cancelUpload()							
-					// 		return
-					// 	}
-					// 	completed += rows.data.length
-					// 	sent += rows.data.length
-					// 	this.setState({progress: Math.floor((completed / count) * 100)})
-					// 	if (sent > 20000){
-					// 		closeTransaction.url = appStore.databaseInfo.url + '/db/data/transaction/' + transactionID + '/commit'
-					// 		closeTransaction.success = function(){
-					// 			committed += sent
-					// 			sent = 0
-					// 			if (committed < count){
-					// 				$.ajax(openTransaction)	
-					// 			}else{
-					// 				setTimeout(function(){
-					// 					this.setState({uploading: false})
-					// 				}.bind(this), 3000)
-					// 			}
-					// 			this.setState({committed: Math.floor((committed / count) * 100)})
-					// 			parser.resume()
-					// 		}.bind(this)
-					// 		$.ajax(closeTransaction)
-					// 	}else{
-					// 		parser.resume()
-					// 	}
-					// }.bind(this)
-					// var a = $.ajax(options);
-					// this.setState({currentAjax: a})
 				}.bind(this)
 			})
 		}.bind(this))
