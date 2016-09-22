@@ -390,7 +390,6 @@ export function buildSessionProps(rows){
 
 export function buildDomainProps(rows){
 	var domains = []
-	domainQuery = 'MERGE (domain1:Domain {name: "{}"}) WITH domain1 MERGE (domain2:Domain {name: "{}"}) WITH domain1,domain2 MERGE (domain1)-[:TrustedBy {TrustType : "{}", Transitive: "{}"}]->(domain2)'
 	$.each(rows, function(index, row){
 		switch(row.TrustDirection){
 			case 'Inbound':
