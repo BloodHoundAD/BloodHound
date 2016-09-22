@@ -332,6 +332,83 @@ export function fullAjax(statements, callback){
 	return options
 }
 
+export function buildGroupMembershipProps(rows){
+	var users = []
+	var groups = []
+	var computers = []
+	$.each(rows, function(index, row){
+		switch (row.AccountType){
+			case 'user':
+				users.push({account:row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase()})
+				break
+			case 'computer':
+				computers.push({account:row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase()})
+				break
+			case 'group':
+				groups.push({account:row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase()})
+				break
+		}
+	})
+
+	return {users: users, groups: groups, computers: computers}
+}
+
+export function buildLocalAdminProps(rows){
+	var users = []
+	var groups = []
+	var computers = []
+	$.each(rows, function(index, row){
+		if (row.AccountName.startsWith('@')){
+			return
+		}
+		switch(row.AccountType){
+			case 'user':
+				users.push({account:row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase()})
+				break;
+			case 'group':
+				groups.push({account:row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase()})
+				break;
+			case 'computer':
+				computers.push({account:row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase()})
+				break
+		}
+	})
+	return {users: users, groups: groups, computers: computers}
+}
+
+export function buildSessionProps(rows){
+	var sessions = []
+	$.each(rows, function(index, row){
+		if (row.UserName === 'ANONYMOUS LOGON@UNKNOWN' || row.UserName === ''){
+			return
+		}
+		sessions.push({account: row.UserName.toUpperCase(), computer: row.ComputerName.toUpperCase(), weight: row.Weight})
+	})
+
+	return sessions
+}
+
+export function buildDomainProps(rows){
+	var domains = []
+	domainQuery = 'MERGE (domain1:Domain {name: "{}"}) WITH domain1 MERGE (domain2:Domain {name: "{}"}) WITH domain1,domain2 MERGE (domain1)-[:TrustedBy {TrustType : "{}", Transitive: "{}"}]->(domain2)'
+	$.each(rows, function(index, row){
+		switch(row.TrustDirection){
+			case 'Inbound':
+				domains.push({domain1: row.TargetDomain.toUpperCase(), domain2: row.SourceDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive})
+				break;
+			case 'Outbound':
+				domains.push({domain1: row.SourceDomain.toUpperCase(), domain2: row.TargetDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive})
+				break;
+			case 'Bidirectional':
+				domains.push({domain1: row.TargetDomain.toUpperCase(), domain2: row.SourceDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive})
+				domains.push({domain1: row.SourceDomain.toUpperCase(), domain2: row.TargetDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive})
+				break
+		}
+	})
+
+	return domains
+}
+
 export function buildMergeQuery(rows, type){
 // PowerView.UserSession
 //        UserName,ComputerName,Weight
