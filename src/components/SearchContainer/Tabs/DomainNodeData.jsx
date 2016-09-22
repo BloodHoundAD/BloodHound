@@ -93,13 +93,13 @@ export default class DomainNodeData extends Component {
 				s7.close()
 			}.bind(this))
 
-		s8.run("MATCH (a:Domain {name:{name}})<-[r:TrustedBy*1..]-(b:Domain) RETURN count(b)", {name:payload})
+		s8.run("MATCH p=shortestPath((a:Domain {name:{name}})<-[r:TrustedBy*1..]-(b:Domain)) RETURN count(b)", {name:payload})
 			.then(function(result){
 				this.setState({'effectiveInboundTrusts':result.records[0]._fields[0].low})
 				s8.close()
 			}.bind(this))
 
-		s9.run("MATCH (a:Domain {name:{name}})-[r:TrustedBy*1..]->(b:Domain) RETURN count(b)", {name:payload})
+		s9.run("MATCH p=shortestPath((a:Domain {name:{name}})-[r:TrustedBy*1..]->(b:Domain)) RETURN count(b)", {name:payload})
 			.then(function(result){
 				this.setState({'effectiveOutboundTrusts':result.records[0]._fields[0].low})
 				s9.close()
@@ -184,7 +184,7 @@ export default class DomainNodeData extends Component {
 							ready={this.state.effectiveInboundTrusts !== -1}
 							value={this.state.effectiveInboundTrusts}
 							click={function(){
-								emitter.emit('query', "MATCH (a:Domain {name:{domain}})<-[r:TrustedBy*1..]-(b:Domain) RETURN a,r,b", {domain: this.state.label})
+								emitter.emit('query', "MATCH p=shortestPath((a:Domain {name:{domain}})<-[r:TrustedBy*1..]-(b:Domain)) RETURN p", {domain: this.state.label})
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -206,7 +206,7 @@ export default class DomainNodeData extends Component {
 							ready={this.state.effectiveOutboundTrusts !== -1}
 							value={this.state.effectiveOutboundTrusts}
 							click={function(){
-								emitter.emit('query', "MATCH (a:Domain {name:{domain}})-[r:TrustedBy*1..]->(b:Domain) RETURN a,r,b", {domain: this.state.label})
+								emitter.emit('query', "MATCH p=shortestPath((a:Domain {name:{domain}})-[r:TrustedBy*1..]->(b:Domain)) RETURN p", {domain: this.state.label})
 							}.bind(this)} />
 					</dd>
 				</dl>
