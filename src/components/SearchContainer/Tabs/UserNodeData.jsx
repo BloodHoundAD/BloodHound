@@ -76,13 +76,13 @@ export default class UserNodeData extends Component {
 				s4.close()
 			}.bind(this))
 
-		s5.run("MATCH (n:User {name:{name}}), (m:Group), x=shortestPath((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN count(distinct(p))", {name:payload})
+		s5.run("MATCH p=shortestPath((n:User {name:{name}})-[r*1..]->(m:Computer)) WHERE NONE(rel in rels(p) WHERE type(rel)='HasSession') WITH p WHERE ANY(rel in rels(p) WHERE type(rel)='MemberOf') RETURN count(p)", {name:payload})
 			.then(function(result){
 				this.setState({'groupDelegatedLocalAdmin':result.records[0]._fields[0].low})
 				s5.close()
 			}.bind(this))
 
-		s6.run("MATCH (n:User {name:{name}}), (target:Computer), p=shortestPath((n)-[*]->(target)) RETURN count(target)", {name:payload})
+		s6.run("MATCH (n:User {name:{name}}), (target:Computer), p=shortestPath((n)-[*]->(target)) RETURN count(p)", {name:payload})
 			.then(function(result){
 				this.setState({'derivativeLocalAdmin':result.records[0]._fields[0].low})
 				s6.close()
@@ -184,7 +184,7 @@ export default class UserNodeData extends Component {
 							ready={this.state.groupDelegatedLocalAdmin !== -1}
 							value={this.state.groupDelegatedLocalAdmin}
 							click={function(){
-								emitter.emit('query', "MATCH (n:User {name:{name}}), (m:Group), y=shortestPath((n)-[r:MemberOf*1..]->(m)) WITH n,m,r,y MATCH x=(m)-[s:AdminTo*1..]->(p:Computer) RETURN x,y", {name:this.state.label}
+								emitter.emit('query', "MATCH p=shortestPath((n:User {name:{name}})-[r*1..]->(m:Computer)) WHERE NONE(rel in rels(p) WHERE type(rel)='HasSession') WITH p WHERE ANY(rel in rels(p) WHERE type(rel)='MemberOf') RETURN p", {name:this.state.label}
 									,this.state.label)
 							}.bind(this)} />
 					</dd>
