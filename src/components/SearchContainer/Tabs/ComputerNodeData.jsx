@@ -221,7 +221,7 @@ export default class ComputerNodeData extends Component {
 							value={this.state.sessions}
 							click={function(){
 								emitter.emit('query',
-									"MATCH (m:Computer {name:{name}})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH '$' RETURN n,r,m".format(this.state.label))
+									"MATCH (m:Computer {name:{name}})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH '$' RETURN n,r,m", {name: this.state.label})
 							}.bind(this)} />
 					</dd>
 				</dl>
