@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes, findGraphPath, defaultAjaxSettings} from 'utils';
 var fs = require('fs');
 var child_process = require('child_process')
+var child = child_process.fork('src/js/worker.js', {silent:true});
 const { dialog } = require('electron').remote
 
 export default class GraphContainer extends Component {
@@ -24,6 +25,18 @@ export default class GraphContainer extends Component {
                 this.setState({template: response}) 
             }.bind(this)
         })
+
+        child.stdout.on('data', (data) => {
+          console.log(`stdout: ${data}`);
+        });
+
+        child.stderr.on('data', (data) => {
+            console.log(`error: ${data}`);
+        });
+
+        child.on('message', function(m) {
+          this.loadFromChildProcess(m)
+        }.bind(this));
 
         var s1 = driver.session()
         var s2 = driver.session()
@@ -107,26 +120,40 @@ export default class GraphContainer extends Component {
     loadFromChildProcess(graph){
         if (graph.nodes.length === 0){
                 emitter.emit('showAlert', "No data returned from query")
+                emitter.emit('updateLoadingText', "Done!")
+                setTimeout(function(){
+                    emitter.emit('showLoadingIndicator', false);    
+                }, 1500)
         }else{
             $.each(graph.nodes, function(i, node){
                 node.glyphs = $.map(node.glyphs, function(value, index) {
                     return [value];
                 });
             })
-            appStore.queryStack.push({
-                nodes: this.state.sigmaInstance.graph.nodes(),
-                edges: this.state.sigmaInstance.graph.edges(),
-                spotlight: appStore.spotlightData,
-                startNode: appStore.startNode,
-                endNode: appStore.endNode
-            })
+            if (!this.state.firstDraw){
+                appStore.queryStack.push({
+                    nodes: this.state.sigmaInstance.graph.nodes(),
+                    edges: this.state.sigmaInstance.graph.edges(),
+                    spotlight: appStore.spotlightData,
+                    startNode: appStore.startNode,
+                    endNode: appStore.endNode
+                })
+            }
+            this.setState({firstDraw: false})
+            sigma.misc.animation.camera(this.state.sigmaInstance.camera, { x: 0, y: 0, ratio: 1.075 });
 
-            appStore.spotlightData = graph.spotlightData;
+            appStore.spotlightData = graph.spotlight;
             this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.graph.read(graph);
             this.state.design.deprecate();
             this.state.sigmaInstance.refresh();
             this.state.design.apply();
+
+            if (appStore.dagre){
+                sigma.layouts.dagre.start(this.state.sigmaInstance);
+            }else{
+                sigma.layouts.startForceLink()
+            }
             emitter.emit('spotlightUpdate');
         } 
     }
@@ -269,7 +296,9 @@ export default class GraphContainer extends Component {
             var query = appStore.queryStack.pop();
             this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.graph.read({ nodes: query.nodes, edges: query.edges });
+            this.state.design.deprecate();
             this.state.sigmaInstance.refresh();
+            this.state.design.apply();
             appStore.spotlightData = query.spotlight;
             appStore.startNode = query.startNode,
             appStore.endNode = query.endNode;
@@ -289,7 +318,7 @@ export default class GraphContainer extends Component {
         }else{
             child = parent;
         }
-        label = child.neo4j_data.name;
+        label = child.label;
         if (child.type_user){
             emitter.emit('userNodeClicked', label)
         }else if (child.type_group){
@@ -412,27 +441,38 @@ export default class GraphContainer extends Component {
         if (typeof params.props === 'undefined'){
             params.props = {}
         }
+        emitter.emit('showLoadingIndicator', true);
+        emitter.emit('updateLoadingText', "Querying Database")
+        emitter.emit('resetSpotlight')
+        var count = 0
         session.run(params.statement, params.props)
             .subscribe({
                 onNext: function(result){
+                    count += 1
+                    if ((count % 100) === 0){
+                        console.log(count / 100)
+                    }
                     if (result._fields[0].hasOwnProperty('segments')){
-                        $.each(result._fields[0].segments,function(index, segment){
-                            var end = this.createNodeFromRow(segment.end, params)
-                            var start = this.createNodeFromRow(segment.start, params)
-                            var edge = this.createEdgeFromRow(segment.relationship)
+                        $.each(result._fields, function(index, field){
+                            $.each(field.segments,function(index, segment){
+                                var end = this.createNodeFromRow(segment.end, params)
+                                var start = this.createNodeFromRow(segment.start, params)
+                                var edge = this.createEdgeFromRow(segment.relationship)
 
-                            if (!edges[edge.id]){
-                                edges[edge.id] = edge
-                            }
+                                if (!edges[edge.id]){
+                                    edges[edge.id] = edge
+                                }
 
-                            if (!nodes[end.id]){
-                                nodes[end.id] = end
-                            }
+                                if (!nodes[end.id]){
+                                    nodes[end.id] = end
+                                }
 
-                            if (!nodes[start.id]){
-                                nodes[start.id] = start
-                            }
+                                if (!nodes[start.id]){
+                                    nodes[start.id] = start
+                                }
+                            }.bind(this))
                         }.bind(this))
+                        
                     }else{
                         $.each(result._fields, function(index, value){
                             if ($.isArray(value)){
@@ -462,19 +502,26 @@ export default class GraphContainer extends Component {
                     var graph = {nodes:[],edges:[]}
                     $.each(nodes, function(node){
                         graph.nodes.push(nodes[node])
+                        if (node.start){
+                            appStore.startNode = node
+                        }
+
+                        if (node.end){
+                            appStore.endNode = node
+                        }
                     })
 
                     $.each(edges, function(edge){
                         graph.edges.push(edges[edge])
                     })
-                    sigmaInstance.graph.clear()
-                    sigmaInstance.graph.read(graph)
-                    $.each(sigmaInstance.graph.nodes(), function(index,node){
-                        node.degree = sigmaInstance.graph.degree(node.id)
-                    })
-                    this.state.design.deprecate();
-                    this.state.sigmaInstance.refresh();
-                    this.state.design.apply();
+                    emitter.emit('updateLoadingText', "Processing Data")
+
+                    child.send(JSON.stringify({graph: graph,
+                         edge: params.allowCollapse ? appStore.performance.edge : 0 ,
+                         sibling: params.allowCollapse ? appStore.performance.sibling : 0,
+                         start: appStore.startNode,
+                         end: appStore.endNode
+                     }))
                     session.close()
                 }.bind(this)
             })
@@ -627,7 +674,7 @@ export default class GraphContainer extends Component {
                 emitter.emit('userNodeClicked', n.data.node.label)
             }else if (n.data.node.type_group){
                 emitter.emit('groupNodeClicked', n.data.node.label)
-            }else if (n.data.node.type_computer){
+            }else if (n.data.node.type_computer && (n.data.node.label !== 'Grouped Computers')){
                 emitter.emit('computerNodeClicked', n.data.node.label)
             }else if (n.data.node.type_domain){
                 emitter.emit('domainNodeClicked', n.data.node.label)
