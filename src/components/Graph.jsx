@@ -350,98 +350,6 @@ export default class GraphContainer extends Component {
         }, 2000)
     }
 
-    bakdoQueryNative(params){
-
-        // if (!this.state.firstDraw){
-        //     appStore.queryStack.push({
-        //         nodes: this.state.sigmaInstance.graph.nodes(),
-        //         edges: this.state.sigmaInstance.graph.edges(),
-        //         spotlight: appStore.spotlightData,
-        //         startNode: appStore.startNode,
-        //         endNode: appStore.endNode
-        //     })
-        // }
-
-        // emitter.emit('showLoadingIndicator', true);
-        // emitter.emit('updateLoadingText', "Querying Database")
-        // emitter.emit('resetSpotlight')
-
-        // sigma.neo4j.cypher({
-        //     url: appStore.databaseInfo.url,
-        //     user: appStore.databaseInfo.user,
-        //     password: appStore.databaseInfo.password
-        // },
-        // params.statement,
-        // this.state.sigmaInstance,
-        // function(sigmaInstance){
-        //     if (sigmaInstance.graph.nodes().length === 0){
-        //         emitter.emit('showAlert', "No data returned from query")
-        //         emitter.emit('updateLoadingText', "Done!")
-        //         setTimeout(function(){
-        //             emitter.emit('showLoadingIndicator', false);    
-        //         }, 1500)
-        //         this.goBack()
-        //         return;
-        //     }
-        //     appStore.spotlightData = {}
-        //     var design = this.state.design;
-        //     sigmaInstance = setNodeData(sigmaInstance, params.start, params.end);
-        //     if (params.allowCollapse){
-        //         sigmaInstance = collapseEdgeNodes(sigmaInstance);
-        //         sigmaInstance = collapseSiblingNodes(sigmaInstance);
-        //     }
-
-        //     $.each(sigmaInstance.graph.nodes(), function(index, node) {
-        //         if (!appStore.spotlightData.hasOwnProperty(node.id)) {
-        //             appStore.spotlightData[node.id] = [node.neo4j_data.name, 0, ""];
-        //         }
-        //     });
-        //     this.state.sigmaInstance = sigmaInstance
-        //     this.state.design = design;
-        //     emitter.emit('spotlightUpdate');
-        //     sigma.misc.animation.camera(sigmaInstance.camera, { x: 0, y: 0, ratio: 1.075 });
-        //     if (appStore.dagre){
-        //         sigma.layouts.dagre.start(this.state.sigmaInstance);
-        //     }else{
-        //         sigma.layouts.startForceLink()
-        //     }
-
-        //     // var child = child_process.fork('src/js/worker.js', {silent:true});
-
-        //     // child.stdout.on('data', (data) => {
-        //     //   console.log(`stdout: ${data}`);
-        //     // });
-
-        //     // child.stderr.on('data', (data) => {
-        //     //     console.log(`error: ${data}`);
-        //     // });
-            
-
-        //     // child.on('message', function(m) {
-        //     //   // Receive results from child process
-        //     //   this.loadFromChildProcess(m)
-        //     // }.bind(this));
-
-        //     // // Send child process some work
-        //     // child.send(JSON.stringify({nodes:sigmaInstance.graph.nodes(),
-        //     //      edges: sigmaInstance.graph.edges(),
-        //     //      edge: params.allowCollapse ? appStore.performance.edge : 0 ,
-        //     //      sibling: params.allowCollapse ? appStore.performance.sibling : 0,
-        //     //      start: appStore.startNode,
-        //     //      end: appStore.endNode
-        //     //  }))
-        //     this.state.design.deprecate();
-        //     this.state.sigmaInstance.refresh();
-        //     this.state.design.apply();
-        // }.bind(this))
-        // if (this.state.firstDraw){
-        //     setTimeout(function(){
-        //         this.state.sigmaInstance.refresh({skipIndexation: true})
-        //     }.bind(this), 500)
-        //     this.setState({firstDraw: false})
-        // }
-    }
-
     doQueryNative(params){
         var sigmaInstance = this.state.sigmaInstance
         var nodes = {}
@@ -516,8 +424,8 @@ export default class GraphContainer extends Component {
                     child.send(JSON.stringify({graph: graph,
                          edge: params.allowCollapse ? appStore.performance.edge : 0 ,
                          sibling: params.allowCollapse ? appStore.performance.sibling : 0,
-                         start: appStore.startNode,
-                         end: appStore.endNode
+                         start: params.start,
+                         end: params.end
                      }))
                     session.close()
                 }.bind(this)
