@@ -57,11 +57,11 @@ function collapseEdgeNodes(sigmaInstance, params, spotlightData){
 		}
 
 		sigmaInstance.graph.adjacentNodes(node.id).forEach(function(anode){
-			if (params.end !== null && anode.label === params.end.label){
+			if (params.end !== null && anode.label === params.end){
 				return
 			}
 
-			if (params.start !== null && anode.label === params.start.label){
+			if (params.start !== null && anode.label === params.start){
 				return
 			}
 
