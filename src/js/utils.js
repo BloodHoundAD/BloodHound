@@ -251,6 +251,7 @@ export function findGraphPath(sigmaInstance, reverse, nodeid){
 				var check = reverse ? edge.source : edge.target
 				//If an edge is pointing in the right direction, set its color
 				//Push the edge into our store and then 
+				node = parseInt(node)
 				if (check === node){
 					edge.color = reverse ? 'blue' : 'red';
 					appStore.highlightedEdges.push(edge);

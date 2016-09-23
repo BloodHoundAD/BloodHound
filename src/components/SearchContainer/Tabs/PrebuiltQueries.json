@@ -13,9 +13,9 @@
 			"nodeSelectQuery":  {
 				"query":"MATCH (n:Group) WHERE n.name =~ {name} RETURN n.name",
 				"queryProps": {"name":"(?i).*DOMAIN ADMINS.*"},
-                "onFinish": "MATCH (n:User),(m:Group {name:{result}}),p=allShortestPaths((n)-[*1..]->(m)) RETURN p",
-                "start":"{}",
-                "end": "",
+                "onFinish": "MATCH (n:User),(m:Group {name:{result}}),p=shortestPath((n)-[*1..]->(m)) RETURN p",
+                "start":"",
+                "end": "{}",
                 "allowCollapse": true,
                 "boxTitle": "Select domain to map..."
 			}
