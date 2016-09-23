@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import NodeALink from './NodeALink'
-import { fullAjax } from 'utils';
 
 export default class GroupNodeData extends Component {
 	propTypes: {

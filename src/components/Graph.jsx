@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
-import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes, findGraphPath, defaultAjaxSettings} from 'utils';
+import  { findGraphPath } from 'utils';
 var fs = require('fs');
 var child_process = require('child_process')
 var child = child_process.fork('src/js/worker.js', {silent:true});

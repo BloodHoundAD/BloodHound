@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { defaultAjaxSettings } from 'utils';
 
 export default class Login extends Component {
 	constructor(){

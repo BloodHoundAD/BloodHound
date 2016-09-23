@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import GlyphiconSpan from '../GlyphiconSpan'
 import Icon from '../Icon'
-import { escapeRegExp, fullAjax } from 'utils';
 import TabContainer from './TabContainer'
 
 export default class SearchContainer extends Component {
@@ -147,8 +146,9 @@ export default class SearchContainer extends Component {
             }
             if (!this.state.pathfindingIsOpen) {
                 if (start !== ""){
-                    var statement = "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n".format(escapeRegExp(start));
-                    emitter.emit('searchQuery', statement)    
+                    var statement = "MATCH (n) WHERE n.name =~ {regex} RETURN n";
+                    var regex = '(?i).*' + start + '.*'
+                    emitter.emit('searchQuery', statement, {regex:regex})
                 }
             } else {
                 var start = jQuery(this.refs.searchbar).val();
