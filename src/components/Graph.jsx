@@ -444,14 +444,9 @@ export default class GraphContainer extends Component {
         emitter.emit('showLoadingIndicator', true);
         emitter.emit('updateLoadingText', "Querying Database")
         emitter.emit('resetSpotlight')
-        var count = 0
         session.run(params.statement, params.props)
             .subscribe({
                 onNext: function(result){
-                    count += 1
-                    if ((count % 100) === 0){
-                        console.log(count / 100)
-                    }
                     if (result._fields[0].hasOwnProperty('segments')){
                         $.each(result._fields, function(index, field){
                             $.each(field.segments,function(index, segment){
@@ -561,6 +556,7 @@ export default class GraphContainer extends Component {
         }
 
         if (label === params.start){
+            appStore.startNode = node
             node.start = true
             node.glyphs.push({
                 'position': 'bottom-right',
@@ -572,6 +568,7 @@ export default class GraphContainer extends Component {
         }
 
         if (label === params.end){
+            appStore.endNode = node
             node.end = true
             node.glyphs.push({
                 'position': 'bottom-right',
