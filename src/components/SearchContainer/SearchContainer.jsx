@@ -80,8 +80,8 @@ export default class SearchContainer extends Component {
             },
             afterSelect: function(selected) {
                 if (!this.state.pathfindingIsOpen) {
-                    var statement = "MATCH (n) WHERE n.name = '{}' RETURN n".format(selected);
-                    emitter.emit('searchQuery', statement)
+                    var statement = "MATCH (n) WHERE n.name = {name} RETURN n"
+                    emitter.emit('searchQuery', statement, {name: selected})
                 } else {
                     var start = jQuery(this.refs.searchbar).val();
                     var end = jQuery(this.refs.pathbar).val();

@@ -125,11 +125,6 @@ export default class GraphContainer extends Component {
                     emitter.emit('showLoadingIndicator', false);    
                 }, 1500)
         }else{
-            $.each(graph.nodes, function(i, node){
-                node.glyphs = $.map(node.glyphs, function(value, index) {
-                    return [value];
-                });
-            })
             if (!this.state.firstDraw){
                 appStore.queryStack.push({
                     nodes: this.state.sigmaInstance.graph.nodes(),
@@ -139,6 +134,20 @@ export default class GraphContainer extends Component {
                     endNode: appStore.endNode
                 })
             }
+            $.each(graph.nodes, function(i, node){
+                if (node.start){
+                    appStore.startNode = node
+                }
+
+                if (node.end){
+                    appStore.endNode = node
+                }
+
+                node.glyphs = $.map(node.glyphs, function(value, index) {
+                    return [value];
+                });
+            })
+
             this.setState({firstDraw: false})
             sigma.misc.animation.camera(this.state.sigmaInstance.camera, { x: 0, y: 0, ratio: 1.075 });
 
@@ -497,13 +506,6 @@ export default class GraphContainer extends Component {
                     var graph = {nodes:[],edges:[]}
                     $.each(nodes, function(node){
                         graph.nodes.push(nodes[node])
-                        if (node.start){
-                            appStore.startNode = node
-                        }
-
-                        if (node.end){
-                            appStore.endNode = node
-                        }
                     })
 
                     $.each(edges, function(edge){
@@ -556,7 +558,6 @@ export default class GraphContainer extends Component {
         }
 
         if (label === params.start){
-            appStore.startNode = node
             node.start = true
             node.glyphs.push({
                 'position': 'bottom-right',
@@ -568,7 +569,6 @@ export default class GraphContainer extends Component {
         }
 
         if (label === params.end){
-            appStore.endNode = node
             node.end = true
             node.glyphs.push({
                 'position': 'bottom-right',
@@ -627,18 +627,24 @@ export default class GraphContainer extends Component {
         this.relayout();
     }
 
-    doSearchQuery(payload){
+    doSearchQuery(payload, props){
+        if (typeof props === 'undefined'){
+            props = {}
+        }
         this.doQueryNative({
             statement: payload,
-            allowCollapse: true
+            allowCollapse: true,
+            props: props
         })
     }
 
     doPathQuery(start, end){
-        var statement = "MATCH (n {name:'{}'}), (m {name:'{}'}), p=allShortestPaths((n)-[*]->(m)) RETURN p".format(start,end)
+        var statement = "MATCH (n {name:{start}}), (m {name:{end}}), p=allShortestPaths((n)-[*]->(m)) RETURN p"
+        var props = {start: start, end: end}
         this.doQueryNative({
             statement: statement,
             allowCollapse: true,
+            props: props,
             start: start,
             end: end
         })

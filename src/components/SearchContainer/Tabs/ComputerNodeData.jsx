@@ -57,7 +57,7 @@ export default class ComputerNodeData extends Component {
 				s1.close()
 			}.bind(this))
 
-		s2.run("MATCH (n:User),(target:Computer {name:{name}}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(target)) WITH nodes(p) AS y RETURN count(distinct(filter(x in y WHERE labels(x)[0] = 'User')))", {name:payload})
+		s2.run("MATCH p=shortestPath((n:User)-[r*1..]->(m:Computer {name:{name}})) WHERE NONE(rel in r WHERE type(rel)='HasSession') RETURN count(m)", {name:payload})
 			.then(function(result){
 				this.setState({'unrolledAdmins':result.records[0]._fields[0].low})
 				s2.close()
@@ -69,13 +69,13 @@ export default class ComputerNodeData extends Component {
 				s3.close()
 			}.bind(this))
 
-		s4.run("MATCH (n:Computer {name:{name}}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN count(distinct(p))", {name:payload})
+		s4.run("MATCH p=shortestPath((n:Computer {name:{name}})-[r*1..]->(m:Computer)) WHERE NONE(rel in rels(p) WHERE type(rel)='HasSession') WITH p WHERE ANY(rel in rels(p) WHERE type(rel)='MemberOf') RETURN count(p)", {name:payload})
 			.then(function(result){
 				this.setState({'groupDelegatedLocalAdmin':result.records[0]._fields[0].low})
 				s4.close()
 			}.bind(this))
 
-		s5.run("MATCH (n:Computer {name:{name}}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN count(distinct(m))", {name:payload})
+		s5.run("MATCH (n:Computer {name:{name}}), (m:Computer), p=shortestPath((n)-[r*1..]->(m)) RETURN count(p)", {name:payload})
 			.then(function(result){
 				this.setState({'derivativeLocalAdmin':result.records[0]._fields[0].low})
 				s5.close()
@@ -185,7 +185,7 @@ export default class ComputerNodeData extends Component {
 							value={this.state.firstDegreeLocalAdmin}
 							click={function(){
 								emitter.emit('query',
-									"MATCH (n:Computer {name:{name}}), (m:Computer), p=allShortestPaths((n)-[r:MemberOf|AdminTo]->(m)) RETURN p",{name: this.state.label}, this.state.label)
+									"MATCH (n:Computer {name:{name}}), (m:Computer), p=shortestPath((n)-[r:MemberOf|AdminTo]->(m)) RETURN p",{name: this.state.label}, this.state.label)
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -197,7 +197,7 @@ export default class ComputerNodeData extends Component {
 							value={this.state.groupDelegatedLocalAdmin}
 							click={function(){
 								emitter.emit('query',
-									"MATCH (n:Computer {name:{name}}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN n,m,r,s,p",{name: this.state.label}, this.state.label)
+									"MATCH p=shortestPath((n:Computer {name:{name}})-[r*1..]->(m:Computer)) WHERE NONE(rel in rels(p) WHERE type(rel)='HasSession') WITH p WHERE ANY(rel in rels(p) WHERE type(rel)='MemberOf') RETURN p",{name: this.state.label}, this.state.label)
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -209,7 +209,7 @@ export default class ComputerNodeData extends Component {
 							value={this.state.derivativeLocalAdmin}
 							click={function(){
 								emitter.emit('query',
-									"MATCH (n:Computer {name:{name}}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN p",{name: this.state.label}, this.state.label)
+									"MATCH (n:Computer {name:{name}}), (m:Computer), p=shortestPath((n)-[r*1..]->(m)) RETURN p",{name: this.state.label}, this.state.label)
 							}.bind(this)} />
 					</dd>
 					<dt>

@@ -63,7 +63,7 @@ export default class DomainNodeData extends Component {
 				s2.close()
 			}.bind(this))
 
-		s3.run("MATCH (n:Computer) WHERE n.name ENDS WITH {name} WITH n WHERE size(split(n.name,'.')) - size(split('{}}','.')) = 1 RETURN count(n)", {name:payload})
+		s3.run("MATCH (n:Computer) WHERE n.name ENDS WITH {name} WITH n WHERE size(split(n.name,'.')) - size(split({name},'.')) = 1 RETURN count(n)", {name:payload})
 			.then(function(result){
 				this.setState({'computers':result.records[0]._fields[0].low})
 				s3.close()
@@ -160,6 +160,17 @@ export default class DomainNodeData extends Component {
 						<NodeALink
 							ready={this.state.foreignGroups !== -1}
 							value={this.state.foreignGroups}
+							click={function(){
+								emitter.emit('query', "MATCH (a:Group) WHERE NOT a.name ENDS WITH ('@' + {domain}) WITH a MATCH (b:Group) WHERE b.name ENDS WITH ('@' + {domain}) WITH a,b MATCH (a)-[r:MemberOf]-(b) RETURN a,r,b", {domain: this.state.label})
+							}.bind(this)} />
+					</dd>
+					<dt>
+						Foreign Admins
+					</dt>
+					<dd>
+						<NodeALink
+							ready={this.state.foreignAdmins !== -1}
+							value={this.state.foreignAdmins}
 							click={function(){
 								emitter.emit('query', "MATCH (a:Group) WHERE NOT a.name ENDS WITH ('@' + {domain}) WITH a MATCH (b:Group) WHERE b.name ENDS WITH ('@' + {domain}) WITH a,b MATCH (a)-[r:MemberOf]-(b) RETURN a,r,b", {domain: this.state.label})
 							}.bind(this)} />
