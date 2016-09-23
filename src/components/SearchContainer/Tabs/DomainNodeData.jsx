@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import NodeALink from './NodeALink.jsx'
 import LoadLabel from './LoadLabel.jsx'
-import { fullAjax } from 'utils'
 
 export default class DomainNodeData extends Component {
 	propTypes: {

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap'
-import { fullAjax } from 'utils'
 import { If, Then, Else } from 'react-if';
 import QueryNodeSelectItem from './QueryNodeSelectItem'
 

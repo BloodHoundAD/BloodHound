@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { fullAjax, defaultAjaxSettings } from 'utils';
 import LogoutModal from 'modals/LogoutModal';
 
 export default class DatabaseDataDisplay extends Component {
