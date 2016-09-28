@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom'
 import  { findGraphPath } from 'utils';
 var fs = require('fs');
 var child_process = require('child_process')
-var child = child_process.fork('src/js/worker.js', {silent:true});
+var path = require('path')
+var child = child_process.fork(path.join(__dirname,'src','js','worker.js'), {silent:true});
 const { dialog } = require('electron').remote
 
 export default class GraphContainer extends Component {
