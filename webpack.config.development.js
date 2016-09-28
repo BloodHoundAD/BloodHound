@@ -27,7 +27,8 @@ var config = {
     new webpack.HotModuleReplacementPlugin(),
   ],
   node: {
-    __dirname: true
+    __dirname: false,
+    __filename: false
   }
 };
 
