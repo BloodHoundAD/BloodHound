@@ -172,7 +172,7 @@ export default class Login extends Component {
 								<span className="input-group-addon" id="dburladdon">
 									Database URL
 								</span>
-								<input ref="url" onFocus={function(){this.setState({dbHelpVisible: false})}.bind(this)} onBlur={this.checkDBPresence.bind(this)} onChange={this._urlChanged.bind(this)} type="text" className="form-control" value={this.state.url} placeholder="http://db-ip:dp-port" aria-describedby="dburladdon" />
+								<input ref="url" onFocus={function(){this.setState({dbHelpVisible: false})}.bind(this)} onBlur={this.checkDBPresence.bind(this)} onChange={this._urlChanged.bind(this)} type="text" className="form-control" value={this.state.url} placeholder="bolt://localhost:7687" aria-describedby="dburladdon" />
 								<i ref="urlspinner" className="fa fa-spinner fa-spin form-control-feedback" />
 							</div>
 							{this.state.dbHelpVisible ? <p className="help-block help-block-add">No Neo4j Database Found</p> : null}
