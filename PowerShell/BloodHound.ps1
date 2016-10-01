@@ -989,11 +989,11 @@ filter Convert-ADName {
 
     .PARAMETER InputType
 
-        The InputType of the user/group name ("NT4","Simple","Canonical").
+        The InputType of the user/group name ("NT4","DN","Simple","Canonical").
 
     .PARAMETER OutputType
 
-        The OutputType of the user/group name ("NT4","Simple","Canonical").
+        The OutputType of the user/group name ("NT4","DN","Simple","Canonical").
 
     .EXAMPLE
 
@@ -1018,15 +1018,16 @@ filter Convert-ADName {
         $ObjectName,
 
         [String]
-        [ValidateSet("NT4","Simple","Canonical")]
+        [ValidateSet("NT4","DN","Simple","Canonical")]
         $InputType,
 
         [String]
-        [ValidateSet("NT4","Simple","Canonical")]
+        [ValidateSet("NT4","DN","Simple","Canonical")]
         $OutputType
     )
 
     $NameTypes = @{
+        'DN'        = 1
         'Canonical' = 2
         'NT4'       = 3
         'Simple'    = 5
@@ -1046,6 +1047,9 @@ filter Convert-ADName {
         elseif($ObjectName -match "^[A-Za-z\.]+/[A-Za-z]+/[A-Za-z/ ]+") {
             $InputType = 'Canonical'
         }
+        elseif($ObjectName -match '^CN=.*') {
+            $InputType = 'DN'
+        }
         else {
             Write-Warning "Can not identify InType for $ObjectName"
         }
@@ -1058,6 +1062,7 @@ filter Convert-ADName {
         $OutputType = Switch($InputType) {
             'NT4' {'Canonical'}
             'Simple' {'NT4'}
+            'DN' {'NT4'}
             'Canonical' {'NT4'}
         }
     }
@@ -1067,6 +1072,7 @@ filter Convert-ADName {
         'NT4' { $ObjectName.split("\")[0] }
         'Simple' { $ObjectName.split("@")[1] }
         'Canonical' { $ObjectName.split("/")[0] }
+        'DN' {$ObjectName.subString($ObjectName.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'}
     }
 
     # Accessor functions to simplify calls to NameTranslate
@@ -4833,14 +4839,18 @@ function Invoke-BloodHound {
             $Title = (Get-Culture).TextInfo
             ForEach ($TargetDomain in $TargetDomains) {
                 # enumerate all groups and all members of each group
-
                 Write-Verbose "Enumerating group memberships for domain $TargetDomain"
+
+                # in-line updated hashtable with group DN->SamAccountName mappings
+                $GroupDNMappings = @{}
 
                 $PrimaryGroups = @{}
                 $DomainSID = Get-DomainSID -Domain $TargetDomain -DomainController $DomainController
 
                 $ObjectSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController
+                # only return results that have 'memberof' set
                 $ObjectSearcher.Filter = '(memberof=*)'
+                # only return specific properties in the results
                 $Null = $ObjectSearcher.PropertiesToLoad.AddRange(('samaccountname', 'distinguishedname', 'cn', 'dnshostname', 'samaccounttype', 'primarygroupid', 'memberof'))
                 $Counter = 0
                 $ObjectSearcher.FindAll() | ForEach-Object {
@@ -4950,7 +4960,8 @@ function Invoke-BloodHound {
                                         $PrimaryGroupName = $PrimaryGroups[$PrimaryGroupSID]
                                     }
                                     else {
-                                        $PrimaryGroupName = Get-ADObject -Domain $Domain -SID $PrimaryGroupSID | Select-Object -ExpandProperty samaccountname
+                                        $RawName = Convert-SidToName -SID $PrimaryGroupSID
+                                        $PrimaryGroupName = $RawName.split('\')[-1]
                                         $PrimaryGroups[$PrimaryGroupSID] = $PrimaryGroupName
                                     }
                                     $MemberPrimaryGroupName = "$PrimaryGroupName@$TargetDomain"
@@ -4960,10 +4971,23 @@ function Invoke-BloodHound {
                         }
                         catch { }
 
+                        # iterate through each membership for this object
                         ForEach($GroupDN in $_.properties['memberof']) {
-                            # iterate through each membership for this object
                             $GroupDomain = $GroupDN.subString($GroupDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'
-                            $GroupName = $GroupDN.SubString(0, $GroupDN.IndexOf(',')).Split('=')[-1]
+
+                            if($GroupDNMappings[$GroupDN]) {
+                                $GroupName = $GroupDNMappings[$GroupDN]
+                            }
+                            else {
+                                $GroupName = Convert-ADName -ObjectName $GroupDN
+                                if($GroupName) {
+                                    $GroupName = $GroupName.Split('\')[-1]
+                                }
+                                else {
+                                    $GroupName = $GroupDN.SubString(0, $GroupDN.IndexOf(',')).Split('=')[-1]
+                                }
+                                $GroupDNMappings[$GroupDN] = $GroupName
+                            }
 
                             if ($PSCmdlet.ParameterSetName -eq 'CSVExport') {
                                 $GroupWriter.WriteLine("`"$GroupName@$GroupDomain`",`"$AccountName`",`"$ObjectType`"")
@@ -5216,7 +5240,8 @@ function Invoke-BloodHound {
             # create a pool of maxThread runspaces
             Write-Verbose "Creating a runspace with $Threads threads"
             $Pool = [RunspaceFactory]::CreateRunspacePool(1, $Threads, $SessionState, $Host)
-            $Pool.ThreadOptions = [System.Management.Automation.Runspaces.PSThreadOptions]::UseNewThread
+            $Pool.ThreadOptions = [System.Management.Automation.Runspaces.PSThreadOptions]::ReuseThread
+            # $Pool.ThreadOptions = [System.Management.Automation.Runspaces.PSThreadOptions]::UseNewThread
             $Pool.Open()
 
             $Jobs = @()
@@ -5298,9 +5323,7 @@ function Invoke-BloodHound {
                             Write-Verbose "Computer counter: $Counter"
                         }
                         elseif($Counter % 1000 -eq 0) {
-                            1..3 | ForEach-Object {
-                                $Null = [GC]::Collect()
-                            }
+                            $Null = [GC]::Collect()
                         }
 
                         while ($($Pool.GetAvailableRunspaces()) -le 0) {
@@ -5496,7 +5519,7 @@ function Invoke-BloodHound {
                                     }
                                 }
                             }
-                            $MovingWindow = $Counter-$Threads-200
+                            $MovingWindow = $Counter-$Threads-300
                         }
 
                         # create a "powershell pipeline runner"
