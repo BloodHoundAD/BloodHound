@@ -4635,7 +4635,7 @@ function Invoke-BloodHound {
         $DomainController,
 
         [String]
-        [ValidateSet('Group', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Stealth', 'Trusts', 'Default')]
+        [ValidateSet('Group', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'ThisDomain', 'ThisDomainStealth', 'Stealth', 'Trusts', 'Default')]
         $CollectionMethod = 'Default',
 
         [Switch]
@@ -4682,12 +4682,27 @@ function Invoke-BloodHound {
             'Session'       { $UseSession = $True; $SkipGCDeconfliction = $False }
             'LoggedOn'      { $UseLoggedOn = $True; $SkipGCDeconfliction = $True }
             'Trusts'        { $UseDomainTrusts = $True; $SkipComputerEnumeration = $True; $SkipGCDeconfliction = $True }
+            'ThisDomainStealth' {
+                $UseGroup = $True
+                $UseGPOGroup = $True
+                $UseSession = $True
+                $UseDomainTrusts = $False
+                $SkipGCDeconfliction = $True
+            }
             'Stealth'       {
                 $UseGroup = $True
                 $UseGPOGroup = $True
                 $UseSession = $True
                 $UseDomainTrusts = $True
                 $SkipGCDeconfliction = $False
+            }
+            'ThisDomain'    {
+                $UseGroup = $True
+                $UseLocalGroup = $True
+                $UseSession = $True
+                $UseLoggedOn = $False
+                $UseDomainTrusts = $False
+                $SkipGCDeconfliction = $True
             }
             'Default'       {
                 $UseGroup = $True
