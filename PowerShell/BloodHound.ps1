@@ -4553,6 +4553,18 @@ function Invoke-BloodHound {
         To modify this, use -CSVFolder. To export to a neo4j RESTful API interface, specify a
         -URI X and -UserPass "...".
 
+    .PARAMETER ComputerName
+
+        Array of one or more computers to enumerate.
+
+    .PARAMETER ComputerADSpath
+
+        The LDAP source to search through for computers, e.g. "LDAP://OU=secret,DC=testlab,DC=local".
+
+    .PARAMETER UserADSpath
+
+        The LDAP source to search through for users/groups, e.g. "LDAP://OU=secret,DC=testlab,DC=local".
+
     .PARAMETER Domain
 
         Domain to query for machines, defaults to the current domain.
@@ -4563,9 +4575,10 @@ function Invoke-BloodHound {
 
     .PARAMETER CollectionMethod
 
-        The method to collect data. 'Group', 'LocalGroup', 'GPOLocalGroup', 'Sesssion', 'LoggedOn', 'Trusts, 'Stealth', or 'Default'.
+        The method to collect data. 'Group', 'ComputerOnly', 'LocalGroup', 'GPOLocalGroup', 'Sesssion', 'LoggedOn', 'Trusts, 'Stealth', or 'Default'.
         'Stealth' uses 'Group' collection, stealth user hunting ('Session' on certain servers), 'GPOLocalGroup' enumeration, and trust enumeration.
         'Default' uses 'Group' collection, regular user hunting with 'Session'/'LoggedOn', 'LocalGroup' enumeration, and 'Trusts' enumeration.
+        'ComputerOnly' only enumerates computers, not groups/trusts, and executes local admin/session/loggedon on each.
 
     .PARAMETER SearchForest
 
@@ -4591,6 +4604,10 @@ function Invoke-BloodHound {
    .PARAMETER GlobalCatalog
 
         The global catalog location to resolve user memberships from, form of GC://global.catalog.
+
+    .PARAMETER SkipGCDeconfliction
+
+        Switch. Skip global catalog enumeration for session deconfliction.
 
     .PARAMETER Threads
 
@@ -4628,6 +4645,18 @@ function Invoke-BloodHound {
 
     [CmdletBinding(DefaultParameterSetName = 'CSVExport')]
     param(
+        [Parameter(ValueFromPipeline=$True)]
+        [Alias('HostName')]
+        [String[]]
+        [ValidateNotNullOrEmpty()]
+        $ComputerName,
+
+        [String]
+        $ComputerADSpath,
+
+        [String]
+        $UserADSpath,
+
         [String]
         $Domain,
 
@@ -4635,7 +4664,7 @@ function Invoke-BloodHound {
         $DomainController,
 
         [String]
-        [ValidateSet('Group', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Stealth', 'Trusts', 'Default')]
+        [ValidateSet('Group', 'ComputerOnly', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Stealth', 'Trusts', 'Default')]
         $CollectionMethod = 'Default',
 
         [Switch]
@@ -4664,6 +4693,9 @@ function Invoke-BloodHound {
         [String]
         $GlobalCatalog,
 
+        [Switch]
+        $SkipGCDeconfliction,
+
         [ValidateRange(1,50)]
         [Int]
         $Threads = 20,
@@ -4676,18 +4708,19 @@ function Invoke-BloodHound {
     BEGIN {
 
         Switch ($CollectionMethod) {
-            'Group'         { $UseGroup = $True; $SkipComputerEnumeration = $True; $SkipGCDeconfliction = $True }
-            'LocalGroup'    { $UseLocalGroup = $True; $SkipGCDeconfliction = $True }
-            'GPOLocalGroup' { $UseGPOGroup = $True; $SkipComputerEnumeration = $True; $SkipGCDeconfliction = $True }
-            'Session'       { $UseSession = $True; $SkipGCDeconfliction = $False }
-            'LoggedOn'      { $UseLoggedOn = $True; $SkipGCDeconfliction = $True }
-            'Trusts'        { $UseDomainTrusts = $True; $SkipComputerEnumeration = $True; $SkipGCDeconfliction = $True }
+            'Group'         { $UseGroup = $True; $SkipComputerEnumeration = $True; $SkipGCDeconfliction2 = $True }
+            'ComputerOnly'  { $UseGroup = $False; $UseLocalGroup = $True; $UseSession = $True; $UseLoggedOn = $True; $SkipGCDeconfliction2 = $False }
+            'LocalGroup'    { $UseLocalGroup = $True; $SkipGCDeconfliction2 = $True }
+            'GPOLocalGroup' { $UseGPOGroup = $True; $SkipComputerEnumeration = $True; $SkipGCDeconfliction2 = $True }
+            'Session'       { $UseSession = $True; $SkipGCDeconfliction2 = $False }
+            'LoggedOn'      { $UseLoggedOn = $True; $SkipGCDeconfliction2 = $True }
+            'Trusts'        { $UseDomainTrusts = $True; $SkipComputerEnumeration = $True; $SkipGCDeconfliction2 = $True }
             'Stealth'       {
                 $UseGroup = $True
                 $UseGPOGroup = $True
                 $UseSession = $True
                 $UseDomainTrusts = $True
-                $SkipGCDeconfliction = $False
+                $SkipGCDeconfliction2 = $False
             }
             'Default'       {
                 $UseGroup = $True
@@ -4695,8 +4728,12 @@ function Invoke-BloodHound {
                 $UseSession = $True
                 $UseLoggedOn = $False
                 $UseDomainTrusts = $True
-                $SkipGCDeconfliction = $False
+                $SkipGCDeconfliction2 = $False
             }
+        }
+
+        if($SkipGCDeconfliction) {
+            $SkipGCDeconfliction2 = $True
         }
 
         if ($PSCmdlet.ParameterSetName -eq 'CSVExport') {
@@ -4811,7 +4848,7 @@ function Invoke-BloodHound {
         }
 
         $UserDomainMappings = @{}
-        if(-not $SkipGCDeconfliction) {
+        if(-not $SkipGCDeconfliction2) {
             # if we're doing session enumeration, create a {user : @(domain,..)} from a global catalog
             #   in order to do user domain deconfliction for sessions
             if($PSBoundParameters['GlobalCatalog']) {
@@ -4847,7 +4884,7 @@ function Invoke-BloodHound {
                 $PrimaryGroups = @{}
                 $DomainSID = Get-DomainSID -Domain $TargetDomain -DomainController $DomainController
 
-                $ObjectSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController
+                $ObjectSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController -ADSPath $UserADSpath
                 # only return results that have 'memberof' set
                 $ObjectSearcher.Filter = '(memberof=*)'
                 # only return specific properties in the results
@@ -4950,6 +4987,8 @@ function Invoke-BloodHound {
 
                     if($AccountName -and (-not $AccountName.StartsWith('@'))) {
 
+                        Write-Verbose "AccountName: $AccountName"
+
                         $MemberPrimaryGroupName = $Null
                         try {
                             if($AccountName -match $TargetDomain) {
@@ -4971,6 +5010,17 @@ function Invoke-BloodHound {
                         }
                         catch { }
 
+                        if($MemberPrimaryGroupName) {
+                            Write-Verbose "MemberPrimaryGroupName: $MemberPrimaryGroupName"
+                            if ($PSCmdlet.ParameterSetName -eq 'CSVExport') {
+                                $GroupWriter.WriteLine("`"$MemberPrimaryGroupName`",`"$AccountName`",`"$ObjectType`"")
+                            }
+                            else {
+                                $ObjectTypeCap = $Title.ToTitleCase($ObjectType)
+                                $Null = $Statements.Add( @{ "statement"="MERGE ($($ObjectType)1:$ObjectTypeCap { name: UPPER('$AccountName') }) MERGE (group2:Group { name: UPPER('$MemberPrimaryGroupName') }) MERGE ($($ObjectType)1)-[:MemberOf]->(group2)" } )
+                            }
+                        }
+
                         # iterate through each membership for this object
                         ForEach($GroupDN in $_.properties['memberof']) {
                             $GroupDomain = $GroupDN.subString($GroupDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'
@@ -4991,19 +5041,12 @@ function Invoke-BloodHound {
 
                             if ($PSCmdlet.ParameterSetName -eq 'CSVExport') {
                                 $GroupWriter.WriteLine("`"$GroupName@$GroupDomain`",`"$AccountName`",`"$ObjectType`"")
-
-                                if($MemberPrimaryGroupName) {
-                                    $GroupWriter.WriteLine("`"$MemberPrimaryGroupName`",`"$AccountName`",`"$ObjectType`"")
-                                }
                             }
                             else {
                                 # otherwise we're exporting to the neo4j RESTful API
                                 $ObjectTypeCap = $Title.ToTitleCase($ObjectType)
 
                                 $Null = $Statements.Add( @{ "statement"="MERGE ($($ObjectType)1:$ObjectTypeCap { name: UPPER('$AccountName') }) MERGE (group2:Group { name: UPPER('$GroupName@$GroupDomain') }) MERGE ($($ObjectType)1)-[:MemberOf]->(group2)" } )
-                                if($MemberPrimaryGroupName) {
-                                    $Null = $Statements.Add( @{ "statement"="MERGE ($($ObjectType)1:$ObjectTypeCap { name: UPPER('$AccountName') }) MERGE (group2:Group { name: UPPER('$MemberPrimaryGroupName') }) MERGE ($($ObjectType)1)-[:MemberOf]->(group2)" } )
-                                }
 
                                 if ($Statements.Count -ge $Throttle) {
                                     $Json = @{ "statements"=[System.Collections.Hashtable[]]$Statements }
@@ -5312,12 +5355,21 @@ function Invoke-BloodHound {
                     }
                 }
                 else {
-                    Write-Verbose "Enumerating all machines in domain $TargetDomain"
-                    $ComputerSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController
-                    $ComputerSearcher.filter = '(sAMAccountType=805306369)'
-                    $Null = $ComputerSearcher.PropertiesToLoad.Add('dnshostname')
 
-                    ForEach($ComputerResult in $ComputerSearcher.FindAll()) {
+                    if($ComputerName) {
+                        Write-Verbose "Using specified -ComputerName target set"
+                        if($ComputerName -isnot [System.Array]) {$ComputerName = @($ComputerName)}
+                        $ComputerResults = $ComputerName
+                    }
+                    else {
+                        Write-Verbose "Enumerating all machines in domain $TargetDomain"
+                        $ComputerSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController -ADSPath $ComputerADSpath
+                        $ComputerSearcher.filter = '(sAMAccountType=805306369)'
+                        $Null = $ComputerSearcher.PropertiesToLoad.Add('dnshostname')
+                        $ComputerResults = $ComputerSearcher.FindAll()
+                    }
+
+                    ForEach($ComputerResult in $ComputerResults) {
                         $Slept = $False
                         if($Counter % 100 -eq 0) {
                             Write-Verbose "Computer counter: $Counter"
@@ -5527,7 +5579,12 @@ function Invoke-BloodHound {
                         $PS[$Counter].RunspacePool = $Pool
 
                         # add the script block + arguments
-                        $Null = $PS[$Counter].AddScript($HostEnumBlock).AddParameter('ComputerName', $($ComputerResult.Properties['dnshostname']))
+                        if($ComputerResult.Properties) {
+                            $Null = $PS[$Counter].AddScript($HostEnumBlock).AddParameter('ComputerName', $($ComputerResult.Properties['dnshostname']))
+                        }
+                        else {
+                            $Null = $PS[$Counter].AddScript($HostEnumBlock).AddParameter('ComputerName', $ComputerResult)
+                        }
 
                         ForEach ($Param in $ScriptParameters.GetEnumerator()) {
                             $Null = $PS[$Counter].AddParameter($Param.Name, $Param.Value)
@@ -5547,7 +5604,7 @@ function Invoke-BloodHound {
     END {
 
         if ($TargetDomains -and (-not $SkipComputerEnumeration)) {
-            Write-Verbose "Waiting for Invoke-BloodHound threads to finish..."
+            Write-Verbose "Waiting 30 seconds for Invoke-BloodHound threads to finish..."
             Start-Sleep -Seconds 30
 
             for ($y = 0; $y -lt $Counter; $y++) {
