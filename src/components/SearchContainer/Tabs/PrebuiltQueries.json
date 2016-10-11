@@ -3,51 +3,58 @@
 		{
 			"name": "Find all Domain Admins",
 			"requireNodeSelect": false,
-			"query": "MATCH (n:Group) WHERE n.name =~ '(?i).*DOMAIN ADMINS.*' WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m",
-			"allowCollapse": false
+			"query": "MATCH (n:Group) WHERE n.name =~ {name} WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m",
+			"allowCollapse": false,
+			"props": {"name": "(?i).*DOMAIN ADMINS.*"}
 		},
 		{
 			"name": "Find Shortest Paths to Domain Admins",
 			"requireNodeSelect": true,
 			"nodeSelectQuery":  {
-				"query":"MATCH (n:Group) WHERE n.name =~ '(?i).*DOMAIN ADMINS.*' RETURN n",
-                "onFinish": "MATCH (n:User),(m:Group {name:'{}'}),p=allShortestPaths((n)-[*1..]->(m)) RETURN p",
-                "start":"{}",
-                "end": "",
+				"query":"MATCH (n:Group) WHERE n.name =~ {name} RETURN n.name",
+				"queryProps": {"name":"(?i).*DOMAIN ADMINS.*"},
+                "onFinish": "MATCH (n:User),(m:Group {name:{result}}),p=shortestPath((n)-[*1..]->(m)) RETURN p",
+                "start":"",
+                "end": "{}",
                 "allowCollapse": true,
                 "boxTitle": "Select domain to map..."
 			}
 		},
 		{
-			"name": "Find User with Most Sessions",
+			"name": "Find Top 10 Users with Most Sessions",
 			"requireNodeSelect": false,
-			"query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m",
-			"allowCollapse": false
+			"query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m",
+			"allowCollapse": true,
+			"props": {}
 		},
 		{
-			"name": "Find Computer with Most Sessions",
+			"name": "Find Top 10 Computers with Most Sessions",
 			"requireNodeSelect": false,
-			"query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH m, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m",
-			"allowCollapse": false
+			"query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH m, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m",
+			"allowCollapse": true,
+			"props": {}
 		},
 		{
-			"name": "Find User with Most Local Admin Rights",
+			"name": "Find Top 10 Users with Most Local Admin Rights",
 			"requireNodeSelect": false,
-			"query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)<-[r:AdminTo]-(n) RETURN n,r,m",
-			"allowCollapse": true
+			"query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH (m)<-[r:AdminTo]-(n) RETURN n,r,m",
+			"allowCollapse": true,
+			"props": {}
 		},
 		{
-			"name": "Find Computer with Most Admins",
+			"name": "Find Top 10 Computers with Most Admins",
 			"requireNodeSelect": false,
-			"query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH m, count(r) as rel_count order by rel_count desc LIMIT 1 MATCH (m)<-[r:AdminTo]-(n) RETURN n,r,m",
-			"allowCollapse": false
+			"query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH m, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH (m)<-[r:AdminTo]-(n) RETURN n,r,m",
+			"allowCollapse": true,
+			"props": {}
 		},
 		{
 			"name" : "Users with Foreign Domain Group Membership",
 			"requireNodeSelect": true,
 			"nodeSelectQuery": {
-				"query": "MATCH (n:Domain) RETURN n",
-				"onFinish": "MATCH (n:User) WHERE n.name ENDS WITH ('@' + '{}') WITH n MATCH (n)-[r:MemberOf]->(m:Group) WHERE NOT m.name ENDS WITH ('@' + '{}') RETURN n,r,m",
+				"query": "MATCH (n:Domain) RETURN n.name",
+				"queryProps": {},
+				"onFinish": "MATCH (n:User) WHERE n.name ENDS WITH ('@' + {result}) WITH n MATCH (n)-[r:MemberOf]->(m:Group) WHERE NOT m.name ENDS WITH ('@' + {result}) RETURN n,r,m",
 				"start": "{}",
 				"end": "",
 				"allowCollapse": false,
@@ -58,8 +65,9 @@
 			"name" : "Groups with Foreign Domain Group Membership",
 			"requireNodeSelect": true,
 			"nodeSelectQuery": {
-				"query": "MATCH (n:Domain) RETURN n",
-				"onFinish": "MATCH (n:Group) WHERE n.name ENDS WITH ('@' + '{}') WITH n MATCH (n)-[r:MemberOf*1..]->(m:Group) WHERE NOT m.name ENDS WITH ('@' + '{}') RETURN n,r,m",
+				"query": "MATCH (n:Domain) RETURN n.name",
+				"queryProps":{},
+				"onFinish": "MATCH (n:Group) WHERE n.name ENDS WITH ('@' + {result}) WITH n MATCH (n)-[r:MemberOf*1..]->(m:Group) WHERE NOT m.name ENDS WITH ('@' + {result}) RETURN n,r,m",
 				"start": "{}",
 				"end": "",
 				"allowCollapse": false,
@@ -70,7 +78,8 @@
 			"name": "Map Domain Trusts",
 			"requireNodeSelect": false,
 			"query": "MATCH (n:Domain) MATCH p=(n)-[r]-() RETURN p",
-			"allowCollapse": false
+			"allowCollapse": false,
+			"props": {}
 		}
 	]
 }

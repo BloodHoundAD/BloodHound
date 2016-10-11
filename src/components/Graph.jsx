@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
-import  { collapseEdgeNodes, setNodeData, collapseSiblingNodes, findGraphPath, defaultAjaxSettings } from 'utils';
+import  { findGraphPath } from 'utils';
 var fs = require('fs');
 var child_process = require('child_process')
+var path = require('path')
+var child = child_process.fork(path.join(__dirname,'src','js','worker.js'), {silent:true});
 const { dialog } = require('electron').remote
 
 export default class GraphContainer extends Component {
@@ -14,7 +16,8 @@ export default class GraphContainer extends Component {
             design: null,
             dragged: false,
             firstDraw: true,
-            template: null
+            template: null,
+            session: driver.session()
         }
         $.ajax({
             url: 'src/components/tooltip.html',
@@ -24,21 +27,53 @@ export default class GraphContainer extends Component {
             }.bind(this)
         })
 
-        var a = defaultAjaxSettings()
-        a.data = JSON.stringify({
-            "statements": [{
-                "statement": "CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE"
-            }, {
-                "statement": "CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE"
-            }, {
-                "statement": "CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE"
-            }, {
-                "statement": "CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE"
-            }]
-        })
+        child.stdout.on('data', (data) => {
+          console.log(`stdout: ${data}`);
+        });
 
-        $.ajax(a)
+        child.stderr.on('data', (data) => {
+            console.log(`error: ${data}`);
+        });
 
+        child.on('message', function(m) {
+          this.loadFromChildProcess(m)
+        }.bind(this));
+
+        var s1 = driver.session()
+        var s2 = driver.session()
+        var s3 = driver.session()
+        var s4 = driver.session()
+
+        s1.run("CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE")
+            .then(function(){
+                s1.close()
+            })
+            .catch(function(){
+                s1.close()
+            })
+        s2.run("CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE")
+            .then(function(){
+                s2.close()
+            })
+            .catch(function(){
+                s2.close()
+            })
+        s3.run("CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE")
+            .then(function(){
+                s3.close()
+            })
+            .catch(function(){
+                s3.close()
+            })
+        s4.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE")
+            .then(function(){
+                s4.close()
+            })
+            .catch(function(){
+                s4.close()
+            })
+
+        
         emitter.on('doLogout', function(){
             this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.refresh();
@@ -86,26 +121,49 @@ export default class GraphContainer extends Component {
     loadFromChildProcess(graph){
         if (graph.nodes.length === 0){
                 emitter.emit('showAlert', "No data returned from query")
+                emitter.emit('updateLoadingText', "Done!")
+                setTimeout(function(){
+                    emitter.emit('showLoadingIndicator', false);    
+                }, 1500)
         }else{
+            if (!this.state.firstDraw){
+                appStore.queryStack.push({
+                    nodes: this.state.sigmaInstance.graph.nodes(),
+                    edges: this.state.sigmaInstance.graph.edges(),
+                    spotlight: appStore.spotlightData,
+                    startNode: appStore.startNode,
+                    endNode: appStore.endNode
+                })
+            }
             $.each(graph.nodes, function(i, node){
+                if (node.start){
+                    appStore.startNode = node
+                }
+
+                if (node.end){
+                    appStore.endNode = node
+                }
+
                 node.glyphs = $.map(node.glyphs, function(value, index) {
                     return [value];
                 });
             })
-            appStore.queryStack.push({
-                nodes: this.state.sigmaInstance.graph.nodes(),
-                edges: this.state.sigmaInstance.graph.edges(),
-                spotlight: appStore.spotlightData,
-                startNode: appStore.startNode,
-                endNode: appStore.endNode
-            })
 
-            appStore.spotlightData = graph.spotlightData;
+            this.setState({firstDraw: false})
+            sigma.misc.animation.camera(this.state.sigmaInstance.camera, { x: 0, y: 0, ratio: 1.075 });
+
+            appStore.spotlightData = graph.spotlight;
             this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.graph.read(graph);
             this.state.design.deprecate();
             this.state.sigmaInstance.refresh();
             this.state.design.apply();
+
+            if (appStore.dagre){
+                sigma.layouts.dagre.start(this.state.sigmaInstance);
+            }else{
+                sigma.layouts.startForceLink()
+            }
             emitter.emit('spotlightUpdate');
         } 
     }
@@ -222,10 +280,11 @@ export default class GraphContainer extends Component {
 
     componentDidMount() {
         this.initializeSigma();
-            
+        
         this.doQueryNative({
             statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
-            allowCollapse: false
+            allowCollapse: false,
+            props: {}
         })
     }
 
@@ -247,7 +306,9 @@ export default class GraphContainer extends Component {
             var query = appStore.queryStack.pop();
             this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.graph.read({ nodes: query.nodes, edges: query.edges });
+            this.state.design.deprecate();
             this.state.sigmaInstance.refresh();
+            this.state.design.apply();
             appStore.spotlightData = query.spotlight;
             appStore.startNode = query.startNode,
             appStore.endNode = query.endNode;
@@ -267,7 +328,7 @@ export default class GraphContainer extends Component {
         }else{
             child = parent;
         }
-        label = child.neo4j_data.name;
+        label = child.label;
         if (child.type_user){
             emitter.emit('userNodeClicked', label)
         }else if (child.type_group){
@@ -291,94 +352,158 @@ export default class GraphContainer extends Component {
     }
 
     doQueryNative(params){
-        if (!this.state.firstDraw){
-            appStore.queryStack.push({
-                nodes: this.state.sigmaInstance.graph.nodes(),
-                edges: this.state.sigmaInstance.graph.edges(),
-                spotlight: appStore.spotlightData,
-                startNode: appStore.startNode,
-                endNode: appStore.endNode
-            })
+        var sigmaInstance = this.state.sigmaInstance
+        var nodes = {}
+        var edges = {}
+        var session = driver.session()
+        if (typeof params.props === 'undefined'){
+            params.props = {}
         }
-
         emitter.emit('showLoadingIndicator', true);
         emitter.emit('updateLoadingText', "Querying Database")
         emitter.emit('resetSpotlight')
+        session.run(params.statement, params.props)
+            .subscribe({
+                onNext: function(result){
+                    if (result._fields[0].hasOwnProperty('segments')){
+                        $.each(result._fields, function(index, field){
+                            $.each(field.segments,function(index, segment){
+                                var end = this.createNodeFromRow(segment.end, params)
+                                var start = this.createNodeFromRow(segment.start, params)
+                                var edge = this.createEdgeFromRow(segment.relationship)
 
-        sigma.neo4j.cypher({
-            url: appStore.databaseInfo.url,
-            user: appStore.databaseInfo.user,
-            password: appStore.databaseInfo.password
-        },
-        params.statement,
-        this.state.sigmaInstance,
-        function(sigmaInstance){
-            if (sigmaInstance.graph.nodes().length === 0){
-                emitter.emit('showAlert', "No data returned from query")
-                emitter.emit('updateLoadingText', "Done!")
-                setTimeout(function(){
-                    emitter.emit('showLoadingIndicator', false);    
-                }, 1500)
-                this.goBack()
-                return;
-            }
-            appStore.spotlightData = {}
-            var design = this.state.design;
-            sigmaInstance = setNodeData(sigmaInstance, params.start, params.end);
-            if (params.allowCollapse){
-                sigmaInstance = collapseEdgeNodes(sigmaInstance);
-                sigmaInstance = collapseSiblingNodes(sigmaInstance);
-            }
+                                if (!edges[edge.id]){
+                                    edges[edge.id] = edge
+                                }
 
-            $.each(sigmaInstance.graph.nodes(), function(index, node) {
-                if (!appStore.spotlightData.hasOwnProperty(node.id)) {
-                    appStore.spotlightData[node.id] = [node.neo4j_data.name, 0, ""];
-                }
-            });
-            this.state.sigmaInstance = sigmaInstance
-            this.state.design = design;
-            emitter.emit('spotlightUpdate');
-            sigma.misc.animation.camera(sigmaInstance.camera, { x: 0, y: 0, ratio: 1.075 });
-            if (appStore.dagre){
-                sigma.layouts.dagre.start(this.state.sigmaInstance);
-            }else{
-                sigma.layouts.startForceLink()
-            }
+                                if (!nodes[end.id]){
+                                    nodes[end.id] = end
+                                }
 
-            // var child = child_process.fork('src/js/worker.js', {silent:true});
+                                if (!nodes[start.id]){
+                                    nodes[start.id] = start
+                                }
+                            }.bind(this))
+                        }.bind(this))
+                        
+                    }else{
+                        $.each(result._fields, function(index, value){
+                            if ($.isArray(value)){
+                                $.each(value, function(index, subval){
+                                    var id = subval.identity.low
+                                    if (subval.end && !edges.id){
+                                        edges[id] = this.createEdgeFromRow(subval)
+                                    }else if (!nodes.id){
+                                        nodes[id] = this.createNodeFromRow(subval, params)
+                                    }
+                                }.bind(this))
+                            }else{
+                                var id = value.identity.low
+                                if (value.end && !edges.id){
+                                    edges[id] = this.createEdgeFromRow(value)
+                                }else if (!nodes.id){
+                                    nodes[id] = this.createNodeFromRow(value, params)
+                                }
+                            }
+                        }.bind(this))
+                    }
+                }.bind(this),
+                onError: function(error){
+                    console.log(error)
+                },
+                onCompleted: function(){
+                    var graph = {nodes:[],edges:[]}
+                    $.each(nodes, function(node){
+                        graph.nodes.push(nodes[node])
+                    })
 
-            // child.stdout.on('data', (data) => {
-            //   console.log(`stdout: ${data}`);
-            // });
+                    $.each(edges, function(edge){
+                        graph.edges.push(edges[edge])
+                    })
+                    emitter.emit('updateLoadingText', "Processing Data")
 
-            // child.stderr.on('data', (data) => {
-            //     console.log(`error: ${data}`);
-            // });
-            
+                    child.send(JSON.stringify({graph: graph,
+                         edge: params.allowCollapse ? appStore.performance.edge : 0 ,
+                         sibling: params.allowCollapse ? appStore.performance.sibling : 0,
+                         start: params.start,
+                         end: params.end
+                     }))
+                    session.close()
+                }.bind(this)
+            })
+    }
 
-            // child.on('message', function(m) {
-            //   // Receive results from child process
-            //   this.loadFromChildProcess(m)
-            // }.bind(this));
-
-            // // Send child process some work
-            // child.send(JSON.stringify({nodes:sigmaInstance.graph.nodes(),
-            //      edges: sigmaInstance.graph.edges(),
-            //      edge: params.allowCollapse ? appStore.performance.edge : 0 ,
-            //      sibling: params.allowCollapse ? appStore.performance.sibling : 0,
-            //      start: appStore.startNode,
-            //      end: appStore.endNode
-            //  }))
-            this.state.design.deprecate();
-            this.state.sigmaInstance.refresh();
-            this.state.design.apply();
-        }.bind(this))
-        if (this.state.firstDraw){
-            setTimeout(function(){
-                this.state.sigmaInstance.refresh({skipIndexation: true})
-            }.bind(this), 500)
-            this.setState({firstDraw: false})
+    createEdgeFromRow(data){
+        var id = data.identity.low
+        var type = data.type
+        var source = data.start.low
+        var target = data.end.low
+        var edge = {
+            id: id,
+            type: type,
+            source: source,
+            target:target,
+            label: type
         }
+
+        return edge
+    }
+
+    createNodeFromRow(data, params){
+        var id = data.identity.low
+        var type = data.labels[0]
+        var label = data.properties.name
+        var node = {
+            id: id,
+            type: type,
+            label: label,
+            glyphs: [],
+            folded: {
+                nodes: [],
+                edges: []
+            },
+            x: Math.random(),
+            y: Math.random()
+        }
+
+        if (label === params.start){
+            node.start = true
+            node.glyphs.push({
+                'position': 'bottom-right',
+                'font': 'FontAwesome',
+                'content': '\uF21D',
+                'fillColor': '#3399FF',
+                'fontScale': 1.5
+            })
+        }
+
+        if (label === params.end){
+            node.end = true
+            node.glyphs.push({
+                'position': 'bottom-right',
+                'font': 'FontAwesome',
+                'fillColor': '#990000',
+                'content': '\uF05B',
+                'fontScale': 1.5
+            })
+        }
+
+        switch (type) {
+            case "Group":
+                node.type_group = true;
+                break;
+            case "User":
+                node.type_user = true;
+                break;
+            case "Computer":
+                node.type_computer = true;
+                break;
+            case "Domain":
+                node.type_domain = true;
+                break;
+        }
+
+        return node
     }
 
     unfoldEdgeNode(id){
@@ -411,32 +536,43 @@ export default class GraphContainer extends Component {
         this.relayout();
     }
 
-    doSearchQuery(payload){
+    doSearchQuery(payload, props){
+        if (typeof props === 'undefined'){
+            props = {}
+        }
         this.doQueryNative({
             statement: payload,
-            allowCollapse: true
+            allowCollapse: true,
+            props: props
         })
     }
 
     doPathQuery(start, end){
-        var statement = "MATCH (n {name:'{}'}), (m {name:'{}'}), p=allShortestPaths((n)-[*]->(m)) RETURN p".format(start,end)
+        var statement = "MATCH (n {name:{start}}), (m {name:{end}}), p=allShortestPaths((n)-[*]->(m)) RETURN p"
+        var props = {start: start, end: end}
         this.doQueryNative({
             statement: statement,
             allowCollapse: true,
+            props: props,
             start: start,
             end: end
         })
     }
 
-    doGenericQuery(statement, start, end, allowCollapse=true){
+    doGenericQuery(statement, props, start, end, allowCollapse=true){
         if (appStore.currentTooltip !== null) {
             appStore.currentTooltip.close();
+        }
+
+        if (typeof props === 'undefined'){
+            props = {}
         }
         this.doQueryNative({
             statement: statement,
             allowCollapse: allowCollapse,
             start: start,
-            end: end
+            end: end,
+            props: props
         })
     }
 
@@ -450,7 +586,7 @@ export default class GraphContainer extends Component {
                 emitter.emit('userNodeClicked', n.data.node.label)
             }else if (n.data.node.type_group){
                 emitter.emit('groupNodeClicked', n.data.node.label)
-            }else if (n.data.node.type_computer){
+            }else if (n.data.node.type_computer && (n.data.node.label !== 'Grouped Computers')){
                 emitter.emit('computerNodeClicked', n.data.node.label)
             }else if (n.data.node.type_domain){
                 emitter.emit('domainNodeClicked', n.data.node.label)

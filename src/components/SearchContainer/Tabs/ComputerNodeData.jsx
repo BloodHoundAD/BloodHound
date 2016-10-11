@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { fullAjax } from 'utils';
 import NodeALink from './NodeALink'
 
 export default class ComputerNodeData extends Component {
@@ -42,71 +41,62 @@ export default class ComputerNodeData extends Component {
 			derivativeLocalAdmin: -1
 		})
 
-		var explicitAdmins, 
-			unrolledAdmins, 
-			firstDegreeGroupMembership,
-			unrolledGroupMembership,
-			firstDegreeLocalAdmin,
-			groupDelegatedLocalAdmin,
-			derivativeLocalAdmin,
-			sessions;
+		var s1 = driver.session()
+		var s2 = driver.session()
+		var s3 = driver.session()
+		var s4 = driver.session()
+		var s5 = driver.session()
+		var s6 = driver.session()
+		var s7 = driver.session()
+		var s8 = driver.session()
 
-		explicitAdmins = fullAjax(
-			"MATCH (a)-[b:AdminTo]->(c:Computer {name:'{}'}) RETURN count(a)".format(payload),
-			function(json){
-				this.setState({explicitAdmins: json.results[0].data[0].row[0]})	
+		s1.run("MATCH (a)-[b:AdminTo]->(c:Computer {name:{name}}) RETURN count(a)", {name:payload})
+			.then(function(result){
+				this.setState({'explicitAdmins':result.records[0]._fields[0].low})
+				s1.close()
 			}.bind(this))
 
-		unrolledAdmins = fullAjax(
-			"MATCH (n:User),(target:Computer {name:'{}'}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(target)) WITH nodes(p) AS y RETURN count(distinct(filter(x in y WHERE labels(x)[0] = 'User')))".format(payload),
-			function(json){
-				this.setState({unrolledAdmins: json.results[0].data[0].row[0]})	
+		s2.run("MATCH p=shortestPath((n:User)-[r*1..]->(m:Computer {name:{name}})) WHERE NONE(rel in r WHERE type(rel)='HasSession') RETURN count(m)", {name:payload})
+			.then(function(result){
+				this.setState({'unrolledAdmins':result.records[0]._fields[0].low})
+				s2.close()
 			}.bind(this))
 
-		firstDegreeLocalAdmin = fullAjax(
-			"MATCH (n:Computer {name:'{}'}), (m:Computer), (n)-[r:AdminTo]-(m) RETURN count(m)".format(payload),
-			function(json){
-				this.setState({firstDegreeLocalAdmin: json.results[0].data[0].row[0]})
+		s3.run("MATCH (n:Computer {name:{name}}), (m:Computer), (n)-[r:AdminTo]-(m) RETURN count(m)", {name:payload})
+			.then(function(result){
+				this.setState({'firstDegreeLocalAdmin':result.records[0]._fields[0].low})
+				s3.close()
 			}.bind(this))
 
-		groupDelegatedLocalAdmin = fullAjax(
-			"MATCH (n:Computer {name:'{}'}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN count(distinct(p))".format(payload),
-			function(json){
-				this.setState({groupDelegatedLocalAdmin: json.results[0].data[0].row[0]})
+		s4.run("MATCH p=shortestPath((n:Computer {name:{name}})-[r*1..]->(m:Computer)) WHERE NONE(rel in rels(p) WHERE type(rel)='HasSession') WITH p WHERE ANY(rel in rels(p) WHERE type(rel)='MemberOf') RETURN count(p)", {name:payload})
+			.then(function(result){
+				this.setState({'groupDelegatedLocalAdmin':result.records[0]._fields[0].low})
+				s4.close()
 			}.bind(this))
 
-		derivativeLocalAdmin = fullAjax(
-			"MATCH (n:Computer {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN count(distinct(m))".format(payload),
-			function(json){
-				this.setState({derivativeLocalAdmin: json.results[0].data[0].row[0]})
+		s5.run("MATCH (n:Computer {name:{name}}), (m:Computer), p=shortestPath((n)-[r*1..]->(m)) RETURN count(p)", {name:payload})
+			.then(function(result){
+				this.setState({'derivativeLocalAdmin':result.records[0]._fields[0].low})
+				s5.close()
 			}.bind(this))
 
-		firstDegreeGroupMembership = fullAjax(
-			"MATCH (n:Computer {name:'{}'}),(target:Group), (n)-[r:MemberOf]->(target) RETURN count(target)".format(payload),
-			function(json){
-				this.setState({firstDegreeGroupMembership: json.results[0].data[0].row[0]})	
+		s6.run("MATCH (n:Computer {name:{name}}),(target:Group), (n)-[r:MemberOf]->(target) RETURN count(target)", {name:payload})
+			.then(function(result){
+				this.setState({'firstDegreeGroupMembership':result.records[0]._fields[0].low})
+				s6.close()
 			}.bind(this))
 
-		unrolledGroupMembership = fullAjax(
-			"MATCH (n:Computer {name:'{}'}), (target:Group), (n)-[r:MemberOf]->(target) RETURN count(target)".format(payload),
-			function(json){
-				this.setState({unrolledGroupMembership: json.results[0].data[0].row[0]})	
+		s7.run("MATCH (n:Computer {name:{name}}), (target:Group), (n)-[r:MemberOf]->(target) RETURN count(target)", {name:payload})
+			.then(function(result){
+				this.setState({'unrolledGroupMembership':result.records[0]._fields[0].low})
+				s7.close()
 			}.bind(this))
 
-		sessions = fullAjax(
-			"MATCH (m:Computer {name:'{}'})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH '$' RETURN count(r)".format(payload),
-			function(json){
-				this.setState({sessions: json.results[0].data[0].row[0]})	
+		s8.run("MATCH (m:Computer {name:{name}})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH '$' RETURN count(r)", {name:payload})
+			.then(function(result){
+				this.setState({'sessions':result.records[0]._fields[0].low})
+				s8.close()
 			}.bind(this))
-
-		$.ajax(explicitAdmins);
-		$.ajax(unrolledAdmins);
-		$.ajax(firstDegreeLocalAdmin);
-		$.ajax(groupDelegatedLocalAdmin);
-		$.ajax(derivativeLocalAdmin);
-		$.ajax(firstDegreeGroupMembership);
-		$.ajax(unrolledGroupMembership);
-		$.ajax(sessions);
 	}
 
 	render() {
@@ -142,7 +132,7 @@ export default class ComputerNodeData extends Component {
 							value={this.state.explicitAdmins}
 							click={function(){
 								emitter.emit('query',
-									"MATCH (n)-[r:AdminTo]->(m:Computer {name:'{}'}) RETURN n,r,m".format(this.state.label))
+									"MATCH (n)-[r:AdminTo]->(m:Computer {name:{name}}) RETURN n,r,m",{name: this.state.label})
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -154,7 +144,9 @@ export default class ComputerNodeData extends Component {
 							value={this.state.unrolledAdmins}
 							click={function(){
 								emitter.emit('query',
-									"MATCH (n:User),(m:Computer {name:'{}'}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(m)) RETURN p".format(this.state.label), this.state.label)
+									"MATCH (n:User),(m:Computer {name:{name}}), p=allShortestPaths((n)-[:AdminTo|MemberOf*1..]->(m)) RETURN p",
+									{name: this.state.label},
+									this.state.label)
 							}.bind(this)} />
 					</dd>
 					<br />
@@ -167,7 +159,7 @@ export default class ComputerNodeData extends Component {
 							value={this.state.firstDegreeGroupMembership}
 							click={function(){
 								emitter.emit('query',
-									"MATCH (n:Computer {name:'{}'}),(m:Group), (n)-[r:MemberOf]->(m) RETURN n,r,m".format(this.state.label), this.state.label)
+									"MATCH (n:Computer {name:{name}}),(m:Group), (n)-[r:MemberOf]->(m) RETURN n,r,m",{name: this.state.label}, this.state.label)
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -179,7 +171,7 @@ export default class ComputerNodeData extends Component {
 							value={this.state.unrolledGroupMembership}
 							click={function(){
 								emitter.emit('query',
-									"MATCH (n:Computer {name:'{}'}), (m:Group),p=allShortestPaths((n)-[:MemberOf*1..]->(m)) RETURN p".format(this.state.label), this.state.label)
+									"MATCH (n:Computer {name:{name}}), (m:Group),p=allShortestPaths((n)-[:MemberOf*1..]->(m)) RETURN p",{name: this.state.label}, this.state.label)
 							}.bind(this)} />
 					</dd>
 					<br />
@@ -192,7 +184,7 @@ export default class ComputerNodeData extends Component {
 							value={this.state.firstDegreeLocalAdmin}
 							click={function(){
 								emitter.emit('query',
-									"MATCH (n:Computer {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r:MemberOf|AdminTo]->(m)) RETURN p".format(this.state.label), this.state.label)
+									"MATCH (n:Computer {name:{name}}), (m:Computer), p=shortestPath((n)-[r:MemberOf|AdminTo]->(m)) RETURN p",{name: this.state.label}, this.state.label)
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -204,7 +196,7 @@ export default class ComputerNodeData extends Component {
 							value={this.state.groupDelegatedLocalAdmin}
 							click={function(){
 								emitter.emit('query',
-									"MATCH (n:Computer {name:'{}'}), (m:Group), x=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (m)-[s:AdminTo*1..]->(p:Computer) RETURN n,m,r,s,p".format(this.state.label), this.state.label)
+									"MATCH p=shortestPath((n:Computer {name:{name}})-[r*1..]->(m:Computer)) WHERE NONE(rel in rels(p) WHERE type(rel)='HasSession') WITH p WHERE ANY(rel in rels(p) WHERE type(rel)='MemberOf') RETURN p",{name: this.state.label}, this.state.label)
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -216,7 +208,7 @@ export default class ComputerNodeData extends Component {
 							value={this.state.derivativeLocalAdmin}
 							click={function(){
 								emitter.emit('query',
-									"MATCH (n:Computer {name:'{}'}), (m:Computer), p=allShortestPaths((n)-[r*1..]->(m)) RETURN p".format(this.state.label), this.state.label)
+									"MATCH (n:Computer {name:{name}}), (m:Computer), p=shortestPath((n)-[r*1..]->(m)) RETURN p",{name: this.state.label}, this.state.label)
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -228,7 +220,7 @@ export default class ComputerNodeData extends Component {
 							value={this.state.sessions}
 							click={function(){
 								emitter.emit('query',
-									"MATCH (m:Computer {name:'{}'})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH '$' RETURN n,r,m".format(this.state.label))
+									"MATCH (m:Computer {name:{name}})-[r:HasSession]->(n:User) WITH n,r,m WHERE NOT n.name ENDS WITH '$' RETURN n,r,m", {name: this.state.label})
 							}.bind(this)} />
 					</dd>
 				</dl>

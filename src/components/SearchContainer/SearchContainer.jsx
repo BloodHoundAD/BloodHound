@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import GlyphiconSpan from '../GlyphiconSpan'
 import Icon from '../Icon'
-import { escapeRegExp, fullAjax } from 'utils';
 import TabContainer from './TabContainer'
 
 export default class SearchContainer extends Component {
@@ -14,34 +13,6 @@ export default class SearchContainer extends Component {
             mainValue: "",
             pathfindValue: ""
         }
-    }
-
-    _getSearchOptions(e, callback){
-        var x = []
-        var promise = $.ajax({
-            url: localStorage.getItem("dbpath") + "/db/data/transaction/commit",
-            type: 'POST',
-            accepts: { json: "application/json" },
-            dataType: "json",
-            contentType: "application/json",
-            headers: {
-                "Authorization": localStorage.getItem("auth")
-            },
-            data: JSON.stringify({
-                "statements": [{
-                    "statement" : "MATCH (n) WHERE n.name =~ '(?i).*" + escapeRegExp(e) + ".*' RETURN n.name LIMIT 10"
-                }]
-            }),
-            success: function(json) {
-                $.each(json.results[0].data, function(index, d){
-                    x.push({id:index, label:d.row[0]})
-                })
-                callback(null, {
-                    options: x,
-                    complete: false
-                })
-            }.bind(this)
-        })
     }
 
     _onPathfindClick(){
@@ -79,6 +50,7 @@ export default class SearchContainer extends Component {
         emitter.on('userNodeClicked', this.openNodeTab.bind(this))
         emitter.on('groupNodeClicked', this.openNodeTab.bind(this))
         emitter.on('computerNodeClicked', this.openNodeTab.bind(this))
+        emitter.on('domainNodeClicked', this.openNodeTab.bind(this))
         emitter.on('setStart', function(payload){
             jQuery(this.refs.searchbar).val(payload);
         }.bind(this))
@@ -93,22 +65,22 @@ export default class SearchContainer extends Component {
 
         jQuery(this.refs.searchbar).typeahead({
             source: function(query, process) {
-                var options = fullAjax(
-                    "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n.name LIMIT 10".format(escapeRegExp(query)),
-                    function(json){
-                        var data = []
-                        $.each(json.results[0].data, function(index, d){
-                            data.push(d.row[0])
+                var session = driver.session()
+                var t = '(?i).*' + query + '.*'
+                var data = []
+                session.run("MATCH (n) WHERE n.name =~ {name} RETURN n.name LIMIT 10", {name:t})
+                    .then(function(results){
+                        $.each(results.records, function(index, record){
+                            data.push(record._fields[0])
                         })
+                        session.close()
                         return process(data)
-                    }
-                )
-                return $.ajax(options)
+                    })
             },
             afterSelect: function(selected) {
                 if (!this.state.pathfindingIsOpen) {
-                    var statement = "MATCH (n) WHERE n.name = '{}' RETURN n".format(selected);
-                    emitter.emit('searchQuery', statement)
+                    var statement = "MATCH (n) WHERE n.name = {name} RETURN n"
+                    emitter.emit('searchQuery', statement, {name: selected})
                 } else {
                     var start = jQuery(this.refs.searchbar).val();
                     var end = jQuery(this.refs.pathbar).val();
@@ -123,17 +95,17 @@ export default class SearchContainer extends Component {
 
         jQuery(this.refs.pathbar).typeahead({
             source: function(query, process) {
-                var options = fullAjax(
-                    "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n.name LIMIT 10".format(escapeRegExp(query)),
-                    function(json){
-                        var data = []
-                        $.each(json.results[0].data, function(index, d){
-                            data.push(d.row[0])
+                var session = driver.session()
+                var t = '(?i).*' + query + '.*'
+                var data = []
+                session.run("MATCH (n) WHERE n.name =~ {name} RETURN n.name LIMIT 10", {name:t})
+                    .then(function(results){
+                        $.each(results.records, function(index, record){
+                            data.push(record._fields[0])
                         })
+                        session.close()
                         return process(data)
-                    }
-                )
-                return $.ajax(options)
+                    })
             },
             afterSelect: function(selected) {
                 var start = jQuery(this.refs.searchbar).val();
@@ -174,8 +146,9 @@ export default class SearchContainer extends Component {
             }
             if (!this.state.pathfindingIsOpen) {
                 if (start !== ""){
-                    var statement = "MATCH (n) WHERE n.name =~ '(?i).*{}.*' RETURN n".format(escapeRegExp(start));
-                    emitter.emit('searchQuery', statement)    
+                    var statement = "MATCH (n) WHERE n.name =~ {regex} RETURN n";
+                    var regex = '(?i).*' + start + '.*'
+                    emitter.emit('searchQuery', statement, {regex:regex})
                 }
             } else {
                 var start = jQuery(this.refs.searchbar).val();
