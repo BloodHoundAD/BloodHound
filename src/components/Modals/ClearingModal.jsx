@@ -26,7 +26,7 @@ export default class ClearingModal extends Component {
 		return (
 			<Modal
 				show={this.state.open}
-				onHide={this.closeModal}
+				onHide={this.closeModal.bind(this)}
 				aria-labelledby="ClearingModalHeader">
 
 				<Modal.Header closeButton={true}>

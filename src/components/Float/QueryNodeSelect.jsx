@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap'
-import { fullAjax } from 'utils'
 import { If, Then, Else } from 'react-if';
 import QueryNodeSelectItem from './QueryNodeSelectItem'
 
@@ -19,35 +18,41 @@ export default class QueryNodeSelect extends Component {
 	getEventInfo(query){
 		$(this.refs.outer).fadeToggle(true)
 		this.state.queryData = query
-		var o = fullAjax(query.query,
-			function(data){
-				var y = $.map(data.results[0].data, function(x){
-					return x.row[0].name
+		var session = driver.session()
+		session.run(query.query, query.queryProps)
+			.then(function(results){
+				var y = $.map(results.records, function(x){
+					return x._fields[0]
 				})
-
 				y.sort()
 				this.setState({data: y})
+				session.close()
 			}.bind(this))
-		$.ajax(o)
 	}
 
 	componentDidMount() {
 		$(this.refs.outer).fadeToggle(0)
 	}
 
+	_dismiss(){
+		$(this.refs.outer).fadeToggle(false)
+	}
+
 	handleClick(event){
 		emitter.emit('query',
 			this.state.queryData.onFinish.formatAll(event.target.text),
-			"", 
-			event.target.text,
+			{result:event.target.text},
+			this.state.queryData.start.format(event.target.text),
+			this.state.queryData.end.format(event.target.text),
 			this.state.queryData.allowCollapse)
 		$(this.refs.outer).fadeToggle(false)
 	}
 
 	render() {
+		var header = <QueryNodeSelectHeader length={this.state.data.length} title={this.state.queryData.boxTitle} dismiss={this._dismiss.bind(this)}/>
 		return (
 			<div className="queryNodeSelect" ref="outer">
-				<Panel header={this.state.data.length > 0 ? this.state.queryData.boxTitle : "Loading..."}>
+				<Panel header={header}>
 					<If condition={ this.state.data.length > 0 }>
 						<Then>
 							<ListGroup ref="list">
@@ -66,6 +71,20 @@ export default class QueryNodeSelect extends Component {
 					</If>
 				</Panel>
 				
+			</div>
+		);
+	}
+}
+
+class QueryNodeSelectHeader extends Component {
+	render() {
+		var title = this.props.length > 0 ? this.props.title : "Loading..."
+		return (
+			<div>
+				{title}
+				<button type="button" className="close" onClick={this.props.dismiss} aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
 			</div>
 		);
 	}

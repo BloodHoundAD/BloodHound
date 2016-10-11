@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import NodeALink from './NodeALink'
-import { fullAjax } from 'utils';
 
 export default class GroupNodeData extends Component {
 	propTypes: {
@@ -36,65 +35,56 @@ export default class GroupNodeData extends Component {
 			foreignGroupMembership: -1
 		})
 
-		var directMembers, 
-			unrolledMembers, 
-			directAdminTo,
-			derivativeAdminTo,
-			unrolledMemberOf,
-			sessions,
-			foreignGroupMembership;
-
-
 		var domain = '@' + payload.split('@').last()
-		directMembers = fullAjax(
-			"MATCH (a)-[b:MemberOf]->(c:Group {name:'{}'}) RETURN count(a)".format(payload),
-			function(json){
-				this.setState({directMembers: json.results[0].data[0].row[0]})	
+		var s1 = driver.session()
+		var s2 = driver.session()
+		var s3 = driver.session()
+		var s4 = driver.session()
+		var s5 = driver.session()
+		var s6 = driver.session()
+		var s7 = driver.session()
+
+		s1.run("MATCH (a)-[b:MemberOf]->(c:Group {name:{name}}) RETURN count(a)", {name:payload})
+			.then(function(result){
+				this.setState({'directMembers':result.records[0]._fields[0].low})
+				s1.close()
 			}.bind(this))
 
-		unrolledMembers = fullAjax(
-			"MATCH (n:User), (m:Group {name:'{}'}), p=allShortestPaths((n)-[:MemberOf*1..]->(m)) WITH nodes(p) AS y RETURN count(distinct(filter(x in y WHERE labels(x)[0] = 'User')))".format(payload),
-			function(json){
-				this.setState({unrolledMembers: json.results[0].data[0].row[0]})	
+		s2.run("MATCH (n:User), (m:Group {name:{name}}), p=allShortestPaths((n)-[:MemberOf*1..]->(m)) WITH nodes(p) AS y RETURN count(distinct(filter(x in y WHERE labels(x)[0] = 'User')))", {name:payload})
+			.then(function(result){
+				this.setState({'unrolledMembers':result.records[0]._fields[0].low})
+				s2.close()
 			}.bind(this))
 
-		directAdminTo = fullAjax(
-			"MATCH (n:Group {name:'{}'})-[r:AdminTo]->(m:Computer) RETURN count(distinct(m))".format(payload),
-			function(json){
-				this.setState({directAdminTo: json.results[0].data[0].row[0]})	
+		s3.run("MATCH (n:Group {name:{name}})-[r:AdminTo]->(m:Computer) RETURN count(distinct(m))", {name:payload})
+			.then(function(result){
+				this.setState({'directAdminTo':result.records[0]._fields[0].low})
+				s3.close()
 			}.bind(this))
 
-		derivativeAdminTo = fullAjax(
-			"MATCH (n:Group {name:'{}'}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN count(distinct(target))".format(payload),
-			function(json){
-				this.setState({derivativeAdminTo: json.results[0].data[0].row[0]})	
+		s4.run("MATCH (n:Group {name:{name}}), (target:Computer), p=shortestPath((n)-[*]->(target)) RETURN count(p)", {name:payload})
+			.then(function(result){
+				this.setState({'derivativeAdminTo':result.records[0]._fields[0].low})
+				s4.close()
 			}.bind(this))
 
-		unrolledMemberOf = fullAjax(
-			"MATCH (n:Group {name:'{}'}), (target:Group), p=allShortestPaths((n)-[r:MemberOf*1..]->(target)) RETURN count(target)".format(payload),
-			function(json){
-				this.setState({unrolledMemberOf: json.results[0].data[0].row[0]})	
+		s5.run("MATCH (n:Group {name:{name}}), (target:Group), p=shortestPath((n)-[r:MemberOf*1..]->(target)) RETURN count(p)", {name:payload})
+			.then(function(result){
+				this.setState({'unrolledMemberOf':result.records[0]._fields[0].low})
+				s5.close()
 			}.bind(this))
 
-		sessions = fullAjax(
-			"MATCH (n:User), (m:Group {name:'{}'}), p=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (n)-[s:HasSession]-(o:Computer) RETURN count(s)".format(payload),
-			function(json){
-				this.setState({sessions: json.results[0].data[0].row[0]})	
+		s6.run("MATCH p=shortestPath((m:User)-[r:MemberOf*1..]->(n:Group {name: {name}})) WITH m,p MATCH q=shortestPath((m)<-[:HasSession]-(o:Computer)) RETURN count(o)", {name:payload})
+			.then(function(result){
+				this.setState({'sessions':result.records[0]._fields[0].low})
+				s6.close()
 			}.bind(this))
 
-		foreignGroupMembership = fullAjax(
-			"MATCH (n:Group) WHERE NOT n.name ENDS WITH '{}' WITH n MATCH (m:Group {name:'{}'}) MATCH (m)-[r:MemberOf]->(n) RETURN count(n)".format(domain,payload),
-			function(json){
-				this.setState({foreignGroupMembership: json.results[0].data[0].row[0]})	
-			}.bind(this))		
-
-		$.ajax(directMembers);
-		$.ajax(unrolledMembers);
-		$.ajax(directAdminTo);
-		$.ajax(derivativeAdminTo);
-		$.ajax(unrolledMemberOf);
-		$.ajax(sessions);
-		$.ajax(foreignGroupMembership);
+		s7.run("MATCH (n:Group) WHERE NOT n.name ENDS WITH {domain} WITH n MATCH (m:Group {name:{name}}) MATCH (m)-[r:MemberOf]->(n) RETURN count(n)", {name:payload, domain:domain})
+			.then(function(result){
+				this.setState({'foreignGroupMembership':result.records[0]._fields[0].low})
+				s7.close()
+			}.bind(this))
 	}
 
 	render() {
@@ -117,7 +107,7 @@ export default class GroupNodeData extends Component {
 							ready={this.state.directMembers !== -1}
 							value={this.state.directMembers}
 							click={function(){
-								emitter.emit('query', "MATCH (n)-[r:MemberOf]->(m:Group {name:'{}'}) RETURN n,r,m".format(this.state.label))
+								emitter.emit('query', "MATCH (n)-[r:MemberOf]->(m:Group {name:{name}}) RETURN n,r,m", {name: this.state.label})
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -128,7 +118,7 @@ export default class GroupNodeData extends Component {
 							ready={this.state.unrolledMembers !== -1}
 							value={this.state.unrolledMembers}
 							click={function(){
-								emitter.emit('query', "MATCH (n:User), (m:Group {name:'{}'}), p=allShortestPaths((n)-[:MemberOf*1..]->(m)) RETURN p".format(this.state.label),
+								emitter.emit('query', "MATCH (n:User), (m:Group {name:{name}}), p=shortestPath((n)-[:MemberOf*1..]->(m)) RETURN p", {name: this.state.label},
 									this.state.label)
 							}.bind(this)} />
 					</dd>
@@ -141,7 +131,7 @@ export default class GroupNodeData extends Component {
 							ready={this.state.directAdminTo !== -1}
 							value={this.state.directAdminTo}
 							click={function(){
-								emitter.emit('query', "MATCH (n:Group {name:'{}'})-[r:AdminTo]->(m:Computer) RETURN n,r,m".format(this.state.label),
+								emitter.emit('query', "MATCH p=shortestPath((n:Group {name:{name}})-[r:AdminTo]->(m:Computer)) RETURN p", {name: this.state.label},
 									this.state.label)
 							}.bind(this)} />
 					</dd>
@@ -154,7 +144,7 @@ export default class GroupNodeData extends Component {
 							ready={this.state.derivativeAdminTo !== -1}
 							value={this.state.derivativeAdminTo}
 							click={function(){
-								emitter.emit('query', "MATCH (n:Group {name:'{}'}), (target:Computer), p=allShortestPaths((n)-[*]->(target)) RETURN p".format(this.state.label),
+								emitter.emit('query', "MATCH (n:Group {name:{name}}), (target:Computer), p=shortestPath((n)-[*]->(target)) RETURN p", {name: this.state.label},
 									this.state.label)
 							}.bind(this)} />
 					</dd>
@@ -166,7 +156,7 @@ export default class GroupNodeData extends Component {
 							ready={this.state.unrolledMemberOf !== -1}
 							value={this.state.unrolledMemberOf}
 							click={function(){
-								emitter.emit('query', "MATCH (n:Group {name:'{}'}), (target:Group), p=allShortestPaths((n)-[r:MemberOf*1..]->(target)) RETURN p".format(this.state.label),
+								emitter.emit('query', "MATCH (n:Group {name:{name}}), (target:Group), p=shortestPath((n)-[r:MemberOf*1..]->(target)) RETURN p", {name: this.state.label},
 									this.state.label)
 							}.bind(this)} />
 					</dd>
@@ -178,7 +168,7 @@ export default class GroupNodeData extends Component {
 							ready={this.state.foreignGroupMembership !== -1}
 							value={this.state.foreignGroupMembership}
 							click={function(){
-								emitter.emit('query', "MATCH (n:Group) WHERE NOT n.name ENDS WITH '{}' WITH n MATCH (m:Group {name:'{}'}) MATCH (m)-[r:MemberOf]->(n) RETURN m,r,n".format(domain, this.state.label))
+								emitter.emit('query', "MATCH (n:Group) WHERE NOT n.name ENDS WITH {domain} WITH n MATCH (m:Group {name:{name}}) MATCH (m)-[r:MemberOf]->(n) RETURN m,r,n", {name: this.state.label, domain: domain})
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -189,7 +179,7 @@ export default class GroupNodeData extends Component {
 							ready={this.state.sessions !== -1}
 							value={this.state.sessions}
 							click={function(){
-								emitter.emit('query', "MATCH (n:User), (m:Group {name: '{}'}), p=allShortestPaths((n)-[r:MemberOf*1..]->(m)) WITH n,m,r MATCH (n)-[s:HasSession]-(o:Computer) RETURN m,n,r,o,s".format(this.state.label),
+								emitter.emit('query', "MATCH (n:Group {name:{name}}),(m:User) MATCH p=shortestPath((m)-[r:MemberOf*1..]->(n)) WITH m,p MATCH q=shortestPath((m)<-[:HasSession]-(o:Computer)) RETURN q,p", {name: this.state.label},
 									"",this.state.label)
 							}.bind(this)} />
 					</dd>
