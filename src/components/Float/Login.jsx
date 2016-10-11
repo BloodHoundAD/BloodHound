@@ -72,7 +72,6 @@ export default class Login extends Component {
 			loginEnabled: false
 		})
 
-		var header = "Basic " + btoa(this.state.user + ":" + this.state.password)
 		var btn = jQuery(this.refs.loginButton)
 
 		var driver = neo4j.v1.driver(this.state.url, neo4j.v1.auth.basic(this.state.user, this.state.password),{knownHosts: 'known_hosts'})
