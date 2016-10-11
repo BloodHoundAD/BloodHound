@@ -13317,7 +13317,7 @@ function Get-BloodHoundData {
 
     .EXAMPLE
 
-        PS C:\> Get-BloodHoundData | Export-BloodHoundData -URI http://SERVER:7474/ -UserPass "user:pass" -Threads 20
+        PS C:\> Get-BloodHoundData -Threads 20 | Export-BloodHoundData -URI http://SERVER:7474/ -UserPass "user:pass"
 
         Executes default collection options and exports the data to a BloodHound neo4j RESTful API endpoint,
         and use 20 threads for collection operations.
