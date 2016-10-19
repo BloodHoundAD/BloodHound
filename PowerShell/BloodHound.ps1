@@ -4797,7 +4797,7 @@ function Invoke-BloodHound {
                 $TrustWriter.AutoFlush = $True
                 if (-not $Exists) {
                     # add the header if the file doesn't already exist
-                    $TrustWriter.WriteLine('"SourceDomain","TargetDomain","TrustDirection","TrustType","Transitive')
+                    $TrustWriter.WriteLine('"SourceDomain","TargetDomain","TrustDirection","TrustType","Transitive"')
                 }
             }
         }
