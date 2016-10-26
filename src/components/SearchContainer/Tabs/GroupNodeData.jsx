@@ -74,7 +74,7 @@ export default class GroupNodeData extends Component {
 				s5.close()
 			}.bind(this))
 
-		s6.run("MATCH p=shortestPath((m:User)-[r:MemberOf*1..]->(n:Group {name: {name}})) WITH m,p MATCH q=shortestPath((m)<-[:HasSession]-(o:Computer)) RETURN count(o)", {name:payload})
+		s6.run("MATCH p=shortestPath((m:User)-[r:MemberOf*1..]->(n:Group {name: {name}})) WITH m,p MATCH q=((m)<-[:HasSession]-(o:Computer)) RETURN count(o)", {name:payload})
 			.then(function(result){
 				this.setState({'sessions':result.records[0]._fields[0].low})
 				s6.close()
@@ -179,7 +179,7 @@ export default class GroupNodeData extends Component {
 							ready={this.state.sessions !== -1}
 							value={this.state.sessions}
 							click={function(){
-								emitter.emit('query', "MATCH (n:Group {name:{name}}),(m:User) MATCH p=shortestPath((m)-[r:MemberOf*1..]->(n)) WITH m,p MATCH q=shortestPath((m)<-[:HasSession]-(o:Computer)) RETURN q,p", {name: this.state.label},
+								emitter.emit('query', "MATCH p=shortestPath((m:User)-[r:MemberOf*1..]->(n:Group {name: {name}})) WITH m,p MATCH q=((m)<-[:HasSession]-(o:Computer)) RETURN q,p", {name: this.state.label},
 									"",this.state.label)
 							}.bind(this)} />
 					</dd>
