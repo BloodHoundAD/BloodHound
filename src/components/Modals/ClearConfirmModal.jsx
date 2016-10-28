@@ -33,7 +33,7 @@ export default class ClearConfirmModal extends Component {
 		return (
 			<Modal
 				show={this.state.open}
-				onHide={this.closeModal}
+				onHide={this.closeModal.bind(this)}
 				aria-labelledby="ConfirmModalHeader">
 
 				<Modal.Header closeButton={true}>
