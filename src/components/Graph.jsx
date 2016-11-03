@@ -3,13 +3,15 @@ import ReactDOM from 'react-dom'
 import  { findGraphPath } from 'utils';
 var fs = require('fs');
 var child_process = require('child_process')
+var child;
 var path = require('path')
-var child = child_process.fork(path.join(__dirname,'src','js','worker.js'), {silent:true});
 const { dialog } = require('electron').remote
 
 export default class GraphContainer extends Component {
     constructor(props){
         super(props)
+
+        child = child_process.fork(path.join(__dirname,'src','js','worker.js'), {silent:true});
 
         this.state = {
             sigmaInstance : null,
@@ -79,6 +81,7 @@ export default class GraphContainer extends Component {
             this.state.sigmaInstance.refresh();
             sigma.layouts.killForceLink();
             this.setState({sigmaInstance: null})
+            child.kill();
         }.bind(this))
     }
 
