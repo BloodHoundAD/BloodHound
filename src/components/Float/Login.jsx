@@ -7,8 +7,6 @@ export default class Login extends Component {
 			url: "",
 			icon: null,
 			loginEnabled: false,
-			dbHelpVisible: false,
-			loginHelpVisible: false,
 			user: "",
 			password: "",
 			loginInProgress: false
@@ -18,6 +16,7 @@ export default class Login extends Component {
 	checkDBPresence(){
 		var url = this.state.url;
 		var icon = this.state.icon;
+		var jicon = jQuery(icon)
 
 		if (url === ""){
 			return;
@@ -38,28 +37,32 @@ export default class Login extends Component {
 		icon.removeClass();
 		icon.addClass("fa fa-spinner fa-spin form-control-feedback");
 		icon.toggle(true);
-		var driver = neo4j.v1.driver(url)
-		var session = driver.session()
-
-		session.run('MATCH (n) RETURN (n) LIMIT 1')
-			.subscribe({
-				onNext: function(next){
-				},
-				onError: function(error){
-					if (error.code){
-						this.setState({dbHelpVisible: true})
-						icon.removeClass();
-                    	icon.addClass("fa fa-times-circle red-icon-color form-control-feedback");
-					}else{
-						icon.removeClass();
-						icon.addClass("fa fa-check-circle green-icon-color form-control-feedback");
-						this.setState({loginEnabled: true, url: url})
-					}
-				}.bind(this),
-				onComplete: function(){
-					session.close()
-				}
-			})
+		var driver = neo4j.driver(url)
+		driver.onCompleted = function(){
+			driver.close()
+		}
+		driver.onError = function(error){
+			if (error.message && error.message.includes("encryption certificate has changed")){
+				var path = error.message.match("`(.*?)`")[1]
+				icon.removeClass();
+				icon.addClass("fa fa-times-circle red-icon-color form-control-feedback");
+				icon.attr('data-original-title', 'Certificate error - delete localhost line in {}'.format(path))
+					.tooltip('fixTitle')
+					.tooltip('show')
+			}else if (error.fields && error.fields[0].code === "Neo.ClientError.Security.Unauthorized"){
+				icon.removeClass();
+				icon.addClass("fa fa-check-circle green-icon-color form-control-feedback");
+				this.setState({loginEnabled: true, url: url})
+			}else{
+				icon.removeClass();
+				icon.addClass("fa fa-times-circle red-icon-color form-control-feedback");
+				icon.attr('data-original-title', 'No database found')
+					.tooltip('fixTitle')
+					.tooltip('show')
+			}
+			driver.close()
+		}.bind(this)
+		driver.session();
 	}
 
 	checkDBCreds(){
@@ -68,24 +71,64 @@ export default class Login extends Component {
 		}
 		this.setState({
 			loginInProgress: true,
-			loginHelpVisible: false,
 			loginEnabled: false
 		})
 
 		var btn = jQuery(this.refs.loginButton)
+		var pwf = jQuery(this.refs.password)
 
-		var driver = neo4j.v1.driver(this.state.url, neo4j.v1.auth.basic(this.state.user, this.state.password),{knownHosts: 'known_hosts'})
-		var session = driver.session()
+		var driver = neo4j.driver(this.state.url, neo4j.auth.basic(this.state.user, this.state.password))
+		driver.onError = function(error){
+			if (error.fields && error.fields[0].code === "Neo.ClientError.Security.Unauthorized"){
+				btn.removeClass('activate');
+				this.setState({
+					loginInProgress: false,
+					loginEnabled: true
+				})
+				pwf.attr('data-original-title', 'Invalid username or password')
+					.tooltip('fixTitle')
+					.tooltip('show')
+			}else if (error.fields && error.fields[0].code === "Neo.ClientError.Security.AuthenticationRateLimit"){
+				btn.removeClass('activate');
+				this.setState({
+					loginInProgress: false,
+					loginEnabled: true
+				})
+				pwf.attr('data-original-title', 'Too many authentication attempts, please wait')
+					.tooltip('fixTitle')
+					.tooltip('show')
+			}else if (error.message && error.message.includes("encryption certificate has changed")){
+				var path = error.message.match("`(.*?)`")[1]
+				var icon = this.state.icon
+				icon.toggle('true')
+				icon.removeClass();
+				icon.addClass("fa fa-times-circle red-icon-color form-control-feedback");
+				jQuery(icon).tooltip({
+					placement : 'right',
+					title: 'Certificate error - delete localhost line in ' + path,
+					container: 'body',
+					delay: {show: 200, hide: 0},
+					template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-custom"></div></div>'
+				})
+				jQuery(icon).tooltip('show')
+			}
+			driver.close()
+		}.bind(this)
+		var session = driver.session();
 		session.run('MATCH (n) RETURN (n) LIMIT 1')
 			.subscribe({
 				onError: function(error){
-					btn.toggleClass('activate');
-					this.setState({
-						loginHelpVisible: true,
-						loginInProgress: false,
-						loginEnabled: true
-					})
-					
+					btn.removeClass('activate');
+					var url = this.state.url.replace('bolt://','http://').replace('7687','7474')
+					if (error.fields && error.fields[0].code === "Neo.ClientError.Security.CredentialsExpired"){
+						pwf.attr('data-original-title', 'Credentials need to be changed from the neo4j browser first. Go to {} and change them.'.format(url))
+							.tooltip('fixTitle')
+							.tooltip('show')
+						this.setState({
+							loginInProgress: false,
+							loginEnabled: true
+						})
+					}
 				}.bind(this),
 				onNext: function(){
 
@@ -105,12 +148,14 @@ export default class Login extends Component {
 					})
 					global.driver = driver
 					appStore.databaseInfo = conf.get('databaseInfo');
+					jQuery(this.refs.password).tooltip('hide')
+					jQuery(this.refs.urlspinner).tooltip('hide')
 					setTimeout(function(){
 						jQuery(this.refs.outer).fadeOut(400, function(){
 							renderEmit.emit('login');
 						});
 					}.bind(this), 1500)
-					session.close()
+					driver.close()
 				}.bind(this)
 			})
 
@@ -130,8 +175,23 @@ export default class Login extends Component {
 	}
 
 	componentDidMount() {
-		jQuery(this.refs.urlspinner).toggle(false)
+		jQuery(this.refs.password).tooltip({
+			placement : 'right',
+			title: '',
+			container: 'body',
+			trigger: 'manual',
+			template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-custom"></div></div>'
+		})
 		this.setState({icon: jQuery(this.refs.urlspinner)})
+		var icon = jQuery(this.refs.urlspinner)
+		icon.tooltip({
+			placement : 'right',
+			title: '',
+			container: 'body',
+			delay: {show: 200, hide: 0},
+			template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-custom"></div></div>'
+		})
+		icon.toggle(false)
 		if (this.state.password !== ""){
 			this.checkDBCreds();
 		}
@@ -142,11 +202,13 @@ export default class Login extends Component {
 	}
 
 	_userChanged(event){
-		this.setState({user: event.target.value})	
+		this.setState({user: event.target.value})
+		jQuery(this.refs.password).tooltip('hide')
 	}
 
 	_passChanged(event){
-		this.setState({password: event.target.value})	
+		this.setState({password: event.target.value})
+		jQuery(this.refs.password).tooltip('hide')
 	}
 
 	_triggerLogin(e){
@@ -171,10 +233,9 @@ export default class Login extends Component {
 								<span className="input-group-addon" id="dburladdon">
 									Database URL
 								</span>
-								<input ref="url" onFocus={function(){this.setState({dbHelpVisible: false})}.bind(this)} onBlur={this.checkDBPresence.bind(this)} onChange={this._urlChanged.bind(this)} type="text" className="form-control" value={this.state.url} placeholder="bolt://localhost:7687" aria-describedby="dburladdon" />
+								<input ref="url" onFocus={function(){jQuery(this.state.icon).tooltip('hide');}.bind(this)} onBlur={this.checkDBPresence.bind(this)} onChange={this._urlChanged.bind(this)} type="text" className="form-control" value={this.state.url} placeholder="bolt://localhost:7687" aria-describedby="dburladdon" />
 								<i ref="urlspinner" className="fa fa-spinner fa-spin form-control-feedback" />
 							</div>
-							{this.state.dbHelpVisible ? <p className="help-block help-block-add">No Neo4j Database Found</p> : null}
 							<div className="input-group spacing">
 								<span className="input-group-addon" id="dbuseraddon">DB Username</span>
 								<input ref="user" type="text" value={this.state.user} onKeyUp={this._triggerLogin.bind(this)} onChange={this._userChanged.bind(this)} className="form-control" placeholder="neo4j" aria-describedby="dbuseraddon" />
@@ -183,7 +244,6 @@ export default class Login extends Component {
 								<span className="input-group-addon" id="dbpwaddon">DB Password</span>
 								<input ref="password" value={this.state.password} onKeyDown={this._triggerLogin.bind(this)} onChange={this._passChanged.bind(this)} type="password" className="form-control" placeholder="neo4j" aria-describedby="dbpwaddon" />
 							</div>
-							{this.state.loginHelpVisible ? <p className="help-block help-block-add" style={{color: "#d9534f"}}>Wrong username or password</p> : null}
 							<button ref="loginButton" disabled={!this.state.loginEnabled} type="button" onClick={this.checkDBCreds.bind(this)} className="btn btn-primary loginbutton has-spinner">
 								Login
 								<span className="button-spinner">
