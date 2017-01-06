@@ -60,6 +60,10 @@ export default class Login extends Component {
 					.tooltip('fixTitle')
 					.tooltip('show')
 			}
+			this.setState({
+				loginInProgress: false,
+				loginEnabled: false
+			})
 			driver.close()
 		}.bind(this)
 		driver.session();
@@ -110,6 +114,10 @@ export default class Login extends Component {
 					delay: {show: 200, hide: 0},
 					template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-custom"></div></div>'
 				})
+				this.setState({
+					loginInProgress: false,
+					loginEnabled: false
+				})
 				jQuery(icon).tooltip('show')
 			}else if (error.toString().includes('ECONNREFUSED')){
 				var icon = this.state.icon
@@ -119,6 +127,10 @@ export default class Login extends Component {
 				icon.attr('data-original-title', 'No database found')
 					.tooltip('fixTitle')
 					.tooltip('show')
+				this.setState({
+					loginInProgress: false,
+					loginEnabled: false
+				})
 			}
 			driver.close()
 		}.bind(this)
