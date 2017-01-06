@@ -166,7 +166,6 @@ export default class Login extends Component {
 						user: this.state.user,
 						password: this.state.password
 					})
-					global.driver = driver
 					appStore.databaseInfo = conf.get('databaseInfo');
 					jQuery(this.refs.password).tooltip('hide')
 					jQuery(this.refs.urlspinner).tooltip('hide')
@@ -176,6 +175,7 @@ export default class Login extends Component {
 						});
 					}.bind(this), 1500)
 					driver.close()
+					global.driver = neo4j.driver(this.state.url, neo4j.auth.basic(this.state.user, this.state.password))
 				}.bind(this)
 			})
 
