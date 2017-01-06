@@ -32,6 +32,10 @@ body {
     background-color: lightgray;
 }
 
+div.tooltip-inner-custom {
+    max-width: 250px;
+}
+
 .queryInput {
     position: relative;
     left: 50%;

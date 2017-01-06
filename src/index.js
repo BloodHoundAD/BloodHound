@@ -12,6 +12,7 @@ global.conf = new ConfigStore('bloodhound')
 var e = require('eventemitter2').EventEmitter2
 global.emitter = new e({})
 global.renderEmit = new e({})
+global.neo4j = require('neo4j-driver').v1;
 
 global.Mustache = require('mustache')
 
@@ -172,6 +173,12 @@ renderEmit.on('login', function(){
 	emitter.removeAllListeners()
 	ReactDOM.unmountComponentAtNode(document.getElementById('root'))
 	ReactDOM.render(<AppContainer />, document.getElementById('root'))	
+})
+
+renderEmit.on('logout', function(){
+	emitter.removeAllListeners()
+	ReactDOM.unmountComponentAtNode(document.getElementById('root'))
+	ReactDOM.render(<Login />, document.getElementById('root'))
 })
 
 ReactDOM.render(<Login />, document.getElementById('root'))
