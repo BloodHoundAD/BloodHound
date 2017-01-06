@@ -111,6 +111,14 @@ export default class Login extends Component {
 					template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-custom"></div></div>'
 				})
 				jQuery(icon).tooltip('show')
+			}else if (error.toString().includes('ECONNREFUSED')){
+				var icon = this.state.icon
+				icon.toggle('true')
+				icon.removeClass();
+				icon.addClass("fa fa-times-circle red-icon-color form-control-feedback");
+				icon.attr('data-original-title', 'No database found')
+					.tooltip('fixTitle')
+					.tooltip('show')
 			}
 			driver.close()
 		}.bind(this)
