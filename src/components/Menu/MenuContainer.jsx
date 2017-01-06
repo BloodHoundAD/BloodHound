@@ -51,9 +51,7 @@ export default class MenuContainer extends Component {
 		}
 	}
 
-	_uploadClick(){
-		var selectedFile = jQuery(this.refs.fileInput)[0].files[0]
-		var filename = selectedFile.path
+	processFile(filename, fileobject){
 		var sent = 0
 
 		var i;
@@ -107,7 +105,7 @@ export default class MenuContainer extends Component {
 				}, 2000)
 
 				console.time('IngestTime')
-				Papa.parse(selectedFile,{
+				Papa.parse(fileobject,{
 					header: true,
 					dynamicTyping: true,
 					skipEmptyLines: true,
@@ -202,6 +200,18 @@ export default class MenuContainer extends Component {
 					}.bind(this)
 				})
 			}.bind(this));
+	}
+
+	_uploadClick(){
+		var input = jQuery(this.refs.fileInput)
+		
+		for (var i = 0, num=input[0].files.length; i < num; i++){
+			var obj = input[0].files[i]
+			var filename = input[0].files[i].path
+			this.processFile(filename, obj)
+			emitter.emit('showAlert', 'Processing file {}'.format(filename));
+		}
+		input.val('')
 	}
 
 	_settingsClick(){
