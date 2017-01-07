@@ -28,6 +28,10 @@ String.prototype.formatAll = function () {
   return this.replace(/{}/g, args[0]);
 };
 
+String.prototype.toTitleCase = function() {
+    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+};
+
 Array.prototype.allEdgesSameType = function() {
 
     for (var i = 1; i < this.length; i++) {
