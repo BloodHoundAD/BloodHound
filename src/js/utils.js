@@ -147,3 +147,38 @@ export function buildDomainProps(rows){
 
 	return domains
 }
+
+export function buildACLProps(rows){
+	var datadict = {}
+
+	$.each(rows, function(index, row){
+		var a = row.ObjectName.toUpperCase()
+		var b = row.PrincipalName.toUpperCase()
+		var atype = row.ObjectType.toTitleCase()
+		var btype = row.PrincipalType.toTitleCase()
+		var rel = row.ActiveDirectoryRights
+
+		var hash = (atype + rel + btype).toUpperCase()
+		if (btype === 'Computer'){
+			return
+		}
+
+		if (rel.includes(' ')){
+			rel = 'WriteDACL'
+		}
+
+		if (datadict[hash]){
+			datadict[hash].props.push({
+				account: a,
+				principal: b
+			})
+		}else{
+			datadict[hash] = {
+				statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:{} {name: prop.principal}) WITH a,b,prop MERGE (a)-[r:{}]->(b)'.format(atype,btype,rel),
+				props: [{account: a, principal: b}]
+			}
+		}
+	})
+
+	return datadict
+}

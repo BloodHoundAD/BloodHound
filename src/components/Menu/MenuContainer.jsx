@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import MenuButton from './MenuButton';
 import ProgressBarMenuButton from './ProgressBarMenuButton';
-import { buildDomainProps, buildSessionProps, buildLocalAdminProps, buildGroupMembershipProps } from 'utils';
+import { buildDomainProps, buildSessionProps, buildLocalAdminProps, buildGroupMembershipProps, buildACLProps } from 'utils';
 import { If, Then, Else } from 'react-if';
 const { dialog, clipboard } = require('electron').remote
 var fs = require('fs')
@@ -84,6 +84,8 @@ export default class MenuContainer extends Component {
 					filetype = 'localadmin'
 				}else if (header.includes('SourceDomain') && header.includes('TargetDomain') && header.includes('TrustDirection') && header.includes('TrustType') && header.includes('Transitive')){
 					filetype = 'domain'
+				}else if (header.includes('ActiveDirectoryRights') && header.includes('ObjectType') && header.includes('PrincipalType')){
+					filetype = 'acl'
 				}
 
 				if (typeof filetype === 'undefined'){
@@ -186,7 +188,7 @@ export default class MenuContainer extends Component {
 									}.bind(this))
 								}.bind(this))
 							}.bind(this))
-						}else{
+						}else if (filetype === 'domain'){
 							var props = buildDomainProps(rows.data)
 							var query = "UNWIND {props} AS prop MERGE (domain1:Domain {name: prop.domain1}) WITH domain1,prop MERGE (domain2:Domain {name: prop.domain2}) WITH domain1,domain2,prop MERGE (domain1)-[:TrustedBy {TrustType : prop.trusttype, Transitive: prop.transitive}]->(domain2)"
 							var session = driver.session()
@@ -195,6 +197,25 @@ export default class MenuContainer extends Component {
 									this.setState({progress: Math.floor((sent / count) * 100)})
 									session.close()
 									parser.resume()
+								}.bind(this))
+						}else if (filetype === 'acl'){
+							var data = buildACLProps(rows.data)
+							var promises = []
+							var session = driver.session()
+							var tx = session.beginTransaction()
+							for (var key in data){
+								var promise = tx.run(data[key].statement, {props: data[key].props})
+								promises.push(promise)
+							}
+
+							Promise.all(promises)
+								.then(function(){
+									tx.commit()
+										.then(function(){
+											this.setState({progress: Math.floor((sent / count) * 100)})
+											session.close()
+											parser.resume()
+										}.bind(this))
 								}.bind(this))
 						}
 					}.bind(this)
