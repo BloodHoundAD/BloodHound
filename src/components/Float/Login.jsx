@@ -51,6 +51,7 @@ export default class Login extends Component {
 					.tooltip('show')
 			}else if (error.fields && error.fields[0].code === "Neo.ClientError.Security.Unauthorized"){
 				icon.removeClass();
+				btn.addClass('activate');
 				icon.addClass("fa fa-check-circle green-icon-color form-control-feedback");
 				this.setState({loginEnabled: true, url: url})
 			}else{

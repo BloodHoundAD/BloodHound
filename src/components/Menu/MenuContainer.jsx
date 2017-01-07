@@ -5,6 +5,7 @@ import { buildDomainProps, buildSessionProps, buildLocalAdminProps, buildGroupMe
 import { If, Then, Else } from 'react-if';
 const { dialog, clipboard } = require('electron').remote
 var fs = require('fs')
+var async = require('async')
 
 export default class MenuContainer extends Component {
 	constructor(){
@@ -51,7 +52,32 @@ export default class MenuContainer extends Component {
 		}
 	}
 
-	processFile(filename, fileobject){
+	_settingsClick(){
+		emitter.emit('openSettings')
+	}
+
+	_cancelUploadClick(){
+		emitter.emit('showCancelUpload')
+	}
+
+	_uploadClick(){
+		var input = jQuery(this.refs.fileInput)
+		var files = $.makeArray(input[0].files)
+
+		async.eachSeries(files, function(file, callback){
+			emitter.emit('showAlert', 'Processing file {}'.format(file.name));
+			this.processFile(file.path, file, callback)
+		}.bind(this),
+		function done(){
+			setTimeout(function(){
+				this.setState({uploading: false})
+			}.bind(this), 3000)
+		}.bind(this))
+
+		input.val('')
+	}
+
+	processFile(filename, fileobject, callback){
 		var sent = 0
 
 		var i;
@@ -119,10 +145,8 @@ export default class MenuContainer extends Component {
 							console.timeEnd('IngestTime')
 							parser.abort()
 							this.setState({progress:100})
-							setTimeout(function(){
-								this.setState({uploading: false})
-							}.bind(this), 3000)
 							emitter.emit('refreshDBData')
+							callback()
 							return
 						}
 						parser.pause()
@@ -142,52 +166,47 @@ export default class MenuContainer extends Component {
 							var userQuery = 'UNWIND {props} AS prop MERGE (user:User {name:prop.account}) WITH user,prop MERGE (group:Group {name:prop.group}) WITH user,group MERGE (user)-[:MemberOf]->(group)'
 							var computerQuery = 'UNWIND {props} AS prop MERGE (computer:Computer {name:prop.account}) WITH computer,prop MERGE (group:Group {name:prop.group}) WITH computer,group MERGE (computer)-[:MemberOf]->(group)'
 							var groupQuery = 'UNWIND {props} AS prop MERGE (group1:Group {name:prop.account}) WITH group1,prop MERGE (group2:Group {name:prop.group}) WITH group1,group2 MERGE (group1)-[:MemberOf]->(group2)'
-							var s1 = driver.session()
-							var s2 = driver.session()
-							var s3 = driver.session()
-							var p1
-							var p2
-							var p3
-							p1 = s1.run(userQuery, {props: props.users})
-							p1.then(function(){
-								s1.close()
-								p2 = s2.run(computerQuery, {props: props.computers})
-								p2.then(function(){
-									s2.close()
-									p3 = s3.run(groupQuery, {props: props.groups})
-									p3.then(function(){
-										s3.close()
-										this.setState({progress: Math.floor((sent / count) * 100)})
-										parser.resume()
-									}.bind(this))
+							
+							var session = driver.session()
+							var tx = session.beginTransaction()
+							var promises = []
+
+							promises.push(tx.run(userQuery, {props: props.users}))
+							promises.push(tx.run(computerQuery, {props: props.computers}))
+							promises.push(tx.run(groupQuery, {props: props.groups}))
+
+							Promise.all(promises)
+								.then(function(){
+									tx.commit()
+										.then(function(){
+											session.close()
+											this.setState({progress: Math.floor((sent / count) * 100)})
+											parser.resume()
+										}.bind(this))
 								}.bind(this))
-							}.bind(this))
 						}else if (filetype === 'localadmin'){
 							var props = buildLocalAdminProps(rows.data)
 							var userQuery = 'UNWIND {props} AS prop MERGE (user:User {name: prop.account}) WITH user,prop MERGE (computer:Computer {name: prop.computer}) WITH user,computer MERGE (user)-[:AdminTo]->(computer)'
 							var groupQuery = 'UNWIND {props} AS prop MERGE (group:Group {name: prop.account}) WITH group,prop MERGE (computer:Computer {name: prop.computer}) WITH group,computer MERGE (group)-[:AdminTo]->(computer)'
 							var computerQuery = 'UNWIND {props} AS prop MERGE (computer1:Computer {name: prop.account}) WITH computer1,prop MERGE (computer2:Computer {name: prop.computer}) WITH computer1,computer2 MERGE (computer1)-[:AdminTo]->(computer2)'
 
-							var s1 = driver.session()
-							var s2 = driver.session()
-							var s3 = driver.session()
-							var p1
-							var p2
-							var p3
-							p1 = s1.run(userQuery, {props: props.users})
-							p1.then(function(){
-								s1.close()
-								p2 = s2.run(computerQuery, {props: props.computers})
-								p2.then(function(){
-									s2.close()
-									p3 = s3.run(groupQuery, {props: props.groups})
-									p3.then(function(){
-										s3.close()
-										this.setState({progress: Math.floor((sent / count) * 100)})
-										parser.resume()
-									}.bind(this))
+							var session = driver.session()
+							var tx = session.beginTransaction()
+							var promises = []
+
+							promises.push(tx.run(userQuery, {props: props.users}))
+							promises.push(tx.run(computerQuery, {props: props.computers}))
+							promises.push(tx.run(groupQuery, {props: props.groups}))
+
+							Promise.all(promises)
+								.then(function(){
+									tx.commit()
+										.then(function(){
+											session.close()
+											this.setState({progress: Math.floor((sent / count) * 100)})
+											parser.resume()
+										}.bind(this))
 								}.bind(this))
-							}.bind(this))
 						}else if (filetype === 'domain'){
 							var props = buildDomainProps(rows.data)
 							var query = "UNWIND {props} AS prop MERGE (domain1:Domain {name: prop.domain1}) WITH domain1,prop MERGE (domain2:Domain {name: prop.domain2}) WITH domain1,domain2,prop MERGE (domain1)-[:TrustedBy {TrustType : prop.trusttype, Transitive: prop.transitive}]->(domain2)"
@@ -221,26 +240,6 @@ export default class MenuContainer extends Component {
 					}.bind(this)
 				})
 			}.bind(this));
-	}
-
-	_uploadClick(){
-		var input = jQuery(this.refs.fileInput)
-		
-		for (var i = 0, num=input[0].files.length; i < num; i++){
-			var obj = input[0].files[i]
-			var filename = input[0].files[i].path
-			this.processFile(filename, obj)
-			emitter.emit('showAlert', 'Processing file {}'.format(filename));
-		}
-		input.val('')
-	}
-
-	_settingsClick(){
-		emitter.emit('openSettings')
-	}
-
-	_cancelUploadClick(){
-		emitter.emit('showCancelUpload')
 	}
 
 	render() {
