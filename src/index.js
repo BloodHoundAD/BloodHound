@@ -6,6 +6,10 @@ import AppContainer from './AppContainer';
 import Login from './components/Float/Login'
 import { getStorageData, storageHasKey, storageSetKey } from './js/utils.js';
 
+const { app } = require('electron').remote
+var fs = require('fs')
+const path = require('path');
+
 const ConfigStore = require('configstore');
 
 global.conf = new ConfigStore('bloodhound')
@@ -170,6 +174,14 @@ if (typeof conf.get('performance') === 'undefined'){
 		nodeLabels: 1
 	})
 }
+
+var custompath = path.join(app.getPath('userData'),'customqueries.json')
+
+fs.stat(custompath, function(err, stats){
+	if (err){
+		fs.writeFile(custompath,"")
+	}
+})
 
 appStore.performance = conf.get('performance')
 
