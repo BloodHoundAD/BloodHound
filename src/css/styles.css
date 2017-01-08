@@ -44,6 +44,13 @@ div.tooltip-inner-custom {
     max-width: 250px;
 }
 
+.aboutscroll{
+    width: 100%;
+    overflow: auto;
+    height: 150px;
+    white-space: pre-wrap;
+}
+
 .queryInput {
     position: relative;
     left: 50%;
