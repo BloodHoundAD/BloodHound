@@ -748,7 +748,7 @@ export default class GraphContainer extends Component {
 
         forcelinkListener.bind('stop', function(event) {
             emitter.emit('updateLoadingText', "Fixing Overlap");
-            sigmaInstance.startNoverlap();
+            //sigmaInstance.startNoverlap();
         })
 
         forcelinkListener.bind('start', function(event){
@@ -764,8 +764,10 @@ export default class GraphContainer extends Component {
         });
 
         dagreListener.bind('stop', function(event){
-            emitter.emit('updateLoadingText', "Fixing Overlap");
-            sigmaInstance.startNoverlap();
+            emitter.emit('updateLoadingText', 'Done!');
+            setTimeout(function(){
+                emitter.emit('showLoadingIndicator', false);    
+            }, 1500)
         })
 
         dagreListener.bind('start', function(event){
