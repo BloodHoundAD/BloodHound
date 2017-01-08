@@ -748,7 +748,7 @@ export default class GraphContainer extends Component {
 
         forcelinkListener.bind('stop', function(event) {
             emitter.emit('updateLoadingText', "Fixing Overlap");
-            //sigmaInstance.startNoverlap();
+            sigmaInstance.startNoverlap();
         })
 
         forcelinkListener.bind('start', function(event){
