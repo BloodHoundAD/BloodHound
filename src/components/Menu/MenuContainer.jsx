@@ -77,6 +77,10 @@ export default class MenuContainer extends Component {
 		input.val('')
 	}
 
+	_aboutClick(){
+		emitter.emit('showAbout')
+	}
+
 	processFile(filename, fileobject, callback){
 		var sent = 0
 
@@ -130,7 +134,7 @@ export default class MenuContainer extends Component {
 						.then(function(){
 							sess.close()
 						})
-				}, 2000)
+				}, 250)
 
 				console.time('IngestTime')
 				Papa.parse(fileobject,{
@@ -269,6 +273,9 @@ export default class MenuContainer extends Component {
 				</div>
 				<div>
 					<MenuButton click={this._settingsClick.bind(this)} hoverVal="Settings" glyphicon="fa fa-cogs" />
+				</div>
+				<div>
+					<MenuButton click={this._aboutClick.bind(this)} hoverVal="About" glyphicon="fa fa-info" />
 				</div>
 				<input ref="fileInput" multiple className="hide" type="file" onChange={this._uploadClick.bind(this)}/>
 			</div>

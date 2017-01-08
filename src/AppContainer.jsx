@@ -16,6 +16,7 @@ import Settings from './components/Float/Settings'
 import ZoomContainer from './components/Zoom/ZoomContainer'
 import QueryNodeSelect from './components/Float/QueryNodeSelect'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import About from './components/Modals/About.jsx'
 
 export default class AppContainer extends Component {
 	constructor(){
@@ -46,6 +47,7 @@ export default class AppContainer extends Component {
 					<Settings />
 					<ZoomContainer />
 					<QueryNodeSelect />
+					<About />
 				</div>
 			</ReactCSSTransitionGroup>
 		);

@@ -209,6 +209,7 @@ export default class GraphContainer extends Component {
 
     clearGraph(){
         this.state.sigmaInstance.graph.clear()
+        this.state.sigmaInstance.refresh()
     }
 
     setGraphicsMode(){
