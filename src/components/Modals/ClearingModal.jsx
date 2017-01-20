@@ -30,7 +30,7 @@ export default class ClearingModal extends Component {
 				aria-labelledby="ClearingModalHeader">
 
 				<Modal.Header closeButton={true}>
-					<Modal.Title id="ClearingModalHeader">Clearing Database</Modal.Title>
+					<Modal.Title id="ClearingModalHeader">Clearing Data</Modal.Title>
 				</Modal.Header>
 			</Modal>
 		);

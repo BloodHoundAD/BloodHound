@@ -39,6 +39,25 @@ export function findGraphPath(sigmaInstance, reverse, nodeid) {
     }
 }
 
+export function clearSessions(){
+    emitter.emit('openClearingModal');
+    deleteSessions();
+}
+
+function deleteSessions(){
+    var session = driver.session()
+    session.run("MATCH ()-[r:HasSession]-() WITH r LIMIT 100000 DELETE r RETURN count(r)")
+        .then(function(results) {
+            session.close()
+            var count = results.records[0]._fields[0].low
+            if (count === 0) {
+                emitter.emit('hideDBClearModal')
+            } else {
+                deleteSessions();
+            }
+        })
+}
+
 export function clearDatabase() {
     emitter.emit('openClearingModal');
     deleteEdges()
