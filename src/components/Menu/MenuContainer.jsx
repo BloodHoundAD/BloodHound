@@ -134,7 +134,7 @@ export default class MenuContainer extends Component {
 						.then(function(){
 							sess.close()
 						})
-				}, 250)
+				}, 2000)
 
 				console.time('IngestTime')
 				Papa.parse(fileobject,{
