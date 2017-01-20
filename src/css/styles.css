@@ -32,6 +32,25 @@ body {
     background-color: lightgray;
 }
 
+.customQueryGlyph{
+    font-size: small;
+    vertical-align: middle;
+    top: -1px;
+    left: 5px;
+    cursor: pointer;
+}
+
+div.tooltip-inner-custom {
+    max-width: 250px;
+}
+
+.aboutscroll{
+    width: 100%;
+    overflow: auto;
+    height: 150px;
+    white-space: pre-wrap;
+}
+
 .queryInput {
     position: relative;
     left: 50%;

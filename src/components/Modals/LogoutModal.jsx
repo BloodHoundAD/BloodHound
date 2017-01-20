@@ -23,8 +23,7 @@ export default class LogoutModal extends Component {
 		this.setState({ open: false })
 		emitter.emit('doLogout');
 		driver.close()
-		ReactDOM.unmountComponentAtNode(document.getElementById('root'))
-		ReactDOM.render(<Login />, document.getElementById('root'))
+		renderEmit.emit('logout')
 	}
 
 	openModal(){

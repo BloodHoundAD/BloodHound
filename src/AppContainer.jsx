@@ -15,7 +15,9 @@ import ExportContainer from './components/Float/ExportContainer';
 import Settings from './components/Float/Settings'
 import ZoomContainer from './components/Zoom/ZoomContainer'
 import QueryNodeSelect from './components/Float/QueryNodeSelect'
+import SessionClearModal from './components/Modals/SessionClearModal'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import About from './components/Modals/About.jsx'
 
 export default class AppContainer extends Component {
 	constructor(){
@@ -41,11 +43,13 @@ export default class AppContainer extends Component {
 					<ClearConfirmModal />
 					<ClearingModal />
 					<CancelUploadModal />
+					<SessionClearModal />
 					<RawQuery />
 					<MenuContainer />
 					<Settings />
 					<ZoomContainer />
 					<QueryNodeSelect />
+					<About />
 				</div>
 			</ReactCSSTransitionGroup>
 		);
