@@ -209,6 +209,7 @@ export default class GraphContainer extends Component {
 
     clearGraph(){
         this.state.sigmaInstance.graph.clear()
+        this.state.sigmaInstance.refresh()
     }
 
     setGraphicsMode(){
@@ -764,8 +765,10 @@ export default class GraphContainer extends Component {
         });
 
         dagreListener.bind('stop', function(event){
-            emitter.emit('updateLoadingText', "Fixing Overlap");
-            sigmaInstance.startNoverlap();
+            emitter.emit('updateLoadingText', 'Done!');
+            setTimeout(function(){
+                emitter.emit('showLoadingIndicator', false);    
+            }, 1500)
         })
 
         dagreListener.bind('start', function(event){

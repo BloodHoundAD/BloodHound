@@ -43,6 +43,10 @@ export default class DatabaseDataDisplay extends Component {
 	toggleDBWarnModal(){
 		emitter.emit('openDBWarnModal')
 	}
+
+	toggleSessionClearModal(){
+		emitter.emit('openSessionClearModal')
+	}
 	
 
 	render() {
@@ -67,8 +71,9 @@ export default class DatabaseDataDisplay extends Component {
 				</dl>
 
 				<div className="text-center">
-					<div className="btn-group dbbuttons">
+					<div className="btn-group btn-group-sm dbbuttons">
 						<button type="button" className="btn btn-success" onClick={function(){this.refreshDBData()}.bind(this)}>Refresh DB Stats</button>
+						<button type="button" className="btn btn-info" onClick={this.toggleSessionClearModal}>Clear Sessions</button>
 						<button type="button" className="btn btn-warning" onClick={this.toggleLogoutModal}>Log Out/Switch DB</button>
 						<button type="button" className="btn btn-danger" onClick={this.toggleDBWarnModal}>Clear Database</button>
 					</div>
