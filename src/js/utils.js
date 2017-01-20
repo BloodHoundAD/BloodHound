@@ -49,6 +49,7 @@ function deleteSessions(){
     session.run("MATCH ()-[r:HasSession]-() WITH r LIMIT 100000 DELETE r RETURN count(r)")
         .then(function(results) {
             session.close()
+            emitter.emit("refreshDBData")
             var count = results.records[0]._fields[0].low
             if (count === 0) {
                 emitter.emit('hideDBClearModal')
@@ -67,6 +68,7 @@ function deleteEdges() {
     var session = driver.session()
     session.run("MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)")
         .then(function(results) {
+            emitter.emit("refreshDBData");
             session.close()
             var count = results.records[0]._fields[0].low
             if (count === 0) {
@@ -81,6 +83,7 @@ function deleteNodes() {
     var session = driver.session()
     session.run("MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)")
         .then(function(results) {
+            emitter.emit("refreshDBData")
             session.close()
             var count = results.records[0]._fields[0].low
             if (count === 0) {
