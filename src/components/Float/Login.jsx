@@ -17,6 +17,7 @@ export default class Login extends Component {
 		var url = this.state.url;
 		var icon = this.state.icon;
 		var jicon = jQuery(icon)
+		var btn = jQuery(this.refs.loginButton)
 
 		if (url === ""){
 			return;
@@ -42,6 +43,7 @@ export default class Login extends Component {
 			driver.close()
 		}
 		driver.onError = function(error){
+			console.log(error)
 			if (error.message && error.message.includes("encryption certificate has changed")){
 				var path = error.message.match("`(.*?)`")[1]
 				icon.removeClass();
@@ -49,9 +51,12 @@ export default class Login extends Component {
 				icon.attr('data-original-title', 'Certificate error - delete localhost line in {}'.format(path))
 					.tooltip('fixTitle')
 					.tooltip('show')
+				this.setState({
+					loginInProgress: false,
+					loginEnabled: false
+				})
 			}else if (error.fields && error.fields[0].code === "Neo.ClientError.Security.Unauthorized"){
 				icon.removeClass();
-				btn.addClass('activate');
 				icon.addClass("fa fa-check-circle green-icon-color form-control-feedback");
 				this.setState({loginEnabled: true, url: url})
 			}else{
@@ -60,11 +65,11 @@ export default class Login extends Component {
 				icon.attr('data-original-title', 'No database found')
 					.tooltip('fixTitle')
 					.tooltip('show')
+				this.setState({
+					loginInProgress: false,
+					loginEnabled: false
+				})
 			}
-			this.setState({
-				loginInProgress: false,
-				loginEnabled: false
-			})
 			driver.close()
 		}.bind(this)
 		driver.session();
