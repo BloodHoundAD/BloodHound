@@ -38,7 +38,7 @@ process.on('message', function(m){
 	spotlightData = result[1]
 	sigmaInstance.graph.nodes().forEach(function(node) {
         if (!spotlightData.hasOwnProperty(node.id)) {
-            spotlightData[node.id] = [node.label, 0, ""];
+            spotlightData[node.id] = [node.label, 0, "", node.type, ""];
         }
     });
 	var toSend = {nodes: sigmaInstance.graph.nodes(), edges: sigmaInstance.graph.edges(), spotlight: spotlightData}
@@ -79,7 +79,7 @@ function collapseEdgeNodes(sigmaInstance, params, spotlightData){
 				node.isGrouped = true
 				node.folded.nodes.push(anode)
 				node.folded.edges.push(edge)
-				spotlightData[anode.id] = [anode.label, node.id, node.label];
+				spotlightData[anode.id] = [anode.label, node.id, node.label, anode.type, node.type];
 				sigmaInstance.graph.dropNode(anode.id);
 			}
 		});
@@ -184,7 +184,7 @@ function collapseSiblingNodes(sigmaInstance, params, spotlightData){
 					})
 
 					n.folded.nodes.push(sibling)
-					spotlightData[sibling.id] = [sibling.label, nodeId, n.label];
+					spotlightData[sibling.id] = [sibling.label, nodeId, n.label, sibling.type, n.type];
 					sigmaInstance.graph.dropNode(sibling.id)
 				})
 			}
