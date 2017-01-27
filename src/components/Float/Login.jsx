@@ -9,7 +9,8 @@ export default class Login extends Component {
 			loginEnabled: false,
 			user: "",
 			password: "",
-			loginInProgress: false
+			loginInProgress: false,
+			save: false
 		}
 	}
 
@@ -166,12 +167,19 @@ export default class Login extends Component {
 					this.setState({
 						loginInProgress: false
 					})
-					conf.set('databaseInfo',{
-						url: this.state.url,
-						user: this.state.user,
-						password: this.state.password
-					})
-					appStore.databaseInfo = conf.get('databaseInfo');
+
+					var dbinfo = {
+							url: this.state.url,
+							user: this.state.user,
+							password: this.state.password
+						}
+					
+					if (this.state.save){
+						conf.set('databaseInfo',dbinfo)	
+					}
+
+					appStore.databaseInfo = dbinfo;
+					
 					jQuery(this.refs.password).tooltip('hide')
 					jQuery(this.refs.urlspinner).tooltip('hide')
 					setTimeout(function(){
@@ -222,6 +230,10 @@ export default class Login extends Component {
 		}
 	}
 
+	_saveChange(event) {
+		this.setState({save: event.target.checked});
+	}
+
 	_urlChanged(event){
 		this.setState({url: event.target.value})
 	}
@@ -269,12 +281,19 @@ export default class Login extends Component {
 								<span className="input-group-addon" id="dbpwaddon">DB Password</span>
 								<input ref="password" value={this.state.password} onKeyDown={this._triggerLogin.bind(this)} onChange={this._passChanged.bind(this)} type="password" className="form-control" placeholder="neo4j" aria-describedby="dbpwaddon" />
 							</div>
-							<button ref="loginButton" disabled={!this.state.loginEnabled} type="button" onClick={this.checkDBCreds.bind(this)} className="btn btn-primary loginbutton has-spinner">
-								Login
-								<span className="button-spinner">
-									<i className="fa fa-spinner fa-spin" />
-								</span>
-							</button>
+							<div className="savecontainer">
+								<div className="checkbox logincheck">
+									<label><input value={this.state.save} onChange={this._saveChange.bind(this)} ref="save" type="checkbox" />Save Password</label>
+								</div>
+								<div className="buttoncontainer">
+									<button ref="loginButton" disabled={!this.state.loginEnabled} type="button" onClick={this.checkDBCreds.bind(this)} className="btn btn-primary loginbutton has-spinner">
+										Login
+										<span className="button-spinner">
+											<i className="fa fa-spinner fa-spin" />
+										</span>
+									</button>
+								</div>
+							</div>
 						</div>
 					</form>
 				</div>
