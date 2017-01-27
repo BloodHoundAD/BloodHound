@@ -43,7 +43,6 @@ export default class Login extends Component {
 			driver.close()
 		}
 		driver.onError = function(error){
-			console.log(error)
 			if (error.message && error.message.includes("encryption certificate has changed")){
 				var path = error.message.match("`(.*?)`")[1]
 				icon.removeClass();
