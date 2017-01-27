@@ -396,10 +396,19 @@ div.tooltip-inner-custom {
     margin-top: 5px;
 }
 
-.loginbutton {
-    display: block;
-    margin: auto;
-    margin-top: 5px;
+.savecontainer{
+    margin-top:10px;
+}
+
+.buttoncontainer {
+    width: 49%;
+    display:inline-block;
+    text-align: right;
+}
+
+.logincheck {
+    width: 49%;
+    display:inline-block;
 }
 
 .has-spinner.activate .button-spinner {
