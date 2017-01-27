@@ -49,33 +49,32 @@ export default class GraphContainer extends Component {
         s1.run("CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE")
             .then(function(){
                 s1.close()
+                 s2.run("CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE")
+                    .then(function(){
+                        s2.close()
+                        s3.run("CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE")
+                            .then(function(){
+                                s3.close()
+                                s4.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE")
+                                    .then(function(){
+                                        s4.close()
+                                    })
+                                    .catch(function(){
+                                        s4.close()
+                                    })
+                            })
+                            .catch(function(){
+                                s3.close()
+                            })
+                    })
+                    .catch(function(){
+                        s2.close()
+                    })
             })
             .catch(function(){
                 s1.close()
             })
-        s2.run("CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE")
-            .then(function(){
-                s2.close()
-            })
-            .catch(function(){
-                s2.close()
-            })
-        s3.run("CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE")
-            .then(function(){
-                s3.close()
-            })
-            .catch(function(){
-                s3.close()
-            })
-        s4.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE")
-            .then(function(){
-                s4.close()
-            })
-            .catch(function(){
-                s4.close()
-            })
-
-        
+       
         emitter.on('doLogout', function(){
             this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.refresh();
