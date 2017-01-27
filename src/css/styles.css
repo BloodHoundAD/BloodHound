@@ -401,13 +401,13 @@ div.tooltip-inner-custom {
 }
 
 .buttoncontainer {
-    width: 49%;
+    width: 50%;
     display:inline-block;
     text-align: right;
 }
 
 .logincheck {
-    width: 49%;
+    width: 50%;
     display:inline-block;
 }
 
