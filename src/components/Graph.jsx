@@ -764,10 +764,21 @@ export default class GraphContainer extends Component {
         });
 
         dagreListener.bind('stop', function(event){
-            emitter.emit('updateLoadingText', 'Done!');
-            setTimeout(function(){
-                emitter.emit('showLoadingIndicator', false);    
-            }, 1500)
+            var needsfix = false;
+            sigmaInstance.graph.nodes().forEach(function(node) {
+                if (isNaN(node.x)){
+                    emitter.emit('updateLoadingText', "Fixing Overlap");
+                    sigmaInstance.startNoverlap();
+                    needsfix = true;
+                    return
+                }
+            }, this);
+            if (!needsfix){
+                emitter.emit('updateLoadingText', 'Done!');
+                setTimeout(function(){
+                    emitter.emit('showLoadingIndicator', false);    
+                }, 1500)
+            }
         })
 
         dagreListener.bind('start', function(event){
