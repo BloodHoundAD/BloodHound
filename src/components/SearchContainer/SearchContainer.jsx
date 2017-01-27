@@ -68,10 +68,10 @@ export default class SearchContainer extends Component {
                 var session = driver.session()
                 var t = '(?i).*' + query + '.*'
                 var data = []
-                session.run("MATCH (n) WHERE n.name =~ {name} RETURN n.name LIMIT 10", {name:t})
+                session.run("MATCH (n) WHERE n.name =~ {name} RETURN n LIMIT 10", {name:t})
                     .then(function(results){
                         $.each(results.records, function(index, record){
-                            data.push(record._fields[0])
+                            data.push(record._fields[0].properties.name + "#" + record._fields[0].labels[0])
                         })
                         session.close()
                         return process(data)
@@ -80,7 +80,7 @@ export default class SearchContainer extends Component {
             afterSelect: function(selected) {
                 if (!this.state.pathfindingIsOpen) {
                     var statement = "MATCH (n) WHERE n.name = {name} RETURN n"
-                    emitter.emit('searchQuery', statement, {name: selected})
+                    emitter.emit('searchQuery', statement, {name: selected.split("#")[0]})
                 } else {
                     var start = jQuery(this.refs.searchbar).val();
                     var end = jQuery(this.refs.pathbar).val();
@@ -89,7 +89,43 @@ export default class SearchContainer extends Component {
                     }
                 }
             }.bind(this),
-            autoSelect: false
+            autoSelect: false,
+            updater: function(item){
+                return item.split("#")[0]
+            },
+            highlighter: function(item) {
+                var parts = item.split("#")
+                var query = this.query;
+                var icon = "";
+                var html = ""
+                switch (parts[1]){
+                    case "Group":
+                        icon = "<i style=\"float:right\" class=\"fa fa-users\"></i>"
+                        break;
+                    case "User":
+                        icon = "<i style=\"float:right\" class=\"fa fa-user\"></i>"
+                        break;
+                    case "Computer":
+                        icon = "<i style=\"float:right\" class=\"fa fa-desktop\"></i>"
+                        break;
+                    case "Domain":
+                        icon = "<i style=\"float:right\" class=\"fa fa-globe\"></i>"
+                        break
+                }
+
+                html = '<div>' + parts[0] + ' ' + icon + '</div>'
+
+                var reEscQuery = query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+                var reQuery = new RegExp('(' + reEscQuery + ')', "gi");
+
+                var jElem = $(html)
+                var textNodes = $(jElem.find('*')).add(jElem).contents().filter(function () { return this.nodeType === 3; });
+                textNodes.replaceWith(function() {
+                    return $(this).text().replace(reQuery, '<strong>$1</strong>')
+                });
+
+                return jElem.html();
+            }
             }
         )
 
@@ -98,10 +134,10 @@ export default class SearchContainer extends Component {
                 var session = driver.session()
                 var t = '(?i).*' + query + '.*'
                 var data = []
-                session.run("MATCH (n) WHERE n.name =~ {name} RETURN n.name LIMIT 10", {name:t})
+                session.run("MATCH (n) WHERE n.name =~ {name} RETURN n LIMIT 10", {name:t})
                     .then(function(results){
                         $.each(results.records, function(index, record){
-                            data.push(record._fields[0])
+                            data.push(record._fields[0].properties.name + "#" + record._fields[0].labels[0])
                         })
                         session.close()
                         return process(data)
@@ -114,7 +150,43 @@ export default class SearchContainer extends Component {
                     emitter.emit('pathQuery', start, end);
                 }
             }.bind(this),
-            autoSelect: false
+            autoSelect: false,
+            updater: function(item){
+                return item.split("#")[0]
+            },
+            highlighter: function(item) {
+                var parts = item.split("#")
+                var query = this.query;
+                var icon = "";
+                var html = ""
+                switch (parts[1]){
+                    case "Group":
+                        icon = "<i style=\"float:right\" class=\"fa fa-users\"></i>"
+                        break;
+                    case "User":
+                        icon = "<i style=\"float:right\" class=\"fa fa-user\"></i>"
+                        break;
+                    case "Computer":
+                        icon = "<i style=\"float:right\" class=\"fa fa-desktop\"></i>"
+                        break;
+                    case "Domain":
+                        icon = "<i style=\"float:right\" class=\"fa fa-globe\"></i>"
+                        break
+                }
+
+                html = '<div>' + parts[0] + ' ' + icon + '</div>'
+
+                var reEscQuery = query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+                var reQuery = new RegExp('(' + reEscQuery + ')', "gi");
+
+                var jElem = $(html)
+                var textNodes = $(jElem.find('*')).add(jElem).contents().filter(function () { return this.nodeType === 3; });
+                textNodes.replaceWith(function() {
+                    return $(this).text().replace(reQuery, '<strong>$1</strong>')
+                });
+
+                return jElem.html();
+            }
             }
         )
     }
