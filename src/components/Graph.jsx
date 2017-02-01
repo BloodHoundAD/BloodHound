@@ -766,7 +766,7 @@ export default class GraphContainer extends Component {
         dagreListener.bind('stop', function(event){
             var needsfix = false;
             sigmaInstance.graph.nodes().forEach(function(node) {
-                if (isNaN(node.x)){
+                if (isNaN(node.x) || isNaN(node.y)){
                     emitter.emit('updateLoadingText', "Fixing Overlap");
                     sigmaInstance.startNoverlap();
                     needsfix = true;
