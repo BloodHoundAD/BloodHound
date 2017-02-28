@@ -187,6 +187,10 @@ export function buildACLProps(rows) {
             rel = "ForceChangePassword"
         }
 
+        if (rel.includes('WriteOwner')){
+            rel = 'WriteOwner'
+        }
+
         var hash = (atype + rel + btype).toUpperCase()
         if (btype === 'Computer') {
             return
@@ -199,7 +203,7 @@ export function buildACLProps(rows) {
             })
         } else {
             datadict[hash] = {
-                statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:{} {name: prop.principal}) WITH a,b,prop MERGE (a)-[r:{}]->(b)'.format(atype, btype, rel),
+                statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:{} {name: prop.principal}) WITH a,b,prop MERGE (a)-[r:{} {isACL:true}]->(b)'.format(atype, btype, rel),
                 props: [{ account: a, principal: b }]
             }
         }
