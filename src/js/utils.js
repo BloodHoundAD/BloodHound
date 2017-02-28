@@ -179,14 +179,17 @@ export function buildACLProps(rows) {
         var btype = row.ObjectType.toTitleCase()
         var atype = row.PrincipalType.toTitleCase()
         var rel = row.ActiveDirectoryRights
+        var extright = row.AccessControlType
+
+        if (extright === 'All'){
+            rel = "AllExtendedRights"
+        }else if (extright === 'User-Force-Change-Password'){
+            rel = "ForceChangePassword"
+        }
 
         var hash = (atype + rel + btype).toUpperCase()
         if (btype === 'Computer') {
             return
-        }
-
-        if (rel.includes(' ')) {
-            rel = 'WriteDACL'
         }
 
         if (datadict[hash]) {
