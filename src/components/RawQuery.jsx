@@ -23,6 +23,11 @@ export default class RawQuery extends Component {
 		}
 	}
 
+	
+	componentWillMount() {
+		emitter.on('setRawQuery', this._setQueryFromEvent.bind(this))
+	}
+	
 	componentDidMount() {
 		$(this.refs.input).slideToggle(0)
 	}
@@ -32,6 +37,10 @@ export default class RawQuery extends Component {
 		this.setState({
 			open: !this.state.open
 		})
+	}
+
+	_setQueryFromEvent(query){
+		this.setState({val:query});
 	}
 
 	render() {
