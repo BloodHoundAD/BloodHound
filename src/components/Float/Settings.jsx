@@ -31,6 +31,7 @@ export default class Settings extends Component {
 		$(this.refs.check).prop('checked', appStore.performance.lowGraphics)
 
 		$(this.refs.outer).fadeToggle(0)
+		$(this.refs.outer).draggable()
 	}
 
 	edgeChange(event, data){
@@ -50,6 +51,12 @@ export default class Settings extends Component {
 		appStore.performance.lowGraphics = event.target.checked
 		conf.set('performance', appStore.performance)
 		emitter.emit('changeGraphicsMode')
+	}
+
+	onDebugChange(event){
+		$(this.refs.debug).prop('checked', event.target.checked)
+		appStore.performance.debug = event.target.checked
+		conf.set('performance', appStore.performance)
 	}
 
 	closeSettings(){
@@ -104,6 +111,16 @@ export default class Settings extends Component {
 							<input type="number" min="0" max="20" className="sliderinput" ref="edgeinput" />
 						</span>
 					</div>
+					<div className="checkbox-inline">
+						<label>
+							<input ref="debug" type="checkbox" onChange={this.onDebugChange.bind(this)}/> Query Debug Mode
+						</label>
+					</div>
+					<i data-toggle="tooltip" 
+							data-placement="right" 
+							title="Dump queries run into the Raw Query Box" 
+							className="glyphicon glyphicon-question-sign"></i>
+					<br />
 					<div className="checkbox-inline">
 						<label>
 							<input ref="check" type="checkbox" onChange={this.onGfxChange.bind(this)}/> Low Detail Mode

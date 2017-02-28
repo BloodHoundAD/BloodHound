@@ -355,6 +355,9 @@ export default class GraphContainer extends Component {
     }
 
     doQueryNative(params){
+        if (appStore.performance.debug){
+            emitter.emit('setRawQuery',params.statement);
+        }
         var sigmaInstance = this.state.sigmaInstance
         var nodes = {}
         var edges = {}
