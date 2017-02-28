@@ -21,6 +21,13 @@
 			}
 		},
 		{
+			"name": "Find logged in admins",
+			"requireNodeSelect": false,
+			"query": "MATCH p=(a:Computer)-[r:HasSession]->(b:User) WITH a,b,r MATCH p=shortestPath((b)-[:AdminTo|MemberOf*1..]->(a)) RETURN b,a,r",
+			"allowCollapse": true,
+			"props": {}
+		},
+		{
 			"name": "Find Top 10 Users with Most Sessions",
 			"requireNodeSelect": false,
 			"query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH (m)-[r:HasSession]->(n) RETURN n,r,m",

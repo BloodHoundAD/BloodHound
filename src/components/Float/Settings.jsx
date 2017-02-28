@@ -29,6 +29,7 @@ export default class Settings extends Component {
 		$(this.refs.sibling).simpleSlider('setValue', appStore.performance.sibling)
 
 		$(this.refs.check).prop('checked', appStore.performance.lowGraphics)
+		$(this.refs.debug).prop('checked', appStore.performance.debug)
 
 		$(this.refs.outer).fadeToggle(0)
 		$(this.refs.outer).draggable()
