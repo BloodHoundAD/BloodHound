@@ -179,13 +179,17 @@ export function buildACLProps(rows) {
         var btype = row.ObjectType.toTitleCase()
         var atype = row.PrincipalType.toTitleCase()
         var rel = row.ActiveDirectoryRights
-        var extright = row.AccessControlType
+        var extright = row.ACEType
 
         if (extright === 'All'){
             rel = "AllExtendedRights"
         }else if (extright === 'User-Force-Change-Password'){
             rel = "ForceChangePassword"
+        }else if (rel === "ExtendedRight"){
+            rel = extright
         }
+
+        rel = rel.replace(/-/g,"")
 
         if (rel.includes('WriteOwner')){
             rel = 'WriteOwner'
