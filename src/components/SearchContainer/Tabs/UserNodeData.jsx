@@ -172,7 +172,7 @@ export default class UserNodeData extends Component {
 							ready={this.state.firstDegreeLocalAdmin !== -1}
 							value={this.state.firstDegreeLocalAdmin}
 							click={function(){
-								emitter.emit('query', "MATCH p = (n:User {name:{name}})-[r:AdminTo]->(c:Computer) RETURN payload", {name:this.state.label})
+								emitter.emit('query', "MATCH p = (n:User {name:{name}})-[r:AdminTo]->(c:Computer) RETURN p", {name:this.state.label})
 							}.bind(this)} />
 					</dd>
 					<dt>
