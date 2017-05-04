@@ -20,7 +20,13 @@ export default class UserNodeData extends Component {
 			firstDegreeLocalAdmin: -1,
 			groupDelegatedLocalAdmin: -1,
 			derivativeLocalAdmin: -1,
-			sessions: -1
+			sessions: -1,
+			firstdegreeControllers: -1,
+			unrolledControllers: -1,
+			transitiveControllers: -1,
+			firstdegreeControl: -1,
+			unrolledControl: -1,
+			transitiveControl: -1
 		}
 
 		emitter.on('userNodeClicked', this.getNodeData.bind(this));
@@ -38,7 +44,13 @@ export default class UserNodeData extends Component {
 			firstDegreeLocalAdmin: -1,
 			groupDelegatedLocalAdmin: -1,
 			derivativeLocalAdmin: -1,
-			sessions: -1
+			sessions: -1,
+			firstdegreeControllers: -1,
+			unrolledControllers: -1,
+			transitiveControllers: -1,
+			firstdegreeControl: -1,
+			unrolledControl: -1,
+			transitiveControl: -1
 		})
 
 		var domain = '@' + payload.split('@').last()
@@ -50,6 +62,12 @@ export default class UserNodeData extends Component {
 		var s5 = driver.session()
 		var s6 = driver.session()
 		var s7 = driver.session()
+		var s8 = driver.session()
+		var s9 = driver.session()
+		var s10 = driver.session()
+		var s11 = driver.session()
+		var s12 = driver.session()
+		var s13 = driver.session()
 
 		s1.run("MATCH (n:Group) WHERE NOT n.name ENDS WITH {domain} WITH n MATCH (m:User {name:{name}}) MATCH (m)-[r:MemberOf*1..]->(n) RETURN count(n)", {name:payload, domain: domain})
 			.then(function(result){
@@ -92,6 +110,42 @@ export default class UserNodeData extends Component {
 				this.setState({'sessions':result.records[0]._fields[0].low})
 				s7.close()
 			}.bind(this))
+
+		s8.run("MATCH p = (n)-[r:AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(u1:User {name: {name}}) RETURN COUNT(DISTINCT(n))", {name:payload})
+			.then(function(result){
+				this.setState({'firstdegreeControllers':result.records[0]._fields[0].low})
+				s8.close()
+			}.bind(this))
+
+		s9.run("MATCH p = (n1)-[r:MemberOf*1..]->(g:Group)-[r1:AddMembers|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(u:User {name: {name}}) WITH LENGTH(p) as pathLength, p, n1 WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = u.name) AND NOT n1.name = u.name RETURN COUNT(DISTINCT(n1))", {name:payload})
+			.then(function(result){
+				this.setState({'unrolledControllers':result.records[0]._fields[0].low})
+				s9.close()
+			}.bind(this))
+
+		s10.run("MATCH p = shortestPath((n1)-[r1:MemberOf|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(u1:User {name: {name}})) RETURN COUNT(DISTINCT(n1))", {name:payload})
+			.then(function(result){
+				this.setState({'transitiveControllers':result.records[0]._fields[0].low})
+				s10.close()
+			}.bind(this))
+
+		s11.run("MATCH p = (u:User {name:{name}})-[r1:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
+			.then(function(result){
+				this.setState({'firstdegreeControl':result.records[0]._fields[0].low})
+				s11.close()
+			}.bind(this))
+
+		s12.run("MATCH p = (u:User {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
+			.then(function(result){
+				this.setState({'unrolledControl':result.records[0]._fields[0].low})
+				s12.close()
+			}.bind(this))
+
+		s13.run("MATCH p = shortestPath((u:User {name:{name}})-[r1:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) RETURN COUNT(DISTINCT(n))", {name:payload})
+			.then(function(result){
+				this.setState({'transitiveControl':result.records[0]._fields[0].low})
+				s13.close()
+			}.bind(this))
 	}
 
 	render() {
@@ -99,13 +153,15 @@ export default class UserNodeData extends Component {
 		return (
 			<div className={this.props.visible ? "" : "displaynone"}>
 				<dl className='dl-horizontal'>
+                    <h4>
+                        Node Info
+                    </h4>
 					<dt>
-						Node
+						Name
 					</dt>
 					<dd>
 						{this.state.label}
 					</dd>
-					<br />
 					<dt>
 						SAMAccountName
 					</dt>
@@ -124,7 +180,20 @@ export default class UserNodeData extends Component {
 					<dd>
 						{this.state.pwdLastChanged}
 					</dd>
+					<dt>
+						Sessions
+					</dt>
+					<dd>
+						<NodeALink
+							ready={this.state.sessions !== -1}
+							value={this.state.sessions}
+							click={function(){
+								emitter.emit('query', "MATCH (n:Computer)-[r:HasSession]->(m:User {name:{name}}) RETURN n,r,m", {name:this.state.label}
+									,this.state.label)
+							}.bind(this)} />
+					</dd>
 					<br />
+					<h4>Group Membership</h4>
 					<dt>
 						First Degree Group Memberships
 					</dt>
@@ -164,6 +233,9 @@ export default class UserNodeData extends Component {
 							}.bind(this)} />
 					</dd>
 					<br />
+					<h4>
+					    Local Admin Rights
+					</h4>
 					<dt>
 						First Degree Local Admin
 					</dt>
@@ -172,7 +244,7 @@ export default class UserNodeData extends Component {
 							ready={this.state.firstDegreeLocalAdmin !== -1}
 							value={this.state.firstDegreeLocalAdmin}
 							click={function(){
-								emitter.emit('query', "MATCH p = (n:User {name:{name}})-[r:AdminTo]->(c:Computer) RETURN payload", {name:this.state.label})
+								emitter.emit('query', "MATCH p = (n:User {name:{name}})-[r:AdminTo]->(c:Computer) RETURN p", {name:this.state.label})
 							}.bind(this)} />
 					</dd>
 					<dt>
@@ -199,15 +271,80 @@ export default class UserNodeData extends Component {
 									,this.state.label)
 							}.bind(this)} />
 					</dd>
+					<br />
+					<h4>
+					    Outbound Object Control
+					</h4>
 					<dt>
-						Sessions
+						First Degree Object Control
 					</dt>
 					<dd>
 						<NodeALink
-							ready={this.state.sessions !== -1}
-							value={this.state.sessions}
+							ready={this.state.firstdegreeControl !== -1}
+							value={this.state.firstdegreeControl}
 							click={function(){
-								emitter.emit('query', "MATCH (n:Computer)-[r:HasSession]->(m:User {name:{name}}) RETURN n,r,m", {name:this.state.label}
+								emitter.emit('query', "MATCH p = (u:User {name:{name}})-[r1:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN p", {name:this.state.label})
+							}.bind(this)} />
+					</dd>
+					<dt>
+						Group Delegated Object Control
+					</dt>
+					<dd>
+						<NodeALink
+							ready={this.state.unrolledControl !== -1}
+							value={this.state.unrolledControl}
+							click={function(){
+								emitter.emit('query', "MATCH p = (u:User {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN p", {name:this.state.label}
+									,this.state.label)
+							}.bind(this)} />
+					</dd>
+					<dt>
+						Transitive Object Control
+					</dt>
+					<dd>
+						<NodeALink
+							ready={this.state.transitiveControl !== -1}
+							value={this.state.transitiveControl}
+							click={function(){	
+								emitter.emit('query', "MATCH p = shortestPath((u:User {name:{name}})-[r1:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) RETURN p", {name:this.state.label}
+									,this.state.label)
+							}.bind(this)} />
+					</dd>
+					<br />
+					<h4>Inbound Object Control</h4>
+					<dt>
+					    Explicit Object Controllers
+					</dt>
+					<dd>
+						<NodeALink
+							ready={this.state.firstdegreeControllers !== -1}
+							value={this.state.firstdegreeControllers}
+							click={function(){	
+								emitter.emit('query', "MATCH p = (n)-[r:AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(u1:User {name: {name}}) RETURN p", {name:this.state.label}
+									,this.state.label)
+							}.bind(this)} />
+					</dd>
+					<dt>
+					    Unrolled Object Controllers
+					</dt>
+					<dd>
+						<NodeALink
+							ready={this.state.unrolledControllers !== -1}
+							value={this.state.unrolledControllers}
+							click={function(){	
+								emitter.emit('query', "MATCH p = (n1)-[r:MemberOf*1..]->(g:Group)-[r1:AddMembers|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(u:User {name: {name}}) WITH LENGTH(p) as pathLength, p, n1 WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = u.name) AND NOT n1.name = u.name RETURN p", {name:this.state.label}
+									,this.state.label)
+							}.bind(this)} />
+					</dd>
+					<dt>
+					    Transitive Object Controllers
+					</dt>
+					<dd>
+						<NodeALink
+							ready={this.state.transitiveControllers !== -1}
+							value={this.state.transitiveControllers}
+							click={function(){	
+								emitter.emit('query', "MATCH p = shortestPath((n1)-[r1:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(u1:User {name: {name}})) RETURN p", {name:this.state.label}
 									,this.state.label)
 							}.bind(this)} />
 					</dd>

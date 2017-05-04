@@ -102,6 +102,13 @@ global.appStore = {
             'AdminTo': 'tapered',
             'MemberOf': 'tapered',
             'HasSession': 'tapered',
+            'AllExtendedRights': 'tapered',
+            'ForceChangePassword': 'tapered',
+            'GenericAll': 'tapered',
+            'GenericWrite': 'tapered',
+            'WriteDACL': 'tapered',
+            'WriteOwner': 'tapered',
+            'AddMembers': 'tapered',
             'TrustedBy': 'curvedArrow'
         }
     },
@@ -116,6 +123,13 @@ global.appStore = {
             'AdminTo': 'line',
             'MemberOf': 'line',
             'HasSession': 'line',
+            'AllExtendedRights': 'line',
+            'ForceChangePassword': 'line',
+            'GenericAll': 'line',
+            'GenericWrite': 'line',
+            'WriteDACL': 'line',
+            'WriteOwner': 'line',
+            'AddMembers': 'line',
             'TrustedBy': 'curvedArrow'
         }
     },
