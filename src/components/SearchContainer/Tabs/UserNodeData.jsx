@@ -344,7 +344,7 @@ export default class UserNodeData extends Component {
 							ready={this.state.transitiveControllers !== -1}
 							value={this.state.transitiveControllers}
 							click={function(){	
-								emitter.emit('query', "MATCH p = shortestPath((n1)-[r1:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(u1:User {name: {name}})) RETURN p", {name:this.state.label}
+								emitter.emit('query', "MATCH p = shortestPath((n1)-[r1:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(u1:User {name: {name}})) RETURN p", {name:this.state.label}
 									,this.state.label)
 							}.bind(this)} />
 					</dd>
