@@ -183,6 +183,10 @@ div.tooltip-inner-custom {
     margin-bottom: 1em;
 }
 
+.dl-horizontal{
+    margin-right: 10px;
+}
+
 .dl-horizontal dt {
     width: auto;
     padding-right: 1em;
@@ -597,7 +601,6 @@ div.tooltip-inner-custom {
 
 .sliderfix .slideinline {
     display: inline-block;
-    float: left;
 }
 
 .sliderfix .slideinline > .track {
@@ -694,10 +697,6 @@ div.tooltip-inner-custom {
     top: 1em;
     right: 1em;
     overflow: visible;
-}
-
-.menudiv > div {
-
 }
 
 .menudiv > div > button{
