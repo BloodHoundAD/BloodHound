@@ -59,7 +59,8 @@ export default class SpotlightContainer extends Component {
 						<tbody ref="spotlight-tbody" className="searchable">
 							{Object.keys(this.state.data).map(function(key){
 								var d = this.state.data[key]
-								var x = this.state.rex.test(d[0]) ? <SpotlightRow key={key} nodeId={key} parentNodeId={d[1]} nodeLabel={d[0]} parentNodeLabel={d[2]} nodeType={d[3]} parentNodeType={d[4]} /> : null
+								var nid = parseInt(key)
+								var x = this.state.rex.test(d[0]) ? <SpotlightRow key={key} nodeId={nid} parentNodeId={d[1]} nodeLabel={d[0]} parentNodeLabel={d[2]} nodeType={d[3]} parentNodeType={d[4]} /> : null
 								return x
 							}.bind(this))}
 						</tbody>

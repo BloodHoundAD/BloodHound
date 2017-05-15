@@ -39,23 +39,15 @@ export default class Login extends Component {
 		icon.removeClass();
 		icon.addClass("fa fa-spinner fa-spin form-control-feedback");
 		icon.toggle(true);
-		var driver = neo4j.driver(url)
+		var driver = neo4j.driver(url, neo4j.auth.basic("",""), {encrypted:'ENCRYPTION_ON'})
+		var session = driver.session();
+
 		driver.onCompleted = function(){
+			session.close()
 			driver.close()
 		}
 		driver.onError = function(error){
-			if (error.message && error.message.includes("encryption certificate has changed")){
-				var path = error.message.match("`(.*?)`")[1]
-				icon.removeClass();
-				icon.addClass("fa fa-times-circle red-icon-color form-control-feedback");
-				icon.attr('data-original-title', 'Certificate error - delete localhost line in {}'.format(path))
-					.tooltip('fixTitle')
-					.tooltip('show')
-				this.setState({
-					loginInProgress: false,
-					loginEnabled: false
-				})
-			}else if (error.fields && error.fields[0].code === "Neo.ClientError.Security.Unauthorized"){
+			if (error.message.includes("authentication failure")){
 				icon.removeClass();
 				icon.addClass("fa fa-check-circle green-icon-color form-control-feedback");
 				this.setState({loginEnabled: true, url: url})
@@ -70,9 +62,10 @@ export default class Login extends Component {
 					loginEnabled: false
 				})
 			}
+			session.close()
 			driver.close()
 		}.bind(this)
-		driver.session();
+		session.run("return 1")
 	}
 
 	checkDBCreds(){
@@ -89,7 +82,8 @@ export default class Login extends Component {
 
 		var driver = neo4j.driver(this.state.url, neo4j.auth.basic(this.state.user, this.state.password))
 		driver.onError = function(error){
-			if (error.fields && error.fields[0].code === "Neo.ClientError.Security.Unauthorized"){
+			console.log(error)
+			if (error.message.includes("authentication failure")){
 				btn.removeClass('activate');
 				this.setState({
 					loginInProgress: false,
@@ -98,7 +92,7 @@ export default class Login extends Component {
 				pwf.attr('data-original-title', 'Invalid username or password')
 					.tooltip('fixTitle')
 					.tooltip('show')
-			}else if (error.fields && error.fields[0].code === "Neo.ClientError.Security.AuthenticationRateLimit"){
+			}else if (error.message.includes("too many times in a row")){
 				btn.removeClass('activate');
 				this.setState({
 					loginInProgress: false,
@@ -107,24 +101,6 @@ export default class Login extends Component {
 				pwf.attr('data-original-title', 'Too many authentication attempts, please wait')
 					.tooltip('fixTitle')
 					.tooltip('show')
-			}else if (error.message && error.message.includes("encryption certificate has changed")){
-				var path = error.message.match("`(.*?)`")[1]
-				var icon = this.state.icon
-				icon.toggle('true')
-				icon.removeClass();
-				icon.addClass("fa fa-times-circle red-icon-color form-control-feedback");
-				jQuery(icon).tooltip({
-					placement : 'right',
-					title: 'Certificate error - delete localhost line in ' + path,
-					container: 'body',
-					delay: {show: 200, hide: 0},
-					template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-custom"></div></div>'
-				})
-				this.setState({
-					loginInProgress: false,
-					loginEnabled: false
-				})
-				jQuery(icon).tooltip('show')
 			}else if (error.toString().includes('ECONNREFUSED')){
 				var icon = this.state.icon
 				icon.toggle('true')

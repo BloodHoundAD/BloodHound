@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import NodeALink from './NodeALink'
+import PropTypes from 'prop-types'
 
 export default class GroupNodeData extends Component {
-	propTypes: {
-		visible : React.PropTypes.bool.isRequired
-	}
-
 	constructor(){
 		super();
 
@@ -384,4 +381,8 @@ export default class GroupNodeData extends Component {
 			</div>
 		);
 	}
+}
+
+GroupNodeData.propTypes = {
+	visible : React.PropTypes.bool.isRequired
 }

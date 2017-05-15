@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types'
 
 export default class Icon extends Component {
-	propTypes: {
-		glyph : React.PropTypes.string.isRequired,
-		extraClass : React.PropTypes.string
-	}
-
 	constructor(props){
 		super(props);
 	}
@@ -15,4 +11,9 @@ export default class Icon extends Component {
 			<i className={"glyphicon glyphicon-" + this.props.glyph + " " + this.props.extraClass}></i>
 		);
 	}
+}
+
+Icon.propTypes =  {
+	glyph : React.PropTypes.string.isRequired,
+	extraClass : React.PropTypes.string
 }

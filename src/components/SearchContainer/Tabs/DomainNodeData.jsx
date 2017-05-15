@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import NodeALink from './NodeALink.jsx'
 import LoadLabel from './LoadLabel.jsx'
+import PropTypes from 'prop-types'
 
 export default class DomainNodeData extends Component {
-	propTypes: {
-		visible : React.PropTypes.bool.isRequired
-	}
-
 	constructor(){
 		super();
 
@@ -223,4 +220,8 @@ export default class DomainNodeData extends Component {
 			</div>
 		);
 	}
+}
+
+DomainNodeData.propTypes = {
+	visible : React.PropTypes.bool.isRequired
 }

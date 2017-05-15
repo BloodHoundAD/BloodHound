@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
 import { If, Then, Else } from 'react-if';
+import PropTypes from 'prop-types'
 
 export default class NodeALink extends Component {
-	propTypes: {
-		ready : React.PropTypes.bool.isRequired,
-		click : React.PropTypes.func,
-		value : React.PropTypes.number
-	}
 	constructor(props){
 		super(props);
 	}
@@ -24,4 +20,10 @@ export default class NodeALink extends Component {
 			</If>
 		);
 	}
+}
+
+NodeALink.propTypes = {
+	ready : React.PropTypes.bool.isRequired,
+	click : React.PropTypes.func,
+	value : React.PropTypes.number
 }

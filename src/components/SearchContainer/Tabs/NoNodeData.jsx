@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types'
 
 export default class NoNodeData extends Component {
-	propTypes: {
-		visible : React.PropTypes.bool.isRequired
-	}
-
 	render() {
 		return (
 			<div className={this.props.visible ? "" : "hidden"}>
@@ -17,4 +14,9 @@ export default class NoNodeData extends Component {
 			</div>
 		);
 	}
+}
+
+
+NoNodeData.propTypes = {
+	visible : React.PropTypes.bool.isRequired
 }

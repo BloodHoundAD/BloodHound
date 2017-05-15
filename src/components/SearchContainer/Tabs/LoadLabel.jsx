@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import { If, Then, Else } from 'react-if';
+import PropTypes from 'prop-types'
 
 export default class LoadLabel extends Component {
-	propTypes: {
-		ready : React.PropTypes.bool.isRequired,
-		value : React.PropTypes.number
-	}
 	constructor(props){
 		super(props);
 	}
@@ -23,4 +20,9 @@ export default class LoadLabel extends Component {
 			</If>
 		);
 	}
+}
+
+LoadLabel.propTypes = {
+	ready : React.PropTypes.bool.isRequired,
+	value : React.PropTypes.number
 }

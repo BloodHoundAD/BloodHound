@@ -1,15 +1,8 @@
 import React, { Component } from 'react';
 import { If, Then, Else } from 'react-if';
+import PropTypes from 'prop-types'
 
-export default class GlyphiconSpan extends Component {
-	propTypes: {
-	    classes : React.PropTypes.string,
-	    tooltipDir : React.PropTypes.string,
-	    tooltipTitle : React.PropTypes.string,
-	    tooltip : React.PropTypes.bool.isRequired,
-	    click: React.PropTypes.func
-	}
-	
+export default class GlyphiconSpan extends Component {	
 	constructor(props){
 		super(props);
 	}
@@ -30,4 +23,12 @@ export default class GlyphiconSpan extends Component {
 			</If>
 		);
 	}
+}
+
+GlyphiconSpan.propTypes = {
+	classes : React.PropTypes.string,
+	tooltipDir : React.PropTypes.string,
+	tooltipTitle : React.PropTypes.string,
+	tooltip : React.PropTypes.bool.isRequired,
+	click: React.PropTypes.func
 }

@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types'
 
 export default class ProgressBarMenuButton extends Component {
-	propTypes: {
-		progress : React.PropTypes.number.isRequired,
-		click : React.PropTypes.func.isRequired
-	}
-
 	constructor(){
 		super()
 
@@ -77,3 +73,8 @@ export default class ProgressBarMenuButton extends Component {
 		);
 	}
 }
+
+ProgressBarMenuButton.propTypes = {
+		progress : React.PropTypes.number.isRequired,
+		click : React.PropTypes.func.isRequired
+	}
