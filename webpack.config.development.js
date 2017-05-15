@@ -1,15 +1,27 @@
 var webpack = require('webpack');
-var webpackTargetElectronRenderer = require('webpack-target-electron-renderer');
 var path = require('path')
 
 var config = {
+  target: 'electron-renderer',
+  externals: [{
+    'electron-config': 'electron-config'
+  }],
   entry: [
     'webpack-hot-middleware/client?reload=true&path=http://localhost:9000/__webpack_hmr',
     './src/index',
   ],
   module: {
-    loaders: [{test: /\.jsx?$/,loaders: ['babel-loader'], exclude: /node_modules/
-    }]
+    rules: [
+      {
+        test: /\.jsx?$/,
+        exclude: /(node_modules)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+          }
+        } 
+      }
+    ]
   },
   output: {
     path: __dirname + '/dist',
@@ -17,7 +29,7 @@ var config = {
     filename: 'bundle.js'
   },
   resolve: {
-    extensions: ['', '.js', '.jsx'],
+    extensions: ['.js', '.jsx'],
     alias: {
       utils: path.resolve(__dirname, 'src', 'js', 'utils.js'),
       modals: path.resolve(__dirname, 'src', 'components', 'Modals')
@@ -31,7 +43,4 @@ var config = {
     __filename: false
   }
 };
-
-config.target = webpackTargetElectronRenderer(config);
-
 module.exports = config;

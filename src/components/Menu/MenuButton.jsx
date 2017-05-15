@@ -1,12 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types'
 
 export default class MenuButton extends Component {
-	propTypes: {
-		hoverVal : React.PropTypes.string.isRequired,
-		glyphicon : React.PropTypes.string.isRequired,
-		click : React.PropTypes.func.isRequired
-	}
-
 	_leave(e){
 		var target = $(e.target)
 		target.css('width', 'auto')
@@ -43,4 +38,10 @@ export default class MenuButton extends Component {
 			</button>
 		);
 	}
+}
+
+MenuButton.propTypes =  {
+	hoverVal : React.PropTypes.string.isRequired,
+	glyphicon : React.PropTypes.string.isRequired,
+	click : React.PropTypes.func.isRequired
 }

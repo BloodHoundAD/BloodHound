@@ -1,15 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types'
 
 export default class SpotlightRow extends Component {
-	propTypes: {
-	 	nodeId : React.PropTypes.number.isRequired,
-	 	parentNodeId : React.PropTypes.number.isRequired,
-	 	nodeLabel : React.PropTypes.string.isRequired,
-	 	parentNodeLabel : React.PropTypes.string.isRequired,
-		nodeType: React.PropTypes.string.isRequired,
-		parentNodeType: React.PropTypes.string.isRequired
-	}
-
 	_handleClick(){
 		emitter.emit('spotlightClick', this.props.nodeId, this.props.parentNodeId)
 	}
@@ -59,4 +51,13 @@ export default class SpotlightRow extends Component {
 			</tr>
 		);
 	}
+}
+
+SpotlightRow.propTypes = {
+	nodeId : React.PropTypes.number.isRequired,
+	parentNodeId : React.PropTypes.number.isRequired,
+	nodeLabel : React.PropTypes.string.isRequired,
+	parentNodeLabel : React.PropTypes.string.isRequired,
+	nodeType: React.PropTypes.string.isRequired,
+	parentNodeType: React.PropTypes.string.isRequired
 }

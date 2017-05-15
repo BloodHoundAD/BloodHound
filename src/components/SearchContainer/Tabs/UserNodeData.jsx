@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import NodeALink from './NodeALink'
+import PropTypes from 'prop-types'
 
 export default class UserNodeData extends Component {
-	propTypes: {
-		visible : React.PropTypes.bool.isRequired
-	}
-
 	constructor(){
 		super();
 
@@ -352,4 +349,8 @@ export default class UserNodeData extends Component {
 			</div>
 		);
 	}
+}
+
+UserNodeData.propTypes = {
+	visible : React.PropTypes.bool.isRequired
 }
