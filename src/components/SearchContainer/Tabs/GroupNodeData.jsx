@@ -23,13 +23,18 @@ export default class GroupNodeData extends Component {
 			transitiveControl: -1,
 			firstDegreeControllers: -1,
 			unrolledControllers: -1,
-			transitiveControllers: -1
+			transitiveControllers: -1,
+			driversessions: []
 		}
 
 		emitter.on('groupNodeClicked', this.getNodeData.bind(this));
 	}
 
 	getNodeData(payload){
+		$.each(this.state.driversessions, function(index, record){
+			record.close();
+		})
+
 		this.setState({
 			label: payload,
 			directMembers: -1,
@@ -163,7 +168,8 @@ export default class GroupNodeData extends Component {
 				this.setState({'transitiveControllers':result.records[0]._fields[0].low})
 				s7.close()
 			}.bind(this))
-			
+		
+		this.setState({'driversessions': [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16]})
 	}
 
 	render() {

@@ -21,13 +21,17 @@ export default class ComputerNodeData extends Component {
 			firstdegreeControl: -1,
 			groupDelegatedControl: -1,
 			transitiveControl: -1,
-			derivativeLocalAdmins: -1
+			derivativeLocalAdmins: -1,
+			driversessions: []
 		}
 
 		emitter.on('computerNodeClicked', this.getNodeData.bind(this));
 	}
 
 	getNodeData(payload){
+		$.each(this.state.driversessions, function(index, record){
+			record.close();
+		})
 		this.setState({
 			label: payload,
 			os: "None",
@@ -59,7 +63,6 @@ export default class ComputerNodeData extends Component {
 		var s11 = driver.session()
 		var s12 = driver.session()
 		var s13 = driver.session()
-		var s14 = driver.session()
 
 		s1.run("MATCH (a)-[b:AdminTo]->(c:Computer {name:{name}}) RETURN count(a)", {name:payload})
 			.then(function(result){
@@ -138,6 +141,8 @@ export default class ComputerNodeData extends Component {
 				this.setState({'transitiveControl':result.records[0]._fields[0].low})
 				s8.close()
 			}.bind(this))
+		
+		this.setState({'driversessions': [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13]})
 	}
 
 	render() {

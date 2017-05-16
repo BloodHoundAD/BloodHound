@@ -23,13 +23,18 @@ export default class UserNodeData extends Component {
 			transitiveControllers: -1,
 			firstdegreeControl: -1,
 			unrolledControl: -1,
-			transitiveControl: -1
+			transitiveControl: -1,
+			driversessions : []
 		}
 
 		emitter.on('userNodeClicked', this.getNodeData.bind(this));
 	}
 
 	getNodeData(payload){
+		$.each(this.state.driversessions,function(index, record){
+			record.close();
+		})
+
 		this.setState({
 			label: payload,
 			samAccountName: "None",
@@ -143,6 +148,8 @@ export default class UserNodeData extends Component {
 				this.setState({'transitiveControl':result.records[0]._fields[0].low})
 				s13.close()
 			}.bind(this))
+		
+		this.setState({'driversessions': [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13]})
 	}
 
 	render() {
