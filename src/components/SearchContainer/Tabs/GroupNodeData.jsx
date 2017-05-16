@@ -118,55 +118,55 @@ export default class GroupNodeData extends Component {
 		s8.run("MATCH p = (n)-[r:MemberOf*1..]->(g:Group {name:{name}}) WHERE NOT g.domain = n.domain RETURN COUNT(DISTINCT(n))", {name:payload})
 			.then(function(result){
 				this.setState({'foreignGroupMembers':result.records[0]._fields[0].low})
-				s7.close()
+				s8.close()
 			}.bind(this))
 
 		s9.run("MATCH p = (g1:Group {name:{name}})-[r:MemberOf]->(g2:Group) RETURN COUNT(DISTINCT(g2))", {name:payload})
 			.then(function(result){
 				this.setState({'firstDegreeGroupMembership':result.records[0]._fields[0].low})
-				s7.close()
+				s9.close()
 			}.bind(this))
 
 		s10.run("MATCH p = (g1:Group {name:{name}})-[r1:MemberOf*1..]->(g2:Group)-[r2:AdminTo]->(c:Computer) RETURN COUNT(DISTINCT(c))", {name:payload})
 			.then(function(result){
 				this.setState({'groupDelegatedAdmin':result.records[0]._fields[0].low})
-				s7.close()
+				s10.close()
 			}.bind(this))
 
 		s11.run("MATCH p = (g:Group {name:{name}})-[r:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
 			.then(function(result){
 				this.setState({'firstdegreeControl':result.records[0]._fields[0].low})
-				s7.close()
+				s11.close()
 			}.bind(this))
 
 		s12.run("MATCH p = (g1:Group {name:{name}})-[r1:MemberOf*1..]->(g2:Group)-[r2:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
 			.then(function(result){
 				this.setState({'groupDelegatedControl':result.records[0]._fields[0].low})
-				s7.close()
+				s12.close()
 			}.bind(this))
 
 		s13.run("MATCH p = shortestPath((g:Group {name:{name}})-[r:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) RETURN COUNT(DISTINCT(n))", {name:payload})
 			.then(function(result){
 				this.setState({'transitiveControl':result.records[0]._fields[0].low})
-				s7.close()
+				s13.close()
 			}.bind(this))
 
 		s14.run("MATCH p = (n)-[r:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(g:Group {name:{name}}) RETURN COUNT(DISTINCT(n))", {name:payload})
 			.then(function(result){
 				this.setState({'firstDegreeControllers':result.records[0]._fields[0].low})
-				s7.close()
+				s14.close()
 			}.bind(this))
 
 		s15.run("MATCH p = (n1)-[r:MemberOf*1..]->(g1:Group)-[r1:AddMembers|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(g2:Group {name: {name}}) WITH LENGTH(p) as pathLength, p, n1 WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = g2.name) AND NOT n1.name = g2.name RETURN COUNT(DISTINCT(n1))", {name:payload})
 			.then(function(result){
 				this.setState({'unrolledControllers':result.records[0]._fields[0].low})
-				s7.close()
+				s15.close()
 			}.bind(this))
 
 		s16.run("MATCH p = shortestPath((n)-[r:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(g:Group {name:{name}})) RETURN COUNT(DISTINCT(n))", {name:payload})
 			.then(function(result){
 				this.setState({'transitiveControllers':result.records[0]._fields[0].low})
-				s7.close()
+				s16.close()
 			}.bind(this))
 		
 		this.setState({'driversessions': [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16]})
