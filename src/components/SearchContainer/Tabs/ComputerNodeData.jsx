@@ -115,31 +115,31 @@ export default class ComputerNodeData extends Component {
 		s9.run("MATCH p = shortestPath((n)-[r:AdminTo|MemberOf|HasSession*1..]->(m:Computer {name:{name}})) RETURN COUNT(DISTINCT(n))", {name:payload})
 			.then(function(result){
 				this.setState({'derivativeLocalAdmins':result.records[0]._fields[0].low})
-				s8.close()
+				s9.close()
 			}.bind(this))
 
 		s10.run("MATCH p = (c:Computer {name:{name}})-[r:MemberOf*1..]->(g:Group) WHERE NOT g.domain = c.domain RETURN COUNT(DISTINCT(g))", {name:payload})
 			.then(function(result){
 				this.setState({'foreignGroupMembership':result.records[0]._fields[0].low})
-				s8.close()
+				s10.close()
 			}.bind(this))
 
 		s11.run("MATCH p = (c:Computer {name:{name}})-[r:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
 			.then(function(result){
 				this.setState({'firstdegreeControl':result.records[0]._fields[0].low})
-				s8.close()
+				s11.close()
 			}.bind(this))
 
 		s12.run("MATCH p = (c:Computer {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
 			.then(function(result){
 				this.setState({'groupDelegatedControl':result.records[0]._fields[0].low})
-				s8.close()
+				s12.close()
 			}.bind(this))
 
 		s13.run("MATCH p = shortestPath((c:Computer {name:{name}})-[r:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) RETURN COUNT(DISTINCT(n))", {name:payload})
 			.then(function(result){
 				this.setState({'transitiveControl':result.records[0]._fields[0].low})
-				s8.close()
+				s13.close()
 			}.bind(this))
 		
 		this.setState({'driversessions': [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13]})
