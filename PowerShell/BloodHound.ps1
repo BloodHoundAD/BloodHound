@@ -4522,9 +4522,10 @@ function New-ThreadedFunction {
         }
 
         $Jobs = @()
+        $ComputerName = $ComputerName | Where-Object { $_ -and ($_ -ne '') }
         Write-Verbose "[New-ThreadedFunction] Total number of hosts: $($ComputerName.count)"
 
-        # partition all hosts from -ComputerName into $Threads number of groups
+        # partition all hosts from -ComputerName into $Threads number of groups 
         if ($Threads -ge $ComputerName.Length) {
             $Threads = $ComputerName.Length
         }
@@ -4573,7 +4574,7 @@ function New-ThreadedFunction {
 
     END {
         Write-Verbose "[New-ThreadedFunction] Threads executing"
-
+        
         # continuously loop through each job queue, consuming output as appropriate
         Do {
             ForEach ($Job in $Jobs) {
@@ -4810,7 +4811,7 @@ function Invoke-BloodHound {
         $DomainController,
 
         [String]
-        [ValidateSet('Group', 'ComputerOnly', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Stealth', 'Trusts', 'Default')]
+        [ValidateSet('Group', 'ACLs', 'ComputerOnly', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Stealth', 'Trusts', 'Default')]
         $CollectionMethod = 'Default',
 
         [Switch]
@@ -4855,6 +4856,7 @@ function Invoke-BloodHound {
 
         Switch ($CollectionMethod) {
             'Group'         { $UseGroup = $True; $SkipComputerEnumeration = $True; $SkipGCDeconfliction2 = $True }
+            'ACLs'          { $UseGroup = $False; $SkipComputerEnumeration = $True; $SkipGCDeconfliction2 = $True; $UseACLs = $True }
             'ComputerOnly'  { $UseGroup = $False; $UseLocalGroup = $True; $UseSession = $True; $UseLoggedOn = $True; $SkipGCDeconfliction2 = $False }
             'LocalGroup'    { $UseLocalGroup = $True; $SkipGCDeconfliction2 = $True }
             'GPOLocalGroup' { $UseGPOGroup = $True; $SkipComputerEnumeration = $True; $SkipGCDeconfliction2 = $True }
@@ -4881,6 +4883,14 @@ function Invoke-BloodHound {
         if($SkipGCDeconfliction) {
             $SkipGCDeconfliction2 = $True
         }
+
+        $GCPath = ([ADSI]'LDAP://RootDSE').dnshostname
+        $GCADSPath = "GC://$GCPath"
+
+        # the ActiveDirectoryRights regex we're using for output
+        #   https://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights(v=vs.110).aspx
+        # $ACLRightsRegex = [regex] 'GenericAll|GenericWrite|WriteProperty|WriteOwner|WriteDacl|ExtendedRight'
+        $ACLGeneralRightsRegex = [regex] 'GenericAll|GenericWrite|WriteOwner|WriteDacl'
 
         if ($PSCmdlet.ParameterSetName -eq 'CSVExport') {
             try {
@@ -4920,6 +4930,18 @@ function Invoke-BloodHound {
                 if (-not $Exists) {
                     # add the header if the file doesn't already exist
                     $GroupWriter.WriteLine('"GroupName","AccountName","AccountType"')
+                }
+            }
+
+            if($UseACLs) {
+                $ACLPath = "$OutputFolder\$($CSVExportPrefix)acls.csv"
+                $Exists = [System.IO.File]::Exists($ACLPath)
+                $ACLFileStream = New-Object IO.FileStream($ACLPath, [System.IO.FileMode]::Append, [System.IO.FileAccess]::Write, [IO.FileShare]::Read)
+                $ACLWriter = New-Object System.IO.StreamWriter($ACLFileStream)
+                $ACLWriter.AutoFlush = $True
+                if (-not $Exists) {
+                    # add the header if the file doesn't already exist
+                    $ACLWriter.WriteLine('"ObjectName","ObjectType","PrincipalName","PrincipalType","ActiveDirectoryRights","ACEType","AccessControlType","IsInherited"')
                 }
             }
 
@@ -5099,7 +5121,9 @@ function Invoke-BloodHound {
                     }
                     elseif (@('805306369') -contains $Properties['samaccounttype']) {
                         $ObjectType = 'computer'
-                        $AccountName = $Properties['dnshostname'][0]
+                        if ($Properties['dnshostname']) {
+                            $AccountName = $Properties['dnshostname'][0]
+                        }
                     }
                     elseif (@('805306368') -contains $Properties['samaccounttype']) {
                         $ObjectType = 'user'
@@ -5218,6 +5242,258 @@ function Invoke-BloodHound {
                 Write-Verbose "Done with group enumeration for domain $TargetDomain"
             }
             [GC]::Collect()
+        }
+
+        if($UseACLs -and $TargetDomains) {
+
+            # $PrincipalMapping format -> @{ PrincipalSID : @(PrincipalSimpleName, PrincipalObjectClass) }
+            $PrincipalMapping = @{}
+            $Counter = 0
+
+            # #CommonSidMapping[SID] = @(name, objectClass)
+            $CommonSidMapping = @{
+                'S-1-0'         = @('Null Authority', 'USER')
+                'S-1-0-0'       = @('Nobody', 'USER')
+                'S-1-1'         = @('World Authority', 'USER')
+                'S-1-1-0'       = @('Everyone', 'GROUP')
+                'S-1-2'         = @('Local Authority', 'USER')
+                'S-1-2-0'       = @('Local', 'GROUP')
+                'S-1-2-1'       = @('Console Logon', 'GROUP')
+                'S-1-3'         = @('Creator Authority', 'USER')
+                'S-1-3-0'       = @('Creator Owner', 'USER')
+                'S-1-3-1'       = @('Creator Group', 'GROUP')
+                'S-1-3-2'       = @('Creator Owner Server', 'COMPUTER')
+                'S-1-3-3'       = @('Creator Group Server', 'COMPUTER')
+                'S-1-3-4'       = @('Owner Rights', 'GROUP')
+                'S-1-4'         = @('Non-unique Authority', 'USER')
+                'S-1-5'         = @('NT Authority', 'USER')
+                'S-1-5-1'       = @('Dialup', 'GROUP')
+                'S-1-5-2'       = @('Network', 'GROUP')
+                'S-1-5-3'       = @('Batch', 'GROUP')
+                'S-1-5-4'       = @('Interactive', 'GROUP')
+                'S-1-5-6'       = @('Service', 'GROUP')
+                'S-1-5-7'       = @('Anonymous', 'GROUP')
+                'S-1-5-8'       = @('Proxy', 'GROUP')
+                'S-1-5-9'       = @('Enterprise Domain Controllers', 'GROUP')
+                'S-1-5-10'      = @('Principal Self', 'USER')
+                'S-1-5-11'      = @('Authenticated Users', 'GROUP')
+                'S-1-5-12'      = @('Restricted Code', 'GROUP')
+                'S-1-5-13'      = @('Terminal Server Users', 'GROUP')
+                'S-1-5-14'      = @('Remote Interactive Logon', 'GROUP')
+                'S-1-5-15'      = @('This Organization ', 'GROUP')
+                'S-1-5-17'      = @('This Organization ', 'GROUP')
+                'S-1-5-18'      = @('Local System', 'USER')
+                'S-1-5-19'      = @('NT Authority', 'USER')
+                'S-1-5-20'      = @('NT Authority', 'USER')
+                'S-1-5-80-0'    = @('All Services ', 'GROUP')
+                'S-1-5-32-544'  = @('Administrators', 'GROUP')
+                'S-1-5-32-545'  = @('Users', 'GROUP')
+                'S-1-5-32-546'  = @('Guests', 'GROUP')
+                'S-1-5-32-547'  = @('Power Users', 'GROUP')
+                'S-1-5-32-548'  = @('Account Operators', 'GROUP')
+                'S-1-5-32-549'  = @('Server Operators', 'GROUP')
+                'S-1-5-32-550'  = @('Print Operators', 'GROUP')
+                'S-1-5-32-551'  = @('Backup Operators', 'GROUP')
+                'S-1-5-32-552'  = @('Replicators', 'GROUP')
+                'S-1-5-32-554'  = @('Pre-Windows 2000 Compatible Access', 'GROUP')
+                'S-1-5-32-555'  = @('Remote Desktop Users', 'GROUP')
+                'S-1-5-32-556'  = @('Network Configuration Operators', 'GROUP')
+                'S-1-5-32-557'  = @('Incoming Forest Trust Builders', 'GROUP')
+                'S-1-5-32-558'  = @('Performance Monitor Users', 'GROUP')
+                'S-1-5-32-559'  = @('Performance Log Users', 'GROUP')
+                'S-1-5-32-560'  = @('Windows Authorization Access Group', 'GROUP')
+                'S-1-5-32-561'  = @('Terminal Server License Servers', 'GROUP')
+                'S-1-5-32-562'  = @('Distributed COM Users', 'GROUP')
+                'S-1-5-32-569'  = @('Cryptographic Operators', 'GROUP')
+                'S-1-5-32-573'  = @('Event Log Readers', 'GROUP')
+                'S-1-5-32-574'  = @('Certificate Service DCOM Access', 'GROUP')
+                'S-1-5-32-575'  = @('RDS Remote Access Servers', 'GROUP')
+                'S-1-5-32-576'  = @('RDS Endpoint Servers', 'GROUP')
+                'S-1-5-32-577'  = @('RDS Management Servers', 'GROUP')
+                'S-1-5-32-578'  = @('Hyper-V Administrators', 'GROUP')
+                'S-1-5-32-579'  = @('Access Control Assistance Operators', 'GROUP')
+                'S-1-5-32-580'  = @('Access Control Assistance Operators', 'GROUP')
+            }
+
+            ForEach ($TargetDomain in $TargetDomains) {
+                # enumerate all reachable user/group/computer objects and their associated ACLs
+                Write-Verbose "Enumerating ACLs for objects in domain: $TargetDomain"
+
+                $ObjectSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController -ADSPath $UserADSpath
+                $ObjectSearcher.SecurityMasks = [System.DirectoryServices.SecurityMasks]::Dacl
+
+                # only enumerate user and group objects (for now)
+                #   805306368 -> user
+                #   805306369 -> computer
+                #   268435456|268435457|536870912|536870913 -> groups
+                $ObjectSearcher.Filter = '(|(samAccountType=805306368)(samAccountType=805306369)(samAccountType=268435456)(samAccountType=268435457)(samAccountType=536870912)(samAccountType=536870913))'
+                $ObjectSearcher.PropertiesToLoad.AddRange(('distinguishedName','samaccountname','dnshostname','objectclass','objectsid','name', 'ntsecuritydescriptor'))
+
+                $ObjectSearcher.FindAll() | ForEach-Object {
+                    $Object = $_.Properties
+                    if($Object -and $Object.distinguishedname -and $Object.distinguishedname[0] -and $Object.objectsid -and $Object.objectsid[0]) {
+
+                        $ObjectSid = (New-Object System.Security.Principal.SecurityIdentifier($Object.objectsid[0],0)).Value
+
+                        try {
+                            # parse the 'ntsecuritydescriptor' field returned
+                            New-Object -TypeName Security.AccessControl.RawSecurityDescriptor -ArgumentList $Object['ntsecuritydescriptor'][0], 0 | Select-Object -Expand DiscretionaryAcl | ForEach-Object {
+                                $Counter += 1
+                                if($Counter % 10000 -eq 0) {
+                                    Write-Verbose "ACE counter: $Counter"
+                                    if($ACLWriter) {
+                                        $ACLWriter.Flush()
+                                    }
+                                    [GC]::Collect()
+                                }
+
+                                $RawActiveDirectoryRights = ([Enum]::ToObject([System.DirectoryServices.ActiveDirectoryRights], $_.AccessMask))
+
+                                # check for the following rights:
+                                #   GenericAll                      -   generic fully control of an object
+                                #   GenericWrite                    -   write to any object properties
+                                #   WriteDacl                       -   modify the permissions of the object
+                                #   WriteOwner                      -   modify the owner of an object
+                                #   User-Force-Change-Password      -   extended attribute (00299570-246d-11d0-a768-00aa006e0529)
+                                #   WriteProperty/Self-Membership   -   modify group membership (bf9679c0-0de6-11d0-a285-00aa003049e2)
+                                #   WriteProperty/Script-Path       -   modify a user's script-path (bf9679a8-0de6-11d0-a285-00aa003049e2)
+                                if (
+                                        ( ($RawActiveDirectoryRights -match 'GenericAll|GenericWrite') -and (-not $_.ObjectAceType -or $_.ObjectAceType -eq '00000000-0000-0000-0000-000000000000') ) -or 
+                                        ($RawActiveDirectoryRights -match 'WriteDacl|WriteOwner') -or 
+                                        ( ($RawActiveDirectoryRights -match 'ExtendedRight') -and (-not $_.ObjectAceType -or $_.ObjectAceType -eq '00000000-0000-0000-0000-000000000000') ) -or 
+                                        (($_.ObjectAceType -eq '00299570-246d-11d0-a768-00aa006e0529') -and ($RawActiveDirectoryRights -match 'ExtendedRight')) -or
+                                        (($_.ObjectAceType -eq 'bf9679c0-0de6-11d0-a285-00aa003049e2') -and ($RawActiveDirectoryRights -match 'WriteProperty')) -or
+                                        (($_.ObjectAceType -eq 'bf9679a8-0de6-11d0-a285-00aa003049e2') -and ($RawActiveDirectoryRights -match 'WriteProperty'))
+                                    ) {
+                                    
+                                    $PrincipalSid = $_.SecurityIdentifier.ToString()
+                                    $PrincipalSimpleName, $PrincipalObjectClass, $ACEType = $Null
+
+                                    # only grab the AD right names we care about
+                                    #   'GenericAll|GenericWrite|WriteOwner|WriteDacl'
+                                    $ActiveDirectoryRights = $ACLGeneralRightsRegex.Matches($RawActiveDirectoryRights) | Select-Object -ExpandProperty Value
+                                    if (-not $ActiveDirectoryRights) {
+                                        if ($RawActiveDirectoryRights -match 'ExtendedRight') {
+                                            $ActiveDirectoryRights = 'ExtendedRight'
+                                        }
+                                        else {
+                                            $ActiveDirectoryRights = 'WriteProperty'
+                                        }
+
+                                        # decode the ACE types here
+                                        $ACEType = Switch ($_.ObjectAceType) {
+                                            '00299570-246d-11d0-a768-00aa006e0529' {'User-Force-Change-Password'}
+                                            'bf9679c0-0de6-11d0-a285-00aa003049e2' {'Member'}
+                                            'bf9679a8-0de6-11d0-a285-00aa003049e2' {'Script-Path'}
+                                            Default {'All'}
+                                        }
+                                    }
+
+                                    if ($PrincipalMapping[$PrincipalSid]) {
+                                        # Write-Verbose "$PrincipalSid in cache!"
+                                        # $PrincipalMappings format -> @{ SID : @(PrincipalSimpleName, PrincipalObjectClass) }
+                                        $PrincipalSimpleName, $PrincipalObjectClass = $PrincipalMapping[$PrincipalSid]
+                                    }
+                                    elseif ($CommonSidMapping[$PrincipalSid]) {
+                                        # Write-Verbose "$PrincipalSid in common sids!"
+                                        $PrincipalName, $PrincipalObjectClass = $CommonSidMapping[$PrincipalSid]
+                                        $PrincipalSimpleName = "$PrincipalName@$TargetDomain"
+                                        $PrincipalMapping[$PrincipalSid] = $PrincipalSimpleName, $PrincipalObjectClass
+                                    }
+                                    else {
+                                        # Write-Verbose "$PrincipalSid NOT in cache!"
+                                        # first try querying the target domain for this SID
+                                        $SIDSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController
+                                        $SIDSearcher.PropertiesToLoad.AddRange(('samaccountname','distinguishedname','dnshostname','objectclass'))
+                                        $SIDSearcher.Filter = "(objectsid=$PrincipalSid)"
+                                        $PrincipalObject = $SIDSearcher.FindOne()
+
+                                        if ((-not $PrincipalObject) -and ((-not $DomainController) -or (-not $DomainController.StartsWith('GC:')))) {
+                                            # if the object didn't resolve from the current domain, attempt to query the global catalog
+                                            $GCSearcher = Get-DomainSearcher -ADSpath $GCADSPath
+                                            $GCSearcher.PropertiesToLoad.AddRange(('samaccountname','distinguishedname','dnshostname','objectclass'))
+                                            $GCSearcher.Filter = "(objectsid=$PrincipalSid)"
+                                            $PrincipalObject = $GCSearcher.FindOne()
+                                        }
+
+                                        if ($PrincipalObject) {
+                                            if ($PrincipalObject.Properties.objectclass.contains('computer')) {
+                                                $PrincipalObjectClass = 'COMPUTER'
+                                                $PrincipalSimpleName = $PrincipalObject.Properties.dnshostname[0]
+                                            }
+                                            else {
+                                                $PrincipalSamAccountName = $PrincipalObject.Properties.samaccountname[0]
+                                                $PrincipalDN = $PrincipalObject.Properties.distinguishedname[0]
+                                                $PrincipalDomain = $PrincipalDN.SubString($PrincipalDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'
+                                                $PrincipalSimpleName = "$PrincipalSamAccountName@$PrincipalDomain"
+
+                                                if ($PrincipalObject.Properties.objectclass.contains('group')) {
+                                                    $PrincipalObjectClass = 'GROUP'
+                                                }
+                                                elseif ($PrincipalObject.Properties.objectclass.contains('user')) {
+                                                    $PrincipalObjectClass = 'USER'
+                                                }
+                                                else {
+                                                    $PrincipalObjectClass = 'OTHER'
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            Write-Verbose "SID not resolved: $PrincipalSid"
+                                        }
+
+                                        $PrincipalMapping[$PrincipalSid] = $PrincipalSimpleName, $PrincipalObjectClass
+                                    }
+
+                                    if ($PrincipalSimpleName -and $PrincipalObjectClass) {
+                                        $ObjectName, $ObjectADType = $Null
+
+                                        if ($Object.objectclass.contains('computer')) {
+                                            $ObjectADType = 'COMPUTER'
+                                            if ($Object.dnshostname) {
+                                                $ObjectName = $Object.dnshostname[0]
+                                            }
+                                        }
+                                        else {
+                                            if($Object.samaccountname) {
+                                                $ObjectSamAccountName = $Object.samaccountname[0]
+                                            }
+                                            else {
+                                                $ObjectSamAccountName = $Object.name[0]
+                                            }
+                                            $DN = $Object.distinguishedname[0]
+                                            $ObjectDomain = $DN.SubString($DN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'
+                                            $ObjectName = "$ObjectSamAccountName@$ObjectDomain"
+
+                                            if ($Object.objectclass.contains('group')) {
+                                                $ObjectADType = 'GROUP'
+                                            }
+                                            elseif ($Object.objectclass.contains('user')) {
+                                                $ObjectADType = 'USER'
+                                            }
+                                            else {
+                                                $ObjectADType = 'OTHER'
+                                            }
+                                        }
+
+                                        if ($ObjectName -and $ObjectADType) {
+                                            if ($PSCmdlet.ParameterSetName -eq 'CSVExport') {
+                                                $ACLWriter.WriteLine("`"$ObjectName`",`"$ObjectADType`",`"$PrincipalSimpleName`",`"$PrincipalObjectClass`",`"$ActiveDirectoryRights`",`"$ACEType`",`"$($_.AceQualifier)`",`"$($_.IsInherited)`"")
+                                            }
+                                            else {
+                                                Write-Warning 'TODO: implement neo4j RESTful API ingestion for ACLs!'
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch {
+                            Write-Verbose "ACL ingestion error: $_"
+                        }
+                    }
+                }
+            }
         }
 
         if($UseDomainTrusts -and $TargetDomains) {
@@ -5402,7 +5678,7 @@ function Invoke-BloodHound {
 
     PROCESS {
         if ($TargetDomains -and (-not $SkipComputerEnumeration)) {
-
+            
             if($Statements) {
                 $Statements.Clear()
             }
@@ -5640,6 +5916,10 @@ function Invoke-BloodHound {
             if($GroupWriter) {
                 $GroupWriter.Dispose()
                 $GroupFileStream.Dispose()
+            }
+            if($ACLWriter) {
+                $ACLWriter.Dispose()
+                $ACLFileStream.Dispose()
             }
             if($LocalAdminWriter) {
                 $LocalAdminWriter.Dispose()
