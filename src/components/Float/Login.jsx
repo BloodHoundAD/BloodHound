@@ -178,7 +178,8 @@ export default class Login extends Component {
 			this.setState({
 				url: c.url,
 				user: c.user,
-				password: c.password
+				password: c.password,
+				save: true
 			})
 		}
 	}
