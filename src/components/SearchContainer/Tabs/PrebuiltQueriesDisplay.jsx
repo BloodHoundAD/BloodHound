@@ -93,7 +93,7 @@ export default class PrebuiltQueriesDisplay extends Component {
                 <h3>
                     Custom Queries
                     <i className="glyphicon glyphicon-pencil customQueryGlyph" data-toggle="tooltip" title="Edit Queries" onClick={this.editCustom.bind(this)}></i>
-                    <i className="glyphicon glyphicon-refresh customQueryGlyph" onClick={this.refreshCustom.bind(this)} style={{"padding-left": "5px"}} data-toggle="tooltip" title="Refresh Queries"></i>
+                    <i className="glyphicon glyphicon-refresh customQueryGlyph" onClick={this.refreshCustom.bind(this)} style={{"paddingLeft": "5px"}} data-toggle="tooltip" title="Refresh Queries"></i>
                 </h3>
                 <div className="query-box">
                     <If condition={ this.state.custom.length == 0}>
