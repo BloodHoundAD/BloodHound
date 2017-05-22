@@ -4722,7 +4722,7 @@ function Invoke-BloodHound {
 
     .PARAMETER CollectionMethod
 
-        The method to collect data. 'Group', 'ComputerOnly', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Trusts, 'Stealth', or 'Default'.
+        The method to collect data. 'Group', 'Containers', 'ComputerOnly', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Trusts, 'Stealth', or 'Default'.
         'Stealth' uses 'Group' collection, stealth user hunting ('Session' on certain servers), 'GPOLocalGroup' enumeration, and trust enumeration.
         'Default' uses 'Group' collection, regular user hunting with 'Session'/'LoggedOn', 'LocalGroup' enumeration, and 'Trusts' enumeration.
         'ComputerOnly' only enumerates computers, not groups/trusts, and executes local admin/session/loggedon on each.
@@ -4811,7 +4811,7 @@ function Invoke-BloodHound {
         $DomainController,
 
         [String]
-        [ValidateSet('Group', 'ACLs', 'ComputerOnly', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Stealth', 'Trusts', 'Default')]
+        [ValidateSet('Group', 'Containers', 'ACLs', 'ComputerOnly', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Stealth', 'Trusts', 'Default')]
         $CollectionMethod = 'Default',
 
         [Switch]
@@ -4856,6 +4856,7 @@ function Invoke-BloodHound {
 
         Switch ($CollectionMethod) {
             'Group'         { $UseGroup = $True; $SkipComputerEnumeration = $True; $SkipGCDeconfliction2 = $True }
+            'Containers'    { $UseContainers = $True; $SkipComputerEnumeration = $True; $SkipGCDeconfliction2 = $True }
             'ACLs'          { $UseGroup = $False; $SkipComputerEnumeration = $True; $SkipGCDeconfliction2 = $True; $UseACLs = $True }
             'ComputerOnly'  { $UseGroup = $False; $UseLocalGroup = $True; $UseSession = $True; $UseLoggedOn = $True; $SkipGCDeconfliction2 = $False }
             'LocalGroup'    { $UseLocalGroup = $True; $SkipGCDeconfliction2 = $True }
@@ -4865,6 +4866,7 @@ function Invoke-BloodHound {
             'Trusts'        { $UseDomainTrusts = $True; $SkipComputerEnumeration = $True; $SkipGCDeconfliction2 = $True }
             'Stealth'       {
                 $UseGroup = $True
+                $UseContainers = $True
                 $UseGPOGroup = $True
                 $UseSession = $True
                 $UseDomainTrusts = $True
@@ -4872,6 +4874,7 @@ function Invoke-BloodHound {
             }
             'Default'       {
                 $UseGroup = $True
+                $UseContainers = $True
                 $UseLocalGroup = $True
                 $UseSession = $True
                 $UseLoggedOn = $False
@@ -4930,6 +4933,28 @@ function Invoke-BloodHound {
                 if (-not $Exists) {
                     # add the header if the file doesn't already exist
                     $GroupWriter.WriteLine('"GroupName","AccountName","AccountType"')
+                }
+            }
+
+            if($UseContainers) {
+                $ContainerPath = "$OutputFolder\$($CSVExportPrefix)container_structure.csv"
+                $Exists = [System.IO.File]::Exists($ContainerPath)
+                $ContainerFileStream = New-Object IO.FileStream($ContainerPath, [System.IO.FileMode]::Append, [System.IO.FileAccess]::Write, [IO.FileShare]::Read)
+                $ContainerWriter = New-Object System.IO.StreamWriter($ContainerFileStream)
+                $ContainerWriter.AutoFlush = $True
+                if (-not $Exists) {
+                    # add the header if the file doesn't already exist
+                    $ContainerWriter.WriteLine('"ContainerType","ContainerName","ContainerGUID","ContainerBlocksInheritence","ObjectType","ObjectName","ObjectGUIDorSID"')
+                }
+
+                $GPLinkPath = "$OutputFolder\$($CSVExportPrefix)container_gplinks.csv"
+                $Exists = [System.IO.File]::Exists($GPLinkPath)
+                $GPLinkFileStream = New-Object IO.FileStream($GPLinkPath, [System.IO.FileMode]::Append, [System.IO.FileAccess]::Write, [IO.FileShare]::Read)
+                $GPLinkWriter = New-Object System.IO.StreamWriter($GPLinkFileStream)
+                $GPLinkWriter.AutoFlush = $True
+                if (-not $Exists) {
+                    # add the header if the file doesn't already exist
+                    $GPLinkWriter.WriteLine('"ObjectType","ObjectName","ObjectGUID","GPODisplayName","GPOGUID","IsEnforced"')
                 }
             }
 
@@ -5240,6 +5265,163 @@ function Invoke-BloodHound {
                     $Statements.Clear()
                 }
                 Write-Verbose "Done with group enumeration for domain $TargetDomain"
+            }
+            [GC]::Collect()
+        }
+
+        if ($UseContainers -and $TargetDomains) {
+            ForEach ($TargetDomain in $TargetDomains) {
+                Write-Verbose "Enumerating container memberships and gpLinks for domain: $TargetDomain"
+                $OUs = New-Object System.Collections.Queue
+
+                # first get a cached listing of all GPO GUIDs -> display names
+                # GPODisplayName,GPOGUID,IsEnforced,ObjectType,ObjectName,ObjectGUID
+                $GPOSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController
+                $GPOSearcher.filter="(&(objectCategory=groupPolicyContainer)(name=*)(gpcfilesyspath=*))"
+                $GPOSearcher.PropertiesToLoad.AddRange(('displayname', 'name'))
+                $GPOs = @{}
+
+                ForEach($GPOResult in $GPOSearcher.FindAll()) {
+                    $GPOdisplayName = $GPOResult.Properties['displayname'][0]
+                    $GPOname = $GPOResult.Properties['name'][0]
+                    $GPOName = $GPOName.Substring(1, $GPOName.Length-2)
+                    $GPOs[$GPOname] = $GPOdisplayName
+                }
+
+                # now get the base domain object and enumerate any GPLinks
+                $DomainSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController
+                $DomainSearcher.SearchScope = 'Base'
+                $Null = $DomainSearcher.PropertiesToLoad.AddRange(('gplink', 'objectguid'))
+                $DomainObject = $DomainSearcher.FindOne()
+                $DomainGUID = (New-Object Guid (,$DomainObject.Properties['objectguid'][0])).Guid
+
+                if ($DomainObject.Properties['gplink']) {
+                    $DomainObject.Properties['gplink'][0].split('][') | ForEach-Object {
+                        if ($_.startswith('LDAP')) {
+                            $Parts = $_.split(';')
+                            $GPODN = $Parts[0]
+                            if ($Parts[1] -eq 2) { $Enforced = $True }
+                            else { $Enforced = $False }
+
+                            $i = $GPODN.IndexOf("CN=")+4
+                            $GPOName = $GPODN.subString($i, $i+25)
+                            $GPODisplayName = $GPOs[$GPOname]
+                            $GPLinkWriter.WriteLine("`"domain`",`"$TargetDomain`",`"$DomainGUID`",`"$GPODisplayName`",`"$GPOName`",`"$Enforced`"")
+                            # "`"domain`",`"$TargetDomain`",`"$DomainGUID`",`"$GPODisplayName`",`"$GPOName`",`"$Enforced`""
+                        }
+                    }
+                }
+
+                # find any non-ou containers and enumerate the users/computers contained in them
+                #   example -> CN=Computers,DC=testlab,DC=local
+                $DomainSearcher.SearchScope = 'OneLevel'
+                $Null = $DomainSearcher.PropertiesToLoad.AddRange(('name'))
+                $DomainSearcher.Filter = "(objectClass=container)"
+                $DomainSearcher.FindAll() | ForEach-Object {
+                    $ContainerName = ,$_.Properties['name'][0]
+                    $ContainerPath = $_.Properties['adspath']
+
+                    $ContainerSearcher = Get-DomainSearcher -ADSpath $ContainerPath
+
+                    $Null = $ContainerSearcher.PropertiesToLoad.AddRange(('name', 'objectsid', 'samaccounttype'))
+                    $ContainerSearcher.Filter = '(|(samAccountType=805306368)(samAccountType=805306369))'
+                    $ContainerSearcher.SearchScope = 'SubTree'
+
+                    $ContainerSearcher.FindAll() | ForEach-Object {
+                        $ObjectName = ,$_.Properties['name'][0]
+                        if ( (,$_.Properties['samaccounttype'][0]) -eq '805306368') {
+                            $ObjectType = 'user'
+                        }
+                        else {
+                            $ObjectType = 'computer'
+                        }
+                        $ObjectSID = (New-Object System.Security.Principal.SecurityIdentifier($_.Properties['objectsid'][0],0)).Value
+                        $ContainerWriter.WriteLine("`"domain`",`"$TargetDomain`",`"$DomainGUID`",`"$False`",`"$ObjectType`",`"$ObjectName`",`"$ObjectSID`"")
+                        # "`"domain`",`"$TargetDomain`",`"$DomainGUID`",`"$False`",`"$ObjectType`",`"$ObjectName`",`"$ObjectSID`""
+                    }
+                    $ContainerSearcher.Dispose()
+                }
+
+                # now enumerate all OUs that are on the "base" domain level
+                $DomainSearcher.SearchScope = 'OneLevel'
+                $Null = $DomainSearcher.PropertiesToLoad.AddRange(('name', 'objectguid', 'gplink'))
+                $DomainSearcher.Filter = "(objectCategory=organizationalUnit)"
+                $DomainSearcher.FindAll() | ForEach-Object {
+                    $OUGuid = (New-Object Guid (,$_.Properties['objectguid'][0])).Guid
+                    $OUName = ,$_.Properties['name'][0]
+
+                    $ContainerWriter.WriteLine("`"domain`",`"$TargetDomain`",`"$DomainGUID`",`"$False`",`"ou`",`"$OUName`",`"$OUGuid`"")
+                    # "`"domain`",`"$TargetDomain`",`"$DomainGUID`",`"$False`",`"ou`",`"$OUName`",`"$OUGuid`""
+
+                    $OUs.Enqueue($_.Properties['adspath'])
+                }
+                $DomainSearcher.Dispose()
+
+                while ($OUs.Count -gt 0) {
+                    # pop a new OU ADSpath from the queue
+                    $ADSPath = $OUs.Dequeue()
+                    Write-Verbose "Enumerating OU: '$ADSPath'"
+
+                    # grab the OU base object first to pull ContainerBlocksInheritence from gpoptions
+                    $DomainSearcher = Get-DomainSearcher -ADSpath $ADSPath
+                    $Null = $DomainSearcher.PropertiesToLoad.AddRange(('name', 'objectguid', 'gplink', 'gpoptions'))
+                    $DomainSearcher.SearchScope = 'Base'
+                    $OU = $DomainSearcher.FindOne()
+                    $OUGuid = (New-Object Guid (,$OU.Properties['objectguid'][0])).Guid
+                    $OUName = ,$OU.Properties['name'][0]
+                    $ContainerBlocksInheritence = $False
+                    if ($OU.Properties['gpoptions'] -and ($OU.Properties['gpoptions'] -eq 1)) {
+                        $ContainerBlocksInheritence = $True
+                    }
+
+                    if ($OU.Properties['gplink']) {
+                        $OU.Properties['gplink'][0].split('][') | ForEach-Object {
+                            if ($_.startswith('LDAP')) {
+                                $Parts = $_.split(';')
+                                $GPODN = $Parts[0]
+                                if ($Parts[1] -eq 2) { $Enforced = $True }
+                                else { $Enforced = $False }
+
+                                $i = $GPODN.IndexOf('CN=', [System.StringComparison]::CurrentCultureIgnoreCase)+4
+                                $GPOName = $GPODN.SubString($i, $i+25)
+                                $GPODisplayName = $GPOs[$GPOname]
+                                $GPLinkWriter.WriteLine("`"ou`",`"$OUName`",`"$OUGuid`",`"$GPODisplayName`",`"$GPOName`",`"$Enforced`"")
+                                # "`"ou`",`"$OUName`",`"$OUGuid`",`"$GPODisplayName`",`"$GPOName`",`"$Enforced`""
+                            }
+                        }
+                    }
+
+                    # now enumerate all computers, users, and OUs in the next level
+                    $Null = $DomainSearcher.PropertiesToLoad.AddRange(('name', 'objectsid', 'objectguid', 'gplink', 'gpoptions', 'objectclass'))
+                    $DomainSearcher.Filter = '(|(samAccountType=805306368)(samAccountType=805306369)(objectclass=organizationalUnit))'
+                    $DomainSearcher.SearchScope = 'OneLevel'
+
+                    $DomainSearcher.FindAll() | ForEach-Object {
+                        if ($_.Properties['objectclass'] -contains 'organizationalUnit') {
+                            $SubOUName = ,$_.Properties['name'][0]
+                            $SubOUGuid = (New-Object Guid (,$_.Properties['objectguid'][0])).Guid
+                            $ContainerWriter.WriteLine("`"ou`",`"$OUName`",`"$OUGuid`",`"$ContainerBlocksInheritence`",`"ou`",`"$SubOUName`",`"$SubOUGuid`"")
+                            # "`"ou`",`"$OUName`",`"$OUGuid`",`"$ContainerBlocksInheritence`",`"ou`",`"$SubOUName`",`"$SubOUGuid`""
+                            $OUs.Enqueue($_.Properties['adspath'])
+                        }
+                        elseif ($_.Properties['objectclass'] -contains 'computer') {
+                            $SubComputerName = ,$_.Properties['name'][0]
+                            $SubComputerSID = (New-Object System.Security.Principal.SecurityIdentifier($_.Properties['objectsid'][0],0)).Value
+                            # "`"ou`",`"$OUName`",`"$OUGuid`",`"$ContainerBlocksInheritence`",`"computer`",`"$SubComputerName`",`"$SubComputerSID`""
+                            $ContainerWriter.WriteLine("`"ou`",`"$OUName`",`"$OUGuid`",`"$ContainerBlocksInheritence`",`"computer`",`"$SubComputerName`",`"$SubComputerSID`"")
+                        }
+                        else {
+                            $SubUserName = ,$_.Properties['name'][0]
+                            $SubUserSID = (New-Object System.Security.Principal.SecurityIdentifier($_.Properties['objectsid'][0],0)).Value
+                            # "`"ou`",`"$OUName`",`"$OUGuid`",`"$ContainerBlocksInheritence`",`"computer`",`"$SubUserName`",`"$SubUserSID`""
+                            $ContainerWriter.WriteLine("`"ou`",`"$OUName`",`"$OUGuid`",`"$ContainerBlocksInheritence`",`"user`",`"$SubUserName`",`"$SubUserSID`"")
+                        }
+                    }
+
+                    $DomainSearcher.Dispose()
+                }
+
+                Write-Verbose "Done with container memberships and gpLink enumeration for domain: $TargetDomain"
             }
             [GC]::Collect()
         }
@@ -5917,6 +6099,14 @@ function Invoke-BloodHound {
                 $GroupWriter.Dispose()
                 $GroupFileStream.Dispose()
             }
+            if($ContainerWriter) {
+                $ContainerWriter.Dispose()
+                $ContainerFileStream.Dispose()
+            }
+            if($GPLinkWriter) {
+                $GPLinkWriter.Dispose()
+                $GPLinkFileStream.Dispose()
+            }
             if($ACLWriter) {
                 $ACLWriter.Dispose()
                 $ACLFileStream.Dispose()
@@ -5965,7 +6155,6 @@ $FunctionDefinitions = @(
     (func netapi32 NetApiBufferFree ([Int]) @([IntPtr])),
     (func advapi32 ConvertSidToStringSid ([Int]) @([IntPtr], [String].MakeByRefType()) -SetLastError)
 )
-
 
 # the NetWkstaUserEnum result structure
 $WKSTA_USER_INFO_1 = struct $Mod WKSTA_USER_INFO_1 @{
