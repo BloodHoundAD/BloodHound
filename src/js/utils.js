@@ -184,33 +184,33 @@ export function buildACLProps(rows) {
         var rights = []
 
         if (extright === 'All'){
-            rights.append("AllExtendedRights")
+            rights.push("AllExtendedRights")
         }
         if (extright === 'User-Force-Change-Password'){
-            rights.append("ForceChangePassword")
+            rights.push("ForceChangePassword")
         }
         if (rel === "ExtendedRight"){
-            rights.append(extright)
+            rights.push(extright)
         }
 
         if (rel.includes("GenericAll")){
-            rights.append("GenericAll")
+            rights.push("GenericAll")
         }
 
         if (rel.includes("WriteDacl")){
-            rights.append("WriteDacl")
+            rights.push("WriteDacl")
         }
 
         if (rel.includes("WriteOwner")){
-            rights.append("WriteOwner")
+            rights.push("WriteOwner")
         }
 
         if (rel.includes("GenericWrite")){
-            rights.append("GenericWrite")
+            rights.push("GenericWrite")
         }
 
         if (rel.includes("WriteProperty") && extright === "Member"){
-            rights.append("AddMember")
+            rights.push("AddMember")
         }
 
         $.each(rights, function(index, record){
