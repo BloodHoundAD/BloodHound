@@ -181,36 +181,57 @@ export function buildACLProps(rows) {
         var rel = row.ActiveDirectoryRights
         var extright = row.ACEType
 
+        var rights = []
+
         if (extright === 'All'){
-            rel = "AllExtendedRights"
-        }else if (extright === 'User-Force-Change-Password'){
-            rel = "ForceChangePassword"
-        }else if (rel === "ExtendedRight"){
-            rel = extright
+            rights.append("AllExtendedRights")
+        }
+        if (extright === 'User-Force-Change-Password'){
+            rights.append("ForceChangePassword")
+        }
+        if (rel === "ExtendedRight"){
+            rights.append(extright)
         }
 
-        rel = rel.replace(/-/g,"")
-
-        if (rel.includes('WriteOwner')){
-            rel = 'WriteOwner'
+        if (rel.includes("GenericAll")){
+            rights.append("GenericAll")
         }
 
-        var hash = (atype + rel + btype).toUpperCase()
-        if (btype === 'Computer') {
-            return
+        if (rel.includes("WriteDacl")){
+            rights.append("WriteDacl")
         }
 
-        if (datadict[hash]) {
-            datadict[hash].props.push({
-                account: a,
-                principal: b
-            })
-        } else {
-            datadict[hash] = {
-                statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:{} {name: prop.principal}) WITH a,b,prop MERGE (a)-[r:{} {isACL:true}]->(b)'.format(atype, btype, rel),
-                props: [{ account: a, principal: b }]
+        if (rel.includes("WriteOwner")){
+            rights.append("WriteOwner")
+        }
+
+        if (rel.includes("GenericWrite")){
+            rights.append("GenericWrite")
+        }
+
+        if (rel.includes("WriteProperty") && extright === "Member"){
+            rights.append("AddMember")
+        }
+
+        $.each(rights, function(index, record){
+            var hash = (atype + record + btype).toUpperCase()
+            if (btype === 'Computer') {
+                return
             }
-        }
+
+            if (datadict[hash]) {
+                datadict[hash].props.push({
+                    account: a,
+                    principal: b
+                })
+            } else {
+                datadict[hash] = {
+                    statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:{} {name: prop.principal}) WITH a,b,prop MERGE (a)-[r:{} {isACL:true}]->(b)'.format(atype, btype, record),
+                    props: [{ account: a, principal: b }]
+                }
+            }
+        })
+        
     })
 
     return datadict
