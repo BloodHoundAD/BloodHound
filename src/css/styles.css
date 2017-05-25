@@ -30,6 +30,7 @@ body {
     font-family: 'Roboto', sans-serif;
     height: 100%;
     background-color: lightgray;
+    overflow: hidden;
 }
 
 .customQueryGlyph{
