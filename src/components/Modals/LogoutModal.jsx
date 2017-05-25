@@ -18,7 +18,7 @@ export default class LogoutModal extends Component {
 	}
 
 	closeAndLogout(){
-		conf.del('databaseInfo')
+		conf.delete('databaseInfo')
 		appStore.databaseInfo = null;
 		this.setState({ open: false })
 		emitter.emit('doLogout');
