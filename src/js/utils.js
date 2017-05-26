@@ -185,11 +185,9 @@ export function buildACLProps(rows) {
 
         if (extright === 'All'){
             rights.push("AllExtendedRights")
-        }
-        if (extright === 'User-Force-Change-Password'){
+        }else if (extright === 'User-Force-Change-Password'){
             rights.push("ForceChangePassword")
-        }
-        if (rel === "ExtendedRight"){
+        }else if (rel === "ExtendedRight"){
             rights.push(extright)
         }
 
