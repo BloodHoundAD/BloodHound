@@ -371,48 +371,49 @@ export default class GraphContainer extends Component {
         session.run(params.statement, params.props)
             .subscribe({
                 onNext: function(result){
-                    if (result._fields[0].hasOwnProperty('segments')){
-                        $.each(result._fields, function(index, field){
-                            $.each(field.segments,function(index, segment){
-                                var end = this.createNodeFromRow(segment.end, params)
-                                var start = this.createNodeFromRow(segment.start, params)
-                                var edge = this.createEdgeFromRow(segment.relationship)
+                    $.each(result._fields, function(index, field){
+                        if (field != null){
+                            if (field.hasOwnProperty('segments')){
+                                $.each(field.segments,function(index, segment){
+                                    var end = this.createNodeFromRow(segment.end, params)
+                                    var start = this.createNodeFromRow(segment.start, params)
+                                    var edge = this.createEdgeFromRow(segment.relationship)
 
-                                if (!edges[edge.id]){
-                                    edges[edge.id] = edge
-                                }
+                                    if (!edges[edge.id]){
+                                        edges[edge.id] = edge
+                                    }
 
-                                if (!nodes[end.id]){
-                                    nodes[end.id] = end
-                                }
+                                    if (!nodes[end.id]){
+                                        nodes[end.id] = end
+                                    }
 
-                                if (!nodes[start.id]){
-                                    nodes[start.id] = start
-                                }
-                            }.bind(this))
-                        }.bind(this))
-                        
-                    }else{
-                        $.each(result._fields, function(index, value){
-                            if ($.isArray(value)){
-                                $.each(value, function(index, subval){
-                                    var id = subval.identity.low
-                                    if (subval.end && !edges.id){
-                                        edges[id] = this.createEdgeFromRow(subval)
-                                    }else if (!nodes.id){
-                                        nodes[id] = this.createNodeFromRow(subval, params)
+                                    if (!nodes[start.id]){
+                                        nodes[start.id] = start
                                     }
                                 }.bind(this))
                             }else{
-                                var id = value.identity.low
-                                if (value.end && !edges.id){
-                                    edges[id] = this.createEdgeFromRow(value)
-                                }else if (!nodes.id){
-                                    nodes[id] = this.createNodeFromRow(value, params)
+                                if ($.isArray(field)){
+                                    $.each(field, function(index, value){
+                                        if (value != null){
+                                            var id = value.identity.low
+                                            if (value.end && !edges.id){
+                                                edges[id] = this.createEdgeFromRow(value)
+                                            }else if (!nodes.id){
+                                                nodes[id] = this.createNodeFromRow(value, params)
+                                            }
+                                        }
+                                    }.bind(this))
+                                }else{
+                                    var id = field.identity.low
+                                    if (field.end && !edges.id){
+                                        edges[id] = this.createEdgeFromRow(field)
+                                    }else if (!nodes.id){
+                                        nodes[id] = this.createNodeFromRow(field, params)
+                                    }
                                 }
                             }
-                        }.bind(this))
-                    }
+                        }
+                    }.bind(this))
                 }.bind(this),
                 onError: function(error){
                     console.log(error)
