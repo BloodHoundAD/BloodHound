@@ -4966,7 +4966,7 @@ function Invoke-BloodHound {
                 $ACLWriter.AutoFlush = $True
                 if (-not $Exists) {
                     # add the header if the file doesn't already exist
-                    $ACLWriter.WriteLine('"ObjectName","ObjectType","PrincipalName","PrincipalType","ActiveDirectoryRights","ACEType","AccessControlType","IsInherited"')
+                    $ACLWriter.WriteLine('"ObjectName","ObjectType","ObjectGuid","PrincipalName","PrincipalType","ActiveDirectoryRights","ACEType","AccessControlType","IsInherited"')
                 }
             }
 
@@ -5307,7 +5307,6 @@ function Invoke-BloodHound {
                             $GPOName = $GPODN.subString($i, $i+25)
                             $GPODisplayName = $GPOs[$GPOname]
                             $GPLinkWriter.WriteLine("`"domain`",`"$TargetDomain`",`"$DomainGUID`",`"$GPODisplayName`",`"$GPOName`",`"$Enforced`"")
-                            # "`"domain`",`"$TargetDomain`",`"$DomainGUID`",`"$GPODisplayName`",`"$GPOName`",`"$Enforced`""
                         }
                     }
                 }
@@ -5320,6 +5319,7 @@ function Invoke-BloodHound {
                 $DomainSearcher.FindAll() | ForEach-Object {
                     $ContainerName = ,$_.Properties['name'][0]
                     $ContainerPath = $_.Properties['adspath']
+                    Write-Verbose "ContainerPath: $ContainerPath"
 
                     $ContainerSearcher = Get-DomainSearcher -ADSpath $ContainerPath
 
@@ -5329,6 +5329,7 @@ function Invoke-BloodHound {
 
                     $ContainerSearcher.FindAll() | ForEach-Object {
                         $ObjectName = ,$_.Properties['name'][0]
+                        Write-Verbose "ObjectName: $ObjectName"
                         if ( (,$_.Properties['samaccounttype'][0]) -eq '805306368') {
                             $ObjectType = 'user'
                         }
@@ -5337,7 +5338,6 @@ function Invoke-BloodHound {
                         }
                         $ObjectSID = (New-Object System.Security.Principal.SecurityIdentifier($_.Properties['objectsid'][0],0)).Value
                         $ContainerWriter.WriteLine("`"domain`",`"$TargetDomain`",`"$DomainGUID`",`"$False`",`"$ObjectType`",`"$ObjectName`",`"$ObjectSID`"")
-                        # "`"domain`",`"$TargetDomain`",`"$DomainGUID`",`"$False`",`"$ObjectType`",`"$ObjectName`",`"$ObjectSID`""
                     }
                     $ContainerSearcher.Dispose()
                 }
@@ -5351,7 +5351,6 @@ function Invoke-BloodHound {
                     $OUName = ,$_.Properties['name'][0]
 
                     $ContainerWriter.WriteLine("`"domain`",`"$TargetDomain`",`"$DomainGUID`",`"$False`",`"ou`",`"$OUName`",`"$OUGuid`"")
-                    # "`"domain`",`"$TargetDomain`",`"$DomainGUID`",`"$False`",`"ou`",`"$OUName`",`"$OUGuid`""
 
                     $OUs.Enqueue($_.Properties['adspath'])
                 }
@@ -5374,7 +5373,8 @@ function Invoke-BloodHound {
                         $ContainerBlocksInheritence = $True
                     }
 
-                    if ($OU.Properties['gplink']) {
+                    # parse any gpLinks if this OU currently has any
+                    if ($OU.Properties['gplink'] -and $OU.Properties['gplink'][0]) {
                         $OU.Properties['gplink'][0].split('][') | ForEach-Object {
                             if ($_.startswith('LDAP')) {
                                 $Parts = $_.split(';')
@@ -5386,7 +5386,6 @@ function Invoke-BloodHound {
                                 $GPOName = $GPODN.SubString($i, $i+25)
                                 $GPODisplayName = $GPOs[$GPOname]
                                 $GPLinkWriter.WriteLine("`"ou`",`"$OUName`",`"$OUGuid`",`"$GPODisplayName`",`"$GPOName`",`"$Enforced`"")
-                                # "`"ou`",`"$OUName`",`"$OUGuid`",`"$GPODisplayName`",`"$GPOName`",`"$Enforced`""
                             }
                         }
                     }
@@ -5401,19 +5400,16 @@ function Invoke-BloodHound {
                             $SubOUName = ,$_.Properties['name'][0]
                             $SubOUGuid = (New-Object Guid (,$_.Properties['objectguid'][0])).Guid
                             $ContainerWriter.WriteLine("`"ou`",`"$OUName`",`"$OUGuid`",`"$ContainerBlocksInheritence`",`"ou`",`"$SubOUName`",`"$SubOUGuid`"")
-                            # "`"ou`",`"$OUName`",`"$OUGuid`",`"$ContainerBlocksInheritence`",`"ou`",`"$SubOUName`",`"$SubOUGuid`""
                             $OUs.Enqueue($_.Properties['adspath'])
                         }
                         elseif ($_.Properties['objectclass'] -contains 'computer') {
                             $SubComputerName = ,$_.Properties['name'][0]
                             $SubComputerSID = (New-Object System.Security.Principal.SecurityIdentifier($_.Properties['objectsid'][0],0)).Value
-                            # "`"ou`",`"$OUName`",`"$OUGuid`",`"$ContainerBlocksInheritence`",`"computer`",`"$SubComputerName`",`"$SubComputerSID`""
                             $ContainerWriter.WriteLine("`"ou`",`"$OUName`",`"$OUGuid`",`"$ContainerBlocksInheritence`",`"computer`",`"$SubComputerName`",`"$SubComputerSID`"")
                         }
                         else {
                             $SubUserName = ,$_.Properties['name'][0]
                             $SubUserSID = (New-Object System.Security.Principal.SecurityIdentifier($_.Properties['objectsid'][0],0)).Value
-                            # "`"ou`",`"$OUName`",`"$OUGuid`",`"$ContainerBlocksInheritence`",`"computer`",`"$SubUserName`",`"$SubUserSID`""
                             $ContainerWriter.WriteLine("`"ou`",`"$OUName`",`"$OUGuid`",`"$ContainerBlocksInheritence`",`"user`",`"$SubUserName`",`"$SubUserSID`"")
                         }
                     }
@@ -5502,165 +5498,252 @@ function Invoke-BloodHound {
                 Write-Verbose "Enumerating ACLs for objects in domain: $TargetDomain"
 
                 $ObjectSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController -ADSPath $UserADSpath
-                $ObjectSearcher.SecurityMasks = [System.DirectoryServices.SecurityMasks]::Dacl
+                $ObjectSearcher.SecurityMasks = [System.DirectoryServices.SecurityMasks]'Dacl,Owner'
 
-                # only enumerate user and group objects (for now)
+                # enumerate user, computer, group, and GPO objects
                 #   805306368 -> user
                 #   805306369 -> computer
                 #   268435456|268435457|536870912|536870913 -> groups
-                $ObjectSearcher.Filter = '(|(samAccountType=805306368)(samAccountType=805306369)(samAccountType=268435456)(samAccountType=268435457)(samAccountType=536870912)(samAccountType=536870913))'
-                $ObjectSearcher.PropertiesToLoad.AddRange(('distinguishedName','samaccountname','dnshostname','objectclass','objectsid','name', 'ntsecuritydescriptor'))
+                #   (objectCategory=groupPolicyContainer) -> GPOs
+                $ObjectSearcher.Filter = '(|(samAccountType=805306368)(samAccountType=805306369)(samAccountType=268435456)(samAccountType=268435457)(samAccountType=536870912)(samAccountType=536870913)(objectCategory=groupPolicyContainer))'
+                $ObjectSearcher.PropertiesToLoad.AddRange(('distinguishedName','samaccountname','dnshostname','displayname','objectclass','objectsid','name','ntsecuritydescriptor'))
 
                 $ObjectSearcher.FindAll() | ForEach-Object {
                     $Object = $_.Properties
-                    if($Object -and $Object.distinguishedname -and $Object.distinguishedname[0] -and $Object.objectsid -and $Object.objectsid[0]) {
+                    if($Object -and $Object.distinguishedname -and $Object.distinguishedname[0]) {
+                        $DN = $Object.distinguishedname[0]
+                        $ObjectDomain = $DN.SubString($DN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'
+                        $ObjectName, $ObjectADType, $ObjectGuid = $Null
+                        if ($Object.objectclass.contains('computer')) {
+                            $ObjectADType = 'COMPUTER'
+                            if ($Object.dnshostname) {
+                                $ObjectName = $Object.dnshostname[0]
+                            }
+                        }
+                        elseif ($Object.objectclass.contains('groupPolicyContainer')) {
+                            $ObjectADType = 'GPO'
+                            $ObjectGuid = $Object.name[0].trim('{}')
+                            $ObjectDisplayName = $Object.displayname[0]
+                            $ObjectName = "$ObjectDisplayName@$ObjectDomain"
+                        }
+                        else {
+                            if($Object.samaccountname) {
+                                $ObjectSamAccountName = $Object.samaccountname[0]
+                            }
+                            else {
+                                $ObjectSamAccountName = $Object.name[0]
+                            }
+                            $ObjectName = "$ObjectSamAccountName@$ObjectDomain"
 
-                        $ObjectSid = (New-Object System.Security.Principal.SecurityIdentifier($Object.objectsid[0],0)).Value
+                            if ($Object.objectclass.contains('group')) {
+                                $ObjectADType = 'GROUP'
+                            }
+                            elseif ($Object.objectclass.contains('user')) {
+                                $ObjectADType = 'USER'
+                            }
+                            else {
+                                $ObjectADType = 'OTHER'
+                            }
+                        }
 
-                        try {
-                            # parse the 'ntsecuritydescriptor' field returned
-                            New-Object -TypeName Security.AccessControl.RawSecurityDescriptor -ArgumentList $Object['ntsecuritydescriptor'][0], 0 | Select-Object -Expand DiscretionaryAcl | ForEach-Object {
-                                $Counter += 1
-                                if($Counter % 10000 -eq 0) {
-                                    Write-Verbose "ACE counter: $Counter"
-                                    if($ACLWriter) {
-                                        $ACLWriter.Flush()
-                                    }
-                                    [GC]::Collect()
-                                }
-
-                                $RawActiveDirectoryRights = ([Enum]::ToObject([System.DirectoryServices.ActiveDirectoryRights], $_.AccessMask))
-
-                                # check for the following rights:
-                                #   GenericAll                      -   generic fully control of an object
-                                #   GenericWrite                    -   write to any object properties
-                                #   WriteDacl                       -   modify the permissions of the object
-                                #   WriteOwner                      -   modify the owner of an object
-                                #   User-Force-Change-Password      -   extended attribute (00299570-246d-11d0-a768-00aa006e0529)
-                                #   WriteProperty/Self-Membership   -   modify group membership (bf9679c0-0de6-11d0-a285-00aa003049e2)
-                                #   WriteProperty/Script-Path       -   modify a user's script-path (bf9679a8-0de6-11d0-a285-00aa003049e2)
-                                if (
-                                        ( ($RawActiveDirectoryRights -match 'GenericAll|GenericWrite') -and (-not $_.ObjectAceType -or $_.ObjectAceType -eq '00000000-0000-0000-0000-000000000000') ) -or 
-                                        ($RawActiveDirectoryRights -match 'WriteDacl|WriteOwner') -or 
-                                        ( ($RawActiveDirectoryRights -match 'ExtendedRight') -and (-not $_.ObjectAceType -or $_.ObjectAceType -eq '00000000-0000-0000-0000-000000000000') ) -or 
-                                        (($_.ObjectAceType -eq '00299570-246d-11d0-a768-00aa006e0529') -and ($RawActiveDirectoryRights -match 'ExtendedRight')) -or
-                                        (($_.ObjectAceType -eq 'bf9679c0-0de6-11d0-a285-00aa003049e2') -and ($RawActiveDirectoryRights -match 'WriteProperty')) -or
-                                        (($_.ObjectAceType -eq 'bf9679a8-0de6-11d0-a285-00aa003049e2') -and ($RawActiveDirectoryRights -match 'WriteProperty'))
-                                    ) {
-                                    
-                                    $PrincipalSid = $_.SecurityIdentifier.ToString()
-                                    $PrincipalSimpleName, $PrincipalObjectClass, $ACEType = $Null
-
-                                    # only grab the AD right names we care about
-                                    #   'GenericAll|GenericWrite|WriteOwner|WriteDacl'
-                                    $ActiveDirectoryRights = $ACLGeneralRightsRegex.Matches($RawActiveDirectoryRights) | Select-Object -ExpandProperty Value
-                                    if (-not $ActiveDirectoryRights) {
-                                        if ($RawActiveDirectoryRights -match 'ExtendedRight') {
-                                            $ActiveDirectoryRights = 'ExtendedRight'
+                        if ($ObjectName -and $ObjectADType) {
+                            try {
+                                # parse the 'ntsecuritydescriptor' field returned
+                                $SecDesc = New-Object -TypeName Security.AccessControl.RawSecurityDescriptor -ArgumentList $Object['ntsecuritydescriptor'][0], 0
+                                $SecDesc| Select-Object -Expand DiscretionaryAcl | ForEach-Object {
+                                    $Counter += 1
+                                    if($Counter % 10000 -eq 0) {
+                                        Write-Verbose "ACE counter: $Counter"
+                                        if($ACLWriter) {
+                                            $ACLWriter.Flush()
                                         }
-                                        else {
-                                            $ActiveDirectoryRights = 'WriteProperty'
-                                        }
-
-                                        # decode the ACE types here
-                                        $ACEType = Switch ($_.ObjectAceType) {
-                                            '00299570-246d-11d0-a768-00aa006e0529' {'User-Force-Change-Password'}
-                                            'bf9679c0-0de6-11d0-a285-00aa003049e2' {'Member'}
-                                            'bf9679a8-0de6-11d0-a285-00aa003049e2' {'Script-Path'}
-                                            Default {'All'}
-                                        }
+                                        [GC]::Collect()
                                     }
 
-                                    if ($PrincipalMapping[$PrincipalSid]) {
-                                        # Write-Verbose "$PrincipalSid in cache!"
-                                        # $PrincipalMappings format -> @{ SID : @(PrincipalSimpleName, PrincipalObjectClass) }
-                                        $PrincipalSimpleName, $PrincipalObjectClass = $PrincipalMapping[$PrincipalSid]
-                                    }
-                                    elseif ($CommonSidMapping[$PrincipalSid]) {
-                                        # Write-Verbose "$PrincipalSid in common sids!"
-                                        $PrincipalName, $PrincipalObjectClass = $CommonSidMapping[$PrincipalSid]
-                                        $PrincipalSimpleName = "$PrincipalName@$TargetDomain"
-                                        $PrincipalMapping[$PrincipalSid] = $PrincipalSimpleName, $PrincipalObjectClass
-                                    }
-                                    else {
-                                        # Write-Verbose "$PrincipalSid NOT in cache!"
-                                        # first try querying the target domain for this SID
-                                        $SIDSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController
-                                        $SIDSearcher.PropertiesToLoad.AddRange(('samaccountname','distinguishedname','dnshostname','objectclass'))
-                                        $SIDSearcher.Filter = "(objectsid=$PrincipalSid)"
-                                        $PrincipalObject = $SIDSearcher.FindOne()
+                                    $RawActiveDirectoryRights = ([Enum]::ToObject([System.DirectoryServices.ActiveDirectoryRights], $_.AccessMask))
 
-                                        if ((-not $PrincipalObject) -and ((-not $DomainController) -or (-not $DomainController.StartsWith('GC:')))) {
-                                            # if the object didn't resolve from the current domain, attempt to query the global catalog
-                                            $GCSearcher = Get-DomainSearcher -ADSpath $GCADSPath
-                                            $GCSearcher.PropertiesToLoad.AddRange(('samaccountname','distinguishedname','dnshostname','objectclass'))
-                                            $GCSearcher.Filter = "(objectsid=$PrincipalSid)"
-                                            $PrincipalObject = $GCSearcher.FindOne()
-                                        }
+                                    # check for the following rights:
+                                    #   GenericAll                                      -   generic fully control of an object
+                                    #   GenericWrite                                    -   write to any object properties
+                                    #   WriteProperty/all                               -   write to any object properties
+                                    #   ExtendedRight/all                               -   write to any object properties
+                                    #   WriteDacl                                       -   modify the permissions of the object
+                                    #   WriteOwner                                      -   modify the owner of an object
+                                    #   ExtendedRight/User-Force-Change-Password        -   force reset a user's password (00299570-246d-11d0-a768-00aa006e0529)
+                                    #   WriteProperty/Self-Membership                   -   modify group membership (bf9679c0-0de6-11d0-a285-00aa003049e2)
+                                    #   WriteProperty/Script-Path                       -   modify a user's script-path (bf9679a8-0de6-11d0-a285-00aa003049e2)
+                                    #   WriteProperty/GPC-File-Sys-Path                 -   modify the files in a GPO's SYSVOL folder (f30e3bc1-9ff0-11d1-b603-0000f80367c1)
+                                    if (
+                                            ( ($RawActiveDirectoryRights -match 'GenericAll|GenericWrite') -and (-not $_.ObjectAceType -or $_.ObjectAceType -eq '00000000-0000-0000-0000-000000000000') ) -or 
+                                            ( ($RawActiveDirectoryRights -match 'WriteProperty') -and (-not $_.ObjectAceType -or $_.ObjectAceType -eq '00000000-0000-0000-0000-000000000000') ) -or 
+                                            ( ($RawActiveDirectoryRights -match 'ExtendedRight') -and (-not $_.ObjectAceType -or $_.ObjectAceType -eq '00000000-0000-0000-0000-000000000000') ) -or 
+                                            ($RawActiveDirectoryRights -match 'WriteDacl|WriteOwner') -or 
+                                            (($_.ObjectAceType -eq '00299570-246d-11d0-a768-00aa006e0529') -and ($RawActiveDirectoryRights -match 'ExtendedRight')) -or
+                                            (($_.ObjectAceType -eq 'bf9679c0-0de6-11d0-a285-00aa003049e2') -and ($RawActiveDirectoryRights -match 'WriteProperty')) -or
+                                            (($_.ObjectAceType -eq 'bf9679a8-0de6-11d0-a285-00aa003049e2') -and ($RawActiveDirectoryRights -match 'WriteProperty')) -or
+                                            (($_.ObjectAceType -eq 'f30e3bc1-9ff0-11d1-b603-0000f80367c1') -and ($RawActiveDirectoryRights -match 'WriteProperty'))
+                                        ) {
 
-                                        if ($PrincipalObject) {
-                                            if ($PrincipalObject.Properties.objectclass.contains('computer')) {
-                                                $PrincipalObjectClass = 'COMPUTER'
-                                                $PrincipalSimpleName = $PrincipalObject.Properties.dnshostname[0]
+                                        $PrincipalSid = $_.SecurityIdentifier.ToString()
+                                        $PrincipalSimpleName, $PrincipalObjectClass, $ACEType = $Null
+
+                                        # only grab the AD right names we care about
+                                        #   'GenericAll|GenericWrite|WriteOwner|WriteDacl'
+                                        $ActiveDirectoryRights = $ACLGeneralRightsRegex.Matches($RawActiveDirectoryRights) | Select-Object -ExpandProperty Value
+                                        if (-not $ActiveDirectoryRights) {
+                                            if ($RawActiveDirectoryRights -match 'ExtendedRight') {
+                                                $ActiveDirectoryRights = 'ExtendedRight'
                                             }
                                             else {
-                                                $PrincipalSamAccountName = $PrincipalObject.Properties.samaccountname[0]
-                                                $PrincipalDN = $PrincipalObject.Properties.distinguishedname[0]
-                                                $PrincipalDomain = $PrincipalDN.SubString($PrincipalDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'
-                                                $PrincipalSimpleName = "$PrincipalSamAccountName@$PrincipalDomain"
+                                                $ActiveDirectoryRights = 'WriteProperty'
+                                            }
 
-                                                if ($PrincipalObject.Properties.objectclass.contains('group')) {
-                                                    $PrincipalObjectClass = 'GROUP'
-                                                }
-                                                elseif ($PrincipalObject.Properties.objectclass.contains('user')) {
-                                                    $PrincipalObjectClass = 'USER'
+                                            # decode the ACE types here
+                                            $ACEType = Switch ($_.ObjectAceType) {
+                                                '00299570-246d-11d0-a768-00aa006e0529' {'User-Force-Change-Password'}
+                                                'bf9679c0-0de6-11d0-a285-00aa003049e2' {'Member'}
+                                                'bf9679a8-0de6-11d0-a285-00aa003049e2' {'Script-Path'}
+                                                'f30e3bc1-9ff0-11d1-b603-0000f80367c1' {'GPC-File-Sys-Path'}
+                                                Default {'All'}
+                                            }
+                                        }
+
+                                        if ($PrincipalMapping[$PrincipalSid]) {
+                                            # $PrincipalMappings format -> @{ SID : @(PrincipalSimpleName, PrincipalObjectClass) }
+                                            $PrincipalSimpleName, $PrincipalObjectClass = $PrincipalMapping[$PrincipalSid]
+                                        }
+                                        elseif ($CommonSidMapping[$PrincipalSid]) {
+                                            $PrincipalName, $PrincipalObjectClass = $CommonSidMapping[$PrincipalSid]
+                                            $PrincipalSimpleName = "$PrincipalName@$TargetDomain"
+                                            $PrincipalMapping[$PrincipalSid] = $PrincipalSimpleName, $PrincipalObjectClass
+                                        }
+                                        else {
+                                            # first try querying the target domain for this SID
+                                            $SIDSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController
+                                            $SIDSearcher.PropertiesToLoad.AddRange(('samaccountname','distinguishedname','dnshostname','objectclass'))
+                                            $SIDSearcher.Filter = "(objectsid=$PrincipalSid)"
+                                            $PrincipalObject = $SIDSearcher.FindOne()
+
+                                            if ((-not $PrincipalObject) -and ((-not $DomainController) -or (-not $DomainController.StartsWith('GC:')))) {
+                                                # if the object didn't resolve from the current domain, attempt to query the global catalog
+                                                $GCSearcher = Get-DomainSearcher -ADSpath $GCADSPath
+                                                $GCSearcher.PropertiesToLoad.AddRange(('samaccountname','distinguishedname','dnshostname','objectclass'))
+                                                $GCSearcher.Filter = "(objectsid=$PrincipalSid)"
+                                                $PrincipalObject = $GCSearcher.FindOne()
+                                            }
+
+                                            if ($PrincipalObject) {
+                                                if ($PrincipalObject.Properties.objectclass.contains('computer')) {
+                                                    $PrincipalObjectClass = 'COMPUTER'
+                                                    $PrincipalSimpleName = $PrincipalObject.Properties.dnshostname[0]
                                                 }
                                                 else {
-                                                    $PrincipalObjectClass = 'OTHER'
+                                                    $PrincipalSamAccountName = $PrincipalObject.Properties.samaccountname[0]
+                                                    $PrincipalDN = $PrincipalObject.Properties.distinguishedname[0]
+                                                    $PrincipalDomain = $PrincipalDN.SubString($PrincipalDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'
+                                                    $PrincipalSimpleName = "$PrincipalSamAccountName@$PrincipalDomain"
+
+                                                    if ($PrincipalObject.Properties.objectclass.contains('group')) {
+                                                        $PrincipalObjectClass = 'GROUP'
+                                                    }
+                                                    elseif ($PrincipalObject.Properties.objectclass.contains('user')) {
+                                                        $PrincipalObjectClass = 'USER'
+                                                    }
+                                                    else {
+                                                        $PrincipalObjectClass = 'OTHER'
+                                                    }
                                                 }
                                             }
-                                        }
-                                        else {
-                                            Write-Verbose "SID not resolved: $PrincipalSid"
+                                            else {
+                                                Write-Verbose "SID not resolved: $PrincipalSid"
+                                            }
+
+                                            $PrincipalMapping[$PrincipalSid] = $PrincipalSimpleName, $PrincipalObjectClass
                                         }
 
-                                        $PrincipalMapping[$PrincipalSid] = $PrincipalSimpleName, $PrincipalObjectClass
+                                        if ($PrincipalSimpleName -and $PrincipalObjectClass) {
+                                            if ($PSCmdlet.ParameterSetName -eq 'CSVExport') {
+                                                # "ObjectName","ObjectType","ObjectGuid","PrincipalName","PrincipalType","ActiveDirectoryRights","ACEType","AccessControlType","IsInherited"
+                                                $ACLWriter.WriteLine("`"$ObjectName`",`"$ObjectADType`",`"$ObjectGuid`",`"$PrincipalSimpleName`",`"$PrincipalObjectClass`",`"$ActiveDirectoryRights`",`"$ACEType`",`"$($_.AceQualifier)`",`"$($_.IsInherited)`"")
+                                            }
+                                            else {
+                                                Write-Warning 'TODO: implement neo4j RESTful API ingestion for ACLs!'
+                                            }
+                                        }
+                                    }
+                                }
+                                $SecDesc | Select-Object -Expand Owner | ForEach-Object {
+                                    # now extract out the object owner
+                                    $Counter += 1
+                                    if($Counter % 10000 -eq 0) {
+                                        Write-Verbose "ACE counter: $Counter"
+                                        if($ACLWriter) {
+                                            $ACLWriter.Flush()
+                                        }
+                                        [GC]::Collect()
                                     }
 
-                                    if ($PrincipalSimpleName -and $PrincipalObjectClass) {
-                                        $ObjectName, $ObjectADType = $Null
+                                    if ($_ -and $_.Value) {
+                                        $PrincipalSid = $_.Value
+                                        $PrincipalSimpleName, $PrincipalObjectClass, $ACEType = $Null
 
-                                        if ($Object.objectclass.contains('computer')) {
-                                            $ObjectADType = 'COMPUTER'
-                                            if ($Object.dnshostname) {
-                                                $ObjectName = $Object.dnshostname[0]
-                                            }
+                                        if ($PrincipalMapping[$PrincipalSid]) {
+                                            # $PrincipalMappings format -> @{ SID : @(PrincipalSimpleName, PrincipalObjectClass) }
+                                            $PrincipalSimpleName, $PrincipalObjectClass = $PrincipalMapping[$PrincipalSid]
+                                        }
+                                        elseif ($CommonSidMapping[$PrincipalSid]) {
+                                            $PrincipalName, $PrincipalObjectClass = $CommonSidMapping[$PrincipalSid]
+                                            $PrincipalSimpleName = "$PrincipalName@$TargetDomain"
+                                            $PrincipalMapping[$PrincipalSid] = $PrincipalSimpleName, $PrincipalObjectClass
                                         }
                                         else {
-                                            if($Object.samaccountname) {
-                                                $ObjectSamAccountName = $Object.samaccountname[0]
-                                            }
-                                            else {
-                                                $ObjectSamAccountName = $Object.name[0]
-                                            }
-                                            $DN = $Object.distinguishedname[0]
-                                            $ObjectDomain = $DN.SubString($DN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'
-                                            $ObjectName = "$ObjectSamAccountName@$ObjectDomain"
+                                            # first try querying the target domain for this SID
+                                            $SIDSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController
+                                            $SIDSearcher.PropertiesToLoad.AddRange(('samaccountname','distinguishedname','dnshostname','objectclass'))
+                                            $SIDSearcher.Filter = "(objectsid=$PrincipalSid)"
+                                            $PrincipalObject = $SIDSearcher.FindOne()
 
-                                            if ($Object.objectclass.contains('group')) {
-                                                $ObjectADType = 'GROUP'
+                                            if ((-not $PrincipalObject) -and ((-not $DomainController) -or (-not $DomainController.StartsWith('GC:')))) {
+                                                # if the object didn't resolve from the current domain, attempt to query the global catalog
+                                                $GCSearcher = Get-DomainSearcher -ADSpath $GCADSPath
+                                                $GCSearcher.PropertiesToLoad.AddRange(('samaccountname','distinguishedname','dnshostname','objectclass'))
+                                                $GCSearcher.Filter = "(objectsid=$PrincipalSid)"
+                                                $PrincipalObject = $GCSearcher.FindOne()
                                             }
-                                            elseif ($Object.objectclass.contains('user')) {
-                                                $ObjectADType = 'USER'
+
+                                            if ($PrincipalObject) {
+                                                if ($PrincipalObject.Properties.objectclass.contains('computer')) {
+                                                    $PrincipalObjectClass = 'COMPUTER'
+                                                    $PrincipalSimpleName = $PrincipalObject.Properties.dnshostname[0]
+                                                }
+                                                else {
+                                                    $PrincipalSamAccountName = $PrincipalObject.Properties.samaccountname[0]
+                                                    $PrincipalDN = $PrincipalObject.Properties.distinguishedname[0]
+                                                    $PrincipalDomain = $PrincipalDN.SubString($PrincipalDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'
+                                                    $PrincipalSimpleName = "$PrincipalSamAccountName@$PrincipalDomain"
+
+                                                    if ($PrincipalObject.Properties.objectclass.contains('group')) {
+                                                        $PrincipalObjectClass = 'GROUP'
+                                                    }
+                                                    elseif ($PrincipalObject.Properties.objectclass.contains('user')) {
+                                                        $PrincipalObjectClass = 'USER'
+                                                    }
+                                                    else {
+                                                        $PrincipalObjectClass = 'OTHER'
+                                                    }
+                                                }
                                             }
                                             else {
-                                                $ObjectADType = 'OTHER'
+                                                Write-Verbose "SID not resolved: $PrincipalSid"
                                             }
+
+                                            $PrincipalMapping[$PrincipalSid] = $PrincipalSimpleName, $PrincipalObjectClass
                                         }
 
-                                        if ($ObjectName -and $ObjectADType) {
+                                        if ($PrincipalSimpleName -and $PrincipalObjectClass) {
                                             if ($PSCmdlet.ParameterSetName -eq 'CSVExport') {
-                                                $ACLWriter.WriteLine("`"$ObjectName`",`"$ObjectADType`",`"$PrincipalSimpleName`",`"$PrincipalObjectClass`",`"$ActiveDirectoryRights`",`"$ACEType`",`"$($_.AceQualifier)`",`"$($_.IsInherited)`"")
+                                                # "ObjectName","ObjectType","ObjectGuid","PrincipalName","PrincipalType","ActiveDirectoryRights","ACEType","AccessControlType","IsInherited"
+                                                $ACLWriter.WriteLine("`"$ObjectName`",`"$ObjectADType`",`"$ObjectGuid`",`"$PrincipalSimpleName`",`"$PrincipalObjectClass`",`"Owner`",`"`",`"AccessAllowed`",`"False`"")
                                             }
                                             else {
                                                 Write-Warning 'TODO: implement neo4j RESTful API ingestion for ACLs!'
@@ -5669,9 +5752,9 @@ function Invoke-BloodHound {
                                     }
                                 }
                             }
-                        }
-                        catch {
-                            Write-Verbose "ACL ingestion error: $_"
+                            catch {
+                                Write-Verbose "ACL ingestion error: $_"
+                            }
                         }
                     }
                 }
