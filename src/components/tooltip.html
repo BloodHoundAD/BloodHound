@@ -9,7 +9,7 @@
      <li onclick="emitter.emit('setEnd', '{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
-     <li onclick="emitter.emit('query', 'MATCH (n:User {name:{name}}),(m:User),p=shortestPath((m)-[r*1..]->(n)) RETURN p', {name: '{{label}}'}, '{{label}}')">
+     <li onclick="emitter.emit('query', 'MATCH (n:User {name:{name}}),(m:User),p=shortestPath((m)-[r*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
      </li>
      {{/type_user}} 
@@ -20,7 +20,7 @@
      <li onclick="emitter.emit('setEnd', '{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
-     <li onclick="emitter.emit('query', 'MATCH (n:Computer {name:{name}}),(m:User),p=allShortestPaths((m)-[r*1..]->(n)) RETURN p', {name: '{{label}}'}, '{{label}}')">
+     <li onclick="emitter.emit('query', 'MATCH (n:Computer {name:{name}}),(m:User),p=allShortestPaths((m)-[r*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
      </li>
      {{/type_computer}} 
@@ -31,7 +31,7 @@
      <li onclick="emitter.emit('setEnd', '{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
-     <li onclick="emitter.emit('query', 'MATCH (n:Group {name:{name}}),(m:User),p=allShortestPaths((m)-[r*1..]->(n)) RETURN p', {name: '{{label}}'}, '{{label}}')">
+     <li onclick="emitter.emit('query', 'MATCH (n:Group {name:{name}}),(m:User),p=allShortestPaths((m)-[r*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
      </li>
      {{/type_group}} 

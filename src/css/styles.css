@@ -29,6 +29,7 @@ html,
 body {
     font-family: 'Roboto', sans-serif;
     height: 100%;
+    overflow: hidden;
     background-color: lightgray;
     overflow: hidden;
 }
@@ -57,6 +58,7 @@ div.tooltip-inner-custom {
     left: 50%;
     width: 70%;
     transform: translateX(-50%);
+    pointer-events: auto;
 }
 
 .bottomdiv {
@@ -65,8 +67,8 @@ div.tooltip-inner-custom {
     bottom: 0;
     overflow: auto;
     width: 100%;
+    pointer-events: none;
 }
-
 
 .slideupbutton {
     position: relative;
@@ -77,6 +79,7 @@ div.tooltip-inner-custom {
     transform: translateX(-50%);
     border-radius: 20px 20px 0 0;
     background-color: white;
+    pointer-events: auto;
 }
 
 .slideupbutton:focus {
