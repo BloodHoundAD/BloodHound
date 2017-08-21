@@ -5051,8 +5051,9 @@ function Invoke-BloodHound {
                 $DomainSID = Get-DomainSID -Domain $TargetDomain -DomainController $DomainController
 
                 $ObjectSearcher = Get-DomainSearcher -Domain $TargetDomain -DomainController $DomainController -ADSPath $UserADSpath
-                # only return results that have 'memberof' set
-                $ObjectSearcher.Filter = '(memberof=*)'
+                # only return results that have 'memberof' or 'primarygroupid' set. We want both because the membership of an object is the union of both
+                # and we don't want to miss objects with only a 'primarygroupid' and no 'memberof'
+                $ObjectSearcher.Filter = '(|(memberof=*)(primarygroupid=*))'
                 # only return specific properties in the results
                 $Null = $ObjectSearcher.PropertiesToLoad.AddRange(('samaccountname', 'distinguishedname', 'cn', 'dnshostname', 'samaccounttype', 'primarygroupid', 'memberof'))
                 $Counter = 0
@@ -5194,37 +5195,39 @@ function Invoke-BloodHound {
                         }
 
                         # iterate through each membership for this object
-                        ForEach($GroupDN in $_.properties['memberof']) {
-                            $GroupDomain = $GroupDN.subString($GroupDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'
+                        if($_.properties['memberof'] -ne $null) { # some objects only have a 'primaryGroupID' but no 'memberOf'
+                            ForEach($GroupDN in $_.properties['memberof']) {
+                                $GroupDomain = $GroupDN.subString($GroupDN.IndexOf('DC=')) -replace 'DC=','' -replace ',','.'
 
-                            if($GroupDNMappings[$GroupDN]) {
-                                $GroupName = $GroupDNMappings[$GroupDN]
-                            }
-                            else {
-                                $GroupName = Convert-ADName -ObjectName $GroupDN
-                                if($GroupName) {
-                                    $GroupName = $GroupName.Split('\')[-1]
+                                if($GroupDNMappings[$GroupDN]) {
+                                    $GroupName = $GroupDNMappings[$GroupDN]
                                 }
                                 else {
-                                    $GroupName = $GroupDN.SubString(0, $GroupDN.IndexOf(',')).Split('=')[-1]
+                                    $GroupName = Convert-ADName -ObjectName $GroupDN
+                                    if($GroupName) {
+                                        $GroupName = $GroupName.Split('\')[-1]
+                                    }
+                                    else {
+                                        $GroupName = $GroupDN.SubString(0, $GroupDN.IndexOf(',')).Split('=')[-1]
+                                    }
+                                    $GroupDNMappings[$GroupDN] = $GroupName
                                 }
-                                $GroupDNMappings[$GroupDN] = $GroupName
-                            }
 
-                            if ($PSCmdlet.ParameterSetName -eq 'CSVExport') {
-                                $GroupWriter.WriteLine("`"$GroupName@$GroupDomain`",`"$AccountName`",`"$ObjectType`"")
-                            }
-                            else {
-                                # otherwise we're exporting to the neo4j RESTful API
-                                $ObjectTypeCap = $Title.ToTitleCase($ObjectType)
+                                if ($PSCmdlet.ParameterSetName -eq 'CSVExport') {
+                                    $GroupWriter.WriteLine("`"$GroupName@$GroupDomain`",`"$AccountName`",`"$ObjectType`"")
+                                }
+                                else {
+                                    # otherwise we're exporting to the neo4j RESTful API
+                                    $ObjectTypeCap = $Title.ToTitleCase($ObjectType)
 
-                                $Null = $Statements.Add( @{ "statement"="MERGE ($($ObjectType)1:$ObjectTypeCap { name: UPPER('$AccountName') }) MERGE (group2:Group { name: UPPER('$GroupName@$GroupDomain') }) MERGE ($($ObjectType)1)-[:MemberOf]->(group2)" } )
+                                    $Null = $Statements.Add( @{ "statement"="MERGE ($($ObjectType)1:$ObjectTypeCap { name: UPPER('$AccountName') }) MERGE (group2:Group { name: UPPER('$GroupName@$GroupDomain') }) MERGE ($($ObjectType)1)-[:MemberOf]->(group2)" } )
 
-                                if ($Statements.Count -ge $Throttle) {
-                                    $Json = @{ "statements"=[System.Collections.Hashtable[]]$Statements }
-                                    $JsonRequest = ConvertTo-Json20 $Json
-                                    $Null = $WebClient.UploadString($URI.AbsoluteUri + "db/data/transaction/commit", $JsonRequest)
-                                    $Statements.Clear()
+                                    if ($Statements.Count -ge $Throttle) {
+                                        $Json = @{ "statements"=[System.Collections.Hashtable[]]$Statements }
+                                        $JsonRequest = ConvertTo-Json20 $Json
+                                        $Null = $WebClient.UploadString($URI.AbsoluteUri + "db/data/transaction/commit", $JsonRequest)
+                                        $Statements.Clear()
+                                    }
                                 }
                             }
                         }
