@@ -3511,9 +3511,16 @@ function Get-NetLocalGroup {
 
         The local group name to query for users. If not given, it defaults to "Administrators"
 
-    .PARAMETER Recurse
+    .PARAMETER LocalAdminGroup
 
-        Switch. If the local member member is a domain group, recursively try to resolve its members to get a list of domain users who can access this machine.
+        Switch. Return the members of the local Administrators (-544) group.
+        If this group is not named GroupName (default "Administrators), probably because of a localization or a rename,
+        this will re-try by discovering first its real name through enumeration.
+
+    .PARAMETER ListGroups
+
+        Switch. List all the local groups instead of their members.
+        Old Get-NetLocalGroups functionality.
 
     .PARAMETER API
 
@@ -3543,10 +3550,9 @@ function Get-NetLocalGroup {
 
     .EXAMPLE
 
-        PS C:\> Get-NetLocalGroup -ComputerName WINDOWS7 -Recurse
+        PS C:\> Get-NetLocalGroup -ComputerName WINDOWS7 -ListGroups
 
-        Returns all effective local/domain users/groups that can access WINDOWS7 with
-        local administrative privileges.
+        Returns all local groups on the WINDOWS7 host.
 
     .EXAMPLE
 
@@ -3581,9 +3587,16 @@ function Get-NetLocalGroup {
         [String]
         $GroupName = 'Administrators',
 
+        [Switch]
+        $LocalAdminGroup,
+        
         [Parameter(ParameterSetName = 'API')]
         [Switch]
         $API,
+
+        [Parameter(ParameterSetName = 'WinNT')]
+        [Switch]
+        $ListGroups,
 
         [Switch]
         $IsDomain,
@@ -3623,6 +3636,19 @@ function Get-NetLocalGroup {
                 # get the local user information
                 $Result = $Netapi32::NetLocalGroupGetMembers($Server, $GroupName, $QueryLevel, [ref]$PtrInfo, -1, [ref]$EntriesRead, [ref]$TotalRead, [ref]$ResumeHandle)
 
+                # Group $GroupName (default 'Administrators') not found (2220=NERR_GroupNotFound) probably because it is renamed or localized
+                # cf. https://social.technet.microsoft.com/wiki/contents/articles/13813.localized-names-for-administrator-account-in-windows.aspx
+                # But the caller wanted the LocalAdminGroup, so we re-try by enumerating all the groups with Get-NetLocalGroup -ListGroups
+                # and discover the admin group name by its well-known -544 SID
+                if (($Result -eq 2220) -and ($LocalAdminGroup)) {
+                    $AdminGroup = Get-NetLocalGroup -ComputerName $Server -ListGroups | Where-Object {$_.SID -eq 'S-1-5-32-544'}
+                    if($AdminGroup)
+                    {
+                        $GroupName = $AdminGroup.Group
+                        $Result = $Netapi32::NetLocalGroupGetMembers($Server, $GroupName, $QueryLevel, [ref]$PtrInfo, -1, [ref]$EntriesRead, [ref]$TotalRead, [ref]$ResumeHandle)
+                    }
+                }
+                
                 # Locate the offset of the initial intPtr
                 $Offset = $PtrInfo.ToInt64()
 
@@ -3631,7 +3657,7 @@ function Get-NetLocalGroup {
                 # 0 = success
                 if (($Result -eq 0) -and ($Offset -gt 0)) {
 
-                    # Work out how mutch to increment the pointer by finding out the size of the structure
+                    # Work out how much to increment the pointer by finding out the size of the structure
                     $Increment = $LOCALGROUP_MEMBERS_INFO_2::GetSize()
 
                     # parse all the result structures
@@ -3697,28 +3723,67 @@ function Get-NetLocalGroup {
             else {
                 # otherwise we're using the WinNT service provider
                 try {
-                    $LocalUsers = @()
-                    $Members = @($([ADSI]"WinNT://$Server/$GroupName,group").psbase.Invoke('Members'))
+                    if($ListGroups) {
+                        # if we're listing the group names on a remote server
+                        $Computer = [ADSI]"WinNT://$Server,computer"
 
-                    $Members | ForEach-Object {
-                        $LocalUser = ([ADSI]$_)
-
-                        $AdsPath = $LocalUser.InvokeGet('AdsPath').Replace('WinNT://', '')
-
-                        if(([regex]::Matches($AdsPath, '/')).count -eq 1) {
-                            # DOMAIN\user
-                            $MemberIsDomain = $True
-                            $Name = $AdsPath.Replace('/', '\')
+                        $Computer.psbase.children | Where-Object { $_.psbase.schemaClassName -eq 'group' } | ForEach-Object {
+                            $Group = New-Object PSObject
+                            $Group | Add-Member Noteproperty 'Group' ($_.name[0])
+                            $Group | Add-Member Noteproperty 'SID' ((New-Object System.Security.Principal.SecurityIdentifier $_.objectsid[0],0).Value)
+                            $Group
                         }
-                        else {
-                            # DOMAIN\machine\user
-                            $MemberIsDomain = $False
-                            $Name = $AdsPath.Substring($AdsPath.IndexOf('/')+1).Replace('/', '\')
+                    }
+                    else {
+                        # otherwise we're listing the group members
+                        $LocalUsers = @()
+                        try {
+                            $Members = @($([ADSI]"WinNT://$Server/$GroupName,group").psbase.Invoke('Members'))
+                        } catch {
+                            # Exception probably means that the group $GroupName (default 'Administrators') was not found, probably because it is renamed or localized
+                            # cf. https://social.technet.microsoft.com/wiki/contents/articles/13813.localized-names-for-administrator-account-in-windows.aspx
+                            # But the caller wanted the LocalAdminGroup, so we re-try by enumerating all the groups with Get-NetLocalGroup -ListGroups
+                            # and discover the admin group name by its well-known -544 SID
+                            if ($LocalAdminGroup) {
+                                $AdminGroup = Get-NetLocalGroup -ListGroups -ComputerName $Server | Where-Object {$_.SID -eq 'S-1-5-32-544'}
+                                if($AdminGroup)
+                                {
+                                    $GroupName = $AdminGroup.Group
+                                    $Members = @($([ADSI]"WinNT://$Server/$GroupName,group").psbase.Invoke('Members'))
+                                }
+                            }
                         }
 
-                        $IsGroup = ($LocalUser.SchemaClassName -like 'group')
-                        if($IsDomain) {
-                            if($MemberIsDomain) {
+                        $Members | ForEach-Object {
+                            $LocalUser = ([ADSI]$_)
+
+                            $AdsPath = $LocalUser.InvokeGet('AdsPath').Replace('WinNT://', '')
+
+                            if(([regex]::Matches($AdsPath, '/')).count -eq 1) {
+                                # DOMAIN\user
+                                $MemberIsDomain = $True
+                                $Name = $AdsPath.Replace('/', '\')
+                            }
+                            else {
+                                # DOMAIN\machine\user
+                                $MemberIsDomain = $False
+                                $Name = $AdsPath.Substring($AdsPath.IndexOf('/')+1).Replace('/', '\')
+                            }
+
+                            $IsGroup = ($LocalUser.SchemaClassName -like 'group')
+                            if($IsDomain) {
+                                if($MemberIsDomain) {
+                                    $LocalUsers += @{
+                                        'ComputerName' = $Server
+                                        'AccountName' = $Name
+                                        'SID' = ((New-Object System.Security.Principal.SecurityIdentifier($LocalUser.InvokeGet('ObjectSID'),0)).Value)
+                                        'IsGroup' = $IsGroup
+                                        'IsDomain' = $MemberIsDomain
+                                        'Type' = 'LocalUser'
+                                    }
+                                }
+                            }
+                            else {
                                 $LocalUsers += @{
                                     'ComputerName' = $Server
                                     'AccountName' = $Name
@@ -3729,18 +3794,8 @@ function Get-NetLocalGroup {
                                 }
                             }
                         }
-                        else {
-                            $LocalUsers += @{
-                                'ComputerName' = $Server
-                                'AccountName' = $Name
-                                'SID' = ((New-Object System.Security.Principal.SecurityIdentifier($LocalUser.InvokeGet('ObjectSID'),0)).Value)
-                                'IsGroup' = $IsGroup
-                                'IsDomain' = $MemberIsDomain
-                                'Type' = 'LocalUser'
-                            }
-                        }
+                        $LocalUsers
                     }
-                    $LocalUsers
                 }
                 catch {
                     Write-Verbose "Get-NetLocalGroup error for $Server : $_"
@@ -4727,6 +4782,11 @@ function Invoke-BloodHound {
         'Default' uses 'Group' collection, regular user hunting with 'Session'/'LoggedOn', 'LocalGroup' enumeration, and 'Trusts' enumeration.
         'ComputerOnly' only enumerates computers, not groups/trusts, and executes local admin/session/loggedon on each.
 
+    .PARAMETER LocalAdminGroupName
+
+        Name of the local admin group on the computers. Default is "Administrators" but the name can be localized (e.g. "Administrateurs" in French)
+        or simply renamed.
+
     .PARAMETER SearchForest
 
         Switch. Search all domains in the forest for target users instead of just
@@ -4813,6 +4873,9 @@ function Invoke-BloodHound {
         [String]
         [ValidateSet('Group', 'ACLs', 'ComputerOnly', 'LocalGroup', 'GPOLocalGroup', 'Session', 'LoggedOn', 'Stealth', 'Trusts', 'Default')]
         $CollectionMethod = 'Default',
+
+        [String]
+        $LocalAdminGroupName = 'Administrators',
 
         [Switch]
         $SearchForest,
@@ -5580,19 +5643,19 @@ function Invoke-BloodHound {
 
         # script block that enumerates a server
         $HostEnumBlock = {
-            Param($ComputerName, $CurrentUser2, $UseLocalGroup2, $UseSession2, $UseLoggedon2, $DomainSID2)
+            Param($ComputerName, $LocalAdminGroupName2, $CurrentUser2, $UseLocalGroup2, $UseSession2, $UseLoggedon2, $DomainSID2)
 
             ForEach ($TargetComputer in $ComputerName) {
                 $Up = Test-Connection -Count 1 -Quiet -ComputerName $TargetComputer
                 if($Up) {
                     if($UseLocalGroup2) {
                         # grab the users for the local admins on this server
-                        $Results = Get-NetLocalGroup -ComputerName $TargetComputer -API -IsDomain -DomainSID $DomainSID2
+                        $Results = Get-NetLocalGroup -ComputerName $TargetComputer -GroupName $LocalAdminGroupName2 -LocalAdminGroup -API -IsDomain -DomainSID $DomainSID2
                         if($Results) {
                             $Results
                         }
                         else {
-                            Get-NetLocalGroup -ComputerName $TargetComputer -IsDomain -DomainSID $DomainSID2
+                            Get-NetLocalGroup -ComputerName $TargetComputer -GroupName $LocalAdminGroupName2 -LocalAdminGroup -IsDomain -DomainSID $DomainSID2
                         }
                     }
 
@@ -5689,6 +5752,7 @@ function Invoke-BloodHound {
                 $DomainSID = Get-DomainSid -Domain $TargetDomain
 
                 $ScriptParameters = @{
+                    'LocalAdminGroupName2' = $LocalAdminGroupName
                     'CurrentUser2' = $CurrentUser
                     'UseLocalGroup2' = $UseLocalGroup
                     'UseSession2' = $UseSession
