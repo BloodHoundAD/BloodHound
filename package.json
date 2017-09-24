@@ -6,12 +6,12 @@
     "Graph",
     "Active Directory"
   ],
-  "homepage": "https://github.com/adaptivethreat/Bloodhound",
+  "homepage": "https://github.com/BloodHoundAD/Bloodhound",
   "repository": {
     "type": "git",
-    "url": "https://github.com/adaptivethreat/Bloodhound.git"
+    "url": "https://github.com/BloodHoundAD/Bloodhound.git"
   },
-  "bugs": "https://github.com/adaptivethreat/Bloodhound/issues",
+  "bugs": "https://github.com/BloodHoundAD/Bloodhound/issues",
   "license": "GPL-3.0",
   "author": "Rohan Vazarkar <rvazarkr@gmail.com> (https://www.twitter.com/cptjesus)",
   "contributors": [
