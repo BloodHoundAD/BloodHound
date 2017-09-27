@@ -20,14 +20,15 @@ export default class GraphContainer extends Component {
             firstDraw: true,
             template: null,
             session: driver.session()
-        }
+        };
+
         $.ajax({
             url: 'src/components/tooltip.html',
             type: 'GET',
             success: function(response){
                 this.setState({template: response}) 
             }.bind(this)
-        })
+        });
 
         child.stdout.on('data', (data) => {
           console.log(`stdout: ${data}`);
@@ -41,7 +42,7 @@ export default class GraphContainer extends Component {
           this.loadFromChildProcess(m)
         }.bind(this));
 
-        var s1 = driver.session()
+        var s1 = driver.session();
         var s2 = driver.session()
         var s3 = driver.session()
         var s4 = driver.session()
@@ -84,12 +85,41 @@ export default class GraphContainer extends Component {
         }.bind(this))
     }
 
+    componentWillMount() {
+        emitter.on('searchQuery', this.doSearchQuery.bind(this));
+        emitter.on('pathQuery', this.doPathQuery.bind(this));
+        emitter.on('graphBack', this.goBack.bind(this));
+        emitter.on('query', this.doGenericQuery.bind(this));
+        emitter.on('spotlightClick', this.spotlightClickHandler.bind(this))
+        emitter.on('graphRefresh', this.relayout.bind(this))
+        emitter.on('export', this.export.bind(this))
+        emitter.on('import', this.import.bind(this))
+        emitter.on('clearDB', this.clearGraph.bind(this))
+        emitter.on('changeGraphicsMode', this.setGraphicsMode.bind(this))
+        emitter.on('ungroupNode', this.ungroupNode.bind(this))
+        emitter.on('unfoldNode', this.unfoldEdgeNode.bind(this))
+        emitter.on('collapseNode', this.foldEdgeNode.bind(this))
+        emitter.on('resetZoom', this.resetZoom.bind(this))
+        emitter.on('zoomIn', this.zoomIn.bind(this))
+        emitter.on('zoomOut', this.zoomOut.bind(this))
+    }
+
+    componentDidMount() {
+        this.initializeSigma();
+        
+        this.doQueryNative({
+            statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
+            allowCollapse: false,
+            props: {}
+        });
+    }
+
     relayout(){
         sigma.layouts.stopForceLink()
         if (appStore.dagre){
             sigma.layouts.dagre.start(this.state.sigmaInstance);
         }else{
-            sigma.layouts.startForceLink()
+            sigma.layouts.startForceLink();
         }
     }
 
@@ -106,17 +136,17 @@ export default class GraphContainer extends Component {
               });
         }else{
             var json = this.state.sigmaInstance.toJSON({
-                pretty: true,
-            })
+                pretty: true
+            });
 
-            json = JSON.parse(json)
-            json.spotlight = appStore.spotlightData
+            json = JSON.parse(json);
+            json.spotlight = appStore.spotlightData;
 
             dialog.showSaveDialog({
                 defaultPath: 'graph.json'
             }, function(loc){
-                fs.writeFile(loc, JSON.stringify(json, null, 2))
-            })
+                fs.writeFile(loc, JSON.stringify(json, null, 2));
+            });
         }
     }
 
@@ -231,25 +261,6 @@ export default class GraphContainer extends Component {
         this.state.design.apply()
     }
 
-    componentWillMount() {
-        emitter.on('searchQuery', this.doSearchQuery.bind(this));
-        emitter.on('pathQuery', this.doPathQuery.bind(this));
-        emitter.on('graphBack', this.goBack.bind(this));
-        emitter.on('query', this.doGenericQuery.bind(this));
-        emitter.on('spotlightClick', this.spotlightClickHandler.bind(this))
-        emitter.on('graphRefresh', this.relayout.bind(this))
-        emitter.on('export', this.export.bind(this))
-        emitter.on('import', this.import.bind(this))
-        emitter.on('clearDB', this.clearGraph.bind(this))
-        emitter.on('changeGraphicsMode', this.setGraphicsMode.bind(this))
-        emitter.on('ungroupNode', this.ungroupNode.bind(this))
-        emitter.on('unfoldNode', this.unfoldEdgeNode.bind(this))
-        emitter.on('collapseNode', this.foldEdgeNode.bind(this))
-        emitter.on('resetZoom', this.resetZoom.bind(this))
-        emitter.on('zoomIn', this.zoomIn.bind(this))
-        emitter.on('zoomOut', this.zoomOut.bind(this))
-    }
-
     resetZoom(){
         sigma.misc.animation.camera(
             this.state.sigmaInstance.camera,
@@ -279,16 +290,6 @@ export default class GraphContainer extends Component {
         {
             duration: sigmaInstance.settings('animationsTime')
         });
-    }
-
-    componentDidMount() {
-        this.initializeSigma();
-        
-        this.doQueryNative({
-            statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
-            allowCollapse: false,
-            props: {}
-        })
     }
 
     render() {

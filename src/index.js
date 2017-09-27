@@ -109,7 +109,8 @@ global.appStore = {
             'WriteDACL': 'tapered',
             'WriteOwner': 'tapered',
             'AddMembers': 'tapered',
-            'TrustedBy': 'curvedArrow'
+            'TrustedBy': 'curvedArrow',
+            'DCSync' : 'tapered'
         }
     },
     lowResPalette: {

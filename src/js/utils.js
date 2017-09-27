@@ -10,32 +10,32 @@ export function generateUniqueId(sigmaInstance, isNode) {
         }
     }
 
-    return i
+    return i;
 }
 
 //Recursive function to highlight paths to start/end nodes
 export function findGraphPath(sigmaInstance, reverse, nodeid) {
-    var target = reverse ? appStore.startNode : appStore.endNode
+    var target = reverse ? appStore.startNode : appStore.endNode;
         //This is our stop condition for recursing
     if (nodeid !== target.id) {
-        var edges = sigmaInstance.graph.adjacentEdges(nodeid)
-        var nodes = reverse ? sigmaInstance.graph.inboundNodes(nodeid) : sigmaInstance.graph.outboundNodes(nodeid)
+        var edges = sigmaInstance.graph.adjacentEdges(nodeid);
+        var nodes = reverse ? sigmaInstance.graph.inboundNodes(nodeid) : sigmaInstance.graph.outboundNodes(nodeid);
             //Loop over the nodes near us and the edges connecting to those nodes
         $.each(nodes, function(index, node) {
             $.each(edges, function(index, edge) {
-                var check = reverse ? edge.source : edge.target
+                var check = reverse ? edge.source : edge.target;
                     //If an edge is pointing in the right direction, set its color
                     //Push the edge into our store and then 
-                node = parseInt(node)
+                node = parseInt(node);
                 if (check === node) {
                     edge.color = reverse ? 'blue' : 'red';
                     appStore.highlightedEdges.push(edge);
                     findGraphPath(sigmaInstance, reverse, node);
                 }
-            })
-        })
+            });
+        });
     } else {
-        return
+        return;
     }
 }
 
@@ -45,192 +45,220 @@ export function clearSessions(){
 }
 
 function deleteSessions(){
-    var session = driver.session()
+    var session = driver.session();
     session.run("MATCH ()-[r:HasSession]-() WITH r LIMIT 100000 DELETE r RETURN count(r)")
         .then(function(results) {
-            session.close()
-            emitter.emit("refreshDBData")
-            var count = results.records[0]._fields[0].low
+            session.close();
+            emitter.emit("refreshDBData");
+            var count = results.records[0]._fields[0].low;
             if (count === 0) {
-                emitter.emit('hideDBClearModal')
+                emitter.emit('hideDBClearModal');
             } else {
                 deleteSessions();
             }
-        })
+        });
 }
 
 export function clearDatabase() {
     emitter.emit('openClearingModal');
-    deleteEdges()
+    deleteEdges();
 }
 
 function deleteEdges() {
-    var session = driver.session()
+    var session = driver.session();
     session.run("MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)")
         .then(function(results) {
             emitter.emit("refreshDBData");
-            session.close()
-            var count = results.records[0]._fields[0].low
+            session.close();
+            var count = results.records[0]._fields[0].low;
             if (count === 0) {
-                deleteNodes()
+                deleteNodes();
             } else {
-                deleteEdges()
+                deleteEdges();
             }
-        })
+        });
 }
 
 function deleteNodes() {
-    var session = driver.session()
+    var session = driver.session();
     session.run("MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)")
         .then(function(results) {
-            emitter.emit("refreshDBData")
-            session.close()
-            var count = results.records[0]._fields[0].low
+            emitter.emit("refreshDBData");
+            session.close();
+            var count = results.records[0]._fields[0].low;
             if (count === 0) {
-                emitter.emit('hideDBClearModal')
+                emitter.emit('hideDBClearModal');
             } else {
-                deleteNodes()
+                deleteNodes();
             }
-        })
+        });
+}
+
+export function findObjectType(header){
+    if (header.includes('UserName') && header.includes('ComputerName') && header.includes('Weight')){
+        return 'sessions';
+    }else if (header.includes('AccountName') && header.includes('AccountType') && header.includes('GroupName')){
+        return 'groupmembership';
+    }else if (header.includes('AccountName') && header.includes('AccountType') && header.includes('ComputerName')){
+        return 'localadmin';
+    }else if (header.includes('SourceDomain') && header.includes('TargetDomain') && header.includes('TrustDirection') && header.includes('TrustType') && header.includes('Transitive')){
+        return 'domain';
+    }else if (header.includes('ActiveDirectoryRights') && header.includes('ObjectType') && header.includes('PrincipalType') && header.includes('PrincipalName') && header.includes('ObjectName') && header.includes('ACEType') && header.includes('AccessControlType') && header.includes('IsInherited')){
+        return 'acl';
+    }else if (header.includes('AccountName') && header.includes('Enabled') && header.includes('PwdLastSet') && header.includes('LastLogon') && header.includes('Sid') && header.includes('SidHistory') && header.includes('HasSPN') && header.includes('ServicePrincipalNames')){
+        return 'userprops';
+    }else if (header.includes('AccountName') && header.include('Enabled') && header.include('PwdLastSet') && header.include('LastLogon') && header.include('OperatingSystem') && header.include('Sid')){
+        return 'compprops';
+    }else{
+        return 'unknown';
+    }
+}
+
+export function buildUserObjectProps(rows){
+    var data = [];
+    $.each(rows, function(index, row){
+        data.push({ account:row.AccountName.toUpperCase(), enabled: row.Enabled, pwdlastset:row.PwdLastSet, lastlogon: row.LastLogon, sid: row.Sid, sidhistory: row.SidHistory, hasspn: row.HasSPN, spn: row.ServicePrincipalNames});
+    });
+
+    return data;
 }
 
 export function buildGroupMembershipProps(rows) {
-    var users = []
-    var groups = []
-    var computers = []
+    var users = [];
+    var groups = [];
+    var computers = [];
     $.each(rows, function(index, row) {
         switch (row.AccountType) {
             case 'user':
-                users.push({ account: row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase() })
-                break
+                users.push({ account: row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase() });
+                break;
             case 'computer':
-                computers.push({ account: row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase() })
-                break
+                computers.push({ account: row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase() });
+                break;
             case 'group':
-                groups.push({ account: row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase() })
-                break
+                groups.push({ account: row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase() });
+                break;
         }
-    })
+    });
 
-    return { users: users, groups: groups, computers: computers }
+    return { users: users, groups: groups, computers: computers };
 }
 
 export function buildLocalAdminProps(rows) {
-    var users = []
-    var groups = []
-    var computers = []
+    var users = [];
+    var groups = [];
+    var computers = [];
     $.each(rows, function(index, row) {
         if (row.AccountName.startsWith('@')) {
-            return
+            return;
         }
         switch (row.AccountType) {
             case 'user':
-                users.push({ account: row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase() })
+                users.push({ account: row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase() });
                 break;
             case 'group':
-                groups.push({ account: row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase() })
+                groups.push({ account: row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase() });
                 break;
             case 'computer':
-                computers.push({ account: row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase() })
-                break
+                computers.push({ account: row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase() });
+                break;
         }
-    })
-    return { users: users, groups: groups, computers: computers }
+    });
+    return { users: users, groups: groups, computers: computers };
 }
 
 export function buildSessionProps(rows) {
-    var sessions = []
+    var sessions = [];
     $.each(rows, function(index, row) {
         if (row.UserName === 'ANONYMOUS LOGON@UNKNOWN' || row.UserName === '') {
-            return
+            return;
         }
-        sessions.push({ account: row.UserName.toUpperCase(), computer: row.ComputerName.toUpperCase(), weight: row.Weight })
-    })
+        sessions.push({ account: row.UserName.toUpperCase(), computer: row.ComputerName.toUpperCase(), weight: parseInt(row.Weight) });
+    });
 
-    return sessions
+    return sessions;
 }
 
 export function buildDomainProps(rows) {
-    var domains = []
+    var domains = [];
     $.each(rows, function(index, row) {
         switch (row.TrustDirection) {
             case 'Inbound':
-                domains.push({ domain1: row.TargetDomain.toUpperCase(), domain2: row.SourceDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive })
+                domains.push({ domain1: row.TargetDomain.toUpperCase(), domain2: row.SourceDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive });
                 break;
             case 'Outbound':
-                domains.push({ domain1: row.SourceDomain.toUpperCase(), domain2: row.TargetDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive })
+                domains.push({ domain1: row.SourceDomain.toUpperCase(), domain2: row.TargetDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive });
                 break;
             case 'Bidirectional':
-                domains.push({ domain1: row.TargetDomain.toUpperCase(), domain2: row.SourceDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive })
-                domains.push({ domain1: row.SourceDomain.toUpperCase(), domain2: row.TargetDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive })
-                break
+                domains.push({ domain1: row.TargetDomain.toUpperCase(), domain2: row.SourceDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive });
+                domains.push({ domain1: row.SourceDomain.toUpperCase(), domain2: row.TargetDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive });
+                break;
         }
-    })
+    });
 
-    return domains
+    return domains;
 }
 
 export function buildACLProps(rows) {
-    var datadict = {}
+    var datadict = {};
 
     $.each(rows, function(index, row) {
-        var b = row.ObjectName.toUpperCase()
-        var a = row.PrincipalName.toUpperCase()
-        var btype = row.ObjectType.toTitleCase()
-        var atype = row.PrincipalType.toTitleCase()
-        var rel = row.ActiveDirectoryRights
-        var extright = row.ACEType
+        var b = row.ObjectName.toUpperCase();
+        var a = row.PrincipalName.toUpperCase();
+        var btype = row.ObjectType.toTitleCase();
+        var atype = row.PrincipalType.toTitleCase();
+        var rel = row.ActiveDirectoryRights;
+        var extright = row.ACEType;
 
-        var rights = []
+        var rights = [];
 
         if (extright === 'All'){
-            rights.push("AllExtendedRights")
+            rights.push("AllExtendedRights");
         }else if (extright === 'User-Force-Change-Password'){
-            rights.push("ForceChangePassword")
+            rights.push("ForceChangePassword");
         }else if (rel === "ExtendedRight"){
-            rights.push(extright)
+            rights.push(extright);
         }
 
         if (rel.includes("GenericAll")){
-            rights.push("GenericAll")
+            rights.push("GenericAll");
         }
 
         if (rel.includes("WriteDacl")){
-            rights.push("WriteDacl")
+            rights.push("WriteDacl");
         }
 
         if (rel.includes("WriteOwner")){
-            rights.push("WriteOwner")
+            rights.push("WriteOwner");
         }
 
         if (rel.includes("GenericWrite")){
-            rights.push("GenericWrite")
+            rights.push("GenericWrite");
         }
 
         if (rel.includes("WriteProperty") && extright === "Member"){
-            rights.push("AddMember")
+            rights.push("AddMember");
         }
 
         $.each(rights, function(index, record){
-            var hash = (atype + record + btype).toUpperCase()
+            var hash = (atype + record + btype).toUpperCase();
             if (btype === 'Computer') {
-                return
+                return;
             }
 
             if (datadict[hash]) {
                 datadict[hash].props.push({
                     account: a,
                     principal: b
-                })
+                });
             } else {
                 datadict[hash] = {
                     statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:{} {name: prop.principal}) WITH a,b,prop MERGE (a)-[r:{} {isACL:true}]->(b)'.format(atype, btype, record),
                     props: [{ account: a, principal: b }]
-                }
+                };
             }
-        })
-        
-    })
+        });
+    });
 
-    return datadict
+    return datadict;
 }

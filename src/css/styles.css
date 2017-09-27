@@ -3,7 +3,8 @@
 #root {
     position: absolute;
     width: 100%;
-    height: 100%;    
+    height: 100%;
+    overflow: hidden;
 }
 
 .max{
@@ -94,6 +95,7 @@ div.tooltip-inner-custom {
     width: 100%;
     height: 100%;
     background-color: lightgray;
+    overflow: hidden;
 }
 
 .graph:focus {
