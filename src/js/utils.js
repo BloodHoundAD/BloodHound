@@ -107,20 +107,11 @@ export function findObjectType(header){
         return 'acl';
     }else if (header.includes('AccountName') && header.includes('Enabled') && header.includes('PwdLastSet') && header.includes('LastLogon') && header.includes('Sid') && header.includes('SidHistory') && header.includes('HasSPN') && header.includes('ServicePrincipalNames')){
         return 'userprops';
-    }else if (header.includes('AccountName') && header.include('Enabled') && header.include('PwdLastSet') && header.include('LastLogon') && header.include('OperatingSystem') && header.include('Sid')){
+    }else if (header.includes('AccountName') && header.includes('Enabled') && header.includes('PwdLastSet') && header.includes('LastLogon') && header.includes('OperatingSystem') && header.includes('Sid')){
         return 'compprops';
     }else{
         return 'unknown';
     }
-}
-
-export function buildUserObjectProps(rows){
-    var data = [];
-    $.each(rows, function(index, row){
-        data.push({ account:row.AccountName.toUpperCase(), enabled: row.Enabled, pwdlastset:row.PwdLastSet, lastlogon: row.LastLogon, sid: row.Sid, sidhistory: row.SidHistory, hasspn: row.HasSPN, spn: row.ServicePrincipalNames});
-    });
-
-    return data;
 }
 
 export function buildGroupMembershipProps(rows) {

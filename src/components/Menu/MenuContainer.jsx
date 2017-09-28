@@ -52,7 +52,7 @@ export default class MenuContainer extends Component {
             properties: ['openFile']
         });
         if (typeof fname !== 'undefined'){
-            emitter.emit('import',fname[0])
+            emitter.emit('import',fname[0]);
         }
     }
 
@@ -67,7 +67,6 @@ export default class MenuContainer extends Component {
     _uploadClick(){
         var input = jQuery(this.refs.fileInput);
         var fileNames = [];
-        var files = [];
 
         $.each(input[0].files, function(index, file){
             fileNames.push({path:file.path, name:file.name});
@@ -127,12 +126,13 @@ export default class MenuContainer extends Component {
         
         var filetype;
         var abort = false;
-        
+
         this.setState({
             uploading: true,
             progress: 0
         });
         console.time('IngestTime');
+
         Papa.parse(fs.createReadStream(file), {
             header: true,
             skipEmptyLines: true,
@@ -141,6 +141,7 @@ export default class MenuContainer extends Component {
                 if (filetype === 'unknown'){
                     abort = true;
                 }
+                
             },
             chunk: function(results, parser){
                 if (abort){
@@ -215,11 +216,11 @@ export default class MenuContainer extends Component {
                     await session.run(processed[key].statement, {props: processed[key].props});
                 }
             }else if (filetype === 'userprops'){
-                query = 'UNWIND {props} AS prop MERGE (user:User {name: upper(prop.AccountName)}) SET user.Enabled = toBoolean(prop.Enabled),user.PwdLastSet = prop.PwdLastSet,user.LastLogon = prop.LastLogon,user.Sid = prop.Sid,user.SidHistory = prop.SidHistory,user.HasSPN = toBoolean(prop.HasSPN),user.ServicePrincipalNames = split(prop.ServicePrincipalNames, "|")';
+                query = 'UNWIND {props} AS prop MERGE (user:User {name: upper(prop.AccountName)}) SET user.Enabled = toBoolean(prop.Enabled),user.PwdLastSet = toInt(prop.PwdLastSet),user.LastLogon = toInt(prop.LastLogon),user.Sid = prop.Sid,user.SidHistory = prop.SidHistory,user.HasSPN = toBoolean(prop.HasSPN),user.ServicePrincipalNames = split(prop.ServicePrincipalNames, "|")';
 
                 await session.run(query, {props:currentChunk});
             }else if (filetype === 'compprops'){
-                query = 'UNWIND {props} AS prop MERGE (comp:Computer {name: upper(prop.AccountName)}) SET comp.Enabled=toBoolean(prop.Enabled),comp.PwdLastSet=prop.PwdLastSet,comp.LastLogon=prop.LastLogon,comp.OperatingSystem=prop.OperatingSystem,comp.Sid=prop.Sid';
+                query = 'UNWIND {props} AS prop MERGE (comp:Computer {name: upper(prop.AccountName)}) SET comp.Enabled=toBoolean(prop.Enabled),comp.PwdLastSet=toInt(prop.PwdLastSet),comp.LastLogon=toInt(prop.LastLogon),comp.OperatingSystem=prop.OperatingSystem,comp.Sid=prop.Sid';
 
                 await session.run(query, {props:currentChunk});
             }
