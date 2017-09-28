@@ -98,6 +98,12 @@ div.tooltip-inner-custom {
     overflow: hidden;
 }
 
+.dropdown-item > i{
+    float:right;
+    margin-top:3px;
+    margin-left: 2px;
+}
+
 .graph:focus {
     outline: 0;
 }
