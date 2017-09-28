@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom';
 import  { findGraphPath } from 'utils';
 var fs = require('fs');
-var child_process = require('child_process')
+var child_process = require('child_process');
 var child;
-var path = require('path')
-const { dialog } = require('electron').remote
+var path = require('path');
+const { dialog } = require('electron').remote;
 
 export default class GraphContainer extends Component {
     constructor(props){
-        super(props)
+        super(props);
 
         child = child_process.fork(path.join(__dirname,'src','js','worker.js'), {silent:true});
 
@@ -26,7 +26,7 @@ export default class GraphContainer extends Component {
             url: 'src/components/tooltip.html',
             type: 'GET',
             success: function(response){
-                this.setState({template: response}) 
+                this.setState({template: response}); 
             }.bind(this)
         });
 
@@ -39,50 +39,50 @@ export default class GraphContainer extends Component {
         });
 
         child.on('message', function(m) {
-          this.loadFromChildProcess(m)
+          this.loadFromChildProcess(m);
         }.bind(this));
 
         var s1 = driver.session();
-        var s2 = driver.session()
-        var s3 = driver.session()
-        var s4 = driver.session()
+        var s2 = driver.session();
+        var s3 = driver.session();
+        var s4 = driver.session();
 
         s1.run("CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE")
             .then(function(){
-                s1.close()
+                s1.close();
                  s2.run("CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE")
                     .then(function(){
-                        s2.close()
+                        s2.close();
                         s3.run("CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE")
                             .then(function(){
-                                s3.close()
+                                s3.close();
                                 s4.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE")
                                     .then(function(){
-                                        s4.close()
+                                        s4.close();
                                     })
                                     .catch(function(){
-                                        s4.close()
-                                    })
+                                        s4.close();
+                                    });
                             })
                             .catch(function(){
-                                s3.close()
-                            })
+                                s3.close();
+                            });
                     })
                     .catch(function(){
-                        s2.close()
-                    })
+                        s2.close();
+                    });
             })
             .catch(function(){
-                s1.close()
-            })
+                s1.close();
+            });
        
         emitter.on('doLogout', function(){
             this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.refresh();
             sigma.layouts.killForceLink();
-            this.setState({sigmaInstance: null})
+            this.setState({sigmaInstance: null});
             child.kill();
-        }.bind(this))
+        }.bind(this));
     }
 
     componentWillMount() {
@@ -90,18 +90,18 @@ export default class GraphContainer extends Component {
         emitter.on('pathQuery', this.doPathQuery.bind(this));
         emitter.on('graphBack', this.goBack.bind(this));
         emitter.on('query', this.doGenericQuery.bind(this));
-        emitter.on('spotlightClick', this.spotlightClickHandler.bind(this))
-        emitter.on('graphRefresh', this.relayout.bind(this))
-        emitter.on('export', this.export.bind(this))
-        emitter.on('import', this.import.bind(this))
-        emitter.on('clearDB', this.clearGraph.bind(this))
-        emitter.on('changeGraphicsMode', this.setGraphicsMode.bind(this))
-        emitter.on('ungroupNode', this.ungroupNode.bind(this))
-        emitter.on('unfoldNode', this.unfoldEdgeNode.bind(this))
-        emitter.on('collapseNode', this.foldEdgeNode.bind(this))
-        emitter.on('resetZoom', this.resetZoom.bind(this))
-        emitter.on('zoomIn', this.zoomIn.bind(this))
-        emitter.on('zoomOut', this.zoomOut.bind(this))
+        emitter.on('spotlightClick', this.spotlightClickHandler.bind(this));
+        emitter.on('graphRefresh', this.relayout.bind(this));
+        emitter.on('export', this.export.bind(this));
+        emitter.on('import', this.import.bind(this));
+        emitter.on('clearDB', this.clearGraph.bind(this));
+        emitter.on('changeGraphicsMode', this.setGraphicsMode.bind(this));
+        emitter.on('ungroupNode', this.ungroupNode.bind(this));
+        emitter.on('unfoldNode', this.unfoldEdgeNode.bind(this));
+        emitter.on('collapseNode', this.foldEdgeNode.bind(this));
+        emitter.on('resetZoom', this.resetZoom.bind(this));
+        emitter.on('zoomIn', this.zoomIn.bind(this));
+        emitter.on('zoomOut', this.zoomOut.bind(this));
     }
 
     componentDidMount() {
@@ -115,7 +115,7 @@ export default class GraphContainer extends Component {
     }
 
     relayout(){
-        sigma.layouts.stopForceLink()
+        sigma.layouts.stopForceLink();
         if (appStore.dagre){
             sigma.layouts.dagre.start(this.state.sigmaInstance);
         }else{
@@ -125,7 +125,7 @@ export default class GraphContainer extends Component {
 
     export(payload){
         if (payload === 'image'){
-            var size = $('#graph').outerWidth()
+            var size = $('#graph').outerWidth();
             sigma.plugins.image(this.state.sigmaInstance,
                 this.state.sigmaInstance.renderers[0],
                 {
@@ -152,11 +152,11 @@ export default class GraphContainer extends Component {
 
     loadFromChildProcess(graph){
         if (graph.nodes.length === 0){
-                emitter.emit('showAlert', "No data returned from query")
-                emitter.emit('updateLoadingText', "Done!")
+                emitter.emit('showAlert', "No data returned from query");
+                emitter.emit('updateLoadingText', "Done!");
                 setTimeout(function(){
                     emitter.emit('showLoadingIndicator', false);    
-                }, 1500)
+                }, 1500);
         }else{
             if (!this.state.firstDraw){
                 appStore.queryStack.push({
@@ -165,23 +165,23 @@ export default class GraphContainer extends Component {
                     spotlight: appStore.spotlightData,
                     startNode: appStore.startNode,
                     endNode: appStore.endNode
-                })
+                });
             }
             $.each(graph.nodes, function(i, node){
                 if (node.start){
-                    appStore.startNode = node
+                    appStore.startNode = node;
                 }
 
                 if (node.end){
-                    appStore.endNode = node
+                    appStore.endNode = node;
                 }
 
                 node.glyphs = $.map(node.glyphs, function(value, index) {
                     return [value];
                 });
-            })
+            });
 
-            this.setState({firstDraw: false})
+            this.setState({firstDraw: false});
             sigma.misc.animation.camera(this.state.sigmaInstance.camera, { x: 0, y: 0, ratio: 1.075 });
 
             appStore.spotlightData = graph.spotlight;
@@ -194,7 +194,7 @@ export default class GraphContainer extends Component {
             if (appStore.dagre){
                 sigma.layouts.dagre.start(this.state.sigmaInstance);
             }else{
-                sigma.layouts.startForceLink()
+                sigma.layouts.startForceLink();
             }
             emitter.emit('spotlightUpdate');
         } 
@@ -207,44 +207,44 @@ export default class GraphContainer extends Component {
                 graph = JSON.parse(data);
             }catch (err){
                 emitter.emit('showAlert', 'Bad JSON File');
-                return
+                return;
             }
 
             if (graph.nodes.length === 0){
-                emitter.emit('showAlert', "No data returned from query")
+                emitter.emit('showAlert', "No data returned from query");
             }else{
                 $.each(graph.nodes, function(i, node){
                     node.glyphs = $.map(node.glyphs, function(value, index) {
                         return [value];
                     });
-                })
+                });
                 appStore.queryStack.push({
                     nodes: this.state.sigmaInstance.graph.nodes(),
                     edges: this.state.sigmaInstance.graph.edges(),
                     spotlight: appStore.spotlightData,
                     startNode: appStore.startNode,
                     endNode: appStore.endNode
-                })
+                });
 
                 appStore.spotlightData = graph.spotlight;
                 this.state.sigmaInstance.graph.clear();
                 this.state.sigmaInstance.graph.read(graph);
-                this.state.sigmaInstance.refresh()
+                this.state.sigmaInstance.refresh();
                 emitter.emit('spotlightUpdate');
             }
             
-        }.bind(this))
+        }.bind(this));
     }
 
     clearGraph(){
-        this.state.sigmaInstance.graph.clear()
-        this.state.sigmaInstance.refresh()
+        this.state.sigmaInstance.graph.clear();
+        this.state.sigmaInstance.refresh();
     }
 
     setGraphicsMode(){
-        var lowgfx = appStore.performance.lowGraphics
-        var sigmaInstance = this.state.sigmaInstance
-        this.state.design.clear()
+        var lowgfx = appStore.performance.lowGraphics;
+        var sigmaInstance = this.state.sigmaInstance;
+        this.state.design.clear();
         if (lowgfx){
             sigmaInstance.settings('defaultEdgeType', 'line');
             sigmaInstance.settings('defaultEdgeColor', 'black');
@@ -256,9 +256,9 @@ export default class GraphContainer extends Component {
             this.state.design.setPalette(appStore.highResPalette);
             this.state.design.setStyles(appStore.highResStyle);
         }
-        this.state.design.deprecate()
-        sigmaInstance.refresh()
-        this.state.design.apply()
+        this.state.design.deprecate();
+        sigmaInstance.refresh();
+        this.state.design.apply();
     }
 
     resetZoom(){
@@ -269,7 +269,7 @@ export default class GraphContainer extends Component {
     }
 
     zoomOut(){
-        var sigmaInstance = this.state.sigmaInstance
+        var sigmaInstance = this.state.sigmaInstance;
         var cam = sigmaInstance.camera;
 
         sigma.misc.animation.camera(cam, {
@@ -280,7 +280,7 @@ export default class GraphContainer extends Component {
     }
 
     zoomIn(){
-        var sigmaInstance = this.state.sigmaInstance
+        var sigmaInstance = this.state.sigmaInstance;
         var cam = sigmaInstance.camera;
 
         sigma.misc.animation.camera(cam, 
@@ -322,25 +322,25 @@ export default class GraphContainer extends Component {
 
     spotlightClickHandler(nodeId, parentId){
         var sigmaInstance = this.state.sigmaInstance;
-        var parent = sigmaInstance.graph.nodes(nodeId)
+        var parent = sigmaInstance.graph.nodes(nodeId);
         var label, child;
         if (typeof parent === 'undefined'){
             child = sigmaInstance.graph.nodes(parentId).folded.nodes.filter(function(val){
-                return val.id == nodeId;
-            })[0]
+                return val.id === nodeId;
+            })[0];
             parent = sigmaInstance.graph.nodes(parentId);
         }else{
             child = parent;
         }
         label = child.label;
         if (child.type_user){
-            emitter.emit('userNodeClicked', label)
+            emitter.emit('userNodeClicked', label);
         }else if (child.type_group){
-            emitter.emit('groupNodeClicked', label)
+            emitter.emit('groupNodeClicked', label);
         }else if (child.type_computer){
-            emitter.emit('computerNodeClicked', label)
+            emitter.emit('computerNodeClicked', label);
         }
-        parent.color = "#2DC486"
+        parent.color = "#2DC486";
         sigma.misc.animation.camera(
             sigmaInstance.camera, {
                 x: parent[sigmaInstance.camera.readPrefix + 'x'],
@@ -352,115 +352,115 @@ export default class GraphContainer extends Component {
         setTimeout(function(){
             parent.color = "black";
             sigmaInstance.refresh({skipIndexation: true});
-        }, 2000)
+        }, 2000);
     }
 
     doQueryNative(params){
         if (appStore.performance.debug){
             emitter.emit('setRawQuery',params.statement);
         }
-        var sigmaInstance = this.state.sigmaInstance
-        var nodes = {}
-        var edges = {}
-        var session = driver.session()
+        var sigmaInstance = this.state.sigmaInstance;
+        var nodes = {};
+        var edges = {};
+        var session = driver.session();
         if (typeof params.props === 'undefined'){
-            params.props = {}
+            params.props = {};
         }
         emitter.emit('showLoadingIndicator', true);
-        emitter.emit('updateLoadingText', "Querying Database")
-        emitter.emit('resetSpotlight')
+        emitter.emit('updateLoadingText', "Querying Database");
+        emitter.emit('resetSpotlight');
         session.run(params.statement, params.props)
             .subscribe({
                 onNext: function(result){
                     $.each(result._fields, function(index, field){
-                        if (field != null){
+                        if (field !== null){
                             if (field.hasOwnProperty('segments')){
                                 $.each(field.segments,function(index, segment){
-                                    var end = this.createNodeFromRow(segment.end, params)
-                                    var start = this.createNodeFromRow(segment.start, params)
-                                    var edge = this.createEdgeFromRow(segment.relationship)
+                                    var end = this.createNodeFromRow(segment.end, params);
+                                    var start = this.createNodeFromRow(segment.start, params);
+                                    var edge = this.createEdgeFromRow(segment.relationship);
 
                                     if (!edges[edge.id]){
-                                        edges[edge.id] = edge
+                                        edges[edge.id] = edge;
                                     }
 
                                     if (!nodes[end.id]){
-                                        nodes[end.id] = end
+                                        nodes[end.id] = end;
                                     }
 
                                     if (!nodes[start.id]){
-                                        nodes[start.id] = start
+                                        nodes[start.id] = start;
                                     }
-                                }.bind(this))
+                                }.bind(this));
                             }else{
                                 if ($.isArray(field)){
                                     $.each(field, function(index, value){
-                                        if (value != null){
-                                            var id = value.identity.low
+                                        if (value !== null){
+                                            var id = value.identity.low;
                                             if (value.end && !edges.id){
-                                                edges[id] = this.createEdgeFromRow(value)
+                                                edges[id] = this.createEdgeFromRow(value);
                                             }else if (!nodes.id){
-                                                nodes[id] = this.createNodeFromRow(value, params)
+                                                nodes[id] = this.createNodeFromRow(value, params);
                                             }
                                         }
-                                    }.bind(this))
+                                    }.bind(this));
                                 }else{
-                                    var id = field.identity.low
+                                    var id = field.identity.low;
                                     if (field.end && !edges.id){
-                                        edges[id] = this.createEdgeFromRow(field)
+                                        edges[id] = this.createEdgeFromRow(field);
                                     }else if (!nodes.id){
-                                        nodes[id] = this.createNodeFromRow(field, params)
+                                        nodes[id] = this.createNodeFromRow(field, params);
                                     }
                                 }
                             }
                         }
-                    }.bind(this))
+                    }.bind(this));
                 }.bind(this),
                 onError: function(error){
-                    console.log(error)
+                    console.log(error);
                 },
                 onCompleted: function(){
-                    var graph = {nodes:[],edges:[]}
+                    var graph = {nodes:[],edges:[]};
                     $.each(nodes, function(node){
-                        graph.nodes.push(nodes[node])
-                    })
+                        graph.nodes.push(nodes[node]);
+                    });
 
                     $.each(edges, function(edge){
-                        graph.edges.push(edges[edge])
-                    })
-                    emitter.emit('updateLoadingText', "Processing Data")
+                        graph.edges.push(edges[edge]);
+                    });
+                    emitter.emit('updateLoadingText', "Processing Data");
 
                     child.send(JSON.stringify({graph: graph,
                          edge: params.allowCollapse ? appStore.performance.edge : 0 ,
                          sibling: params.allowCollapse ? appStore.performance.sibling : 0,
                          start: params.start,
                          end: params.end
-                     }))
-                    session.close()
+                     }));
+                    session.close();
                 }.bind(this)
-            })
+            });
     }
 
     createEdgeFromRow(data){
-        var id = data.identity.low
-        var type = data.type
-        var source = data.start.low
-        var target = data.end.low
+        var id = data.identity.low;
+        var type = data.type;
+        var source = data.start.low;
+        var target = data.end.low;
         var edge = {
             id: id,
             type: type,
             source: source,
             target:target,
             label: type
-        }
+        };
 
-        return edge
+        return edge;
     }
 
     createNodeFromRow(data, params){
-        var id = data.identity.low
-        var type = data.labels[0]
-        var label = data.properties.name
+        var id = data.identity.low;
+        var type = data.labels[0];
+        var label = data.properties.name;
         var node = {
             id: id,
             type: type,
@@ -472,28 +472,28 @@ export default class GraphContainer extends Component {
             },
             x: Math.random(),
             y: Math.random()
-        }
+        };
 
         if (label === params.start){
-            node.start = true
+            node.start = true;
             node.glyphs.push({
                 'position': 'bottom-right',
                 'font': 'FontAwesome',
                 'content': '\uF21D',
                 'fillColor': '#3399FF',
                 'fontScale': 1.5
-            })
+            });
         }
 
         if (label === params.end){
-            node.end = true
+            node.end = true;
             node.glyphs.push({
                 'position': 'bottom-right',
                 'font': 'FontAwesome',
                 'fillColor': '#990000',
                 'content': '\uF05B',
                 'fontScale': 1.5
-            })
+            });
         }
 
         switch (type) {
@@ -511,60 +511,60 @@ export default class GraphContainer extends Component {
                 break;
         }
 
-        return node
+        return node;
     }
 
     unfoldEdgeNode(id){
-        var sigmaInstance = this.state.sigmaInstance
-        sigmaInstance.graph.read(sigmaInstance.graph.nodes(id).folded)
-        this.state.design.deprecate()
+        var sigmaInstance = this.state.sigmaInstance;
+        sigmaInstance.graph.read(sigmaInstance.graph.nodes(id).folded);
+        this.state.design.deprecate();
         this.state.design.apply();
-        this.relayout()
+        this.relayout();
     }
 
     foldEdgeNode(id){
-        var sigmaInstance = this.state.sigmaInstance
+        var sigmaInstance = this.state.sigmaInstance;
         $.each(sigmaInstance.graph.nodes(id).folded.nodes, function(index, node){
-            sigmaInstance.graph.dropNode(node.id)
-        })
-        sigmaInstance.refresh()
+            sigmaInstance.graph.dropNode(node.id);
+        });
+        sigmaInstance.refresh();
         this.state.design.deprecate();
         this.state.design.apply();
         this.relayout();
     }
 
     ungroupNode(id){
-        var sigmaInstance = this.state.sigmaInstance
-        var node = sigmaInstance.graph.nodes(id)
+        var sigmaInstance = this.state.sigmaInstance;
+        var node = sigmaInstance.graph.nodes(id);
         sigmaInstance.graph.dropNode(id);
-        sigmaInstance.graph.read(node.folded)
-        this.state.design.deprecate()
-        sigmaInstance.refresh()
-        this.state.design.apply()
+        sigmaInstance.graph.read(node.folded);
+        this.state.design.deprecate();
+        sigmaInstance.refresh();
+        this.state.design.apply();
         this.relayout();
     }
 
     doSearchQuery(payload, props){
         if (typeof props === 'undefined'){
-            props = {}
+            props = {};
         }
         this.doQueryNative({
             statement: payload,
             allowCollapse: true,
             props: props
-        })
+        });
     }
 
     doPathQuery(start, end){
-        var statement = "MATCH (n {name:{start}}), (m {name:{end}}), p=allShortestPaths((n)-[*]->(m)) RETURN p"
-        var props = {start: start, end: end}
+        var statement = "MATCH (n {name:{start}}), (m {name:{end}}), p=allShortestPaths((n)-[*]->(m)) RETURN p";
+        var props = {start: start, end: end};
         this.doQueryNative({
             statement: statement,
             allowCollapse: true,
             props: props,
             start: start,
             end: end
-        })
+        });
     }
 
     doGenericQuery(statement, props, start, end, allowCollapse=true){
@@ -573,7 +573,7 @@ export default class GraphContainer extends Component {
         }
 
         if (typeof props === 'undefined'){
-            props = {}
+            props = {};
         }
         this.doQueryNative({
             statement: statement,
@@ -581,26 +581,26 @@ export default class GraphContainer extends Component {
             start: start,
             end: end,
             props: props
-        })
+        });
     }
 
     _nodeDragged(){
-        this.setState({dragged:true})
+        this.setState({dragged:true});
     }
 
     _nodeClicked(n){
         if (!this.state.dragged){
             if (n.data.node.type_user){
-                emitter.emit('userNodeClicked', n.data.node.label)
+                emitter.emit('userNodeClicked', n.data.node.label);
             }else if (n.data.node.type_group){
-                emitter.emit('groupNodeClicked', n.data.node.label)
+                emitter.emit('groupNodeClicked', n.data.node.label);
             }else if (n.data.node.type_computer && (n.data.node.label !== 'Grouped Computers')){
-                emitter.emit('computerNodeClicked', n.data.node.label)
+                emitter.emit('computerNodeClicked', n.data.node.label);
             }else if (n.data.node.type_domain){
-                emitter.emit('domainNodeClicked', n.data.node.label)
+                emitter.emit('domainNodeClicked', n.data.node.label);
             }
         }else{
-            this.setState({dragged: false})
+            this.setState({dragged: false});
         }
     }
 
@@ -611,7 +611,7 @@ export default class GraphContainer extends Component {
             {
                 container: 'graph'
             }
-        )
+        );
 
         sigmaInstance.settings(
             {
@@ -630,7 +630,7 @@ export default class GraphContainer extends Component {
                 zoomingRatio: 1.4,
                 scalingMode: 'inside'
             }
-        )
+        );
 
         //Bind sigma events
         sigmaInstance.renderers[0].bind('render', function(e) {
@@ -643,21 +643,21 @@ export default class GraphContainer extends Component {
             }else{
                 sigmaInstance.settings('drawEdgeLabels', true);
             }
-        })
+        });
 
-        sigmaInstance.bind('clickNode', this._nodeClicked.bind(this))
+        sigmaInstance.bind('clickNode', this._nodeClicked.bind(this));
 
         sigmaInstance.bind('hovers', function(e){
             if (e.data.enter.nodes.length > 0) {
                 if (appStore.endNode !== null) {
-                    findGraphPath(this.state.sigmaInstance, false, e.data.enter.nodes[0].id)
+                    findGraphPath(this.state.sigmaInstance, false, e.data.enter.nodes[0].id);
                 }
 
                 if (appStore.startNode !== null) {
-                    findGraphPath(this.state.sigmaInstance, true, e.data.enter.nodes[0].id)
+                    findGraphPath(this.state.sigmaInstance, true, e.data.enter.nodes[0].id);
                 }
 
-                sigmaInstance.refresh({'skipIndexation': true})
+                sigmaInstance.refresh({'skipIndexation': true});
             }
 
             if (e.data.leave.nodes.length > 0) {
@@ -669,13 +669,13 @@ export default class GraphContainer extends Component {
                     sigmaInstance.refresh({ 'skipIndexation': true });
                 }
             }
-        }.bind(this))
+        }.bind(this));
 
         //Some key binds
         $(window).on('keyup', function(e){
-            var key = e.keyCode ? e.keyCode : e.which
-            var mode = appStore.performance.nodeLabels
-            var sigmaInstance = this.state.sigmaInstance
+            var key = e.keyCode ? e.keyCode : e.which;
+            var mode = appStore.performance.nodeLabels;
+            var sigmaInstance = this.state.sigmaInstance;
 
             if (document.activeElement === document.body && key === 17){
                 mode = mode + 1;
@@ -683,28 +683,28 @@ export default class GraphContainer extends Component {
                     mode = 0;
                 }
                 appStore.performance.nodeLabels = mode;
-                conf.set('performance', appStore.performance)
+                conf.set('performance', appStore.performance);
 
                 if (mode === 0){
                     sigmaInstance.settings('labelThreshold', 500);
-                    emitter.emit('showAlert', 'Hiding Node Labels')
+                    emitter.emit('showAlert', 'Hiding Node Labels');
                 }else if (mode === 1){
                     sigmaInstance.settings('labelThreshold', 15);
-                    emitter.emit('showAlert', 'Default Node Label Threshold')
+                    emitter.emit('showAlert', 'Default Node Label Threshold');
                 }else{
                     sigmaInstance.settings('labelThreshold', 1);
-                    emitter.emit('showAlert', 'Always Showing Node Labels')
+                    emitter.emit('showAlert', 'Always Showing Node Labels');
                 }
 
-                sigmaInstance.refresh({'skipIndexation' : true})
+                sigmaInstance.refresh({'skipIndexation' : true});
             }
-        }.bind(this))
+        }.bind(this));
 
         //Plugin Configuration
         var dragListener = sigma.plugins.dragNodes(sigmaInstance,
-                                sigmaInstance.renderers[0])
+                                sigmaInstance.renderers[0]);
 
-        dragListener.bind('drag', this._nodeDragged.bind(this))
+        dragListener.bind('drag', this._nodeDragged.bind(this));
 
         var tooltips = sigma.plugins.tooltips(
         sigmaInstance,
@@ -719,7 +719,7 @@ export default class GraphContainer extends Component {
                         node.expand = false;
                         node.collapse = false;
                         if (node.folded.nodes.length > 0 && !node.groupedNode) {
-                            if (typeof this.state.sigmaInstance.graph.nodes(node.folded.nodes[0].id) == 'undefined') {
+                            if (typeof this.state.sigmaInstance.graph.nodes(node.folded.nodes[0].id) === 'undefined') {
                                 node.expand = true;
                             } else {
                                 node.collapse = true;
@@ -754,12 +754,12 @@ export default class GraphContainer extends Component {
         forcelinkListener.bind('stop', function(event) {
             emitter.emit('updateLoadingText', "Fixing Overlap");
             sigmaInstance.startNoverlap();
-        })
+        });
 
         forcelinkListener.bind('start', function(event){
-            emitter.emit('updateLoadingText', 'Initial Layout')
-            emitter.emit('showLoadingIndicator', true)
-        })
+            emitter.emit('updateLoadingText', 'Initial Layout');
+            emitter.emit('showLoadingIndicator', true);
+        });
 
         var dagreListener = sigma.layouts.dagre.configure(sigmaInstance, {
             easing: 'cubicInOut',
@@ -775,22 +775,22 @@ export default class GraphContainer extends Component {
                     emitter.emit('updateLoadingText', "Fixing Overlap");
                     sigmaInstance.startNoverlap();
                     needsfix = true;
-                    return
+                    return;
                 }
             }, this);
             if (!needsfix){
                 emitter.emit('updateLoadingText', 'Done!');
-                sigma.canvas.edges.autoCurve(sigmaInstance)
+                sigma.canvas.edges.autoCurve(sigmaInstance);
                 setTimeout(function(){
                     emitter.emit('showLoadingIndicator', false);    
-                }, 1500)
+                }, 1500);
             }
-        })
+        });
 
         dagreListener.bind('start', function(event){
-            emitter.emit('updateLoadingText', 'Initial Layout')
-            emitter.emit('showLoadingIndicator', true)
-        })
+            emitter.emit('updateLoadingText', 'Initial Layout');
+            emitter.emit('showLoadingIndicator', true);
+        });
 
         // var noverlapListener = sigmaInstance.configNoverlap({
         //     nodeMargin: 5.0,
@@ -800,19 +800,19 @@ export default class GraphContainer extends Component {
         // });
         // 
         
-        var noverlapListener = sigmaInstance.configNoverlap({})
+        var noverlapListener = sigmaInstance.configNoverlap({});
 
         noverlapListener.bind('stop', function(event) {
             emitter.emit('updateLoadingText', 'Done!');
-            sigma.canvas.edges.autoCurve(sigmaInstance)
+            sigma.canvas.edges.autoCurve(sigmaInstance);
             setTimeout(function(){
                 emitter.emit('showLoadingIndicator', false);
-            }, 1500)
+            }, 1500);
             
         });
 
         
-        var lowgfx = appStore.performance.lowGraphics
+        var lowgfx = appStore.performance.lowGraphics;
 
         design = sigma.plugins.design(sigmaInstance);
         if (lowgfx){
@@ -827,7 +827,7 @@ export default class GraphContainer extends Component {
             design.setStyles(appStore.highResStyle);
         }
 
-        var mode = appStore.performance.nodeLabels
+        var mode = appStore.performance.nodeLabels;
 
         if (mode === 0){
             sigmaInstance.settings('labelThreshold', 500);

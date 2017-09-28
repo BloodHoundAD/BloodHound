@@ -8,7 +8,6 @@ export default class UserNodeData extends Component {
 
         this.state = {
             label: "",
-            samAccountName: "None",
             displayName: "None",
             pwdLastChanged: "None",
             firstDegreeGroupMembership: -1,
@@ -37,7 +36,6 @@ export default class UserNodeData extends Component {
 
         this.setState({
             label: payload,
-            samAccountName: "None",
             displayName: "None",
             pwdLastChanged: "None",
             firstDegreeGroupMembership: -1,
@@ -70,6 +68,24 @@ export default class UserNodeData extends Component {
         var s11 = driver.session();
         var s12 = driver.session();
         var s13 = driver.session();
+
+        var props = driver.session();
+        props.run("MATCH (n:User {name:{name}}) RETURN n", {name: payload})
+            .then(function(result){
+                var properties = result.records[0]._fields[0].properties;
+                if (properties.hasOwnProperty('PwdLastSet')){
+                    this.setState({'pwdLastChanged': new Date(properties.PwdLastSet.low * 1000).toUTCString() });
+                }
+
+                if (properties.hasOwnProperty("DisplayName")){
+                    var dname = properties.DisplayName;
+                    if (dname === ""){
+                        dname = "None";
+                    }
+                    this.setState({'displayName': dname });
+                }
+                props.close();
+            }.bind(this));
 
         s1.run("MATCH (n:Group) WHERE NOT n.name ENDS WITH {domain} WITH n MATCH (m:User {name:{name}}) MATCH (m)-[r:MemberOf*1..]->(n) RETURN count(n)", {name:payload, domain: domain})
             .then(function(result){
@@ -149,7 +165,7 @@ export default class UserNodeData extends Component {
                 s13.close();
             }.bind(this));
         
-        this.setState({'driversessions': [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13]});
+        this.setState({'driversessions': [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,props]});
     }
 
     render() {
@@ -165,12 +181,6 @@ export default class UserNodeData extends Component {
                     </dt>
                     <dd>
                         {this.state.label}
-                    </dd>
-                    <dt>
-                        SAMAccountName
-                    </dt>
-                    <dd>
-                        {this.state.samAccountName}
                     </dd>
                     <dt>
                         Display Name

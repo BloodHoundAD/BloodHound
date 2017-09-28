@@ -216,11 +216,11 @@ export default class MenuContainer extends Component {
                     await session.run(processed[key].statement, {props: processed[key].props});
                 }
             }else if (filetype === 'userprops'){
-                query = 'UNWIND {props} AS prop MERGE (user:User {name: upper(prop.AccountName)}) SET user.Enabled = toBoolean(prop.Enabled),user.PwdLastSet = toInt(prop.PwdLastSet),user.LastLogon = toInt(prop.LastLogon),user.Sid = prop.Sid,user.SidHistory = prop.SidHistory,user.HasSPN = toBoolean(prop.HasSPN),user.ServicePrincipalNames = split(prop.ServicePrincipalNames, "|")';
+                query = 'UNWIND {props} AS prop MERGE (user:User {name: upper(prop.AccountName)}) SET user.Enabled = toBoolean(prop.Enabled),user.PwdLastSet = toInt(prop.PwdLastSet),user.LastLogon = toInt(prop.LastLogon),user.Sid = prop.Sid,user.SidHistory = prop.SidHistory,user.HasSPN = toBoolean(prop.HasSPN),user.DisplayName=prop.DisplayName,user.ServicePrincipalNames = split(prop.ServicePrincipalNames, "|")';
 
                 await session.run(query, {props:currentChunk});
             }else if (filetype === 'compprops'){
-                query = 'UNWIND {props} AS prop MERGE (comp:Computer {name: upper(prop.AccountName)}) SET comp.Enabled=toBoolean(prop.Enabled),comp.PwdLastSet=toInt(prop.PwdLastSet),comp.LastLogon=toInt(prop.LastLogon),comp.OperatingSystem=prop.OperatingSystem,comp.Sid=prop.Sid';
+                query = 'UNWIND {props} AS prop MERGE (comp:Computer {name: upper(prop.AccountName)}) SET comp.Enabled=toBoolean(prop.Enabled),comp.PwdLastSet=toInt(prop.PwdLastSet),comp.LastLogon=toInt(prop.LastLogon),comp.OperatingSystem=prop.OperatingSystem,comp.Sid=prop.Sid,comp.UnconstrainedDelegation=toBoolean(prop.UnconstrainedDelegation)';
 
                 await session.run(query, {props:currentChunk});
             }
