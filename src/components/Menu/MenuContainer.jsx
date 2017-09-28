@@ -3,22 +3,24 @@ import MenuButton from './MenuButton';
 import ProgressBarMenuButton from './ProgressBarMenuButton';
 import { buildDomainProps, buildSessionProps, buildLocalAdminProps, buildGroupMembershipProps, buildACLProps, findObjectType} from 'utils';
 import { If, Then, Else } from 'react-if';
-const { dialog, clipboard } = require('electron').remote;
+const { dialog, clipboard, app } = require('electron').remote;
 var fs = require('fs');
 var async = require('async');
 var Papa = require('papaparse');
 var awaitReadStream = require('await-stream-ready').read;
+var unzip = require('unzipper');
+var fpath = require('path');
 
 export default class MenuContainer extends Component {
     constructor(){
-        super()
+        super();
 
         this.state = {
             refreshHover: false,
             uploading: false,
             progress: 0,
             parser: null
-        }
+        };
 
         emitter.on('cancelUpload', this.cancelUpload.bind(this))
     }
@@ -48,7 +50,7 @@ export default class MenuContainer extends Component {
     _importClick(){
         var fname = dialog.showOpenDialog({
             properties: ['openFile']
-        })
+        });
         if (typeof fname !== 'undefined'){
             emitter.emit('import',fname[0])
         }
@@ -63,27 +65,63 @@ export default class MenuContainer extends Component {
     }
 
     _uploadClick(){
-        var input = jQuery(this.refs.fileInput)
-        var files = $.makeArray(input[0].files)
+        var input = jQuery(this.refs.fileInput);
+        var fileNames = [];
+        var files = [];
 
-        async.eachSeries(files, function(file, callback){
-            emitter.emit('showAlert', 'Processing file {}'.format(file.name));
-            this.processFile(file.path, file, callback)
-        }.bind(this),
-        function done(){
-            setTimeout(function(){
-                this.setState({uploading: false})
-            }.bind(this), 3000)
-        }.bind(this))
+        $.each(input[0].files, function(index, file){
+            fileNames.push({path:file.path, name:file.name});
+        });
 
-        input.val('')
+        this.unzipNecessary(fileNames).then(function(results){
+            async.eachSeries(results, function(file, callback){
+                emitter.emit('showAlert', 'Processing file {}'.format(file.name));
+                this.processFile(file.path, callback);
+                if (file.delete){
+                    fs.unlink(file.path);
+                }
+            }.bind(this),
+            function done(){
+                setTimeout(function(){
+                    this.setState({uploading: false})
+                }.bind(this), 3000)
+            }.bind(this))
+    
+            input.val('')
+        }.bind(this));
+        
+    }
+
+    async unzipNecessary(files){
+        var index = 0;
+        var processed = [];
+        var tempPath = app.getPath('temp');
+        while (index < files.length){
+            var path = files[index].path;
+            var name = files[index].name;
+
+            if (path.endsWith(".zip")){
+                await fs.createReadStream(path).
+                    pipe(unzip.Parse())
+                    .on('entry', function(entry){
+                        var output = fpath.join(tempPath, entry.path);
+                        entry.pipe(fs.createWriteStream(output));
+                        processed.push({path:output, name:entry.path, delete: true});
+                    }).promise();
+            }else{
+                processed.push({path:path,name:name, delete: false});
+            }
+            index++;
+        }
+
+        return processed;
     }
 
     _aboutClick(){
         emitter.emit('showAbout')
     }
     
-    processFile(filename, fileobject, callback){
+    processFile(file, callback){
         var count = 0;
         var dataset = [];
         
@@ -95,7 +133,7 @@ export default class MenuContainer extends Component {
             progress: 0
         });
         console.time('IngestTime');
-        Papa.parse(fs.createReadStream(filename), {
+        Papa.parse(fs.createReadStream(file), {
             header: true,
             skipEmptyLines: true,
             beforeFirstChunk: function(chunk){
@@ -169,7 +207,7 @@ export default class MenuContainer extends Component {
 
                 processed = buildDomainProps(currentChunk);
 
-                await session.run(query, {props: props});
+                await session.run(query, {props: processed});
             }else if (filetype === 'acl'){
                 processed = buildACLProps(currentChunk);
 
