@@ -19,17 +19,17 @@ export default class MenuContainer extends Component {
             refreshHover: false,
             uploading: false,
             progress: 0,
-            parser: null
+            cancelled: false
         };
 
         emitter.on('cancelUpload', this.cancelUpload.bind(this))
     }
 
     cancelUpload(){
-        this.state.parser.abort()
+        this.setState({cancelled: true});
         setTimeout(function(){
             this.setState({uploading: false})
-        }.bind(this), 1000)
+        }.bind(this), 1000);
     }
 
     _refreshClick(){
@@ -153,6 +153,11 @@ export default class MenuContainer extends Component {
                     });
                     return;
                 }
+                
+                if (this.state.cancelled){
+                    parser.abort();
+                }
+
                 dataset = dataset.concat(results.data);
                 count += results.data.length;
             }.bind(this),
@@ -175,6 +180,10 @@ export default class MenuContainer extends Component {
         var session = driver.session();
 
         while (index < chunks.length){
+            if (this.state.cancelled){
+                this.setState({cancelled:false});
+                break;
+            }
             var currentChunk = chunks[index];
 
             if (filetype === 'groupmembership'){
@@ -229,7 +238,10 @@ export default class MenuContainer extends Component {
             this.setState({progress: Math.floor(sent / total * 100)});
             index++;
         }
-        this.setState({progress:100});
+        if (!this.state.cancelled){
+            this.setState({progress:100});
+        }
+        
         emitter.emit('refreshDBData');
         console.timeEnd('IngestTime');
         callback();

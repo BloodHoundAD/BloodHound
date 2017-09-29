@@ -465,6 +465,7 @@ export default class GraphContainer extends Component {
             id: id,
             type: type,
             label: label,
+            Enabled: data.properties.Enabled,
             glyphs: [],
             folded: {
                 nodes: [],
