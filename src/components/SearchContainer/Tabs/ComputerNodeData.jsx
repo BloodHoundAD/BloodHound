@@ -8,8 +8,6 @@ export default class ComputerNodeData extends Component {
 
         this.state = {
             label: "",
-            os: "None",
-            unconstrained: "None",
             explicitAdmins: -1,
             unrolledAdmins: -1,
             firstDegreeGroupMembership: -1,
@@ -22,7 +20,8 @@ export default class ComputerNodeData extends Component {
             groupDelegatedControl: -1,
             transitiveControl: -1,
             derivativeLocalAdmins: -1,
-            driversessions: []
+            driversessions: [],
+            propertyMap: {}
         };
 
         emitter.on('computerNodeClicked', this.getNodeData.bind(this));
@@ -34,8 +33,6 @@ export default class ComputerNodeData extends Component {
         });
         this.setState({
             label: payload,
-            os: "None",
-            unconstrained: "None",
             explicitAdmins: -1,
             unrolledAdmins: -1,
             firstDegreeGroupMembership: -1,
@@ -47,7 +44,8 @@ export default class ComputerNodeData extends Component {
             firstdegreeControl: -1,
             groupDelegatedControl: -1,
             transitiveControl: -1,
-            derivativeLocalAdmins: -1
+            derivativeLocalAdmins: -1,
+            propertyMap: {}
         });
 
         var s1 = driver.session();
@@ -66,14 +64,9 @@ export default class ComputerNodeData extends Component {
 
         var propCollection = driver.session();
         propCollection.run("MATCH (c:Computer {name:{name}}) RETURN c", {name:payload})
-            .then(function(results){
-                var props = results.records[0]._fields[0].properties;
-                if (props.hasOwnProperty('UnconstrainedDelegation')){
-                    this.setState({'unconstrained': props.UnconstrainedDelegation.toString().toTitleCase()});
-                }
-                if (props.hasOwnProperty('OperatingSystem')){
-                    this.setState({'os': props.OperatingSystem});
-                }
+            .then(function(result){
+                var properties = result.records[0]._fields[0].properties;                
+                this.setState({propertyMap: properties});
                 propCollection.close();
             }.bind(this));
 
@@ -158,6 +151,22 @@ export default class ComputerNodeData extends Component {
         this.setState({'driversessions': [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,propCollection]});
     }
 
+    convertToDisplayProp(propName){
+        var obj = this.state.propertyMap[propName];
+        var type = typeof obj;
+        if (type === 'undefined'){
+            return "No Data";
+        }else if (obj.hasOwnProperty('low')){
+            return new Date(obj.low * 1000).toUTCString();
+        }else if (type === 'boolean'){
+            return obj.toString().toTitleCase();
+        }else if (obj === ""){
+            return "None";
+        }else{
+            return obj;
+        }
+    }
+
     render() {
         return (
             <div className={this.props.visible ? "" : "displaynone"}>
@@ -173,13 +182,19 @@ export default class ComputerNodeData extends Component {
                         OS
                     </dt>
                     <dd>
-                        {this.state.os}
+                        {this.convertToDisplayProp("OperatingSystem")}
+                    </dd>
+                    <dt>
+                        Enabled
+                    </dt>
+                    <dd>
+                        {this.convertToDisplayProp("Enabled")}
                     </dd>
                     <dt>
                         Allows Unconstrained Delegation
                     </dt>
                     <dd>
-                        {this.state.unconstrained}
+                        {this.convertToDisplayProp("UnconstrainedDelegation")}
                     </dd>
                     <dt>
                         Sessions
@@ -194,7 +209,6 @@ export default class ComputerNodeData extends Component {
                             }.bind(this)}
                         />
                     </dd>
-                    <br />
                     <h4>Local Admins</h4>
                     <dt>
                         Explicit Admins
@@ -237,7 +251,6 @@ export default class ComputerNodeData extends Component {
                             }.bind(this)}
                         />
                     </dd>
-                    <br />
                     <h4>Group Memberships</h4>
                     <dt>
                         First Degree Group Membership
@@ -278,7 +291,6 @@ export default class ComputerNodeData extends Component {
                             }.bind(this)} 
                         />
                     </dd>
-                    <br />
                     <h4>Local Admin Rights</h4>
                     <dt>
                         First Degree Local Admin
@@ -319,7 +331,6 @@ export default class ComputerNodeData extends Component {
                             }.bind(this)} 
                         />
                     </dd>
-                    <br />
                     <h4>Outbound Object Control</h4>
                     <dt>
                         First Degree Object Control

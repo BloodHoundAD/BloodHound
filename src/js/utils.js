@@ -164,7 +164,7 @@ export function buildSessionProps(rows) {
         if (row.UserName === 'ANONYMOUS LOGON@UNKNOWN' || row.UserName === '') {
             return;
         }
-        sessions.push({ account: row.UserName.toUpperCase(), computer: row.ComputerName.toUpperCase(), weight: parseInt(row.Weight) });
+        sessions.push({ account: row.UserName.toUpperCase(), computer: row.ComputerName.toUpperCase(), weight: row.Weight });
     });
 
     return sessions;

@@ -195,6 +195,12 @@ div.tooltip-inner-custom {
     margin-bottom: 1em;
 }
 
+.dl-horizontal > h4 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: blue;
+}
+
 .dl-horizontal{
     margin-right: 10px;
 }
@@ -771,7 +777,6 @@ div.tooltip-inner-custom {
 }
 
 .tab-content > div:nth-last-child(2) > div{
-    height: 600px;
+    max-height: 600px;
     overflow-y: auto;
-    resize: vertical;
 }

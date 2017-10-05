@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import NodeALink from './NodeALink';
+import NodePropItem from './NodePropItem';
 import PropTypes from 'prop-types';
+
+import { If, Then, Else } from 'react-if';
 
 export default class UserNodeData extends Component {
     constructor(){
@@ -8,8 +11,6 @@ export default class UserNodeData extends Component {
 
         this.state = {
             label: "",
-            displayName: "None",
-            pwdLastChanged: "None",
             firstDegreeGroupMembership: -1,
             unrolledGroupMembership: -1,
             foreignGroupMembership: -1,
@@ -23,7 +24,8 @@ export default class UserNodeData extends Component {
             firstdegreeControl: -1,
             unrolledControl: -1,
             transitiveControl: -1,
-            driversessions : []
+            driversessions : [],
+            propertyMap: {ServicePrincipalNames: []}
         };
 
         emitter.on('userNodeClicked', this.getNodeData.bind(this));
@@ -36,8 +38,6 @@ export default class UserNodeData extends Component {
 
         this.setState({
             label: payload,
-            displayName: "None",
-            pwdLastChanged: "None",
             firstDegreeGroupMembership: -1,
             unrolledGroupMembership: -1,
             foreignGroupMembership: -1,
@@ -50,7 +50,8 @@ export default class UserNodeData extends Component {
             transitiveControllers: -1,
             firstdegreeControl: -1,
             unrolledControl: -1,
-            transitiveControl: -1
+            transitiveControl: -1,
+            propertyMap: {ServicePrincipalNames: []}
         });
 
         var domain = '@' + payload.split('@').last();
@@ -71,19 +72,8 @@ export default class UserNodeData extends Component {
 
         var props = driver.session();
         props.run("MATCH (n:User {name:{name}}) RETURN n", {name: payload})
-            .then(function(result){
-                var properties = result.records[0]._fields[0].properties;
-                if (properties.hasOwnProperty('PwdLastSet')){
-                    this.setState({'pwdLastChanged': new Date(properties.PwdLastSet.low * 1000).toUTCString() });
-                }
-
-                if (properties.hasOwnProperty("DisplayName")){
-                    var dname = properties.DisplayName;
-                    if (dname === ""){
-                        dname = "None";
-                    }
-                    this.setState({'displayName': dname });
-                }
+            .then(function(result){                
+                this.setState({propertyMap: properties});
                 props.close();
             }.bind(this));
 
@@ -168,13 +158,33 @@ export default class UserNodeData extends Component {
         this.setState({'driversessions': [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,props]});
     }
 
+    isArray(object){
+        return object && typeof object === 'object' && object.constructor === Array;
+    }
+
+    convertToDisplayProp(propName){
+        var obj = this.state.propertyMap[propName];
+        var type = typeof obj;
+        if (type === 'undefined'){
+            return "No Data";
+        }else if (obj.hasOwnProperty('low')){
+            return new Date(obj.low * 1000).toUTCString();
+        }else if (type === 'boolean'){
+            return obj.toString().toTitleCase();
+        }else if (obj === ""){
+            return "None";
+        }else{
+            return obj;
+        }
+    }
+
     render() {
         var domain = '@' + this.state.label.split('@').last();
         return (
             <div className={this.props.visible ? "" : "displaynone"}>
                 <dl className='dl-horizontal'>
                     <h4>
-                        Node Info
+                        User Info
                     </h4>
                     <dt>
                         Name
@@ -186,14 +196,38 @@ export default class UserNodeData extends Component {
                         Display Name
                     </dt>
                     <dd>
-                        {this.state.displayName}
+                        {this.convertToDisplayProp("DisplayName")}
                     </dd>
                     <dt>
                         Password Last Changed
                     </dt>
                     <dd>
-                        {this.state.pwdLastChanged}
+                        {this.convertToDisplayProp("PwdLastSet")}
                     </dd>
+                    <dt>
+                        Last Logon
+                    </dt>
+                    <dd>
+                        {this.convertToDisplayProp("LastLogon")}
+                    </dd>
+                    <dt>
+                        Enabled
+                    </dt>
+                    <dd>
+                        {this.convertToDisplayProp("Enabled")}
+                    </dd>
+                    <dt>
+                        Service Principal Names
+                    </dt>
+                    {(() => {
+                        if (this.state.propertyMap.ServicePrincipalNames.length === 0){
+                            return <dd>None</dd>;
+                        }
+                    })()}
+                    {Object.keys(this.state.propertyMap.ServicePrincipalNames).map(function(key){
+                        var x = <dd key={key}>{this.state.propertyMap.ServicePrincipalNames[key]}</dd>;
+                        return x;
+                    }.bind(this))}
                     <dt>
                         Sessions
                     </dt>
@@ -207,7 +241,7 @@ export default class UserNodeData extends Component {
                             }.bind(this)}
                         />
                     </dd>
-                    <br />
+                    
                     <h4>Group Membership</h4>
                     <dt>
                         First Degree Group Memberships
@@ -250,7 +284,7 @@ export default class UserNodeData extends Component {
                             }.bind(this)}
                         />
                     </dd>
-                    <br />
+                    
                     <h4>
                         Local Admin Rights
                     </h4>
@@ -292,7 +326,7 @@ export default class UserNodeData extends Component {
                             }.bind(this)}
                         />
                     </dd>
-                    <br />
+                    
                     <h4>
                         Outbound Object Control
                     </h4>
@@ -334,7 +368,7 @@ export default class UserNodeData extends Component {
                             }.bind(this)}
                         />
                     </dd>
-                    <br />
+                    
                     <h4>Inbound Object Control</h4>
                     <dt>
                         Explicit Object Controllers
@@ -382,5 +416,5 @@ export default class UserNodeData extends Component {
 }
 
 UserNodeData.propTypes = {
-    visible : React.PropTypes.bool.isRequired
+    visible : PropTypes.bool.isRequired
 };
