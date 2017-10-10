@@ -28,7 +28,7 @@
   },
   "babel": {
     "presets": [
-      "es2015",
+      "env",
       "stage-0",
       "react"
     ]
@@ -38,7 +38,7 @@
     "babel-core": "^6.22.1",
     "babel-loader": "^7.0.0",
     "babel-polyfill": "^6.22.0",
-    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.22.0",
     "babel-preset-stage-0": "^6.22.0",
     "concurrently": "^3.1.0",
@@ -56,15 +56,16 @@
     "configstore": "^3.1.0",
     "dagre": "^0.7.4",
     "eventemitter2": "^4.1.0",
+    "fast-csv": "^2.4.1",
     "jquery": "^3.2.1",
     "linkurious": "^1.5.1",
     "mustache": "^2.2.1",
-    "neo4j-driver": "^1.3.0",
-    "prop-types": "^15.5.10",
+    "neo4j-driver": "^1.4.1",
     "react": "^15.4.2",
     "react-bootstrap": "^0.31.0",
     "react-dom": "^15.4.2",
     "react-if": "^2.1.0",
-    "react-transition-group": "^1.1.3"
+    "react-transition-group": "^1.1.3",
+    "unzipper": "^0.8.9"
   }
 }
