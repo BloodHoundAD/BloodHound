@@ -72,7 +72,8 @@ export default class UserNodeData extends Component {
 
         var props = driver.session();
         props.run("MATCH (n:User {name:{name}}) RETURN n", {name: payload})
-            .then(function(result){                
+            .then(function(result){
+                var properties = result.records[0]._fields[0].properties;
                 this.setState({propertyMap: properties});
                 props.close();
             }.bind(this));
@@ -168,7 +169,12 @@ export default class UserNodeData extends Component {
         if (type === 'undefined'){
             return "No Data";
         }else if (obj.hasOwnProperty('low')){
-            return new Date(obj.low * 1000).toUTCString();
+            var t = obj.low;
+            if (t === 0){
+                return "Never";
+            }else{
+                return new Date(obj.low * 1000).toUTCString();
+            }
         }else if (type === 'boolean'){
             return obj.toString().toTitleCase();
         }else if (obj === ""){
@@ -215,6 +221,12 @@ export default class UserNodeData extends Component {
                     </dt>
                     <dd>
                         {this.convertToDisplayProp("Enabled")}
+                    </dd>
+                    <dt>
+                        Email
+                    </dt>
+                    <dd>
+                        {this.convertToDisplayProp("Email")}
                     </dd>
                     <dt>
                         Service Principal Names

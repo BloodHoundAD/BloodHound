@@ -197,7 +197,6 @@ export default class GroupNodeData extends Component {
                             }.bind(this)}
                         />
                     </dd>
-                    <br />
                     <h4>Group Members</h4>
                     <dt>
                         Direct Members
@@ -237,7 +236,6 @@ export default class GroupNodeData extends Component {
                             }.bind(this)}
                         />
                     </dd>
-                    <br />
                     <h4>Group Membership</h4>
                     <dt>
                         First Degree Group Membership
@@ -277,7 +275,6 @@ export default class GroupNodeData extends Component {
                             }.bind(this)}
                         />
                     </dd>
-                    <br />
                     <h4>Local Admin Rights</h4>
                     <dt>
                         First Degree Local Admin
@@ -318,7 +315,6 @@ export default class GroupNodeData extends Component {
                             }.bind(this)}
                         />
                     </dd>
-                    <br />
                     <h4>Outbound Object Control</h4>
                     <dt>
                         First Degree Object Control
@@ -358,7 +354,6 @@ export default class GroupNodeData extends Component {
                             }.bind(this)}
                         />
                     </dd>
-                    <br />
                     <h4>Inbound Object Control</h4>
                     <dt>
                         Explicit Object Controllers

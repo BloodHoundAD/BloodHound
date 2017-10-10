@@ -157,7 +157,12 @@ export default class ComputerNodeData extends Component {
         if (type === 'undefined'){
             return "No Data";
         }else if (obj.hasOwnProperty('low')){
-            return new Date(obj.low * 1000).toUTCString();
+            var t = obj.low;
+            if (t === 0){
+                return "Never";
+            }else{
+                return new Date(obj.low * 1000).toUTCString();
+            }
         }else if (type === 'boolean'){
             return obj.toString().toTitleCase();
         }else if (obj === ""){
