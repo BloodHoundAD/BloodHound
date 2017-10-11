@@ -74,6 +74,9 @@ export default class UserNodeData extends Component {
         props.run("MATCH (n:User {name:{name}}) RETURN n", {name: payload})
             .then(function(result){
                 var properties = result.records[0]._fields[0].properties;
+                if (typeof properties.ServicePrincipalNames === 'undefined'){
+                    properties.ServicePrincipalNames = [];
+                }
                 this.setState({propertyMap: properties});
                 props.close();
             }.bind(this));
