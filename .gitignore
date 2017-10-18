@@ -2,3 +2,5 @@ node_modules/*
 Bloodhound-*
 dist/
 npm-debug.log
+*.bin
+*.csv
