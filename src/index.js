@@ -10,9 +10,9 @@ const { app } = require('electron').remote
 var fs = require('fs')
 const path = require('path');
 
-const ConfigStore = require('configstore');
+const ConfigStore = require('electron-store');
 
-global.conf = new ConfigStore('bloodhound')
+global.conf = new ConfigStore()
 var e = require('eventemitter2').EventEmitter2
 global.emitter = new e({})
 global.renderEmit = new e({})

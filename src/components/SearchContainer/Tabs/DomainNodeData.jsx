@@ -239,5 +239,5 @@ export default class DomainNodeData extends Component {
 }
 
 DomainNodeData.propTypes = {
-    visible : React.PropTypes.bool.isRequired
+    visible : PropTypes.bool.isRequired
 };

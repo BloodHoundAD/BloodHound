@@ -14,6 +14,6 @@ export default class Icon extends Component {
 }
 
 Icon.propTypes =  {
-	glyph : React.PropTypes.string.isRequired,
-	extraClass : React.PropTypes.string
+	glyph : PropTypes.string.isRequired,
+	extraClass : PropTypes.string
 }

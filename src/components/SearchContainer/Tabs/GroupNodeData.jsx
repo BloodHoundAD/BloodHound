@@ -401,5 +401,5 @@ export default class GroupNodeData extends Component {
 }
 
 GroupNodeData.propTypes = {
-    visible : React.PropTypes.bool.isRequired
+    visible : PropTypes.bool.isRequired
 };

@@ -23,6 +23,6 @@ export default class LoadLabel extends Component {
 }
 
 LoadLabel.propTypes = {
-	ready : React.PropTypes.bool.isRequired,
-	value : React.PropTypes.number
+	ready : PropTypes.bool.isRequired,
+	value : PropTypes.number
 }

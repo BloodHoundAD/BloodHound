@@ -16,38 +16,38 @@ import Settings from './components/Float/Settings'
 import ZoomContainer from './components/Zoom/ZoomContainer'
 import QueryNodeSelect from './components/Float/QueryNodeSelect'
 import SessionClearModal from './components/Modals/SessionClearModal'
-import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup'
 import About from './components/Modals/About.jsx'
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 export default class AppContainer extends Component {
 	render() {
 		return (
-			 <CSSTransitionGroup transitionName="mainfade" 
-			 	transitionAppear={true} 
-			 	transitionAppearTimeout={1000}
-			 	transitionEnter={false}
-			 	transitionLeave={false}>
-				<div className="max">
-					<GenericAlert />
-					<ExportContainer />
-					<LoadingContainer />
-					<SpotlightContainer />
-					<GraphContainer />
-					<SearchContainer />
-					<LogoutModal />
-					<ClearWarnModal />
-					<ClearConfirmModal />
-					<ClearingModal />
-					<CancelUploadModal />
-					<SessionClearModal />
-					<RawQuery />
-					<MenuContainer />
-					<Settings />
-					<ZoomContainer />
-					<QueryNodeSelect />
-					<About />
-				</div>
-			</CSSTransitionGroup>
+			 <TransitionGroup className="max">
+				 <CSSTransition classNames="mainfade" 
+					appear={true} 
+					timeout={1000}>
+					<div className="max">
+						<GenericAlert />
+						<ExportContainer />
+						<LoadingContainer />
+						<SpotlightContainer />
+						<GraphContainer />
+						<SearchContainer />
+						<LogoutModal />
+						<ClearWarnModal />
+						<ClearConfirmModal />
+						<ClearingModal />
+						<CancelUploadModal />
+						<SessionClearModal />
+						<RawQuery />
+						<MenuContainer />
+						<Settings />
+						<ZoomContainer />
+						<QueryNodeSelect />
+						<About />
+					</div>
+				</CSSTransition>
+			</TransitionGroup>
 		);
 	};
 }

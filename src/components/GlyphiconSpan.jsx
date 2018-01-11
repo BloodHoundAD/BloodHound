@@ -26,9 +26,9 @@ export default class GlyphiconSpan extends Component {
 }
 
 GlyphiconSpan.propTypes = {
-	classes : React.PropTypes.string,
-	tooltipDir : React.PropTypes.string,
-	tooltipTitle : React.PropTypes.string,
-	tooltip : React.PropTypes.bool.isRequired,
-	click: React.PropTypes.func
+	classes : PropTypes.string,
+	tooltipDir : PropTypes.string,
+	tooltipTitle : PropTypes.string,
+	tooltip : PropTypes.bool.isRequired,
+	click: PropTypes.func
 }

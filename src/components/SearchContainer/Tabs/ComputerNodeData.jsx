@@ -382,5 +382,5 @@ export default class ComputerNodeData extends Component {
 }
 
 ComputerNodeData.propTypes= {
-    visible : React.PropTypes.bool.isRequired
+    visible : PropTypes.bool.isRequired
 };

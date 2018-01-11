@@ -75,6 +75,6 @@ export default class ProgressBarMenuButton extends Component {
 }
 
 ProgressBarMenuButton.propTypes = {
-    progress : React.PropTypes.number.isRequired,
-    click : React.PropTypes.func.isRequired
+    progress : PropTypes.number.isRequired,
+    click : PropTypes.func.isRequired
 };

@@ -23,7 +23,7 @@ export default class NodeALink extends Component {
 }
 
 NodeALink.propTypes = {
-	ready : React.PropTypes.bool.isRequired,
-	click : React.PropTypes.func,
-	value : React.PropTypes.number
+	ready : PropTypes.bool.isRequired,
+	click : PropTypes.func,
+	value : PropTypes.number
 }

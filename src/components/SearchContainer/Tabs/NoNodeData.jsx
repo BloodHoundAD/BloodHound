@@ -18,5 +18,5 @@ export default class NoNodeData extends Component {
 
 
 NoNodeData.propTypes = {
-	visible : React.PropTypes.bool.isRequired
+	visible : PropTypes.bool.isRequired
 }

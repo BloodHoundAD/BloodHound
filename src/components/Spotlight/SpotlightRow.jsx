@@ -54,10 +54,10 @@ export default class SpotlightRow extends Component {
 }
 
 SpotlightRow.propTypes = {
-	nodeId : React.PropTypes.number.isRequired,
-	parentNodeId : React.PropTypes.number.isRequired,
-	nodeLabel : React.PropTypes.string.isRequired,
-	parentNodeLabel : React.PropTypes.string.isRequired,
-	nodeType: React.PropTypes.string.isRequired,
-	parentNodeType: React.PropTypes.string.isRequired
+	nodeId : PropTypes.number.isRequired,
+	parentNodeId : PropTypes.number.isRequired,
+	nodeLabel : PropTypes.string.isRequired,
+	parentNodeLabel : PropTypes.string.isRequired,
+	nodeType: PropTypes.string.isRequired,
+	parentNodeType: PropTypes.string.isRequired
 }
