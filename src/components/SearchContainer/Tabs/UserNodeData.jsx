@@ -129,7 +129,7 @@ export default class UserNodeData extends Component {
                 s8.close();
             }.bind(this));
 
-        s9.run("MATCH p = (n1)-[r:MemberOf*1..]->(g:Group)-[r1:AddMembers|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(u:User {name: {name}}) WITH LENGTH(p) as pathLength, p, n1 WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = u.name) AND NOT n1.name = u.name RETURN COUNT(DISTINCT(n1))", {name:payload})
+        s9.run("MATCH p = (n1)-[r:MemberOf*1..]->(g:Group)-[r1:AddMember|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(u:User {name: {name}}) WITH LENGTH(p) as pathLength, p, n1 WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = u.name) AND NOT n1.name = u.name RETURN COUNT(DISTINCT(n1))", {name:payload})
             .then(function(result){
                 this.setState({'unrolledControllers':result.records[0]._fields[0].low});
                 s9.close();
@@ -141,19 +141,19 @@ export default class UserNodeData extends Component {
                 s10.close();
             }.bind(this));
 
-        s11.run("MATCH p = (u:User {name:{name}})-[r1:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
+        s11.run("MATCH p = (u:User {name:{name}})-[r1:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
             .then(function(result){
                 this.setState({'firstdegreeControl':result.records[0]._fields[0].low});
                 s11.close();
             }.bind(this));
 
-        s12.run("MATCH p = (u:User {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
+        s12.run("MATCH p = (u:User {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
             .then(function(result){
                 this.setState({'unrolledControl':result.records[0]._fields[0].low});
                 s12.close();
             }.bind(this));
 
-        s13.run("MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((u:User {name:{name}})-[r1:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) RETURN COUNT(DISTINCT(n))", {name:payload})
+        s13.run("MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((u:User {name:{name}})-[r1:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) RETURN COUNT(DISTINCT(n))", {name:payload})
             .then(function(result){
                 this.setState({'transitiveControl':result.records[0]._fields[0].low});
                 s13.close();
@@ -353,7 +353,7 @@ export default class UserNodeData extends Component {
                             ready={this.state.firstdegreeControl !== -1}
                             value={this.state.firstdegreeControl}
                             click={function(){
-                                emitter.emit('query', "MATCH p = (u:User {name:{name}})-[r1:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN p", {name:this.state.label});
+                                emitter.emit('query', "MATCH p = (u:User {name:{name}})-[r1:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN p", {name:this.state.label});
                             }.bind(this)}
                         />
                     </dd>
@@ -365,7 +365,7 @@ export default class UserNodeData extends Component {
                             ready={this.state.unrolledControl !== -1}
                             value={this.state.unrolledControl}
                             click={function(){
-                                emitter.emit('query', "MATCH p = (u:User {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN p", {name:this.state.label}
+                                emitter.emit('query', "MATCH p = (u:User {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN p", {name:this.state.label}
                                     ,this.state.label);
                             }.bind(this)}
                         />
@@ -378,7 +378,7 @@ export default class UserNodeData extends Component {
                             ready={this.state.transitiveControl !== -1}
                             value={this.state.transitiveControl}
                             click={function(){    
-                                emitter.emit('query', "MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((u:User {name:{name}})-[r1:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) RETURN p", {name:this.state.label}
+                                emitter.emit('query', "MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((u:User {name:{name}})-[r1:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) RETURN p", {name:this.state.label}
                                     ,this.state.label);
                             }.bind(this)}
                         />
@@ -406,7 +406,7 @@ export default class UserNodeData extends Component {
                             ready={this.state.unrolledControllers !== -1}
                             value={this.state.unrolledControllers}
                             click={function(){    
-                                emitter.emit('query', "MATCH p = (n1)-[r:MemberOf*1..]->(g:Group)-[r1:AddMembers|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(u:User {name: {name}}) WITH LENGTH(p) as pathLength, p, n1 WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = u.name) AND NOT n1.name = u.name RETURN p", {name:this.state.label}
+                                emitter.emit('query', "MATCH p = (n1)-[r:MemberOf*1..]->(g:Group)-[r1:AddMember|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(u:User {name: {name}}) WITH LENGTH(p) as pathLength, p, n1 WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = u.name) AND NOT n1.name = u.name RETURN p", {name:this.state.label}
                                     ,this.state.label);
                             }.bind(this)}
                         />
@@ -419,7 +419,7 @@ export default class UserNodeData extends Component {
                             ready={this.state.transitiveControllers !== -1}
                             value={this.state.transitiveControllers}
                             click={function(){    
-                                emitter.emit('query', "MATCH (n1) WHERE NOT n1.name={name} WITH n1 MATCH p = shortestPath((n1)-[r1:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(u1:User {name: {name}})) RETURN p", {name:this.state.label}
+                                emitter.emit('query', "MATCH (n1) WHERE NOT n1.name={name} WITH n1 MATCH p = shortestPath((n1)-[r1:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(u1:User {name: {name}})) RETURN p", {name:this.state.label}
                                     ,this.state.label);
                             }.bind(this)}
                         />

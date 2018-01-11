@@ -108,7 +108,7 @@ global.appStore = {
             'GenericWrite': 'tapered',
             'WriteDacl': 'tapered',
             'WriteOwner': 'tapered',
-            'AddMembers': 'tapered',
+            'AddMember': 'tapered',
             'TrustedBy': 'curvedArrow',
             'DCSync' : 'tapered'
         }
@@ -130,7 +130,7 @@ global.appStore = {
             'GenericWrite': 'line',
             'WriteDACL': 'line',
             'WriteOwner': 'line',
-            'AddMembers': 'line',
+            'AddMember': 'line',
             'TrustedBy': 'curvedArrow'
         }
     },

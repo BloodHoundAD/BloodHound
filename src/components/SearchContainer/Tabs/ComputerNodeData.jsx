@@ -130,19 +130,19 @@ export default class ComputerNodeData extends Component {
                 s10.close();
             }.bind(this));
 
-        s11.run("MATCH p = (c:Computer {name:{name}})-[r:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
+        s11.run("MATCH p = (c:Computer {name:{name}})-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
             .then(function(result){
                 this.setState({'firstdegreeControl':result.records[0]._fields[0].low});
                 s11.close();
             }.bind(this));
 
-        s12.run("MATCH p = (c:Computer {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
+        s12.run("MATCH p = (c:Computer {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN COUNT(DISTINCT(n))", {name:payload})
             .then(function(result){
                 this.setState({'groupDelegatedControl':result.records[0]._fields[0].low});
                 s12.close();
             }.bind(this));
 
-        s13.run("MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((c:Computer {name:{name}})-[r:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) RETURN COUNT(DISTINCT(n))", {name:payload})
+        s13.run("MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((c:Computer {name:{name}})-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) RETURN COUNT(DISTINCT(n))", {name:payload})
             .then(function(result){
                 this.setState({'transitiveControl':result.records[0]._fields[0].low});
                 s13.close();
@@ -345,7 +345,7 @@ export default class ComputerNodeData extends Component {
                             ready={this.state.firstdegreeControl !== -1}
                             value={this.state.firstdegreeControl}
                             click={function(){
-                                emitter.emit('query', "MATCH p = (c:Computer {name:{name}})-[r1:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN p", {name:this.state.label});
+                                emitter.emit('query', "MATCH p = (c:Computer {name:{name}})-[r1:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN p", {name:this.state.label});
                             }.bind(this)}
                         />
                     </dd>
@@ -357,7 +357,7 @@ export default class ComputerNodeData extends Component {
                             ready={this.state.groupDelegatedControl !== -1}
                             value={this.state.groupDelegatedControl}
                             click={function(){
-                                emitter.emit('query', "MATCH p = (c:Computer {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN p", {name:this.state.label}
+                                emitter.emit('query', "MATCH p = (c:Computer {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner]->(n) RETURN p", {name:this.state.label}
                                     ,this.state.label);
                             }.bind(this)}
                         />
@@ -370,7 +370,7 @@ export default class ComputerNodeData extends Component {
                             ready={this.state.transitiveControl !== -1}
                             value={this.state.transitiveControl}
                             click={function(){    
-                                emitter.emit('query', "MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((c:Computer {name:{name}})-[r1:MemberOf|AddMembers|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) RETURN p", {name:this.state.label}
+                                emitter.emit('query', "MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((c:Computer {name:{name}})-[r1:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) RETURN p", {name:this.state.label}
                                     ,this.state.label);
                             }.bind(this)}
                         />
