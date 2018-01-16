@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import NodeALink from './NodeALink';
 import NodePropItem from './NodePropItem';
 import PropTypes from 'prop-types';
+import NodeProps from './NodeProps';
 
 import { If, Then, Else } from 'react-if';
 
@@ -25,7 +26,9 @@ export default class UserNodeData extends Component {
             unrolledControl: -1,
             transitiveControl: -1,
             driversessions : [],
-            propertyMap: {ServicePrincipalNames: []}
+            propertyMap: {},
+            ServicePrincipalNames: [],
+            displayMap: {"DisplayName":"Display Name", "PwdLastSet":"Password Last Changed", "LastLogon": "Last Logon", "Enabled":"Enabled","Email":"Email"}
         };
 
         emitter.on('userNodeClicked', this.getNodeData.bind(this));
@@ -51,7 +54,8 @@ export default class UserNodeData extends Component {
             firstdegreeControl: -1,
             unrolledControl: -1,
             transitiveControl: -1,
-            propertyMap: {ServicePrincipalNames: []}
+            propertyMap: {},
+            ServicePrincipalNames: []
         });
 
         var domain = '@' + payload.split('@').last();
@@ -75,7 +79,9 @@ export default class UserNodeData extends Component {
             .then(function(result){
                 var properties = result.records[0]._fields[0].properties;
                 if (typeof properties.ServicePrincipalNames === 'undefined'){
-                    properties.ServicePrincipalNames = [];
+                    this.setState({ServicePrincipalNames: []});
+                }else{
+                    this.setState({ ServicePrincipalNames: properties.ServicePrincipalNames });
                 }
                 this.setState({propertyMap: properties});
                 props.close();
@@ -201,48 +207,7 @@ export default class UserNodeData extends Component {
                     <dd>
                         {this.state.label}
                     </dd>
-                    <dt>
-                        Display Name
-                    </dt>
-                    <dd>
-                        {this.convertToDisplayProp("DisplayName")}
-                    </dd>
-                    <dt>
-                        Password Last Changed
-                    </dt>
-                    <dd>
-                        {this.convertToDisplayProp("PwdLastSet")}
-                    </dd>
-                    <dt>
-                        Last Logon
-                    </dt>
-                    <dd>
-                        {this.convertToDisplayProp("LastLogon")}
-                    </dd>
-                    <dt>
-                        Enabled
-                    </dt>
-                    <dd>
-                        {this.convertToDisplayProp("Enabled")}
-                    </dd>
-                    <dt>
-                        Email
-                    </dt>
-                    <dd>
-                        {this.convertToDisplayProp("Email")}
-                    </dd>
-                    <dt>
-                        Service Principal Names
-                    </dt>
-                    {(() => {
-                        if (this.state.propertyMap.ServicePrincipalNames.length === 0){
-                            return <dd>None</dd>;
-                        }
-                    })()}
-                    {Object.keys(this.state.propertyMap.ServicePrincipalNames).map(function(key){
-                        var x = <dd key={key}>{this.state.propertyMap.ServicePrincipalNames[key]}</dd>;
-                        return x;
-                    }.bind(this))}
+                    <NodeProps properties={this.state.propertyMap} displayMap={this.state.displayMap} ServicePrincipalNames={this.state.ServicePrincipalNames} />
                     <dt>
                         Sessions
                     </dt>

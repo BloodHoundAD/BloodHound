@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import NodeALink from './NodeALink';
 import PropTypes from 'prop-types';
+import NodeProps from './NodeProps';
 
 export default class ComputerNodeData extends Component {
     constructor(){
@@ -21,7 +22,9 @@ export default class ComputerNodeData extends Component {
             transitiveControl: -1,
             derivativeLocalAdmins: -1,
             driversessions: [],
-            propertyMap: {}
+            propertyMap: {},
+            ServicePrincipalNames: [],
+            displayMap: { "OperatingSystem": "OS", "Enabled": "Enabled", "UnconstrainedDelegation": "Allows Unconstrained Delegation"}
         };
 
         emitter.on('computerNodeClicked', this.getNodeData.bind(this));
@@ -183,24 +186,7 @@ export default class ComputerNodeData extends Component {
                     <dd>
                         {this.state.label}
                     </dd>
-                    <dt>
-                        OS
-                    </dt>
-                    <dd>
-                        {this.convertToDisplayProp("OperatingSystem")}
-                    </dd>
-                    <dt>
-                        Enabled
-                    </dt>
-                    <dd>
-                        {this.convertToDisplayProp("Enabled")}
-                    </dd>
-                    <dt>
-                        Allows Unconstrained Delegation
-                    </dt>
-                    <dd>
-                        {this.convertToDisplayProp("UnconstrainedDelegation")}
-                    </dd>
+                    <NodeProps properties={this.state.propertyMap} displayMap={this.state.displayMap} ServicePrincipalNames={this.state.ServicePrincipalNames} />
                     <dt>
                         Sessions
                     </dt>
