@@ -20,34 +20,34 @@ import About from './components/Modals/About.jsx'
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 export default class AppContainer extends Component {
-	render() {
-		return (
-			 <TransitionGroup className="max">
-				 <CSSTransition classNames="mainfade" 
-					appear={true} 
-					timeout={1000}>
-					<div className="max">
-						<GenericAlert />
-						<ExportContainer />
-						<LoadingContainer />
-						<SpotlightContainer />
-						<GraphContainer />
-						<SearchContainer />
-						<LogoutModal />
-						<ClearWarnModal />
-						<ClearConfirmModal />
-						<ClearingModal />
-						<CancelUploadModal />
-						<SessionClearModal />
-						<RawQuery />
-						<MenuContainer />
-						<Settings />
-						<ZoomContainer />
-						<QueryNodeSelect />
-						<About />
-					</div>
-				</CSSTransition>
-			</TransitionGroup>
-		);
-	};
+    render() {
+        return (
+             <TransitionGroup className="max">
+                 <CSSTransition classNames="mainfade" 
+                     appear 
+                     timeout={1000}>
+                    <div className="max">
+                        <GenericAlert />
+                        <ExportContainer />
+                        <LoadingContainer />
+                        <SpotlightContainer />
+                        <GraphContainer />
+                        <SearchContainer />
+                        <LogoutModal />
+                        <ClearWarnModal />
+                        <ClearConfirmModal />
+                        <ClearingModal />
+                        <CancelUploadModal />
+                        <SessionClearModal />
+                        <RawQuery />
+                        <MenuContainer />
+                        <Settings />
+                        <ZoomContainer />
+                        <QueryNodeSelect />
+                        <About />
+                    </div>
+                </CSSTransition>
+            </TransitionGroup>
+        );
+    };
 }

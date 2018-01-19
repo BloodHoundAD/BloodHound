@@ -50,28 +50,32 @@ export default class QueryNodeSelect extends Component {
     }
 
     render() {
-        var header = <QueryNodeSelectHeader length={this.state.data.length} title={this.state.queryData.boxTitle} dismiss={this._dismiss.bind(this)}/>;
         return (
             <div className="queryNodeSelect" ref="outer">
-                <Panel header={header}>
-                    <If condition={this.state.data.length > 0}>
-                        <Then>
-                            <ListGroup ref="list">
-                                {
-                                    this.state.data.map(function(key){
-                                        var x = <QueryNodeSelectItem key={key} label={key} click={this.handleClick.bind(this)} />;
-                                        return x;
-                                    }.bind(this))
-                                }
-                            </ListGroup>
-                        </Then>
-                        <Else>{() => 
-                            <img src="src/img/loading.gif" />
-                        }
-                        </Else>
-                    </If>
+                <Panel>
+                    <Panel.Heading>
+                        {/* <QueryNodeSelectHeader length={this.state.data.length} title={this.state.queryData.boxTitle} dismiss={this._dismiss.bind(this)} />; */}
+                        {this.state.queryData.boxTitle}
+                    </Panel.Heading>
+                    <Panel.Body>
+                        <If condition={this.state.data.length > 0}>
+                            <Then>
+                                <ListGroup ref="list">
+                                    {
+                                        this.state.data.map(function(key){
+                                            var x = <QueryNodeSelectItem key={key} label={key} click={this.handleClick.bind(this)} />;
+                                            return x;
+                                        }.bind(this))
+                                    }
+                                </ListGroup>
+                            </Then>
+                            <Else>{() => 
+                                <img src="src/img/loading.gif" />
+                            }
+                            </Else>
+                        </If>
+                    </Panel.Body>
                 </Panel>
-                
             </div>
         );
     }
