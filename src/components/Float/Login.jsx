@@ -87,7 +87,7 @@ export default class Login extends Component {
             driver.close();
         };
         driver.onError = function(error){
-            if (error.message.includes("authentication failure")){
+            if (error.code.includes("Unauthorized")){
                 icon.removeClass();
                 icon.addClass("fa fa-check-circle green-icon-color form-control-feedback");
                 this.setState({loginEnabled: true, url: url});
@@ -105,7 +105,6 @@ export default class Login extends Component {
             session.close();
             driver.close();
         }.bind(this);
-        session.run("return 1");
     }
 
     checkDBCreds(){
