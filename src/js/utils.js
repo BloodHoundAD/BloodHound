@@ -231,6 +231,10 @@ export function buildACLProps(rows) {
             rights.push("AddMember");
         }
 
+        if (rel.includes("Owner")){
+            rights.push("Owns");
+        }
+
         $.each(rights, function(index, record){
             var hash = (atype + record + btype).toUpperCase();
             if (btype === 'Computer') {
