@@ -124,7 +124,8 @@ global.appStore = {
             'TrustedBy': 'curvedArrow',
             'DCSync' : 'tapered',
             'Contains': 'tapered',
-            'GpLink':'tapered'
+            'GpLink':'tapered',
+            'Owns':'tapered'
         }
     },
     lowResPalette: {
