@@ -257,7 +257,6 @@ export default class GraphContainer extends Component {
     }
 
     applyDesign(){
-        console.log('applying design')
         this.state.design.deprecate();
         this.state.sigmaInstance.refresh();
         this.state.design.apply();
