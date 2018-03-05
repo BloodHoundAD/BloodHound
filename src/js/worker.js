@@ -10,13 +10,13 @@ Array.prototype.allEdgesSameType = function() {
     return true;
 };
 
-sigma.classes.graph.addMethod('outboundNodes', function(id) {
-    return this.outNeighborsIndex.get(id).keyList();
-});
+// sigma.classes.graph.addMethod('outboundNodes', function(id) {
+//     return this.outNeighborsIndex.get(id).keyList();
+// });
 
-sigma.classes.graph.addMethod('inboundNodes', function(id) {
-    return this.inNeighborsIndex.get(id).keyList();
-});
+// sigma.classes.graph.addMethod('inboundNodes', function(id) {
+//     return this.inNeighborsIndex.get(id).keyList();
+// });
 
 var sigmaInstance = new sigma();
 

@@ -109,6 +109,10 @@ export function findObjectType(header){
         return 'userprops';
     }else if (header.includes('AccountName') && header.includes('Enabled') && header.includes('PwdLastSet') && header.includes('LastLogon') && header.includes('OperatingSystem') && header.includes('Sid')){
         return 'compprops';
+    } else if (header.includes('ContainerType') && header.includes('ContainerName') && header.includes('ContainerGUID') && header.includes('ContainerBlocksInheritance') && header.includes('ObjectType') && header.includes('ObjectName') && header.includes('ObjectId')){
+        return 'structure';
+    } else if (header.includes('ObjectType') && header.includes('ObjectName') && header.includes('ObjectGUID') && header.includes('GPODisplayName') && header.includes('GPOGuid') && header.includes('IsEnforced')){
+        return 'gplink';
     }else{
         return 'unknown';
     }
@@ -188,6 +192,53 @@ export function buildDomainProps(rows) {
     });
 
     return domains;
+}
+
+export function buildStructureProps(rows){
+    var datadict = {};
+
+    $.each(rows, function(index, row){
+        var hash = (row.ContainerType + row.ObjectType).toUpperCase();
+        var atype = row.ContainerType.toTitleCase();
+        var btype = row.ObjectType.toTitleCase();
+
+        if (datadict[hash]){
+            datadict[hash].props.push({
+                container: row.ContainerName.toUpperCase(),
+                object: row.ObjectName.toUpperCase()
+            });
+        }else{
+            datadict[hash] = {
+                statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.container}) WITH a,prop MERGE (b:{} {name: prop.object}) WITH a,b,prop MERGE (a)-[r:Contains]->(b) SET a.blocksInheritance={}'.format(atype, btype, row.ContainerBlocksInheritance),
+                props: [{ container: row.ContainerName.toUpperCase(), object: row.ObjectName.toUpperCase() }]
+            };
+        }
+    });
+
+    return datadict;
+}
+
+export function buildGplinkProps(rows){
+    var datadict = {};
+
+    $.each(rows, function (index, row) {
+        var type = row.ObjectType.toTitleCase();
+
+        if (datadict[type]){
+            datadict[type].props.push({
+                gponame: row.GPODisplayName.toUpperCase(),
+                objectname: row.ObjectName.toUpperCase(),
+                enforced: row.IsEnforced
+            });
+        }else{
+            datadict[type] = {
+                statement: 'UNWIND {props} as prop MERGE (a:Gpo {name: prop.gponame}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: prop.enforced}]->(b)'.format(type),
+                props:[{gponame: row.GPODisplayName.toUpperCase(), objectname: row.ObjectName.toUpperCase(), enforced: row.IsEnforced}]
+            };
+        }
+    });
+    console.log(datadict)
+    return datadict;
 }
 
 export function buildACLProps(rows) {

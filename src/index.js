@@ -96,6 +96,18 @@ global.appStore = {
                 content: '\uF0AC',
                 scale: 1.5,
                 color: '#17E6B9'
+            },
+            'Ou': {
+                font: 'FontAwesome',
+                content: '\uF0E8',
+                scale: 1.25,
+                color: '#52667D'
+            },
+            'Gpo': {
+                font: 'FontAwesome',
+                content: '\uF03A',
+                scale: 1.25,
+                color: '#7F72FD'
             }
         },
         edgeScheme: {
@@ -110,7 +122,9 @@ global.appStore = {
             'WriteOwner': 'tapered',
             'AddMember': 'tapered',
             'TrustedBy': 'curvedArrow',
-            'DCSync' : 'tapered'
+            'DCSync' : 'tapered',
+            'Contains': 'tapered',
+            'GpLink':'tapered'
         }
     },
     lowResPalette: {

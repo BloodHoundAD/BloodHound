@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import MenuButton from './MenuButton';
 import ProgressBarMenuButton from './ProgressBarMenuButton';
-import { buildDomainProps, buildSessionProps, buildLocalAdminProps, buildGroupMembershipProps, buildACLProps, findObjectType} from 'utils';
+import { buildDomainProps, buildSessionProps, buildLocalAdminProps, buildGroupMembershipProps, buildACLProps, findObjectType, buildStructureProps, buildGplinkProps} from 'utils';
 import { If, Then, Else } from 'react-if';
 const { dialog, clipboard, app } = require('electron').remote;
 var fs = require('fs');
@@ -269,6 +269,18 @@ export default class MenuContainer extends Component {
             query = 'UNWIND {props} AS prop MERGE (comp:Computer {name: upper(prop.AccountName)}) SET comp.Enabled=toBoolean(prop.Enabled),comp.PwdLastSet=toInt(prop.PwdLastSet),comp.LastLogon=toInt(prop.LastLogon),comp.OperatingSystem=prop.OperatingSystem,comp.Sid=prop.Sid,comp.UnconstrainedDelegation=toBoolean(prop.UnconstrainedDelegation)';
 
             await session.run(query, {props:currentChunk});
+        }else if (filetype === 'structure'){  
+            processed = buildStructureProps(currentChunk);
+
+            for (var skey in processed){
+                await session.run(processed[skey].statement, { props: processed[skey].props });
+            }
+        }else if (filetype === 'gplink'){
+            processed = buildGplinkProps(currentChunk);
+
+            for (var gkey in processed) {
+                await session.run(processed[gkey].statement, { props: processed[gkey].props });
+            }
         }
     }
 

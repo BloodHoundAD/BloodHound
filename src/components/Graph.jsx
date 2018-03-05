@@ -46,6 +46,8 @@ export default class GraphContainer extends Component {
         var s2 = driver.session();
         var s3 = driver.session();
         var s4 = driver.session();
+        var s5 = driver.session();
+        var s6 = driver.session();
 
         s1.run("CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE")
             .then(function(){
@@ -59,6 +61,20 @@ export default class GraphContainer extends Component {
                                 s4.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE")
                                     .then(function(){
                                         s4.close();
+                                        s5.run("CREATE CONSTRAINT on (c:Ou) ASSERT c.name IS UNIQUE")
+                                            .then(function() {
+                                                s5.close();
+                                                s6.run("CREATE CONSTRAINT on (c:Gpo) ASSERT c.name is UNIQUE")
+                                                    .then(function(){
+                                                        s6.close();
+                                                    })
+                                                    .catch(function(){
+                                                        s6.close();
+                                                    });
+                                            })
+                                            .catch(function(){
+                                                s5.close();  
+                                            });
                                     })
                                     .catch(function(){
                                         s4.close();
@@ -109,6 +125,7 @@ export default class GraphContainer extends Component {
         
         this.doQueryNative({
             statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
+            //statement: 'MATCH (n)-[r]->(m) RETURN n,r,m',
             allowCollapse: false,
             props: {}
         });
@@ -187,9 +204,7 @@ export default class GraphContainer extends Component {
             appStore.spotlightData = graph.spotlight;
             this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.graph.read(graph);
-            this.state.design.deprecate();
-            this.state.sigmaInstance.refresh();
-            this.state.design.apply();
+            this.applyDesign();
 
             if (appStore.dagre){
                 sigma.layouts.dagre.start(this.state.sigmaInstance);
@@ -241,6 +256,38 @@ export default class GraphContainer extends Component {
         this.state.sigmaInstance.refresh();
     }
 
+    applyDesign(){
+        console.log('applying design')
+        this.state.design.deprecate();
+        this.state.sigmaInstance.refresh();
+        this.state.design.apply();
+
+        $.each(this.state.sigmaInstance.graph.edges(), function(index, edge){
+            if (edge.hasOwnProperty('enforced')){
+                if (edge.enforced === 'False'){
+                    edge.type = 'dashed';
+                }
+            }
+        });
+
+        $.each(this.state.sigmaInstance.graph.nodes(), function(index, node){
+            if (node.hasOwnProperty('blocksInheritance')){
+                if (node.blocksInheritance === true){
+                    let targets = [];
+                    $.each(this.state.sigmaInstance.graph.outNeighbors(node.id),function(index, nodeid){
+                        targets.push(parseInt(nodeid));
+                    }.bind(this));
+
+                    $.each(this.state.sigmaInstance.graph.adjacentEdges(node.id), function(index, edge){
+                        if (targets.includes(edge.target)){
+                            edge.type = 'dashed';
+                        }
+                    });
+                }
+            }
+        }.bind(this));
+    }
+
     setGraphicsMode(){
         var lowgfx = appStore.performance.lowGraphics;
         var sigmaInstance = this.state.sigmaInstance;
@@ -256,9 +303,7 @@ export default class GraphContainer extends Component {
             this.state.design.setPalette(appStore.highResPalette);
             this.state.design.setStyles(appStore.highResStyle);
         }
-        this.state.design.deprecate();
-        sigmaInstance.refresh();
-        this.state.design.apply();
+        this.applyDesign();
     }
 
     resetZoom(){
@@ -310,9 +355,7 @@ export default class GraphContainer extends Component {
             var query = appStore.queryStack.pop();
             this.state.sigmaInstance.graph.clear();
             this.state.sigmaInstance.graph.read({ nodes: query.nodes, edges: query.edges });
-            this.state.design.deprecate();
-            this.state.sigmaInstance.refresh();
-            this.state.design.apply();
+            this.applyDesign()
             appStore.spotlightData = query.spotlight;
             appStore.startNode = query.startNode,
             appStore.endNode = query.endNode;
@@ -446,6 +489,7 @@ export default class GraphContainer extends Component {
         var type = data.type;
         var source = data.start.low;
         var target = data.end.low;
+        
         var edge = {
             id: id,
             type: type,
@@ -453,6 +497,10 @@ export default class GraphContainer extends Component {
             target:target,
             label: type
         };
+
+        if (data.hasOwnProperty('properties') && data.properties.hasOwnProperty('enforced')) {
+            edge.enforced = data.properties.enforced;
+        }
 
         return edge;
     }
@@ -474,6 +522,10 @@ export default class GraphContainer extends Component {
             x: Math.random(),
             y: Math.random()
         };
+
+        if (data.hasOwnProperty('properties') && data.properties.hasOwnProperty('blocksInheritance')){
+            node.blocksInheritance = data.properties.blocksInheritance;
+        }
 
         if (label === params.start){
             node.start = true;
@@ -509,6 +561,12 @@ export default class GraphContainer extends Component {
                 break;
             case "Domain":
                 node.type_domain = true;
+                break;
+            case "Gpo":
+                node.type_gpo = true;
+                break;
+            case "Ou":
+                node.type_ou = true;
                 break;
         }
 
@@ -607,6 +665,10 @@ export default class GraphContainer extends Component {
 
     initializeSigma(){
         var sigmaInstance, design;
+
+        sigma.classes.graph.addMethod('outNeighbors', function (id) {
+            return this.outNeighborsIndex.get(id).keyList();
+        });
 
         sigmaInstance = new sigma(
             {
