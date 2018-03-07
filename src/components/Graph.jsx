@@ -665,10 +665,6 @@ export default class GraphContainer extends Component {
     initializeSigma(){
         var sigmaInstance, design;
 
-        sigma.classes.graph.addMethod('outNeighbors', function (id) {
-            return this.outNeighborsIndex.get(id).keyList();
-        });
-
         sigmaInstance = new sigma(
             {
                 container: 'graph'
@@ -712,11 +708,11 @@ export default class GraphContainer extends Component {
         sigmaInstance.bind('hovers', function(e){
             if (e.data.enter.nodes.length > 0) {
                 if (appStore.endNode !== null) {
-                    findGraphPath(this.state.sigmaInstance, false, e.data.enter.nodes[0].id);
+                    findGraphPath(this.state.sigmaInstance, false, e.data.enter.nodes[0].id, []);
                 }
 
                 if (appStore.startNode !== null) {
-                    findGraphPath(this.state.sigmaInstance, true, e.data.enter.nodes[0].id);
+                    findGraphPath(this.state.sigmaInstance, true, e.data.enter.nodes[0].id, []);
                 }
 
                 sigmaInstance.refresh({'skipIndexation': true});

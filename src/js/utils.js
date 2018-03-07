@@ -14,23 +14,24 @@ export function generateUniqueId(sigmaInstance, isNode) {
 }
 
 //Recursive function to highlight paths to start/end nodes
-export function findGraphPath(sigmaInstance, reverse, nodeid) {
-    var target = reverse ? appStore.startNode : appStore.endNode;
-        //This is our stop condition for recursing
+export function findGraphPath(sigmaInstance, reverse, nodeid, traversed) {
+    let target = reverse ? appStore.startNode : appStore.endNode;
+    traversed.push(nodeid);
+    //This is our stop condition for recursing
     if (nodeid !== target.id) {
         var edges = sigmaInstance.graph.adjacentEdges(nodeid);
         var nodes = reverse ? sigmaInstance.graph.inboundNodes(nodeid) : sigmaInstance.graph.outboundNodes(nodeid);
-            //Loop over the nodes near us and the edges connecting to those nodes
+        //Loop over the nodes near us and the edges connecting to those nodes
         $.each(nodes, function(index, node) {
             $.each(edges, function(index, edge) {
                 var check = reverse ? edge.source : edge.target;
-                    //If an edge is pointing in the right direction, set its color
-                    //Push the edge into our store and then 
+                //If an edge is pointing in the right direction, set its color
+                //Push the edge into our store and then 
                 node = parseInt(node);
-                if (check === node) {
+                if (check === node && !traversed.includes(node)) {
                     edge.color = reverse ? 'blue' : 'red';
                     appStore.highlightedEdges.push(edge);
-                    findGraphPath(sigmaInstance, reverse, node);
+                    findGraphPath(sigmaInstance, reverse, node, traversed);
                 }
             });
         });
@@ -237,7 +238,6 @@ export function buildGplinkProps(rows){
             };
         }
     });
-    console.log(datadict)
     return datadict;
 }
 
@@ -247,6 +247,9 @@ export function buildACLProps(rows) {
     $.each(rows, function(index, row) {
         var b = row.ObjectName.toUpperCase();
         var a = row.PrincipalName.toUpperCase();
+        if (a === b){
+            return;
+        }
         var btype = row.ObjectType.toTitleCase();
         var atype = row.PrincipalType.toTitleCase();
         var rel = row.ActiveDirectoryRights;
