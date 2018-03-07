@@ -34,8 +34,8 @@ export default class componentName extends Component {
             let val = this.convertToDisplayProp(key);
 
             if (val !== null){
-                l.push(<dt key={key}>{value}</dt>);
-                l.push(<dd key={val}>{val}</dd>);
+                l.push(<dt key={key + 'a'}>{value}</dt>);
+                l.push(<dd key={key + 'b'}>{val}</dd>);
             }
         }.bind(this));
 
