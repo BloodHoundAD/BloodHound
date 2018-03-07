@@ -63,6 +63,10 @@ sigma.classes.graph.addMethod('inboundNodes', function(id) {
     return this.inNeighborsIndex.get(id).keyList();
 });
 
+sigma.classes.graph.addMethod('outNeighbors', function (id) {
+    return this.outNeighborsIndex.get(id).keyList();
+});
+
 global.appStore = {
     dagre: false,
     startNode: null,
