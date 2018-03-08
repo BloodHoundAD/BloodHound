@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import NodeALink from './NodeALink';
 import NodePropItem from './NodePropItem';
 import PropTypes from 'prop-types';
 import NodeProps from './NodeProps';
