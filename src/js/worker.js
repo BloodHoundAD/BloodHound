@@ -48,13 +48,22 @@ process.on('message', function(m){
 function collapseEdgeNodes(sigmaInstance, params, spotlightData){
     var threshold = params.edge;
 
-    if (threshold == 0){
+    if (threshold === 0){
         return [sigmaInstance, spotlightData];
     }
     sigmaInstance.graph.nodes().forEach(function(node){
         if (node.degree < threshold){
             return;
         }
+
+        if (params.end !== null && node.label === params.end) {
+            return;
+        }
+
+        if (params.start !== null && node.label === params.start) {
+            return;
+        }
+        
 
         sigmaInstance.graph.adjacentNodes(node.id).forEach(function(anode){
             if (params.end !== null && anode.label === params.end){
@@ -75,7 +84,6 @@ function collapseEdgeNodes(sigmaInstance, params, spotlightData){
             if ((anode.type_user) 
                 || (anode.type_computer) 
                 || (anode.type_group && edge.label === 'AdminTo')){
-
                 node.isGrouped = true;
                 node.folded.nodes.push(anode);
                 node.folded.edges.push(edge);
@@ -103,7 +111,15 @@ function collapseSiblingNodes(sigmaInstance, params, spotlightData){
 
     sigmaInstance.graph.nodes().forEach(function(node){
         //Dont apply this logic to anything thats folded or isn't a computer
-        if (!node.type_computer || node.folded.nodes.length > 0){
+        if (!node.type_computer || node.folded.nodes.length > 0 ){
+            return;
+        }
+
+        if (params.end !== null && node.label === params.end) {
+            return;
+        }
+
+        if (params.start !== null && node.label === params.start) {
             return;
         }
 
