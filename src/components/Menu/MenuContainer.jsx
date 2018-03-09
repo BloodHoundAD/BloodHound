@@ -214,41 +214,31 @@ export default class MenuContainer extends Component {
         var session = driver.session();
 
         if (filetype === 'groupmembership'){
-            var userQuery = 'UNWIND {props} AS prop MERGE (user:User {name:prop.account}) WITH user,prop MERGE (group:Group {name:prop.group}) WITH user,group MERGE (user)-[:MemberOf {isACL:false}]->(group)';
-            var computerQuery = 'UNWIND {props} AS prop MERGE (computer:Computer {name:prop.account}) WITH computer,prop MERGE (group:Group {name:prop.group}) WITH computer,group MERGE (computer)-[:MemberOf {isACL:false}]->(group)';
-            var groupQuery = 'UNWIND {props} AS prop MERGE (group1:Group {name:prop.account}) WITH group1,prop MERGE (group2:Group {name:prop.group}) WITH group1,group2 MERGE (group1)-[:MemberOf {isACL:false}]->(group2)';
-
             processed = buildGroupMembershipProps(currentChunk);
-
-            await session.run(userQuery, {props: processed.users});
-            await session.run(computerQuery, {props: processed.computers});
-            await session.run(groupQuery, {props: processed.groups});
+            for (let skey in processed) {
+                await session.run(processed[skey].statement, { props: processed[skey].props });
+            }
         }else if (filetype === 'localadmin'){
-            userQuery = 'UNWIND {props} AS prop MERGE (user:User {name: prop.account}) WITH user,prop MERGE (computer:Computer {name: prop.computer}) WITH user,computer MERGE (user)-[:AdminTo {isACL:false}]->(computer)';
-            groupQuery = 'UNWIND {props} AS prop MERGE (group:Group {name: prop.account}) WITH group,prop MERGE (computer:Computer {name: prop.computer}) WITH group,computer MERGE (group)-[:AdminTo {isACL:false}]->(computer)';
-            computerQuery = 'UNWIND {props} AS prop MERGE (computer1:Computer {name: prop.account}) WITH computer1,prop MERGE (computer2:Computer {name: prop.computer}) WITH computer1,computer2 MERGE (computer1)-[:AdminTo {isACL:false}]->(computer2)';
-
             processed = buildLocalAdminProps(currentChunk);
-
-            await session.run(userQuery, {props: processed.users});
-            await session.run(computerQuery, {props: processed.computers});
-            await session.run(groupQuery, {props: processed.groups});
+            for (let skey in processed) {
+                await session.run(processed[skey].statement, { props: processed[skey].props });
+            }
         }else if (filetype === 'sessions'){
-            var query = 'UNWIND {props} AS prop MERGE (user:User {name:prop.account}) WITH user,prop MERGE (computer:Computer {name: prop.computer}) WITH user,computer,prop MERGE (computer)-[:HasSession {Weight : prop.weight, isACL: false}]-(user)';
-
             processed = buildSessionProps(currentChunk);
 
-            await session.run(query, {props: processed});
+            for (let skey in processed) {
+                await session.run(processed[skey].statement, { props: processed[skey].props });
+            }
         }else if (filetype === 'domain'){
-            query = "UNWIND {props} AS prop MERGE (domain1:Domain {name: prop.domain1}) WITH domain1,prop MERGE (domain2:Domain {name: prop.domain2}) WITH domain1,domain2,prop MERGE (domain1)-[:TrustedBy {TrustType : prop.trusttype, Transitive: toBoolean(prop.transitive), isACL:false}]->(domain2)";
-
             processed = buildDomainProps(currentChunk);
 
-            await session.run(query, {props: processed});
+            for (let skey in processed) {
+                await session.run(processed[skey].statement, { props: processed[skey].props });
+            }
         }else if (filetype === 'acl'){
             processed = buildACLProps(currentChunk);
 
-            for (var key in processed){
+            for (let key in processed){
                 await session.run(processed[key].statement, {props: processed[key].props});
             }
         }else if (filetype === 'userprops'){
@@ -262,23 +252,22 @@ export default class MenuContainer extends Component {
                     obj.ServicePrincipalNames = spn.split('|');
                 }
             });
-            query = 'UNWIND {props} AS prop MERGE (user:User {name: upper(prop.AccountName)}) SET user.Enabled = toBoolean(prop.Enabled),user.PwdLastSet = toInt(prop.PwdLastSet),user.LastLogon = toInt(prop.LastLogon),user.Sid = prop.Sid,user.SidHistory = prop.SidHistory,user.HasSPN = toBoolean(prop.HasSPN),user.DisplayName=prop.DisplayName,user.ServicePrincipalNames = prop.ServicePrincipalNames,user.Email=prop.Email';
+            let query = 'UNWIND {props} AS prop MERGE (user:User {name: upper(prop.AccountName)}) SET user.Enabled = toBoolean(prop.Enabled),user.PwdLastSet = toInt(prop.PwdLastSet),user.LastLogon = toInt(prop.LastLogon),user.Sid = prop.Sid,user.SidHistory = prop.SidHistory,user.HasSPN = toBoolean(prop.HasSPN),user.DisplayName=prop.DisplayName,user.ServicePrincipalNames = prop.ServicePrincipalNames,user.Email=prop.Email,user.domain=prop.Domain';
 
             await session.run(query, {props:currentChunk});
         }else if (filetype === 'compprops'){
-            query = 'UNWIND {props} AS prop MERGE (comp:Computer {name: upper(prop.AccountName)}) SET comp.Enabled=toBoolean(prop.Enabled),comp.PwdLastSet=toInt(prop.PwdLastSet),comp.LastLogon=toInt(prop.LastLogon),comp.OperatingSystem=prop.OperatingSystem,comp.Sid=prop.Sid,comp.UnconstrainedDelegation=toBoolean(prop.UnconstrainedDelegation)';
-
+            let query = 'UNWIND {props} AS prop MERGE (comp:Computer {name: upper(prop.AccountName)}) SET comp.Enabled=toBoolean(prop.Enabled),comp.PwdLastSet=toInt(prop.PwdLastSet),comp.LastLogon=toInt(prop.LastLogon),comp.OperatingSystem=prop.OperatingSystem,comp.Sid=prop.Sid,comp.UnconstrainedDelegation=toBoolean(prop.UnconstrainedDelegation),comp.domain=prop.Domain';
             await session.run(query, {props:currentChunk});
         }else if (filetype === 'structure'){  
             processed = buildStructureProps(currentChunk);
 
-            for (var skey in processed){
+            for (let skey in processed){
                 await session.run(processed[skey].statement, { props: processed[skey].props });
             }
         }else if (filetype === 'gplink'){
             processed = buildGplinkProps(currentChunk);
 
-            for (var gkey in processed) {
+            for (let gkey in processed) {
                 await session.run(processed[gkey].statement, { props: processed[gkey].props });
             }
         }

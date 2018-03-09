@@ -119,99 +119,188 @@ export function findObjectType(header){
     }
 }
 
+function getDomainFromLabel(label){
+    if (label.includes('@')){
+        return label.split('@')[1];
+    }else{
+        let d = label.split('.');
+        d.shift();
+        return d.join('.');
+    }
+}
+
 export function buildGroupMembershipProps(rows) {
-    var users = [];
-    var groups = [];
-    var computers = [];
-    $.each(rows, function(index, row) {
-        switch (row.AccountType) {
-            case 'user':
-                users.push({ account: row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase() });
-                break;
-            case 'computer':
-                computers.push({ account: row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase() });
-                break;
-            case 'group':
-                groups.push({ account: row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase() });
-                break;
+    var datadict = {};
+
+    $.each(rows, function (index, row) {
+        let type = row.AccountType.toTitleCase();
+        let account = row.AccountName.toUpperCase();
+        let group = row.GroupName.toUpperCase();
+
+        if (datadict[type]){
+            datadict[type].props.push({
+                accountName: account,
+                accountDomain: getDomainFromLabel(account),
+                groupName: group,
+                groupDomain: getDomainFromLabel(group)
+            });
+        }else{
+            datadict[type] = {
+                statement: `UNWIND {props} AS prop MERGE (a:{} {name:prop.accountName}) WITH a,prop MERGE (b:Group {name:prop.groupName}) WITH a,b,prop MERGE (a)-[r:MemberOf {isACL:false}]->(b) SET a.domain=prop.accountDomain,b.domain=prop.groupDomain`.format(type),
+                props:[{
+                    accountName: account,
+                    accountDomain: getDomainFromLabel(account),
+                    groupName: group,
+                    groupDomain: getDomainFromLabel(group)
+                }]
+            };
         }
     });
 
-    return { users: users, groups: groups, computers: computers };
+    return datadict;
 }
 
 export function buildLocalAdminProps(rows) {
-    var users = [];
-    var groups = [];
-    var computers = [];
-    $.each(rows, function(index, row) {
-        if (row.AccountName.startsWith('@')) {
-            return;
-        }
-        switch (row.AccountType) {
-            case 'user':
-                users.push({ account: row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase() });
-                break;
-            case 'group':
-                groups.push({ account: row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase() });
-                break;
-            case 'computer':
-                computers.push({ account: row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase() });
-                break;
+    var datadict = {};
+
+    $.each(rows, function (index, row) {
+        let type = row.AccountType.toTitleCase();
+        let account = row.AccountName.toUpperCase();
+        let computer = row.ComputerName.toUpperCase();
+
+        if (datadict[type]) {
+            datadict[type].props.push({
+                accountName: account,
+                accountDomain: getDomainFromLabel(account),
+                computerName: computer,
+                computerDomain: getDomainFromLabel(computer)
+            });
+        } else {
+            datadict[type] = {
+                statement: `UNWIND {props} AS prop MERGE (a:{} {name:prop.accountName}) WITH a,prop MERGE (b:Computer {name:prop.computerName}) WITH a,b,prop MERGE (a)-[r:AdminTo {isACL: false}]->(b) SET a.domain=prop.accountDomain, b.domain=prop.computerDomain`.format(type),
+                props: [{
+                    accountName: account,
+                    accountDomain: getDomainFromLabel(account),
+                    computerName: computer,
+                    computerDomain: getDomainFromLabel(computer)
+                }]
+            };
         }
     });
-    return { users: users, groups: groups, computers: computers };
+
+    return datadict;
 }
 
 export function buildSessionProps(rows) {
-    var sessions = [];
-    $.each(rows, function(index, row) {
-        if (row.UserName === 'ANONYMOUS LOGON@UNKNOWN' || row.UserName === '') {
-            return;
+    var datadict = {};
+
+    $.each(rows, function (index, row) {
+        let type = row.AccountType.toTitleCase();
+        let account = row.UserName.toUpperCase();
+        let computer = row.ComputerName.toUpperCase();
+
+        if (datadict['user']) {
+            datadict['user'].props.push({
+                accountName: account,
+                accountDomain: getDomainFromLabel(account),
+                computerName: computer,
+                computerDomain: getDomainFromLabel(computer),
+                weight: row.Weight
+            });
+        } else {
+            datadict['user'] = {
+                statement: `UNWIND {props} AS prop MERGE (a:User {name:prop.accountName}) WITH a,prop MERGE (b:Computer {name: prop.computerName}) WITH a,b,prop MERGE (b)-[:HasSession {Weight : prop.weight, isACL:false}]-(a) SET a.domain=accountDomain,b.domain=computerDomain`,
+                props: [{
+                    accountName: account,
+                    accountDomain: getDomainFromLabel(account),
+                    computerName: computer,
+                    computerDomain: getDomainFromLabel(computer),
+                    weight: row.Weight
+                }]
+            };
         }
-        sessions.push({ account: row.UserName.toUpperCase(), computer: row.ComputerName.toUpperCase(), weight: row.Weight });
     });
 
-    return sessions;
+    return datadict;
 }
 
 export function buildDomainProps(rows) {
-    var domains = [];
-    $.each(rows, function(index, row) {
-        switch (row.TrustDirection) {
+    var datadict = {};
+
+    $.each(rows, function (index, row) {
+        let type = row.TrustDirection;
+        let domaina = row.TargetDomain.toUpperCase();
+        let domainb = row.SourceDomain.toUpperCase();
+        datadict['domain'] = {
+            statement: 'UNWIND {props} AS prop MERGE (domain1:Domain {name: prop.domain1}) WITH domain1,prop MERGE (domain2:Domain {name: prop.domain2}) WITH domain1,domain2,prop MERGE (domain1)-[:TrustedBy {TrustType : prop.trusttype, Transitive: toBoolean(prop.transitive), isACL:false}]->(domain2)',
+            props: []
+        };
+
+        switch (type){
             case 'Inbound':
-                domains.push({ domain1: row.TargetDomain.toUpperCase(), domain2: row.SourceDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive });
+                datadict['domain'].props.push({
+                    domain1: domaina,
+                    domain2: domainb,
+                    trusttype: row.TrustType,
+                    transitive: row.Transitive
+                });
                 break;
             case 'Outbound':
-                domains.push({ domain1: row.SourceDomain.toUpperCase(), domain2: row.TargetDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive });
+                datadict['domain'].props.push({
+                    domain1: domainb,
+                    domain2: domaina,
+                    trusttype: row.TrustType,
+                    transitive: row.Transitive
+                });
                 break;
             case 'Bidirectional':
-                domains.push({ domain1: row.TargetDomain.toUpperCase(), domain2: row.SourceDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive });
-                domains.push({ domain1: row.SourceDomain.toUpperCase(), domain2: row.TargetDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive });
+                datadict['domain'].props.push({
+                    domain1: domaina,
+                    domain2: domainb,
+                    trusttype: row.TrustType,
+                    transitive: row.Transitive
+                });
+                datadict['domain'].props.push({
+                    domain1: domainb,
+                    domain2: domaina,
+                    trusttype: row.TrustType,
+                    transitive: row.Transitive
+                });
                 break;
         }
     });
 
-    return domains;
+    return datadict;
 }
 
 export function buildStructureProps(rows){
-    var datadict = {};
+    let datadict = {};
 
     $.each(rows, function(index, row){
-        var hash = (row.ContainerType + row.ObjectType).toUpperCase();
-        var atype = row.ContainerType.toTitleCase();
-        var btype = row.ObjectType.toTitleCase();
+        let hash = (row.ContainerType + row.ObjectType).toUpperCase();
+        let atype = row.ContainerType.toTitleCase();
+        let btype = row.ObjectType.toTitleCase();
+        let container = row.ContainerName.toUpperCase();
+        let object = row.ObjectName.toUpperCase();
 
         if (datadict[hash]){
             datadict[hash].props.push({
-                container: row.ContainerName.toUpperCase(),
-                object: row.ObjectName.toUpperCase()
+                container: container,
+                object: object,
+                containerDomain: getDomainFromLabel(container),
+                objectDomain: getDomainFromLabel(object),
+                blocksInheritance: row.ContainerBlocksInheritance
             });
         }else{
             datadict[hash] = {
-                statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.container}) WITH a,prop MERGE (b:{} {name: prop.object}) WITH a,b,prop MERGE (a)-[r:Contains]->(b) SET a.blocksInheritance={}'.format(atype, btype, row.ContainerBlocksInheritance),
-                props: [{ container: row.ContainerName.toUpperCase(), object: row.ObjectName.toUpperCase() }]
+                statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.container}) WITH a,prop MERGE (b:{} {name: prop.object}) WITH a,b,prop MERGE (a)-[r:Contains {isACL: false}]->(b) SET a.blocksInheritance=prop.blocksInheritance, a.domain=prop.containerDomain, b.domain=prop.objectDomain'.format(atype, btype),
+                props: [{
+                    container: container,
+                    object: object,
+                    containerDomain: getDomainFromLabel(container),
+                    objectDomain: getDomainFromLabel(object),
+                    blocksInheritance: row.ContainerBlocksInheritance
+                }]
             };
         }
     });
@@ -220,21 +309,31 @@ export function buildStructureProps(rows){
 }
 
 export function buildGplinkProps(rows){
-    var datadict = {};
+    let datadict = {};
 
     $.each(rows, function (index, row) {
-        var type = row.ObjectType.toTitleCase();
+        let type = row.ObjectType.toTitleCase();
+        let gpoName = row.GPODisplayName.toUpperCase();
+        let objectName = row.ObjectName.toUpperCase();
 
         if (datadict[type]){
             datadict[type].props.push({
-                gponame: row.GPODisplayName.toUpperCase(),
-                objectname: row.ObjectName.toUpperCase(),
-                enforced: row.IsEnforced
+                gponame: gpoName,
+                objectname: objectName,
+                enforced: row.IsEnforced,
+                gpoDomain: getDomainFromLabel(gpoName),
+                objectDomain: getDomainFromLabel(objectName)
             });
         }else{
             datadict[type] = {
-                statement: 'UNWIND {props} as prop MERGE (a:Gpo {name: prop.gponame}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: prop.enforced}]->(b)'.format(type),
-                props:[{gponame: row.GPODisplayName.toUpperCase(), objectname: row.ObjectName.toUpperCase(), enforced: row.IsEnforced}]
+                statement: 'UNWIND {props} as prop MERGE (a:Gpo {name: prop.gponame}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: prop.enforced, isACL: false}]->(b) SET a.domain=prop.gpoDomain,b.domain=prop.objectDomain'.format(type),
+                props:[{
+                    gponame: gpoName,
+                    objectname: objectName,
+                    enforced: row.IsEnforced,
+                    gpoDomain: getDomainFromLabel(gpoName),
+                    objectDomain: getDomainFromLabel(objectName)
+                }]
             };
         }
     });
