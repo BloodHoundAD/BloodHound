@@ -195,7 +195,6 @@ export function buildSessionProps(rows) {
     var datadict = {};
 
     $.each(rows, function (index, row) {
-        let type = row.AccountType.toTitleCase();
         let account = row.UserName.toUpperCase();
         let computer = row.ComputerName.toUpperCase();
 
@@ -209,7 +208,7 @@ export function buildSessionProps(rows) {
             });
         } else {
             datadict['user'] = {
-                statement: `UNWIND {props} AS prop MERGE (a:User {name:prop.accountName}) WITH a,prop MERGE (b:Computer {name: prop.computerName}) WITH a,b,prop MERGE (b)-[:HasSession {Weight : prop.weight, isACL:false}]-(a) SET a.domain=accountDomain,b.domain=computerDomain`,
+                statement: `UNWIND {props} AS prop MERGE (a:User {name:prop.accountName}) WITH a,prop MERGE (b:Computer {name: prop.computerName}) WITH a,b,prop MERGE (b)-[:HasSession {Weight : prop.weight, isACL:false}]-(a) SET a.domain=prop.accountDomain,b.domain=prop.computerDomain`,
                 props: [{
                     accountName: account,
                     accountDomain: getDomainFromLabel(account),
@@ -227,15 +226,16 @@ export function buildSessionProps(rows) {
 export function buildDomainProps(rows) {
     var datadict = {};
 
+    datadict['domain'] = {
+        statement: 'UNWIND {props} AS prop MERGE (domain1:Domain {name: prop.domain1}) WITH domain1,prop MERGE (domain2:Domain {name: prop.domain2}) WITH domain1,domain2,prop MERGE (domain1)-[:TrustedBy {TrustType : prop.trusttype, Transitive: toBoolean(prop.transitive), isACL:false}]->(domain2)',
+        props: []
+    };
+
     $.each(rows, function (index, row) {
         let type = row.TrustDirection;
         let domaina = row.TargetDomain.toUpperCase();
         let domainb = row.SourceDomain.toUpperCase();
-        datadict['domain'] = {
-            statement: 'UNWIND {props} AS prop MERGE (domain1:Domain {name: prop.domain1}) WITH domain1,prop MERGE (domain2:Domain {name: prop.domain2}) WITH domain1,domain2,prop MERGE (domain1)-[:TrustedBy {TrustType : prop.trusttype, Transitive: toBoolean(prop.transitive), isACL:false}]->(domain2)',
-            props: []
-        };
-
+        
         switch (type){
             case 'Inbound':
                 datadict['domain'].props.push({
