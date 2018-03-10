@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import NodeALink from './NodeALink.jsx';
 import LoadLabel from './LoadLabel.jsx';
 import PropTypes from 'prop-types';
+import NodeCypherLink from './NodeCypherLink.jsx';
 
 export default class DomainNodeData extends Component {
     constructor(){
@@ -12,12 +13,6 @@ export default class DomainNodeData extends Component {
             users: -1,
             groups: -1,
             computers: -1,
-            foreignGroups: -1,
-            foreignUsers: -1,
-            firstDegreeOutboundTrusts: -1,
-            effectiveOutboundTrusts: -1,
-            firstDegreeInboundTrusts: -1,
-            effectiveInboundTrusts: -1,
             driversessions: []
         };
 
@@ -33,79 +28,31 @@ export default class DomainNodeData extends Component {
             users: -1,
             groups: -1,
             computers: -1,
-            foreignGroups: -1,
-            foreignUsers: -1,
-            firstDegreeOutboundTrusts: -1,
-            effectiveOutboundTrusts: -1,
-            firstDegreeInboundTrusts: -1,
-            effectiveInboundTrusts: -1
         });
 
         var s1 = driver.session();
         var s2 = driver.session();
         var s3 = driver.session();
-        var s4 = driver.session();
-        var s5 = driver.session();
-        var s6 = driver.session();
-        var s7 = driver.session();
-        var s8 = driver.session();
-        var s9 = driver.session();
 
-        s1.run("MATCH (a:User) WHERE a.name ENDS WITH ('@' + {name}) RETURN COUNT(a)", {name:payload})
+        s1.run("MATCH (a:User) WHERE a.domain={name} RETURN COUNT(a)", {name:payload})
             .then(function(result){
                 this.setState({'users':result.records[0]._fields[0].low});
                 s1.close();
             }.bind(this));
 
-        s2.run("MATCH (a:Group) WHERE a.name ENDS WITH ('@' + {name}) RETURN COUNT(a)", {name:payload})
+        s2.run("MATCH (a:Group) WHERE a.domain={name} RETURN COUNT(a)", {name:payload})
             .then(function(result){
                 this.setState({'groups':result.records[0]._fields[0].low});
                 s2.close();
             }.bind(this));
 
-        s3.run("MATCH (n:Computer) WHERE n.name ENDS WITH {name} WITH n WHERE size(split(n.name,'.')) - size(split({name},'.')) = 1 RETURN count(n)", {name:payload})
+        s3.run("MATCH (n:Computer) WHERE n.domain={name} RETURN count(n)", {name:payload})
             .then(function(result){
                 this.setState({'computers':result.records[0]._fields[0].low});
                 s3.close();
             }.bind(this));
-
-        s4.run("MATCH (a:Group) WHERE NOT a.name ENDS WITH ('@' + {name}) WITH a MATCH (b:Group) WHERE b.name ENDS WITH ('@' + {name}) WITH a,b MATCH (a)-[r:MemberOf]->(b) RETURN count(a)", {name:payload})
-            .then(function(result){
-                this.setState({'foreignGroups':result.records[0]._fields[0].low});
-                s4.close();
-            }.bind(this));
-
-        s5.run("MATCH (a:User) WHERE NOT a.name ENDS WITH ('@' + {name}) WITH a MATCH (b:Group) WHERE b.name ENDS WITH ('@' + {name}) WITH a,b MATCH (a)-[r:MemberOf]->(b) RETURN count(a)", {name:payload})
-            .then(function(result){
-                this.setState({'foreignUsers':result.records[0]._fields[0].low});
-                s5.close();
-            }.bind(this));
-
-        s6.run("MATCH (a:Domain {name:{name}})<-[r:TrustedBy]-(b:Domain) RETURN count(b)", {name:payload})
-            .then(function(result){
-                this.setState({'firstDegreeInboundTrusts':result.records[0]._fields[0].low});
-                s6.close();
-            }.bind(this));
-
-        s7.run("MATCH (a:Domain {name:{name}})-[r:TrustedBy]->(b:Domain) RETURN count(b)", {name:payload})
-            .then(function(result){
-                this.setState({'firstDegreeOutboundTrusts':result.records[0]._fields[0].low});
-                s7.close();
-            }.bind(this));
-
-        s8.run("MATCH (b:Domain) WHERE NOT b.name={name} WITH b MATCH p=shortestPath((a:Domain {name:{name}})<-[r:TrustedBy*1..]-(b)) RETURN count(b)", {name:payload})
-            .then(function(result){
-                this.setState({'effectiveInboundTrusts':result.records[0]._fields[0].low});
-                s8.close();
-            }.bind(this));
-
-        s9.run("MATCH (b:Domain) WHERE NOT b.name={name} MATCH p=shortestPath((a:Domain {name:{name}})-[r:TrustedBy*1..]->(b)) RETURN count(b)", {name:payload})
-            .then(function(result){
-                this.setState({'effectiveOutboundTrusts':result.records[0]._fields[0].low});
-                s9.close();
-            }.bind(this));
         
-        this.setState({'driversessions': [s1,s2,s3,s4,s5,s6,s7,s8,s9]});
+        this.setState({'driversessions': [s1,s2,s3]});
     }
 
     render() {
@@ -113,7 +60,7 @@ export default class DomainNodeData extends Component {
             <div className={this.props.visible ? "" : "displaynone"}>
                 <dl className='dl-horizontal'>
                     <dt>
-                        Node
+                        Domain
                     </dt>
                     <dd>
                         {this.state.label}
@@ -146,92 +93,31 @@ export default class DomainNodeData extends Component {
                             value={this.state.computers}
                         />
                     </dd>
-                    <br />
-                    <dt>
-                        Foreign Users
-                    </dt>
-                    <dd>
-                        <NodeALink
-                            ready={this.state.foreignUsers !== -1}
-                            value={this.state.foreignUsers}
-                            click={function(){
-                                emitter.emit('query', "MATCH (a:User) WHERE NOT a.name ENDS WITH ('@' + {domain}) WITH a MATCH (b:Group) WHERE b.name ENDS WITH ('@' + {domain}) WITH a,b MATCH (a)-[r:MemberOf]-(b) RETURN a,r,b", {domain: this.state.label});
-                            }.bind(this)}
-                        />
-                    </dd>
-                    <dt>
-                        Foreign Groups
-                    </dt>
-                    <dd>
-                        <NodeALink
-                            ready={this.state.foreignGroups !== -1}
-                            value={this.state.foreignGroups}
-                            click={function(){
-                                emitter.emit('query', "MATCH (a:Group) WHERE NOT a.name ENDS WITH ('@' + {domain}) WITH a MATCH (b:Group) WHERE b.name ENDS WITH ('@' + {domain}) WITH a,b MATCH (a)-[r:MemberOf]-(b) RETURN a,r,b", {domain: this.state.label});
-                            }.bind(this)}
-                        />
-                    </dd>
-                    <dt>
-                        Foreign Admins
-                    </dt>
-                    <dd>
-                        <NodeALink
-                            ready={this.state.foreignAdmins !== -1}
-                            value={this.state.foreignAdmins}
-                            click={function(){
-                                emitter.emit('query', "MATCH (a:Group) WHERE NOT a.name ENDS WITH ('@' + {domain}) WITH a MATCH (b:Group) WHERE b.name ENDS WITH ('@' + {domain}) WITH a,b MATCH (a)-[r:MemberOf]-(b) RETURN a,r,b", {domain: this.state.label});
-                            }.bind(this)}
-                        />
-                    </dd>
-                    <br />
-                    <dt>
-                        Inbound Trusts
-                    </dt>
-                    <dd>
-                        <NodeALink
-                            ready={this.state.firstDegreeInboundTrusts !== -1}
-                            value={this.state.firstDegreeInboundTrusts}
-                            click={function(){
-                                emitter.emit('query', "MATCH (a:Domain {name:{domain}})<-[r:TrustedBy]-(b:Domain) RETURN a,r,b", {domain: this.state.label});
-                            }.bind(this)}
-                        />
-                    </dd>
-                    <dt>
-                        Effective Inbound Trusts
-                    </dt>
-                    <dd>
-                        <NodeALink
-                            ready={this.state.effectiveInboundTrusts !== -1}
-                            value={this.state.effectiveInboundTrusts}
-                            click={function(){
-                                emitter.emit('query', "MATCH (b:Domain) WHERE NOT b.name={domain} WITH b MATCH p=shortestPath((a:Domain {name:{domain}})<-[r:TrustedBy*1..]-(b)) RETURN p", {domain: this.state.label});
-                            }.bind(this)}
-                        />
-                    </dd>
-                    <dt>
-                        Outbound Trusts
-                    </dt>
-                    <dd>
-                        <NodeALink
-                            ready={this.state.firstDegreeOutboundTrusts !== -1}
-                            value={this.state.firstDegreeOutboundTrusts}
-                            click={function(){
-                                emitter.emit('query', "MATCH (a:Domain {name:{domain}})-[r:TrustedBy]->(b:Domain) RETURN a,r,b", {domain: this.state.label});
-                            }.bind(this)}
-                        />
-                    </dd>
-                    <dt>
-                        Effective Outbound Trusts
-                    </dt>
-                    <dd>
-                        <NodeALink
-                            ready={this.state.effectiveOutboundTrusts !== -1}
-                            value={this.state.effectiveOutboundTrusts}
-                            click={function(){
-                                emitter.emit('query', "MATCH (b:Domain) WHERE NOT b.name={domain} WITH b MATCH p=shortestPath((a:Domain {name:{domain}})-[r:TrustedBy*1..]->(b:Domain)) RETURN p", {domain: this.state.label});
-                            }.bind(this)}
-                        />
-                    </dd>
+                    <h4>Foreign Members</h4>
+
+                    <NodeCypherLink property="Foreign Users" target={this.state.label} baseQuery={"MATCH (n:User) WHERE NOT n.domain={name} WITH n MATCH (b:Group) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r:MemberOf]->(b)"}  />
+                    
+                    <NodeCypherLink property="Foreign Groups" target={this.state.label} baseQuery={"MATCH (n:Group) WHERE NOT n.domain={name} WITH n MATCH (b:Group) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r:MemberOf]->(b)"}  />
+
+                    <NodeCypherLink property="Foreign Admins" target={this.state.label} baseQuery={"MATCH (n) WHERE NOT n.domain={name} WITH n MATCH (b:Computer) WHERE b.domain={name} WITH n,b MATCH p=shortestPath((n)-[r:AdminTo|MemberOf*1..]->(b))"} />
+
+                    <h4>Inbound Trusts</h4>
+                    <NodeCypherLink property="First Degree Trusts" target={this.state.label} baseQuery={"MATCH p=(a:Domain {name:{name}})<-[r:TrustedBy]-(n:Domain)"} />
+                    
+                    <NodeCypherLink property="Effective Inbound Trusts" target={this.state.label} baseQuery={"MATCH (n:Domain) WHERE NOT n.name={name} WITH n MATCH p=shortestPath((a:Domain {name:{name}})<-[r:TrustedBy*1..]-(n))"}/>
+
+                    <h4>Outbound Trusts</h4>
+                    <NodeCypherLink property="First Degree Trusts" target={this.state.label} baseQuery={"MATCH p=(a:Domain {name:{name}})-[r:TrustedBy]->(n:Domain)"} />
+
+                    <NodeCypherLink property="Effective Outbound Trusts" target={this.state.label} baseQuery={"MATCH (n:Domain) WHERE NOT n.name={name} MATCH p=shortestPath((a:Domain {name:{name}})-[r:TrustedBy*1..]->(n))"} />
+
+                    <h4>Domain ACLs</h4>
+
+                    <NodeCypherLink property="First Degree Controllers" target={this.state.label} baseQuery={"MATCH p=(n)-[r]->(u:Domain {name: {name}}) WHERE r.isACL=true"} distinct />
+
+                    <NodeCypherLink property="Unrolled Controllers" target={this.state.label} baseQuery={"MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1]->(u:Domain {name: {name}}) WHERE r1.isACL=true"} distinct />
+
+                    <NodeCypherLink property="Transitive Controllers" target={this.state.label} baseQuery={"MATCH p=shortestPath((n)-[r1:MemberOf|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns|DCSync*1..]->(u:Domain {name: {name}})) WHERE NOT n.name={name}"} distinct />
                 </dl>
             </div>
         );
