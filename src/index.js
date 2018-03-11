@@ -3,22 +3,22 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import AppContainer from './AppContainer';
-import Login from './components/Float/Login'
+import Login from './components/Float/Login';
 import { getStorageData, storageHasKey, storageSetKey } from './js/utils.js';
 
-const { app } = require('electron').remote
-var fs = require('fs')
+const { app } = require('electron').remote;
+var fs = require('fs');
 const path = require('path');
 
 const ConfigStore = require('electron-store');
 
-global.conf = new ConfigStore()
-var e = require('eventemitter2').EventEmitter2
-global.emitter = new e({})
-global.renderEmit = new e({})
+global.conf = new ConfigStore();
+var e = require('eventemitter2').EventEmitter2;
+global.emitter = new e({});
+global.renderEmit = new e({});
 global.neo4j = require('neo4j-driver').v1;
 
-global.Mustache = require('mustache')
+global.Mustache = require('mustache');
 
 String.prototype.format = function() {
     var i = 0,
@@ -199,37 +199,43 @@ global.appStore = {
             }
         }
     }
-}
+};
 
 if (typeof conf.get('performance') === 'undefined') {
     conf.set('performance', {
         edge: 5,
         sibling: 10,
         lowGraphics: false,
-        nodeLabels: 1
-    })
+        nodeLabels: 0,
+        edgeLabels: 0
+    });
 }
 
-var custompath = path.join(app.getPath('userData'), 'customqueries.json')
+var custompath = path.join(app.getPath('userData'), 'customqueries.json');
 
 fs.stat(custompath, function(err, stats) {
     if (err) {
-        fs.writeFile(custompath, "[]")
+        fs.writeFile(custompath, "[]");
     }
-})
+});
 
-appStore.performance = conf.get('performance')
+appStore.performance = conf.get('performance');
+
+if (typeof appStore.performance.edgeLabels === 'undefined'){
+    appStore.performance.edgeLabels = 0;
+    conf.set('performance', appStore.performance);
+}
 
 renderEmit.on('login', function() {
-    emitter.removeAllListeners()
-    ReactDOM.unmountComponentAtNode(document.getElementById('root'))
-    ReactDOM.render( < AppContainer / > , document.getElementById('root'))
-})
+    emitter.removeAllListeners();
+    ReactDOM.unmountComponentAtNode(document.getElementById('root'));
+    ReactDOM.render( < AppContainer / > , document.getElementById('root'));
+});
 
 renderEmit.on('logout', function() {
-    emitter.removeAllListeners()
-    ReactDOM.unmountComponentAtNode(document.getElementById('root'))
-    ReactDOM.render( < Login / > , document.getElementById('root'))
-})
+    emitter.removeAllListeners();
+    ReactDOM.unmountComponentAtNode(document.getElementById('root'));
+    ReactDOM.render( < Login / > , document.getElementById('root'));
+});
 
-ReactDOM.render( < Login / > , document.getElementById('root'))
+ReactDOM.render( < Login / > , document.getElementById('root'));

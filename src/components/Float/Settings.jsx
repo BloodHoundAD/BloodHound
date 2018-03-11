@@ -1,26 +1,32 @@
 import React, { Component } from 'react';
+import {FormGroup,ControlLabel,FormControl} from 'react-bootstrap';
 
 export default class Settings extends Component {
     constructor(){
         super();
+
+        this.state = {
+            nodeLabelVal: appStore.performance.nodeLabels,
+            edgeLabelVal: appStore.performance.edgeLabels
+        };
     }
 
     componentDidMount() {
         emitter.on('openSettings', function(){
             this.openSettings()
-        }.bind(this))
+        }.bind(this));
 
         $(this.refs.edge).simpleSlider({
             range: [0,20],
             step: 1,
             theme: 'volume slideinline'
-        })
+        });
 
         $(this.refs.sibling).simpleSlider({
             range: [0,20],
             step: 1,
             theme: 'volume slideinline'
-        })
+        });
 
         $(this.refs.edge).bind('slider:changed', this.edgeChange.bind(this))
         $(this.refs.sibling).bind('slider:changed', this.siblingChange.bind(this))
@@ -29,10 +35,10 @@ export default class Settings extends Component {
         $(this.refs.sibling).simpleSlider('setValue', appStore.performance.sibling)
 
         $(this.refs.check).prop('checked', appStore.performance.lowGraphics)
-        $(this.refs.debug).prop('checked', appStore.performance.debug)
+        $(this.refs.debug).prop('checked', appStore.performance.debug);
 
-        $(this.refs.outer).fadeToggle(0)
-        $(this.refs.outer).draggable()
+        $(this.refs.outer).fadeToggle(0);
+        $(this.refs.outer).draggable();
     }
 
     edgeChange(event, data){
@@ -48,15 +54,15 @@ export default class Settings extends Component {
     }
 
     onGfxChange(event){
-        $(this.refs.check).prop('checked', event.target.checked)
-        appStore.performance.lowGraphics = event.target.checked
-        conf.set('performance', appStore.performance)
-        emitter.emit('changeGraphicsMode')
+        $(this.refs.check).prop('checked', event.target.checked);
+        appStore.performance.lowGraphics = event.target.checked;
+        conf.set('performance', appStore.performance);
+        emitter.emit('changeGraphicsMode');
     }
 
     onDebugChange(event){
         $(this.refs.debug).prop('checked', event.target.checked)
-        appStore.performance.debug = event.target.checked
+        appStore.performance.debug = event.target.checked;
         conf.set('performance', appStore.performance)
     }
 
@@ -76,6 +82,26 @@ export default class Settings extends Component {
         $(this.refs.edge).simpleSlider('setValue', event.target.value)
     }
 
+    onNodeLabelChange(event){
+        let newVal = parseInt(event.target.value);
+        this.setState({
+            nodeLabelVal: newVal
+        });
+        appStore.performance.nodeLabels=newVal;
+        conf.set('performance', appStore.performance);
+        emitter.emit('changeNodeLabels');
+    }
+
+    onEdgeLabelChange(event){
+        let newVal = parseInt(event.target.value);
+        this.setState({
+            edgeLabelVal: newVal
+        });
+        appStore.performance.edgeLabels = newVal;
+        conf.set('performance', appStore.performance);
+        emitter.emit('changeEdgeLabels');
+    }
+
     render() {
         return (
             <div ref="outer" className="settingsDiv panel panel-default">
@@ -92,7 +118,8 @@ export default class Settings extends Component {
                         <i data-toggle="tooltip" 
                             data-placement="right" 
                             title="Merge nodes that have the same parent. 0 to Disable, Default 10" 
-                            className="glyphicon glyphicon-question-sign"></i>
+                            className="glyphicon glyphicon-question-sign" 
+                        />
                         <br/>
                         <input type="text" ref="sibling" />
                         <span>
@@ -101,11 +128,12 @@ export default class Settings extends Component {
                     </div>
 
                     <div>
-                        <strong>Node Collapse Threshold</strong> 
+                        <strong>Node Collapse Threshold</strong>
                         <i data-toggle="tooltip" 
                             data-placement="right" 
                             title="Collapse nodes at the end of paths that only have one relationship. 0 to Disable, Default 5" 
-                            className="glyphicon glyphicon-question-sign"></i>
+                            className="glyphicon glyphicon-question-sign" 
+                        />
                         <br />
                         <input type="text" ref="edge" />
                         <span>
@@ -113,15 +141,46 @@ export default class Settings extends Component {
                         </span>
                     </div>
                     <br />
+                    <div>
+                        <form>
+                            <FormGroup controlId="formControlEdge">
+                                <ControlLabel>Edge Label Display</ControlLabel>
+                                <i data-toggle="tooltip"
+                                    data-placement="right"
+                                    title="When to display edge labels"
+                                    className="glyphicon glyphicon-question-sign"
+                                />
+                                <FormControl onChange={this.onEdgeLabelChange.bind(this)} componentClass="select" value={this.state.edgeLabelVal}>
+                                    <option value="0">Threshold Display</option>
+                                    <option value="1">Always Display</option>
+                                    <option value="2">Never Display</option>
+                                </FormControl>
+                            </FormGroup>
+                            <FormGroup controlId="formControlNode">
+                                <ControlLabel>Node Label Display</ControlLabel>
+                                <i data-toggle="tooltip"
+                                    data-placement="right"
+                                    title="When to display node labels"
+                                    className="glyphicon glyphicon-question-sign"
+                                />
+                                <FormControl ref="nodeLabelControl" onChange={this.onNodeLabelChange.bind(this)} componentClass="select" value={this.state.nodeLabelVal}>
+                                    <option value="0">Threshold Display</option>
+                                    <option value="1">Always Display</option>
+                                    <option value="2">Never Display</option>
+                                </FormControl>
+                            </FormGroup>
+                        </form>
+                    </div>
                     <div className="checkbox-inline">
                         <label>
                             <input ref="debug" type="checkbox" onChange={this.onDebugChange.bind(this)}/> Query Debug Mode
                         </label>
                     </div>
                     <i data-toggle="tooltip" 
-                            data-placement="right" 
-                            title="Dump queries run into the Raw Query Box" 
-                            className="glyphicon glyphicon-question-sign"></i>
+                        data-placement="right" 
+                        title="Dump queries run into the Raw Query Box" 
+                        className="glyphicon glyphicon-question-sign"
+                    />
                     <br />
                     <div className="checkbox-inline">
                         <label>
@@ -131,7 +190,8 @@ export default class Settings extends Component {
                     <i data-toggle="tooltip" 
                         data-placement="right" 
                         title="Lower detail of graph to improve performance" 
-                        className="glyphicon glyphicon-question-sign"></i>
+                        className="glyphicon glyphicon-question-sign" 
+                    />
                 </div>
             </div>
         );

@@ -118,6 +118,8 @@ export default class GraphContainer extends Component {
         emitter.on('resetZoom', this.resetZoom.bind(this));
         emitter.on('zoomIn', this.zoomIn.bind(this));
         emitter.on('zoomOut', this.zoomOut.bind(this));
+        emitter.on('changeNodeLabels', this.changeNodeLabelMode.bind(this));
+        emitter.on('changeEdgeLabels', this.changeEdgeLabelMode.bind(this));
     }
 
     componentDidMount() {
@@ -165,6 +167,35 @@ export default class GraphContainer extends Component {
                 fs.writeFile(loc, JSON.stringify(json, null, 2));
             });
         }
+    }
+
+    changeNodeLabelMode(){
+        let mode = appStore.performance.nodeLabels;
+        let instance = this.state.sigmaInstance;
+        if (mode === 0) {
+            instance.settings('labelThreshold', 15);
+        } else if (mode === 1) {
+            instance.settings('labelThreshold', 1);
+        } else {
+            instance.settings('labelThreshold', 500);
+        }
+        instance.refresh({ 'skipIndexation': true });
+        this.setState({
+            sigmaInstance: instance
+        });
+    }
+
+    changeEdgeLabelMode(){
+        let instance = this.state.sigmaInstance;
+        let x = instance.camera.x;
+        let y = instance.camera.y;
+        let ratio = instance.camera.ratio;
+        let angle = instance.camera.angle;
+        instance.camera.goTo({x:x,y:y,ratio:ratio,angle:angle});
+        instance.refresh({ 'skipIndexation': true });
+        this.setState({
+            sigmaInstance: instance
+        });
     }
 
     loadFromChildProcess(graph){
@@ -696,10 +727,16 @@ export default class GraphContainer extends Component {
         });
 
         sigmaInstance.camera.bind('coordinatesUpdated', function(e){
-            if (e.target.ratio > 1.25){
-                sigmaInstance.settings('drawEdgeLabels', false);
-            }else{
+            if (appStore.performance.edgeLabels === 0){
+                if (e.target.ratio > 1.25) {
+                    sigmaInstance.settings('drawEdgeLabels', false);
+                } else {
+                    sigmaInstance.settings('drawEdgeLabels', true);
+                }
+            }else if (appStore.performance.edgeLabels === 1){
                 sigmaInstance.settings('drawEdgeLabels', true);
+            }else{
+                sigmaInstance.settings('drawEdgeLabels', false);
             }
         });
 
@@ -743,10 +780,10 @@ export default class GraphContainer extends Component {
                 appStore.performance.nodeLabels = mode;
                 conf.set('performance', appStore.performance);
 
-                if (mode === 0){
+                if (mode === 2){
                     sigmaInstance.settings('labelThreshold', 500);
                     emitter.emit('showAlert', 'Hiding Node Labels');
-                }else if (mode === 1){
+                }else if (mode === 0){
                     sigmaInstance.settings('labelThreshold', 15);
                     emitter.emit('showAlert', 'Default Node Label Threshold');
                 }else{
@@ -887,15 +924,17 @@ export default class GraphContainer extends Component {
 
         var mode = appStore.performance.nodeLabels;
 
-        if (mode === 0){
+        if (mode === 2){
             sigmaInstance.settings('labelThreshold', 500);
-        }else if (mode === 1){
+        }else if (mode === 0){
             sigmaInstance.settings('labelThreshold', 15);
         }else{
             sigmaInstance.settings('labelThreshold', 1);
         }
 
-        this.state.sigmaInstance = sigmaInstance;
-        this.state.design = design;
+        this.setState({
+            sigmaInstance: sigmaInstance,
+            design: design
+        });
     }
 }
