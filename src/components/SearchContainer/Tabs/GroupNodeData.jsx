@@ -65,9 +65,9 @@ export default class GroupNodeData extends Component {
                     
                     <h4>Outbound Object Control</h4>
 
-                    <NodeCypherLink property="First Degree Object Control" target={this.state.label} baseQuery={"MATCH p = (g:Group {name:{name}})-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(n)"} start={this.state.label} distinct />
+                    <NodeCypherLink property="First Degree Object Control" target={this.state.label} baseQuery={"MATCH p = (g:Group {name:{name}})-[r]->(n) WHERE r.isACL=true"} start={this.state.label} distinct />
                     
-                    <NodeCypherLink property="Group Delegated Object Control" target={this.state.label} baseQuery={"MATCH p = (g1:Group {name:{name}})-[r1:MemberOf*1..]->(g2:Group)-[r2:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(n)"} start={this.state.label} distinct />
+                    <NodeCypherLink property="Group Delegated Object Control" target={this.state.label} baseQuery={"MATCH p = (g1:Group {name:{name}})-[r1:MemberOf*1..]->(g2:Group)-[r2]->(n) WHERE r2.isACL=true"} start={this.state.label} distinct />
 
                     <NodeCypherLink property="Transitive Object Control" target={this.state.label} baseQuery={"MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((g:Group {name:{name}})-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))"} start={this.state.label} distinct />
 
@@ -75,7 +75,7 @@ export default class GroupNodeData extends Component {
 
                     <NodeCypherLink property="Explicit Object Controllers" target={this.state.label} baseQuery={"MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:Group {name:{name}})"} end={this.state.label} distinct />
                     
-                    <NodeCypherLink property="Unrolled Object Controllers" target={this.state.label} baseQuery={"MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AddMember|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g2:Group {name: {name}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = g2.name) AND NOT n.name = g2.name"} end={this.state.label} distinct />
+                    <NodeCypherLink property="Unrolled Object Controllers" target={this.state.label} baseQuery={"MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:Group {name: {name}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = g2.name) AND NOT n.name = g2.name AND r1.isACL=true"} end={this.state.label} distinct />
                     
                     <NodeCypherLink property="Transitive Object Controllers" target={this.state.label} baseQuery={"MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:Group {name:{name}}))"} end={this.state.label} distinct />
                 </dl>
