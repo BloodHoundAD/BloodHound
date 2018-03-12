@@ -687,6 +687,10 @@ export default class GraphContainer extends Component {
                 emitter.emit('computerNodeClicked', n.data.node.label);
             }else if (n.data.node.type_domain){
                 emitter.emit('domainNodeClicked', n.data.node.label);
+            }else if (n.data.node.type_gpo){
+                emitter.emit('gpoNodeClicked', n.data.node.label);
+            }else if (n.data.node.type_ou){
+                emitter.emit('ouNodeClicked', n.data.node.label);
             }
         }else{
             this.setState({dragged: false});
