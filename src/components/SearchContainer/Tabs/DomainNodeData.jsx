@@ -26,7 +26,7 @@ export default class DomainNodeData extends Component {
             label: payload,
             users: -1,
             groups: -1,
-            computers: -1,
+            computers: -1
         });
 
         var s1 = driver.session();

@@ -71,6 +71,7 @@ global.appStore = {
     dagre: false,
     startNode: null,
     endNode: null,
+    prebuiltQuery: [],
     highlightedEdges: [],
     spotlightData: {},
     queryStack: [],

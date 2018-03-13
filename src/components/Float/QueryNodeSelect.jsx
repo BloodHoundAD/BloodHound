@@ -10,29 +10,76 @@ export default class QueryNodeSelect extends Component {
 
         this.state = {
             data:[],
-            queryData: {}
+            currentQueryTitle: ""
         };
 
-        emitter.on('nodeSelectQuery', this.getEventInfo.bind(this));        
+        emitter.on('prebuiltQueryStart', this.getEventInfo.bind(this));
+        emitter.on('prebuiltQueryStep', this.doQueryStep.bind(this));
     }
 
     componentDidMount() {
         $(this.refs.outer).fadeToggle(0);
     }
 
-    getEventInfo(query) {
-        $(this.refs.outer).fadeToggle(true);
-        this.setState({queryData:query});
-        var session = driver.session();
-        session.run(query.query, query.queryProps)
-            .then(function (results) {
-                var y = $.map(results.records, function (x) {
-                    return x._fields[0];
-                });
-                y.sort();
-                this.setState({ data: y });
-                session.close();
-            }.bind(this));
+    getEventInfo() {
+        var query = appStore.prebuiltQuery.shift();
+        if (query.final){
+            emitter.emit('query',
+                query.query,
+                query.props,
+                null,
+                null,
+                query.allowCollapse);
+        }else{
+            this.setState({
+                currentQueryTitle: query.title
+            });
+            $(this.refs.outer).fadeToggle(true);
+            var session = driver.session();
+            session.run(query.query, query.props)
+                .then(function (results) {
+                    var y = $.map(results.records, function (x) {
+                        return x._fields[0];
+                    });
+                    this.setState({ data: y });
+                    session.close();
+                }.bind(this));
+        }
+    }
+
+    doQueryStep(querydata){
+        var query = appStore.prebuiltQuery.shift();
+        if (query.final) {
+            let start = typeof query.startNode !== 'undefined' ? query.startNode.format(querydata) : "";
+            let end = typeof query.endNode !== 'undefined' ? query.startNode.format(querydata) : "";
+            emitter.emit('query',
+                query.query,
+                {"result":querydata},
+                start,
+                end,
+                query.allowCollapse);
+            appStore.prebuiltQuery = [];
+            this._dismiss();
+        } else {
+            this.setState({
+                currentQueryTitle: query.title
+            });
+            var session = driver.session();
+            session.run(query.query, {"result":querydata})
+                .then(function (results) {
+                    var y = $.map(results.records, function (x) {
+                        return x._fields[0];
+                    });
+                    if (y.length === 0){
+                        emitter.emit('showAlert', "No data returned from query");
+                        appStore.prebuiltQuery = [];
+                        this._dismiss();
+                    }else{
+                        this.setState({ data: y });
+                    }
+                    session.close();
+                }.bind(this));
+        }
     }
 
     _dismiss(){
@@ -55,7 +102,7 @@ export default class QueryNodeSelect extends Component {
                 <Panel>
                     <Panel.Heading>
                         {/* <QueryNodeSelectHeader length={this.state.data.length} title={this.state.queryData.boxTitle} dismiss={this._dismiss.bind(this)} />; */}
-                        {this.state.queryData.boxTitle}
+                        {this.state.currentQueryTitle}
                     </Panel.Heading>
                     <Panel.Body>
                         <If condition={this.state.data.length > 0}>
@@ -63,7 +110,7 @@ export default class QueryNodeSelect extends Component {
                                 <ListGroup ref="list">
                                     {
                                         this.state.data.map(function(key){
-                                            var x = <QueryNodeSelectItem key={key} label={key} click={this.handleClick.bind(this)} />;
+                                            var x = <QueryNodeSelectItem key={key} label={key} />;
                                             return x;
                                         }.bind(this))
                                     }
