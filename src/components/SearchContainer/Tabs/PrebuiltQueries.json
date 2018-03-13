@@ -85,7 +85,7 @@
             ]
         },
         {
-            "name": "Users with Foreign Domain Group Membership New",
+            "name": "Users with Foreign Domain Group Membership",
             "queryList": [
                 {
                     "final": false,
@@ -101,7 +101,7 @@
             ]
         },
         {
-            "name": "Groups with Foreign Domain Group Membership New",
+            "name": "Groups with Foreign Domain Group Membership",
             "queryList": [
                 {
                     "final": false,
@@ -136,7 +136,7 @@
                 },
                 {
                     "final": false,
-                    "title": "Select a user with an SPN",
+                    "title": "Select a user (ordered by PasswordLastSet)",
                     "query": "MATCH (n:User) WHERE n.domain={result} AND n.HasSPN=true RETURN n.name ORDER BY n.PwdLastSet DESC"
                 },
                 {
