@@ -89,7 +89,7 @@ export default class PrebuiltQueriesDisplay extends Component {
                 </h3>
                 <div className="query-box">
                     {this.state.queries.map(function(a){
-                        return <PrebuiltQueryNode key={a.name} info={a} />;
+                        return <PrebuiltQueryNode key={a.name} info={a} />
                     })}
                 </div>
                 <h3>
@@ -103,7 +103,7 @@ export default class PrebuiltQueriesDisplay extends Component {
                     <Else>{() =>
                         <div>
                         {this.state.custom.map(function(a){
-                            return <PrebuiltQueryNode key={a.name} info={a} />;
+                            return <PrebuiltQueryNode key={a.name} info={a} />
                         })}
                         </div>
                     }

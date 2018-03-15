@@ -8,7 +8,7 @@ export default class QueryNodeSelectItem extends Component {
         }.bind(this);
         return (
             <ListGroupItem href="#" onClick={c}>
-            {this.props.label}
+                {this.props.label}
             </ListGroupItem>
         );
     }

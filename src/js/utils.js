@@ -293,7 +293,7 @@ export function buildStructureProps(rows){
             });
         }else{
             datadict[hash] = {
-                statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.container}) WITH a,prop MERGE (b:{} {name: prop.object}) WITH a,b,prop MERGE (a)-[r:Contains {isACL: false}]->(b) SET a.blocksInheritance=prop.blocksInheritance, a.domain=prop.containerDomain, b.domain=prop.objectDomain'.format(atype, btype),
+                statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.container}) WITH a,prop MERGE (b:{} {name: prop.object}) WITH a,b,prop MERGE (a)-[r:Contains {isACL: false}]->(b) SET a.blocksInheritance=toBoolean(prop.blocksInheritance), a.domain=prop.containerDomain, b.domain=prop.objectDomain'.format(atype, btype),
                 props: [{
                     container: container,
                     object: object,
@@ -326,7 +326,7 @@ export function buildGplinkProps(rows){
             });
         }else{
             datadict[type] = {
-                statement: 'UNWIND {props} as prop MERGE (a:Gpo {name: prop.gponame}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: prop.enforced, isACL: false}]->(b) SET a.domain=prop.gpoDomain,b.domain=prop.objectDomain'.format(type),
+                statement: 'UNWIND {props} as prop MERGE (a:Gpo {name: prop.gponame}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.domain=prop.gpoDomain,b.domain=prop.objectDomain'.format(type),
                 props:[{
                     gponame: gpoName,
                     objectname: objectName,

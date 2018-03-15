@@ -31,7 +31,7 @@ export default class SearchContainer extends Component {
         emitter.on('setEnd', function (payload) {
             jQuery(this.refs.pathbar).val(payload);
             var e = jQuery(this.refs.pathfinding);
-            if (!(e.is(":visible"))) {
+            if (! e.is(":visible")) {
                 e.slideToggle();
             }
         }.bind(this));
@@ -83,6 +83,12 @@ export default class SearchContainer extends Component {
                         break;
                     case "Domain":
                         icon = "<i style=\"float:right\" class=\"fa fa-globe\"></i>";
+                        break;
+                    case "Gpo":
+                        icon = "<i style=\"float:right\" class=\"fa fa-list\"></i>";
+                        break;
+                    case "Ou":
+                        icon = "<i style=\"float:right\" class=\"fa fa-sitemap\"></i>";
                         break;
                 }
 
@@ -144,6 +150,12 @@ export default class SearchContainer extends Component {
                         break;
                     case "Domain":
                         icon = "<i class=\"fa fa-globe\"></i>";
+                        break;
+                    case "Gpo":
+                        icon = "<i style=\"float:right\" class=\"fa fa-list\"></i>";
+                        break;
+                    case "Ou":
+                        icon = "<i style=\"float:right\" class=\"fa fa-sitemap\"></i>";
                         break;
                 }
 
