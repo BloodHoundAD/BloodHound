@@ -136,8 +136,8 @@
                 },
                 {
                     "final": false,
-                    "title": "Select a user (ordered by PasswordLastSet)",
-                    "query": "MATCH (n:User) WHERE n.domain={result} AND n.HasSPN=true RETURN n.name ORDER BY n.PwdLastSet DESC"
+                    "title": "Select a user",
+                    "query": "MATCH (n:User) WHERE n.domain={result} AND n.HasSPN=true RETURN n.name, n.PwdLastSet ORDER BY n.PwdLastSet ASC"
                 },
                 {
                     "final": true,
