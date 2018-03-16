@@ -3,6 +3,8 @@ import NodePropItem from './NodePropItem';
 import PropTypes from 'prop-types';
 import NodeProps from './NodeProps';
 import NodeCypherLink from './NodeCypherLink';
+import NodeCypherNoNumberLink from './NodeCypherNoNumberLink';
+import NodeCypherLinkComplex from './NodeCypherLinkComplex';
 
 import { If, Then, Else } from 'react-if';
 
@@ -63,8 +65,13 @@ export default class UserNodeData extends Component {
                         {this.state.label}
                     </dd>
                     <NodeProps properties={this.state.propertyMap} displayMap={this.state.displayMap} ServicePrincipalNames={this.state.ServicePrincipalNames} />
+                    
 
                     <NodeCypherLink property="Sessions" target={this.state.label} baseQuery={"MATCH p=(m:Computer)-[r:HasSession]->(n:User {name:{name}})"} end={this.state.label} />
+
+                    <NodeCypherLinkComplex property="Sibling Objects in the Same OU" target={this.state.label} countQuery={"MATCH (o1)-[r1:Contains]->(o2:User {name:{name}}) WITH o1 OPTIONAL MATCH p1=(d)-[r2:Contains*1..]->(o1) OPTIONAL MATCH p2=(o1)-[r3:Contains]->(n) WHERE n:User OR n:Computer RETURN count(p1)+count(p2)"} graphQuery={"MATCH (o1)-[r1:Contains]->(o2:User {name:{name}}) WITH o1 OPTIONAL MATCH p1=(d)-[r2:Contains*1..]->(o1) OPTIONAL MATCH p2=(o1)-[r3:Contains]->(n) WHERE n:User OR n:Computer RETURN p1,p2"} />
+
+                    <NodeCypherNoNumberLink target={this.state.label} property="See User within Domain/OU Tree" query="MATCH p = (d:Domain)-[r:Contains*1..]->(u:User {name:{name}}) RETURN p" />
                     
                     <h4>Group Membership</h4>
                     

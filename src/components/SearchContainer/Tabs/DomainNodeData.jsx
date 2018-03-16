@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import LoadLabel from './LoadLabel.jsx';
 import PropTypes from 'prop-types';
 import NodeCypherLink from './NodeCypherLink.jsx';
+import NodeCypherNoNumberLink from './NodeCypherNoNumberLink';
 
 export default class DomainNodeData extends Component {
     constructor(){
@@ -12,6 +13,8 @@ export default class DomainNodeData extends Component {
             users: -1,
             groups: -1,
             computers: -1,
+            ous: -1,
+            gpos: -1,
             driversessions: []
         };
 
@@ -26,12 +29,16 @@ export default class DomainNodeData extends Component {
             label: payload,
             users: -1,
             groups: -1,
-            computers: -1
+            computers: -1,
+            ous: -1,
+            gpos: -1
         });
 
-        var s1 = driver.session();
-        var s2 = driver.session();
-        var s3 = driver.session();
+        let s1 = driver.session();
+        let s2 = driver.session();
+        let s3 = driver.session();
+        let s4 = driver.session();
+        let s5 = driver.session();
 
         s1.run("MATCH (a:User) WHERE a.domain={name} RETURN COUNT(a)", {name:payload})
             .then(function(result){
@@ -49,6 +56,18 @@ export default class DomainNodeData extends Component {
             .then(function(result){
                 this.setState({'computers':result.records[0]._fields[0].low});
                 s3.close();
+            }.bind(this));
+        
+        s4.run("MATCH (n:Ou {domain:{name}}) RETURN COUNT(n)", { name: payload })
+            .then(function (result) {
+                this.setState({ 'ous': result.records[0]._fields[0].low });
+                s4.close();
+            }.bind(this));
+        
+        s5.run("MATCH (n:Gpo {domain:{name}}) RETURN COUNT(n)", { name: payload })
+            .then(function (result) {
+                this.setState({ 'gpos': result.records[0]._fields[0].low });
+                s5.close();
             }.bind(this));
         
         this.setState({'driversessions': [s1,s2,s3]});
@@ -92,6 +111,26 @@ export default class DomainNodeData extends Component {
                             value={this.state.computers}
                         />
                     </dd>
+                    <dt>
+                        OUs
+                    </dt>
+                    <dd>
+                        <LoadLabel
+                            ready={this.state.ous !== -1}
+                            value={this.state.ous}
+                        />
+                    </dd>
+                    <dt>
+                        GPOs
+                    </dt>
+                    <dd>
+                        <LoadLabel
+                            ready={this.state.gpos !== -1}
+                            value={this.state.gpos}
+                        />
+                    </dd>
+                    <NodeCypherNoNumberLink target={this.state.label} property="Map OU Structure" query="MATCH p = (d:Domain {name:{name}})-[r:Contains*1..]->(n) RETURN p" />
+                    <br />
                     <h4>Foreign Members</h4>
 
                     <NodeCypherLink property="Foreign Users" target={this.state.label} baseQuery={"MATCH (n:User) WHERE NOT n.domain={name} WITH n MATCH (b:Group) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r:MemberOf]->(b)"}  />

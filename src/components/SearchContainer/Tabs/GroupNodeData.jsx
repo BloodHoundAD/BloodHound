@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import NodeALink from './NodeALink';
 import PropTypes from 'prop-types';
 import NodeCypherLink from './NodeCypherLink';
+import NodeCypherNoNumberLink from './NodeCypherNoNumberLink';
 
 export default class GroupNodeData extends Component {
     constructor(){
@@ -37,9 +38,9 @@ export default class GroupNodeData extends Component {
                     <dd>
                         {this.state.label}
                     </dd>
-
                     <NodeCypherLink property="Sessions" target={this.state.label} baseQuery={"MATCH p = (c:Computer)-[n:HasSession]->(u:User)-[r2:MemberOf*1..]->(g:Group {name: {name}})"} end={this.state.label} />
 
+                    {/* <NodeCypherLink property="Sibling Objects in the Same OU" target={this.state.label} baseQuery={"MATCH (o1:OU)-[r1:Contains]->(g1:Group {name:{name}}) WITH o1 MATCH p= (d: Domain)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)"} /> */}
                     
                     <h4>Group Members</h4>
                     <NodeCypherLink property="Direct Members" target={this.state.label} baseQuery={"MATCH p=(n)-[b:MemberOf]->(c:Group {name: {name}})"} end={this.state.label} />
