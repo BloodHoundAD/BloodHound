@@ -28,7 +28,6 @@
                 {
                     "final": true,
                     "query": "MATCH (n:User),(m:Group {name:{result}}),p=shortestPath((n)-[*1..]->(m)) RETURN p",
-                    "startNode": "{}",
                     "allowCollapse": true,
                     "endNode":"{}"
                 }
@@ -127,7 +126,7 @@
             ]
         },
         {
-            "name": "Shortest SPN Paths",
+            "name": "Shortest Path from SPN User",
             "queryList":[
                 {
                     "final": false,
@@ -144,6 +143,25 @@
                     "query": "MATCH n=shortestPath((a:User {name:{result}})-[r*1..]->(b:Computer)) RETURN n",
                     "startNode":"{}",
                     "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Shortest Paths to Domain Admins from SPN Users",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain Admin group...",
+                    "query": "MATCH (n:Group) WHERE n.name =~ {name} RETURN n.name ORDER BY n.name DESC",
+                    "props": {
+                        "name": "(?i).*DOMAIN ADMINS.*"
+                    }
+                },
+                {
+                    "final": true,
+                    "query": "MATCH (n:User),(m:Group {name:{result}}),p=shortestPath((n)-[*1..]->(m)) WHERE n.HasSPN=true RETURN p",
+                    "allowCollapse": true,
+                    "endNode": "{}"
                 }
             ]
         }

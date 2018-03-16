@@ -28,8 +28,10 @@ export default class QueryNodeSelectItem extends Component {
             } else {
                 val = obj;
             }
-
-            str += prop + ": " + val + "\n";
+            if (val !== null){
+                str += prop + ": " + val + "\n";
+            }
+            
         }.bind(this));
         return str;
     }

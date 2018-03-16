@@ -61,7 +61,7 @@ export default class QueryNodeSelect extends Component {
         var query = appStore.prebuiltQuery.shift();
         if (query.final) {
             let start = typeof query.startNode !== 'undefined' ? query.startNode.format(querydata) : "";
-            let end = typeof query.endNode !== 'undefined' ? query.startNode.format(querydata) : "";
+            let end = typeof query.endNode !== 'undefined' ? query.endNode.format(querydata) : "";
             emitter.emit('query',
                 query.query,
                 {"result":querydata},
