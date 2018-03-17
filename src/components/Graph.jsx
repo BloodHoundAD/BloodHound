@@ -61,10 +61,10 @@ export default class GraphContainer extends Component {
                                 s4.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE")
                                     .then(function(){
                                         s4.close();
-                                        s5.run("CREATE CONSTRAINT on (c:Ou) ASSERT c.name IS UNIQUE")
+                                        s5.run("CREATE CONSTRAINT on (c:OU) ASSERT c.name IS UNIQUE")
                                             .then(function() {
                                                 s5.close();
-                                                s6.run("CREATE CONSTRAINT on (c:Gpo) ASSERT c.name is UNIQUE")
+                                                s6.run("CREATE CONSTRAINT on (c:GPO) ASSERT c.name is UNIQUE")
                                                     .then(function(){
                                                         s6.close();
                                                     })

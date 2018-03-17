@@ -278,8 +278,21 @@ export function buildStructureProps(rows){
 
     $.each(rows, function(index, row){
         let hash = (row.ContainerType + row.ObjectType).toUpperCase();
-        let atype = row.ContainerType.toTitleCase();
-        let btype = row.ObjectType.toTitleCase();
+        let atype = row.ContainerType;
+        let btype = row.ObjectType;
+
+        if (atype === 'ou'){
+            atype = 'OU';
+        }else{
+            atype = atype.toTitleCase();
+        }
+
+        if (btype === 'ou') {
+            btype = 'OU';
+        } else {
+            btype = btype.toTitleCase();
+        }
+
         let container = row.ContainerName.toUpperCase();
         let object = row.ObjectName.toUpperCase();
 
@@ -312,9 +325,15 @@ export function buildGplinkProps(rows){
     let datadict = {};
 
     $.each(rows, function (index, row) {
-        let type = row.ObjectType.toTitleCase();
+        let type = row.ObjectType;
         let gpoName = row.GPODisplayName.toUpperCase();
         let objectName = row.ObjectName.toUpperCase();
+
+        if (type === 'ou') {
+            type = 'OU';
+        } else {
+            type = type.toTitleCase();
+        }
 
         if (datadict[type]){
             datadict[type].props.push({
@@ -326,7 +345,7 @@ export function buildGplinkProps(rows){
             });
         }else{
             datadict[type] = {
-                statement: 'UNWIND {props} as prop MERGE (a:Gpo {name: prop.gponame}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.domain=prop.gpoDomain,b.domain=prop.objectDomain'.format(type),
+                statement: 'UNWIND {props} as prop MERGE (a:GPO {name: prop.gponame}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.domain=prop.gpoDomain,b.domain=prop.objectDomain'.format(type),
                 props:[{
                     gponame: gpoName,
                     objectname: objectName,
