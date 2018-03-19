@@ -41,7 +41,7 @@ export default class SearchContainer extends Component {
                 var session = driver.session();
                 var t = '(?i).*' + query + '.*';
                 var data = [];
-                session.run("MATCH (n) WHERE n.name =~ {name} RETURN n LIMIT 10", { name: t })
+                session.run("MATCH (n) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10", { name: t })
                     .then(function (results) {
                         $.each(results.records, function (index, record) {
                             data.push(record._fields[0].properties.name + "#" + record._fields[0].labels[0]);
@@ -66,6 +66,9 @@ export default class SearchContainer extends Component {
             updater: function (item) {
                 return item.split("#")[0];
             },
+            matcher: function(item){
+                return true;
+            },
             highlighter: function (item) {
                 var parts = item.split("#");
                 var query = this.query;
@@ -84,10 +87,10 @@ export default class SearchContainer extends Component {
                     case "Domain":
                         icon = "<i style=\"float:right\" class=\"fa fa-globe\"></i>";
                         break;
-                    case "Gpo":
+                    case "GPO":
                         icon = "<i style=\"float:right\" class=\"fa fa-list\"></i>";
                         break;
-                    case "Ou":
+                    case "OU":
                         icon = "<i style=\"float:right\" class=\"fa fa-sitemap\"></i>";
                         break;
                 }
@@ -105,15 +108,14 @@ export default class SearchContainer extends Component {
 
                 return jElem.html();
             }
-        }
-        );
+        });
 
         jQuery(this.refs.pathbar).typeahead({
             source: function (query, process) {
                 var session = driver.session();
                 var t = '(?i).*' + query + '.*';
                 var data = [];
-                session.run("MATCH (n) WHERE n.name =~ {name} RETURN n LIMIT 10", { name: t })
+                session.run("MATCH (n) WHERE n.name =~ {name}  OR n.guid =~ {name} RETURN n LIMIT 10", { name: t })
                     .then(function (results) {
                         $.each(results.records, function (index, record) {
                             data.push(record._fields[0].properties.name + "#" + record._fields[0].labels[0]);
@@ -130,6 +132,9 @@ export default class SearchContainer extends Component {
                 }
             }.bind(this),
             autoSelect: false,
+            matcher: function(item){
+                return true;
+            },
             updater: function (item) {
                 return item.split("#")[0];
             },
@@ -151,10 +156,10 @@ export default class SearchContainer extends Component {
                     case "Domain":
                         icon = "<i class=\"fa fa-globe\"></i>";
                         break;
-                    case "Gpo":
+                    case "GPO":
                         icon = "<i style=\"float:right\" class=\"fa fa-list\"></i>";
                         break;
-                    case "Ou":
+                    case "OU":
                         icon = "<i style=\"float:right\" class=\"fa fa-sitemap\"></i>";
                         break;
                 }

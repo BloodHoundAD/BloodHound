@@ -106,7 +106,7 @@ global.appStore = {
                 font: 'FontAwesome',
                 content: '\uF0E8',
                 scale: 1.25,
-                color: '#52667D'
+                color: '#FFAA00'
             },
             'GPO': {
                 font: 'FontAwesome',
