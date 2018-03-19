@@ -126,9 +126,9 @@ export default class GraphContainer extends Component {
         this.initializeSigma();
         
         this.doQueryNative({
-            //statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
+            statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
             //statement: 'MATCH (n)-[r]->(m) RETURN n,r,m',
-            statement: 'MATCH p=(n:Domain)-[r]-(m:Domain) RETURN p',
+            //statement: 'MATCH p=(n:Domain)-[r]-(m:Domain) RETURN p',
             allowCollapse: false,
             props: {}
         });
