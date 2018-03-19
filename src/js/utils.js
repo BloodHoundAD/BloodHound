@@ -119,7 +119,10 @@ export function findObjectType(header){
     }
 }
 
-function getDomainFromLabel(label){
+function getDomainFromLabel(label, type){
+    if (type === 'Domain'){
+        return label;
+    }
     if (label.includes('@')){
         return label.split('@')[1];
     }else{
@@ -140,18 +143,18 @@ export function buildGroupMembershipProps(rows) {
         if (datadict[type]){
             datadict[type].props.push({
                 accountName: account,
-                accountDomain: getDomainFromLabel(account),
+                accountDomain: getDomainFromLabel(account, type),
                 groupName: group,
-                groupDomain: getDomainFromLabel(group)
+                groupDomain: getDomainFromLabel(group, "group")
             });
         }else{
             datadict[type] = {
                 statement: `UNWIND {props} AS prop MERGE (a:{} {name:prop.accountName}) WITH a,prop MERGE (b:Group {name:prop.groupName}) WITH a,b,prop MERGE (a)-[r:MemberOf {isACL:false}]->(b) SET a.domain=prop.accountDomain,b.domain=prop.groupDomain`.format(type),
                 props:[{
                     accountName: account,
-                    accountDomain: getDomainFromLabel(account),
+                    accountDomain: getDomainFromLabel(account, type),
                     groupName: group,
-                    groupDomain: getDomainFromLabel(group)
+                    groupDomain: getDomainFromLabel(group, "group")
                 }]
             };
         }
@@ -171,18 +174,18 @@ export function buildLocalAdminProps(rows) {
         if (datadict[type]) {
             datadict[type].props.push({
                 accountName: account,
-                accountDomain: getDomainFromLabel(account),
+                accountDomain: getDomainFromLabel(account, type),
                 computerName: computer,
-                computerDomain: getDomainFromLabel(computer)
+                computerDomain: getDomainFromLabel(computer, "computer")
             });
         } else {
             datadict[type] = {
                 statement: `UNWIND {props} AS prop MERGE (a:{} {name:prop.accountName}) WITH a,prop MERGE (b:Computer {name:prop.computerName}) WITH a,b,prop MERGE (a)-[r:AdminTo {isACL: false}]->(b) SET a.domain=prop.accountDomain, b.domain=prop.computerDomain`.format(type),
                 props: [{
                     accountName: account,
-                    accountDomain: getDomainFromLabel(account),
+                    accountDomain: getDomainFromLabel(account, type),
                     computerName: computer,
-                    computerDomain: getDomainFromLabel(computer)
+                    computerDomain: getDomainFromLabel(computer, "computer")
                 }]
             };
         }
@@ -201,9 +204,9 @@ export function buildSessionProps(rows) {
         if (datadict['user']) {
             datadict['user'].props.push({
                 accountName: account,
-                accountDomain: getDomainFromLabel(account),
+                accountDomain: getDomainFromLabel(account, "user"),
                 computerName: computer,
-                computerDomain: getDomainFromLabel(computer),
+                computerDomain: getDomainFromLabel(computer, "computer"),
                 weight: row.Weight
             });
         } else {
@@ -211,9 +214,9 @@ export function buildSessionProps(rows) {
                 statement: `UNWIND {props} AS prop MERGE (a:User {name:prop.accountName}) WITH a,prop MERGE (b:Computer {name: prop.computerName}) WITH a,b,prop MERGE (b)-[:HasSession {Weight : prop.weight, isACL:false}]-(a) SET a.domain=prop.accountDomain,b.domain=prop.computerDomain`,
                 props: [{
                     accountName: account,
-                    accountDomain: getDomainFromLabel(account),
+                    accountDomain: getDomainFromLabel(account, "user"),
                     computerName: computer,
-                    computerDomain: getDomainFromLabel(computer),
+                    computerDomain: getDomainFromLabel(computer, "computer"),
                     weight: row.Weight
                 }]
             };
@@ -227,7 +230,7 @@ export function buildDomainProps(rows) {
     var datadict = {};
 
     datadict['domain'] = {
-        statement: 'UNWIND {props} AS prop MERGE (domain1:Domain {name: prop.domain1}) WITH domain1,prop MERGE (domain2:Domain {name: prop.domain2}) WITH domain1,domain2,prop MERGE (domain1)-[:TrustedBy {TrustType : prop.trusttype, Transitive: toBoolean(prop.transitive), isACL:false}]->(domain2)',
+        statement: 'UNWIND {props} AS prop MERGE (domain1:Domain {name: prop.domain1}) WITH domain1,prop MERGE (domain2:Domain {name: prop.domain2}) WITH domain1,domain2,prop MERGE (domain1)-[:TrustedBy {TrustType : prop.trusttype, Transitive: toBoolean(prop.transitive), isACL:false}]->(domain2) SET domain1.domain=prop.domain1,domain2.domain=prop.domain2',
         props: []
     };
 
@@ -303,8 +306,8 @@ export function buildStructureProps(rows){
                 datadict[hash].props.push({
                     container: container,
                     object: object,
-                    containerDomain: getDomainFromLabel(container),
-                    objectDomain: getDomainFromLabel(object),
+                    containerDomain: getDomainFromLabel(container, atype),
+                    objectDomain: getDomainFromLabel(object, btype),
                     blocksInheritance: row.ContainerBlocksInheritance,
                     containerGuid: aguid,
                     objectGuid: bguid
@@ -315,8 +318,8 @@ export function buildStructureProps(rows){
                     props: [{
                         container: container,
                         object: object,
-                        containerDomain: getDomainFromLabel(container),
-                        objectDomain: getDomainFromLabel(object),
+                        containerDomain: getDomainFromLabel(container, atype),
+                        objectDomain: getDomainFromLabel(object, btype),
                         blocksInheritance: row.ContainerBlocksInheritance,
                         containerGuid: aguid,
                         objectGuid: bguid
@@ -328,8 +331,8 @@ export function buildStructureProps(rows){
                 datadict[hash].props.push({
                     container: container,
                     object: object,
-                    containerDomain: getDomainFromLabel(container),
-                    objectDomain: getDomainFromLabel(object),
+                    containerDomain: getDomainFromLabel(container, "OU"),
+                    objectDomain: getDomainFromLabel(object, btype),
                     blocksInheritance: row.ContainerBlocksInheritance,
                     containerGuid: row.ContainerGUID
                 });
@@ -339,8 +342,8 @@ export function buildStructureProps(rows){
                     props: [{
                         container: container,
                         object: object,
-                        containerDomain: getDomainFromLabel(container),
-                        objectDomain: getDomainFromLabel(object),
+                        containerDomain: getDomainFromLabel(container, "OU"),
+                        objectDomain: getDomainFromLabel(object, btype),
                         blocksInheritance: row.ContainerBlocksInheritance,
                         containerGuid: row.ContainerGUID
                     }]
@@ -351,8 +354,8 @@ export function buildStructureProps(rows){
                 datadict[hash].props.push({
                     container: container,
                     object: object,
-                    containerDomain: getDomainFromLabel(container),
-                    objectDomain: getDomainFromLabel(object),
+                    containerDomain: getDomainFromLabel(container, atype),
+                    objectDomain: getDomainFromLabel(object, "OU"),
                     blocksInheritance: row.ContainerBlocksInheritance,
                     objectGuid: row.ObjectId
                 });
@@ -362,8 +365,8 @@ export function buildStructureProps(rows){
                     props: [{
                         container: container,
                         object: object,
-                        containerDomain: getDomainFromLabel(container),
-                        objectDomain: getDomainFromLabel(object),
+                        containerDomain: getDomainFromLabel(container, atype),
+                        objectDomain: getDomainFromLabel(object, "OU"),
                         blocksInheritance: row.ContainerBlocksInheritance,
                         objectGuid: row.ObjectId
                     }]
@@ -374,8 +377,8 @@ export function buildStructureProps(rows){
                 datadict[hash].props.push({
                     container: container,
                     object: object,
-                    containerDomain: getDomainFromLabel(container),
-                    objectDomain: getDomainFromLabel(object),
+                    containerDomain: getDomainFromLabel(container, atype),
+                    objectDomain: getDomainFromLabel(object, btype),
                     blocksInheritance: row.ContainerBlocksInheritance
                 });
             } else {
@@ -384,8 +387,8 @@ export function buildStructureProps(rows){
                     props: [{
                         container: container,
                         object: object,
-                        containerDomain: getDomainFromLabel(container),
-                        objectDomain: getDomainFromLabel(object),
+                        containerDomain: getDomainFromLabel(container, atype),
+                        objectDomain: getDomainFromLabel(object, btype),
                         blocksInheritance: row.ContainerBlocksInheritance
                     }]
                 };
@@ -416,8 +419,8 @@ export function buildGplinkProps(rows){
                     gponame: gpoName,
                     objectname: objectName,
                     enforced: row.IsEnforced,
-                    gpoDomain: getDomainFromLabel(gpoName),
-                    objectDomain: getDomainFromLabel(objectName),
+                    gpoDomain: getDomainFromLabel(gpoName, "GPO"),
+                    objectDomain: getDomainFromLabel(objectName, "OU"),
                     objectGuid: row.ObjectGUID,
                     gpoGuid: row.GPOGuid
                 });
@@ -428,8 +431,8 @@ export function buildGplinkProps(rows){
                         gponame: gpoName,
                         objectname: objectName,
                         enforced: row.IsEnforced,
-                        gpoDomain: getDomainFromLabel(gpoName),
-                        objectDomain: getDomainFromLabel(objectName),
+                        gpoDomain: getDomainFromLabel(gpoName, "GPO"),
+                        objectDomain: getDomainFromLabel(objectName, "OU"),
                         objectGuid: row.ObjectGUID,
                         gpoGuid: row.GPOGuid
                     }]
@@ -441,8 +444,8 @@ export function buildGplinkProps(rows){
                     gponame: gpoName,
                     objectname: objectName,
                     enforced: row.IsEnforced,
-                    gpoDomain: getDomainFromLabel(gpoName),
-                    objectDomain: getDomainFromLabel(objectName),
+                    gpoDomain: getDomainFromLabel(gpoName, "GPO"),
+                    objectDomain: getDomainFromLabel(objectName, type),
                     gpoGuid: row.GPOGuid
                 });
             } else {
@@ -452,8 +455,8 @@ export function buildGplinkProps(rows){
                         gponame: gpoName,
                         objectname: objectName,
                         enforced: row.IsEnforced,
-                        gpoDomain: getDomainFromLabel(gpoName),
-                        objectDomain: getDomainFromLabel(objectName),
+                        gpoDomain: getDomainFromLabel(gpoName, "GPO"),
+                        objectDomain: getDomainFromLabel(objectName, type),
                         gpoGuid: row.GPOGuid
                     }]
                 };
