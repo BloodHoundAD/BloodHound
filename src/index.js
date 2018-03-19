@@ -102,13 +102,13 @@ global.appStore = {
                 scale: 1.5,
                 color: '#17E6B9'
             },
-            'Ou': {
+            'OU': {
                 font: 'FontAwesome',
                 content: '\uF0E8',
                 scale: 1.25,
                 color: '#52667D'
             },
-            'Gpo': {
+            'GPO': {
                 font: 'FontAwesome',
                 content: '\uF03A',
                 scale: 1.25,

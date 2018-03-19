@@ -61,7 +61,7 @@ export default class GraphContainer extends Component {
                                 s4.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE")
                                     .then(function(){
                                         s4.close();
-                                        s5.run("CREATE CONSTRAINT on (c:OU) ASSERT c.name IS UNIQUE")
+                                        s5.run("CREATE CONSTRAINT on (c:OU) ASSERT c.guid IS UNIQUE")
                                             .then(function() {
                                                 s5.close();
                                                 s6.run("CREATE CONSTRAINT on (c:GPO) ASSERT c.name is UNIQUE")
@@ -126,8 +126,9 @@ export default class GraphContainer extends Component {
         this.initializeSigma();
         
         this.doQueryNative({
-            statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
+            //statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
             //statement: 'MATCH (n)-[r]->(m) RETURN n,r,m',
+            statement: 'MATCH p=(n:Domain)-[r]-(m:Domain) RETURN p',
             allowCollapse: false,
             props: {}
         });
@@ -553,9 +554,16 @@ export default class GraphContainer extends Component {
             y: Math.random()
         };
 
-        if (data.hasOwnProperty('properties') && data.properties.hasOwnProperty('blocksInheritance')){
-            node.blocksInheritance = data.properties.blocksInheritance;
+        if (data.hasOwnProperty('properties')){
+            if (data.properties.hasOwnProperty('blocksInheritance')) {
+                node.blocksInheritance = data.properties.blocksInheritance;
+            }
+
+            if (data.properties.hasOwnProperty('guid')){
+                node.guid = data.properties.guid;
+            }
         }
+        
 
         if (label === params.start){
             node.start = true;
@@ -592,10 +600,10 @@ export default class GraphContainer extends Component {
             case "Domain":
                 node.type_domain = true;
                 break;
-            case "Gpo":
+            case "GPO":
                 node.type_gpo = true;
                 break;
-            case "Ou":
+            case "OU":
                 node.type_ou = true;
                 break;
         }
@@ -688,9 +696,9 @@ export default class GraphContainer extends Component {
             }else if (n.data.node.type_domain){
                 emitter.emit('domainNodeClicked', n.data.node.label);
             }else if (n.data.node.type_gpo){
-                emitter.emit('gpoNodeClicked', n.data.node.label);
+                emitter.emit('gpoNodeClicked', n.data.node.label, n.data.node.guid);
             }else if (n.data.node.type_ou){
-                emitter.emit('ouNodeClicked', n.data.node.label);
+                emitter.emit('ouNodeClicked', n.data.node.label, n.data.node.guid);
             }
         }else{
             this.setState({dragged: false});

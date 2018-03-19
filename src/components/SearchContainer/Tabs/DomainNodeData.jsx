@@ -58,13 +58,13 @@ export default class DomainNodeData extends Component {
                 s3.close();
             }.bind(this));
         
-        s4.run("MATCH (n:Ou {domain:{name}}) RETURN COUNT(n)", { name: payload })
+        s4.run("MATCH (n:OU {domain:{name}}) RETURN COUNT(n)", { name: payload })
             .then(function (result) {
                 this.setState({ 'ous': result.records[0]._fields[0].low });
                 s4.close();
             }.bind(this));
         
-        s5.run("MATCH (n:Gpo {domain:{name}}) RETURN COUNT(n)", { name: payload })
+        s5.run("MATCH (n:GPO {domain:{name}}) RETURN COUNT(n)", { name: payload })
             .then(function (result) {
                 this.setState({ 'gpos': result.records[0]._fields[0].low });
                 s5.close();

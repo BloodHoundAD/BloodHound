@@ -280,6 +280,8 @@ export function buildStructureProps(rows){
         let hash = (row.ContainerType + row.ObjectType).toUpperCase();
         let atype = row.ContainerType;
         let btype = row.ObjectType;
+        let aguid = row.ContainerGUID;
+        let bguid = row.ObjectId;
 
         if (atype === 'ou'){
             atype = 'OU';
@@ -296,25 +298,98 @@ export function buildStructureProps(rows){
         let container = row.ContainerName.toUpperCase();
         let object = row.ObjectName.toUpperCase();
 
-        if (datadict[hash]){
-            datadict[hash].props.push({
-                container: container,
-                object: object,
-                containerDomain: getDomainFromLabel(container),
-                objectDomain: getDomainFromLabel(object),
-                blocksInheritance: row.ContainerBlocksInheritance
-            });
+        if (atype === 'OU' && btype === 'OU') {
+            if (datadict[hash]){
+                datadict[hash].props.push({
+                    container: container,
+                    object: object,
+                    containerDomain: getDomainFromLabel(container),
+                    objectDomain: getDomainFromLabel(object),
+                    blocksInheritance: row.ContainerBlocksInheritance,
+                    containerGuid: aguid,
+                    objectGuid: bguid
+                });
+            }else{
+                datadict[hash] = {
+                    statement: 'UNWIND {props} AS prop MERGE (a:OU {guid:prop.containerGuid}) WITH a,prop MERGE (b:OU {guid:prop.objectGuid}) WITH a,b,prop MERGE (a)-[r:Contains {isACL: false}]->(b) SET a.blocksInheritance=toBoolean(prop.blocksInheritance), a.domain=prop.containerDomain, b.domain=prop.objectDomain, a.name=prop.container, b.name=prop.object',
+                    props: [{
+                        container: container,
+                        object: object,
+                        containerDomain: getDomainFromLabel(container),
+                        objectDomain: getDomainFromLabel(object),
+                        blocksInheritance: row.ContainerBlocksInheritance,
+                        containerGuid: aguid,
+                        objectGuid: bguid
+                    }]
+                };
+            }
+        }else if (atype === 'OU'){
+            if (datadict[hash]) {
+                datadict[hash].props.push({
+                    container: container,
+                    object: object,
+                    containerDomain: getDomainFromLabel(container),
+                    objectDomain: getDomainFromLabel(object),
+                    blocksInheritance: row.ContainerBlocksInheritance,
+                    containerGuid: row.ContainerGUID
+                });
+            } else {
+                datadict[hash] = {
+                    statement: 'UNWIND {props} AS prop MERGE (a:OU {guid:prop.containerGuid}) WITH a,prop MERGE (b:{} {name:prop.object}) WITH a,b,prop MERGE (a)-[r:Contains {isACL: false}]->(b) SET a.blocksInheritance=toBoolean(prop.blocksInheritance), a.domain=prop.containerDomain, b.domain=prop.objectDomain, a.name=prop.container'.format(btype),
+                    props: [{
+                        container: container,
+                        object: object,
+                        containerDomain: getDomainFromLabel(container),
+                        objectDomain: getDomainFromLabel(object),
+                        blocksInheritance: row.ContainerBlocksInheritance,
+                        containerGuid: row.ContainerGUID
+                    }]
+                };
+            }
+        }else if (btype === 'OU'){
+            if (datadict[hash]) {
+                datadict[hash].props.push({
+                    container: container,
+                    object: object,
+                    containerDomain: getDomainFromLabel(container),
+                    objectDomain: getDomainFromLabel(object),
+                    blocksInheritance: row.ContainerBlocksInheritance,
+                    objectGuid: row.ObjectId
+                });
+            } else {
+                datadict[hash] = {
+                    statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.container}) WITH a,prop MERGE (b:OU {guid:prop.objectGuid}) WITH a,b,prop MERGE (a)-[r:Contains {isACL: false}]->(b) SET a.blocksInheritance=toBoolean(prop.blocksInheritance), a.domain=prop.containerDomain, b.domain=prop.objectDomain, b.name=prop.object'.format(atype),
+                    props: [{
+                        container: container,
+                        object: object,
+                        containerDomain: getDomainFromLabel(container),
+                        objectDomain: getDomainFromLabel(object),
+                        blocksInheritance: row.ContainerBlocksInheritance,
+                        objectGuid: row.ObjectId
+                    }]
+                };
+            }
         }else{
-            datadict[hash] = {
-                statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.container}) WITH a,prop MERGE (b:{} {name: prop.object}) WITH a,b,prop MERGE (a)-[r:Contains {isACL: false}]->(b) SET a.blocksInheritance=toBoolean(prop.blocksInheritance), a.domain=prop.containerDomain, b.domain=prop.objectDomain'.format(atype, btype),
-                props: [{
+            if (datadict[hash]) {
+                datadict[hash].props.push({
                     container: container,
                     object: object,
                     containerDomain: getDomainFromLabel(container),
                     objectDomain: getDomainFromLabel(object),
                     blocksInheritance: row.ContainerBlocksInheritance
-                }]
-            };
+                });
+            } else {
+                datadict[hash] = {
+                    statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.container}) WITH a,prop MERGE (b:{} {name: prop.object}) WITH a,b,prop MERGE (a)-[r:Contains {isACL: false}]->(b) SET a.blocksInheritance=toBoolean(prop.blocksInheritance), a.domain=prop.containerDomain, b.domain=prop.objectDomain'.format(atype, btype),
+                    props: [{
+                        container: container,
+                        object: object,
+                        containerDomain: getDomainFromLabel(container),
+                        objectDomain: getDomainFromLabel(object),
+                        blocksInheritance: row.ContainerBlocksInheritance
+                    }]
+                };
+            }
         }
     });
 
@@ -335,26 +410,56 @@ export function buildGplinkProps(rows){
             type = type.toTitleCase();
         }
 
-        if (datadict[type]){
-            datadict[type].props.push({
-                gponame: gpoName,
-                objectname: objectName,
-                enforced: row.IsEnforced,
-                gpoDomain: getDomainFromLabel(gpoName),
-                objectDomain: getDomainFromLabel(objectName)
-            });
-        }else{
-            datadict[type] = {
-                statement: 'UNWIND {props} as prop MERGE (a:GPO {name: prop.gponame}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.domain=prop.gpoDomain,b.domain=prop.objectDomain'.format(type),
-                props:[{
+        if (type === 'OU'){
+            if (datadict[type]) {
+                datadict[type].props.push({
                     gponame: gpoName,
                     objectname: objectName,
                     enforced: row.IsEnforced,
                     gpoDomain: getDomainFromLabel(gpoName),
-                    objectDomain: getDomainFromLabel(objectName)
-                }]
-            };
+                    objectDomain: getDomainFromLabel(objectName),
+                    objectGuid: row.ObjectGUID,
+                    gpoGuid: row.GPOGuid
+                });
+            } else {
+                datadict[type] = {
+                    statement: 'UNWIND {props} as prop MERGE (a:GPO {guid: prop.gpoGuid}) WITH a,prop MERGE (b:OU {guid: prop.objectGuid}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.name=prop.gponame,b.name=prop.objectName,a.domain=prop.gpoDomain,b.domain=prop.objectDomain',
+                    props: [{
+                        gponame: gpoName,
+                        objectname: objectName,
+                        enforced: row.IsEnforced,
+                        gpoDomain: getDomainFromLabel(gpoName),
+                        objectDomain: getDomainFromLabel(objectName),
+                        objectGuid: row.ObjectGUID,
+                        gpoGuid: row.GPOGuid
+                    }]
+                };
+            }
+        }else{
+            if (datadict[type]) {
+                datadict[type].props.push({
+                    gponame: gpoName,
+                    objectname: objectName,
+                    enforced: row.IsEnforced,
+                    gpoDomain: getDomainFromLabel(gpoName),
+                    objectDomain: getDomainFromLabel(objectName),
+                    gpoGuid: row.GPOGuid
+                });
+            } else {
+                datadict[type] = {
+                    statement: 'UNWIND {props} as prop MERGE (a:GPO {guid: prop.gpoGuid}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.name=prop.gponame,a.domain=prop.gpoDomain,b.domain=prop.objectDomain'.format(type),
+                    props: [{
+                        gponame: gpoName,
+                        objectname: objectName,
+                        enforced: row.IsEnforced,
+                        gpoDomain: getDomainFromLabel(gpoName),
+                        objectDomain: getDomainFromLabel(objectName),
+                        gpoGuid: row.GPOGuid
+                    }]
+                };
+            }
         }
+        
     });
     return datadict;
 }
