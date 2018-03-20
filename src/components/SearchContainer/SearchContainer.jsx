@@ -115,12 +115,16 @@ export default class SearchContainer extends Component {
                     
                     emitter.emit('searchQuery', statement, props);
                 } else {
+                    let start = jQuery(this.refs.searchbar).val();
+                    let end = jQuery(this.refs.pathbar).val();
+
                     if (start === "" || end === "") {
                         return;
                     }
 
-                    let start = jQuery(this.refs.searchbar).val();
-                    let end = jQuery(this.refs.pathbar).val();
+                    if (start === end) {
+                        return;
+                    }
 
                     let query = "";
 
@@ -314,12 +318,16 @@ export default class SearchContainer extends Component {
 
             },
             afterSelect: function (selected) {
+                let start = jQuery(this.refs.searchbar).val();
+                let end = jQuery(this.refs.pathbar).val();
+
                 if (start === "" || end === "") {
                     return;
                 }
 
-                let start = jQuery(this.refs.searchbar).val();
-                let end = jQuery(this.refs.pathbar).val();
+                if (start === end) {
+                    return;
+                }
 
                 let query = "";
 
@@ -458,11 +466,67 @@ export default class SearchContainer extends Component {
     }
 
     _onPlayClick(){
-        var start = jQuery(this.refs.searchbar).val();
-        var end = jQuery(this.refs.pathbar).val();
-        if (start !== "" && end !== ""){
-            emitter.emit('pathQuery', start, end);
+        let start = jQuery(this.refs.searchbar).val();
+        let end = jQuery(this.refs.pathbar).val();
+
+        if (start === "" || end === "") {
+            return;
         }
+
+        if (start === end){
+            return;
+        }
+
+        let query = "";
+
+        let labels = ["OU", "GPO", "User", "Computer", "Group", "Domain"];
+        if (start.includes(":")) {
+            let spl = start.split(':');
+            let type = spl[0];
+            let search = spl[1];
+            start = search;
+
+            $.each(labels, function (_, l) {
+                if (l.toLowerCase() === type.toLowerCase()) {
+                    type = l;
+                }
+            });
+
+            if (type === 'OU' || type === 'GPO') {
+                query += "MATCH (n:{}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}".format(type);
+            } else {
+                query += "MATCH (n:{}) WHERE n.name =~ {aprop}".format(type);
+            }
+        } else {
+            query += "MATCH (n) WHERE n.name =~ {aprop}";
+        }
+
+        query += " WITH n ";
+
+        if (end.includes(":")) {
+            let spl = end.split(':');
+            let type = spl[0];
+            let search = spl[1];
+            end = search;
+
+            $.each(labels, function (_, l) {
+                if (l.toLowerCase() === type.toLowerCase()) {
+                    type = l;
+                }
+            });
+
+            if (type === 'OU' || type === 'GPO') {
+                query += "MATCH (m:{}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}".format(type);
+            } else {
+                query += "MATCH (m:{}) WHERE m.name =~ {bprop}".format(type);
+            }
+        } else {
+            query += "MATCH (m) WHERE m.name =~ {bprop}";
+        }
+
+        query += " WITH m,n MATCH p=allShortestPaths((n)-[*]->(m)) RETURN p";
+
+        emitter.emit('query', query, { aprop: start, bprop: end });
     }
 
     _onExpandClick(){
@@ -533,17 +597,21 @@ export default class SearchContainer extends Component {
                     }
                 }
             } else {
+                let start = jQuery(this.refs.searchbar).val();
+                let end = jQuery(this.refs.pathbar).val();
+
                 if (start === "" || end === "") {
                     return;
                 }
 
-                let start = jQuery(this.refs.searchbar).val();
-                let end = jQuery(this.refs.pathbar).val();
+                if (start === end) {
+                    return;
+                }
 
                 let query = "";
 
                 let labels = ["OU", "GPO", "User", "Computer", "Group", "Domain"];
-                if (start.includes(":")){
+                if (start.includes(":")) {
                     let spl = start.split(':');
                     let type = spl[0];
                     let search = spl[1];
@@ -555,12 +623,12 @@ export default class SearchContainer extends Component {
                         }
                     });
 
-                    if (type === 'OU' || type === 'GPO'){
+                    if (type === 'OU' || type === 'GPO') {
                         query += "MATCH (n:{}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}".format(type);
-                    }else{
+                    } else {
                         query += "MATCH (n:{}) WHERE n.name =~ {aprop}".format(type);
                     }
-                }else{
+                } else {
                     query += "MATCH (n) WHERE n.name =~ {aprop}";
                 }
 
@@ -589,7 +657,7 @@ export default class SearchContainer extends Component {
 
                 query += " WITH m,n MATCH p=allShortestPaths((n)-[*]->(m)) RETURN p";
 
-                emitter.emit('query', query, {aprop:start, bprop:end});
+                emitter.emit('query', query, { aprop: start, bprop: end });
             }
         }
     }
