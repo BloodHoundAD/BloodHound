@@ -311,7 +311,7 @@ export default class GraphContainer extends Component {
 
                     $.each(this.state.sigmaInstance.graph.adjacentEdges(node.id), function(index, edge){
                         if (targets.includes(edge.target)){
-                            edge.type = 'dashed';
+                            edge.type = 'dotted';
                         }
                     });
                 }
@@ -698,7 +698,7 @@ export default class GraphContainer extends Component {
             }else if (n.data.node.type_gpo){
                 emitter.emit('gpoNodeClicked', n.data.node.label, n.data.node.guid);
             }else if (n.data.node.type_ou){
-                emitter.emit('ouNodeClicked', n.data.node.label, n.data.node.guid);
+                emitter.emit('ouNodeClicked', n.data.node.label, n.data.node.guid, n.data.node.blocksInheritance);
             }
         }else{
             this.setState({dragged: false});

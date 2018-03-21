@@ -10,16 +10,21 @@ export default class OuNodeData extends Component {
 
         this.state = {
             label: "",
-            guid: ""
+            guid: "",
+            blocks: ""
         };
 
         emitter.on('ouNodeClicked', this.getNodeData.bind(this));
     }
 
-    getNodeData(payload, guid) {
+    getNodeData(payload, guid, blocksInheritance) {
+        let bi = ''+blocksInheritance;
+        bi = bi.toTitleCase()
+
         this.setState({
             label: payload,
-            guid: guid
+            guid: guid,
+            blocks: bi
         });
     }
 
@@ -39,8 +44,13 @@ export default class OuNodeData extends Component {
                     <dd>
                         {this.state.guid}
                     </dd>
+                    <dt>
+                        Blocks Inheritance
+                    </dt>
+                    <dd>
+                        {this.state.blocks}
+                    </dd>
                     <NodeCypherNoNumberLink query="MATCH p = (d)-[r:Contains*1..]->(o:OU {guid:{name}}) RETURN p" target={this.state.guid} property="See OU Within Domain Tree" />
-
                     <br />
 
                     <h4>Descendant Objects</h4>

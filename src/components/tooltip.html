@@ -3,10 +3,10 @@
 </div>
 <ul>
      {{#type_user}}
-     <li onclick="emitter.emit('setStart', '{{label}}')">
+     <li onclick="emitter.emit('setStart', '{{type}}:{{label}}')">
           <i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node
      </li>
-     <li onclick="emitter.emit('setEnd', '{{label}}')">
+     <li onclick="emitter.emit('setEnd', '{{type}}:{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
      <li onclick="emitter.emit('query', 'MATCH (n:User {name:{name}}),(m:User),p=shortestPath((m)-[r*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
@@ -14,10 +14,10 @@
      </li>
      {{/type_user}} 
      {{#type_computer}}
-     <li onclick="emitter.emit('setStart', '{{label}}')">
+     <li onclick="emitter.emit('setStart', '{{type}}:{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Starting Node
      </li>
-     <li onclick="emitter.emit('setEnd', '{{label}}')">
+     <li onclick="emitter.emit('setEnd', '{{type}}:{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
      <li onclick="emitter.emit('query', 'MATCH (n:Computer {name:{name}}),(m:User),p=allShortestPaths((m)-[r*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
@@ -25,10 +25,10 @@
      </li>
      {{/type_computer}} 
      {{#type_group}}
-     <li onclick="emitter.emit('setStart', '{{label}}')">
+     <li onclick="emitter.emit('setStart', '{{type}}:{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Starting Node
      </li>
-     <li onclick="emitter.emit('setEnd', '{{label}}')">
+     <li onclick="emitter.emit('setEnd', '{{type}}:{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
      <li onclick="emitter.emit('query', 'MATCH (n:Group {name:{name}}),(m:User),p=allShortestPaths((m)-[r*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
@@ -58,10 +58,10 @@
      </li>
      {{/type_ou}}
      {{#type_domain}}
-     <li onclick="emitter.emit('setStart', '{{label}}')">
+     <li onclick="emitter.emit('setStart', '{{type}}:{{label}}')">
          <i class="glyphicon glyphicon-screenshot"> </i> Set as Starting Node
      </li>
-     <li onclick="emitter.emit('setEnd', '{{label}}')">
+     <li onclick="emitter.emit('setEnd', '{{type}}:{{label}}')">
          <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
      <li onclick="emitter.emit('query', 'MATCH (n:Domain {name:{name}}),(m:User),p=allShortestPaths((m)-[r*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}} ')">

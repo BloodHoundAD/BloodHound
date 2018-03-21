@@ -71,6 +71,8 @@ export default class UserNodeData extends Component {
 
                     <NodeCypherLinkComplex property="Sibling Objects in the Same OU" target={this.state.label} countQuery={"MATCH (o1)-[r1:Contains]->(o2:User {name:{name}}) WITH o1 OPTIONAL MATCH p1=(d)-[r2:Contains*1..]->(o1) OPTIONAL MATCH p2=(o1)-[r3:Contains]->(n) WHERE n:User OR n:Computer RETURN count(p1)+count(p2)"} graphQuery={"MATCH (o1)-[r1:Contains]->(o2:User {name:{name}}) WITH o1 OPTIONAL MATCH p1=(d)-[r2:Contains*1..]->(o1) OPTIONAL MATCH p2=(o1)-[r3:Contains]->(n) WHERE n:User OR n:Computer RETURN p1,p2"} />
 
+                    <NodeCypherLinkComplex property="Effective Inbound GPOs" target={this.state.label} countQuery={"MATCH (c:User {name:{name}}) OPTIONAL MATCH p1 = (g1:GPO)-[r1:GpLink {enforced:true}]->(container1)-[r2:Contains*1..]->(c) OPTIONAL MATCH p2 = (g2:GPO)-[r3:GpLink {enforced:false}]->(container2)-[r4:Contains*1..]->(c) WHERE NONE (x in NODES(p2) WHERE x.blocksInheritance = true AND LABELS(x) = 'OU') RETURN count(g1)+count(g2)"} graphQuery={"MATCH (c:User {name:{name}}) OPTIONAL MATCH p1 = (g1:GPO)-[r1:GpLink {enforced:true}]->(container1)-[r2:Contains*1..]->(c) OPTIONAL MATCH p2 = (g2:GPO)-[r3:GpLink {enforced:false}]->(container2)-[r4:Contains*1..]->(c) WHERE NONE (x in NODES(p2) WHERE x.blocksInheritance = true AND LABELS(x) = 'OU') RETURN p1,p2"} />
+
                     <NodeCypherNoNumberLink target={this.state.label} property="See User within Domain/OU Tree" query="MATCH p = (d:Domain)-[r:Contains*1..]->(u:User {name:{name}}) RETURN p" />
                     
                     <h4>Group Membership</h4>
