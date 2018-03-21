@@ -139,6 +139,8 @@ export default class DomainNodeData extends Component {
 
                     <NodeCypherLink property="Foreign Admins" target={this.state.label} baseQuery={"MATCH (n) WHERE NOT n.domain={name} WITH n MATCH (b:Computer) WHERE b.domain={name} WITH n,b MATCH p=shortestPath((n)-[r:AdminTo|MemberOf*1..]->(b))"} />
 
+                    <NodeCypherLink property="Foreign GPO Controllers" target={this.state.label} baseQuery={"MATCH (n) WHERE NOT n.domain={name} WITH n MATCH (b:GPO) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r]->(b) WHERE r.isACL=true"} />
+
                     <h4>Inbound Trusts</h4>
                     <NodeCypherLink property="First Degree Trusts" target={this.state.label} baseQuery={"MATCH p=(a:Domain {name:{name}})<-[r:TrustedBy]-(n:Domain)"} />
                     
