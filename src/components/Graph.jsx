@@ -295,7 +295,7 @@ export default class GraphContainer extends Component {
 
         $.each(this.state.sigmaInstance.graph.edges(), function(index, edge){
             if (edge.hasOwnProperty('enforced')){
-                if (edge.enforced === 'False'){
+                if (edge.enforced === false){
                     edge.type = 'dashed';
                 }
             }
