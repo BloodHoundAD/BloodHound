@@ -3,6 +3,7 @@ import LoadLabel from './LoadLabel.jsx';
 import PropTypes from 'prop-types';
 import NodeCypherLink from './NodeCypherLink.jsx';
 import NodeCypherNoNumberLink from './NodeCypherNoNumberLink';
+import NodeCypherLinkComplex from './NodeCypherLinkComplex';
 
 export default class DomainNodeData extends Component {
     constructor(){
@@ -151,13 +152,15 @@ export default class DomainNodeData extends Component {
 
                     <NodeCypherLink property="Effective Outbound Trusts" target={this.state.label} baseQuery={"MATCH (n:Domain) WHERE NOT n.name={name} MATCH p=shortestPath((a:Domain {name:{name}})-[r:TrustedBy*1..]->(n))"} />
 
-                    <h4>Domain ACLs</h4>
+                    <h4>Inbound Controllers</h4>
 
                     <NodeCypherLink property="First Degree Controllers" target={this.state.label} baseQuery={"MATCH p=(n)-[r]->(u:Domain {name: {name}}) WHERE r.isACL=true"} distinct />
 
                     <NodeCypherLink property="Unrolled Controllers" target={this.state.label} baseQuery={"MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1]->(u:Domain {name: {name}}) WHERE r1.isACL=true"} distinct />
 
                     <NodeCypherLink property="Transitive Controllers" target={this.state.label} baseQuery={"MATCH p=shortestPath((n)-[r1:MemberOf|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns|DCSync*1..]->(u:Domain {name: {name}})) WHERE NOT n.name={name}"} distinct />
+
+                    <NodeCypherLinkComplex property="Calculated Principals with DCSync Privileges" target={this.state.label} countQuery={"MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH n1 MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u:Domain {name: {name}}) WITH n1 MATCH (n2)-[:MemberOf|DCSync*1..]->(u:Domain {name: {name}}) WITH collect(distinct(n1.name))+collect(distinct(n2.name)) as results UNWIND results as x RETURN count(distinct(x))"} graphQuery={"MATCH p=(n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH p,n1 MATCH p2=(n1)-[:MemberOf|GetChangesAll*1..]->(u:Domain {name: {name}}) WITH p,p2 MATCH p3=(n2)-[:MemberOf|DCSync*1..]->(u:Domain {name: {name}}) RETURN p,p2,p3"} />
                 </dl>
             </div>
         );
