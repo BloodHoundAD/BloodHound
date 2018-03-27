@@ -64,7 +64,7 @@
      <li onclick="emitter.emit('setEnd', '{{type}}:{{label}}')">
          <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
-     <li onclick="emitter.emit('query', 'MATCH (n:Domain {name:{name}}),(m:User),p=allShortestPaths((m)-[r*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}} ')">
+     <li onclick="emitter.emit('query', 'MATCH (n:Domain {name:{name}}),(m:User),p=allShortestPaths((m)-[r:MemberOf|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}} ')">
          <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
      </li>
      {{/type_domain}}
