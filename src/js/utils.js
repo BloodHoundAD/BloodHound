@@ -110,7 +110,6 @@ function grabConstraints(){
 
             dropConstraints(constraints);
         });
-    
 }
 
 function dropConstraints(constraints){
@@ -123,6 +122,38 @@ function dropConstraints(constraints){
                 session.close();
             });
     }else{
+        grabIndexes();
+    }
+}
+
+function grabIndexes(){
+    var session = driver.session();
+    let constraints = [];
+
+    session.run("CALL db.indexes")
+        .then(function (results) {
+            $.each(results.records, function (index, container) {
+                let constraint = container._fields[0];
+                let query = "DROP " + constraint;
+                constraints.push(query);
+            });
+
+            session.close();
+
+            dropIndexes(constraints);
+        });
+}
+
+function dropIndexes(indexes){
+    if (indexes.length > 0) {
+        let constraint = indexes.shift();
+        let session = driver.session();
+        session.run(constraint)
+            .then(function () {
+                dropConstraints(indexes);
+                session.close();
+            });
+    } else {
         addConstraints();
     }
 }
