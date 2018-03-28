@@ -22,10 +22,10 @@ export default class SpotlightRow extends Component {
             case "Domain":
                 nodeIcon = "fa fa-globe";
                 break;
-            case "Ou":
+            case "OU":
                 nodeIcon = "fa fa-sitemap";
                 break;
-            case "Gpo":
+            case "GPO":
                 nodeIcon = "fa fa-list";
                 break;
             default:
@@ -46,10 +46,10 @@ export default class SpotlightRow extends Component {
             case "Domain":
                 parentIcon = "fa fa-globe";
                 break;
-            case "Ou":
+            case "OU":
                 nodeIcon = "fa fa-sitemap";
                 break;
-            case "Gpo":
+            case "GPO":
                 nodeIcon = "fa fa-list";
                 break;
             default:

@@ -260,13 +260,11 @@ export default class MenuContainer extends Component {
             await session.run(query, {props:currentChunk});
         }else if (filetype === 'structure'){  
             processed = buildStructureProps(currentChunk);
-
             for (let skey in processed){
                 await session.run(processed[skey].statement, { props: processed[skey].props });
             }
         }else if (filetype === 'gplink'){
             processed = buildGplinkProps(currentChunk);
-
             for (let gkey in processed) {
                 await session.run(processed[gkey].statement, { props: processed[gkey].props });
             }

@@ -13,7 +13,7 @@ export default class componentName extends Component {
             return null;
         } else if (obj.hasOwnProperty('low')) {
             var t = obj.low;
-            if (t === 0) {
+            if (t === 0 || t === -1) {
                 return "Never";
             } else {
                 return new Date(obj.low * 1000).toUTCString();

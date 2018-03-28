@@ -39,7 +39,17 @@ export default class QueryNodeSelect extends Component {
             session.run(query.query, query.props)
                 .then(function (results) {
                     var y = $.map(results.records, function (x) {
-                        return x._fields[0];
+                        let a = x.keys.map(function (e, i) {
+                            let obj = {};
+                            obj[e.split('.')[1]] = x._fields[i];
+                            return obj;
+                        });
+                        let b = {};
+                        $.each(a, function (index, o) {
+                            Object.assign(b, o);
+                        });
+
+                        return b;
                     });
                     this.setState({ data: y });
                     session.close();
@@ -51,7 +61,7 @@ export default class QueryNodeSelect extends Component {
         var query = appStore.prebuiltQuery.shift();
         if (query.final) {
             let start = typeof query.startNode !== 'undefined' ? query.startNode.format(querydata) : "";
-            let end = typeof query.endNode !== 'undefined' ? query.startNode.format(querydata) : "";
+            let end = typeof query.endNode !== 'undefined' ? query.endNode.format(querydata) : "";
             emitter.emit('query',
                 query.query,
                 {"result":querydata},
@@ -68,7 +78,17 @@ export default class QueryNodeSelect extends Component {
             session.run(query.query, {"result":querydata})
                 .then(function (results) {
                     var y = $.map(results.records, function (x) {
-                        return x._fields[0];
+                        let a = x.keys.map(function(e, i){
+                            let obj = {};
+                            obj[e.split('.')[1]] = x._fields[i];
+                            return obj;
+                        });
+                        let b = {};
+                        $.each(a, function(index, o){
+                            Object.assign(b, o);
+                        });
+                        
+                        return b;
                     });
                     if (y.length === 0){
                         emitter.emit('showAlert', "No data returned from query");
@@ -110,7 +130,7 @@ export default class QueryNodeSelect extends Component {
                                 <ListGroup ref="list">
                                     {
                                         this.state.data.map(function(key){
-                                            var x = <QueryNodeSelectItem key={key} label={key} />;
+                                            var x = <QueryNodeSelectItem key={key.name} label={key.name} extraProps={key} />;
                                             return x;
                                         }.bind(this))
                                     }

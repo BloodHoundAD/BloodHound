@@ -771,6 +771,10 @@ div.tooltip-inner-custom {
     margin:auto;
 }
 
+.queryNodeItemPreWrap > p{
+    white-space: pre-wrap;
+}
+
 .tab-content > div:last-child > div{
     max-height: 200px;
     overflow-y: auto;

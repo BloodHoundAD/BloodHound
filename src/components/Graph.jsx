@@ -61,10 +61,10 @@ export default class GraphContainer extends Component {
                                 s4.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE")
                                     .then(function(){
                                         s4.close();
-                                        s5.run("CREATE CONSTRAINT on (c:Ou) ASSERT c.name IS UNIQUE")
+                                        s5.run("CREATE CONSTRAINT on (c:OU) ASSERT c.guid IS UNIQUE")
                                             .then(function() {
                                                 s5.close();
-                                                s6.run("CREATE CONSTRAINT on (c:Gpo) ASSERT c.name is UNIQUE")
+                                                s6.run("CREATE CONSTRAINT on (c:GPO) ASSERT c.guid is UNIQUE")
                                                     .then(function(){
                                                         s6.close();
                                                     })
@@ -128,6 +128,7 @@ export default class GraphContainer extends Component {
         this.doQueryNative({
             statement: 'MATCH (n:Group) WHERE n.name =~ "(?i).*DOMAIN ADMINS.*" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
             //statement: 'MATCH (n)-[r]->(m) RETURN n,r,m',
+            //statement: 'MATCH p=(n:Domain)-[r]-(m:Domain) RETURN p',
             allowCollapse: false,
             props: {}
         });
@@ -294,7 +295,7 @@ export default class GraphContainer extends Component {
 
         $.each(this.state.sigmaInstance.graph.edges(), function(index, edge){
             if (edge.hasOwnProperty('enforced')){
-                if (edge.enforced === 'False'){
+                if (edge.enforced === false){
                     edge.type = 'dashed';
                 }
             }
@@ -310,7 +311,7 @@ export default class GraphContainer extends Component {
 
                     $.each(this.state.sigmaInstance.graph.adjacentEdges(node.id), function(index, edge){
                         if (targets.includes(edge.target)){
-                            edge.type = 'dashed';
+                            edge.type = 'dotted';
                         }
                     });
                 }
@@ -553,9 +554,16 @@ export default class GraphContainer extends Component {
             y: Math.random()
         };
 
-        if (data.hasOwnProperty('properties') && data.properties.hasOwnProperty('blocksInheritance')){
-            node.blocksInheritance = data.properties.blocksInheritance;
+        if (data.hasOwnProperty('properties')){
+            if (data.properties.hasOwnProperty('blocksInheritance')) {
+                node.blocksInheritance = data.properties.blocksInheritance;
+            }
+
+            if (data.properties.hasOwnProperty('guid')){
+                node.guid = data.properties.guid;
+            }
         }
+        
 
         if (label === params.start){
             node.start = true;
@@ -592,10 +600,10 @@ export default class GraphContainer extends Component {
             case "Domain":
                 node.type_domain = true;
                 break;
-            case "Gpo":
+            case "GPO":
                 node.type_gpo = true;
                 break;
-            case "Ou":
+            case "OU":
                 node.type_ou = true;
                 break;
         }
@@ -688,9 +696,9 @@ export default class GraphContainer extends Component {
             }else if (n.data.node.type_domain){
                 emitter.emit('domainNodeClicked', n.data.node.label);
             }else if (n.data.node.type_gpo){
-                emitter.emit('gpoNodeClicked', n.data.node.label);
+                emitter.emit('gpoNodeClicked', n.data.node.label, n.data.node.guid);
             }else if (n.data.node.type_ou){
-                emitter.emit('ouNodeClicked', n.data.node.label);
+                emitter.emit('ouNodeClicked', n.data.node.label, n.data.node.guid, n.data.node.blocksInheritance);
             }
         }else{
             this.setState({dragged: false});
