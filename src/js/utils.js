@@ -88,11 +88,97 @@ function deleteNodes() {
             session.close();
             var count = results.records[0]._fields[0].low;
             if (count === 0) {
-                emitter.emit('hideDBClearModal');
+                grabConstraints();
             } else {
                 deleteNodes();
             }
         });
+}
+
+function grabConstraints(){
+    var session = driver.session();
+    let constraints = [];
+    session.run("CALL db.constraints")
+        .then(function(results){
+            $.each(results.records, function(index, container){
+                let constraint = container._fields[0];
+                let query = "DROP " + constraint;
+                constraints.push(query);
+            });
+
+            session.close();
+
+            dropConstraints(constraints);
+        });
+    
+}
+
+function dropConstraints(constraints){
+    if (constraints.length > 0){
+        let constraint = constraints.shift();
+        let session = driver.session();
+        session.run(constraint)
+            .then(function(){
+                dropConstraints(constraints);
+                session.close();
+            });
+    }else{
+        addConstraints();
+    }
+}
+
+function addConstraints(){
+    var s1 = driver.session();
+    var s2 = driver.session();
+    var s3 = driver.session();
+    var s4 = driver.session();
+    var s5 = driver.session();
+    var s6 = driver.session();
+
+    s1.run("CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE")
+        .then(function () {
+            s1.close();
+            s2.run("CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE")
+                .then(function () {
+                    s2.close();
+                    s3.run("CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE")
+                        .then(function () {
+                            s3.close();
+                            s4.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE")
+                                .then(function () {
+                                    s4.close();
+                                    s5.run("CREATE CONSTRAINT on (c:OU) ASSERT c.guid IS UNIQUE")
+                                        .then(function () {
+                                            s5.close();
+                                            s6.run("CREATE CONSTRAINT on (c:GPO) ASSERT c.name is UNIQUE")
+                                                .then(function () {
+                                                    s6.close();
+                                                })
+                                                .catch(function () {
+                                                    s6.close();
+                                                });
+                                        })
+                                        .catch(function () {
+                                            s5.close();
+                                        });
+                                })
+                                .catch(function () {
+                                    s4.close();
+                                });
+                        })
+                        .catch(function () {
+                            s3.close();
+                        });
+                })
+                .catch(function () {
+                    s2.close();
+                });
+        })
+        .catch(function () {
+            s1.close();
+        });
+
+    emitter.emit('hideDBClearModal');
 }
 
 export function findObjectType(header){
@@ -426,7 +512,7 @@ export function buildGplinkProps(rows){
                 });
             } else {
                 datadict[type] = {
-                    statement: 'UNWIND {props} as prop MERGE (a:GPO {guid: prop.gpoGuid}) WITH a,prop MERGE (b:OU {guid: prop.objectGuid}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.name=prop.gponame,b.name=prop.objectName,a.domain=prop.gpoDomain,b.domain=prop.objectDomain',
+                    statement: 'UNWIND {props} as prop MERGE (a:GPO {name: prop.gponame}) WITH a,prop MERGE (b:OU {guid: prop.objectGuid}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.guid=prop.gpoGuid,b.name=prop.objectName,a.domain=prop.gpoDomain,b.domain=prop.objectDomain',
                     props: [{
                         gponame: gpoName,
                         objectname: objectName,
@@ -450,7 +536,7 @@ export function buildGplinkProps(rows){
                 });
             } else {
                 datadict[type] = {
-                    statement: 'UNWIND {props} as prop MERGE (a:GPO {guid: prop.gpoGuid}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.name=prop.gponame,a.domain=prop.gpoDomain,b.domain=prop.objectDomain'.format(type),
+                    statement: 'UNWIND {props} as prop MERGE (a:GPO {name: prop.gponame}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.guid=prop.gpoGuid,a.domain=prop.gpoDomain,b.domain=prop.objectDomain'.format(type),
                     props: [{
                         gponame: gpoName,
                         objectname: objectName,
