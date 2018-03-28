@@ -173,7 +173,7 @@ export default class SearchContainer extends Component {
                         query += "MATCH (m) WHERE m.name =~ {bprop}";
                     }
 
-                    query += " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
+                    query += " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
 
                     emitter.emit('query', query, { aprop: start, bprop: end });
                 }
@@ -376,7 +376,7 @@ export default class SearchContainer extends Component {
                     query += "MATCH (m) WHERE m.name =~ {bprop}";
                 }
 
-                query += " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
+                query += " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
 
                 emitter.emit('query', query, { aprop: start, bprop: end });
             }.bind(this),
@@ -524,7 +524,7 @@ export default class SearchContainer extends Component {
             query += "MATCH (m) WHERE m.name =~ {bprop}";
         }
 
-        query += " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
+        query += " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
 
         emitter.emit('query', query, { aprop: start, bprop: end });
     }
@@ -655,7 +655,7 @@ export default class SearchContainer extends Component {
                     query += "MATCH (m) WHERE m.name =~ {bprop}";
                 }
 
-                query += " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
+                query += " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
 
                 emitter.emit('query', query, { aprop: start, bprop: end });
             }
