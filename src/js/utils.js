@@ -241,7 +241,7 @@ function getDomainFromLabel(label, type){
         return label;
     }
     if (label.includes('@')){
-        return label.split('@')[1];
+        return label.split('@').pop();
     }else{
         let d = label.split('.');
         d.shift();
