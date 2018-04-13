@@ -650,7 +650,7 @@ export function buildACLProps(rows) {
                     });
                 } else {
                     datadict[hash] = {
-                        statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:GPO {guid: prop.guid}) WITH a,b,prop MERGE (a)-[r:{} {isACL:true}]->(b) SET b.name=prop.principal'.format(atype, record),
+                        statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:GPO {guid: prop.principal}) WITH a,b,prop MERGE (a)-[r:{} {isACL:true}]->(b) SET b.guid=prop.guid'.format(atype, record),
                         props: [{ account: a, principal: b, guid:row.ObjectGuid }]
                     };
                 }
