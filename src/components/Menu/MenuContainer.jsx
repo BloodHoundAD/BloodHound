@@ -252,7 +252,7 @@ export default class MenuContainer extends Component {
                     obj.ServicePrincipalNames = spn.split('|');
                 }
             });
-            let query = 'UNWIND {props} AS prop MERGE (user:User {name: upper(prop.AccountName)}) SET user.Enabled = toBoolean(prop.Enabled),user.PwdLastSet = toInt(prop.PwdLastSet),user.LastLogon = toInt(prop.LastLogon),user.Sid = prop.Sid,user.SidHistory = prop.SidHistory,user.HasSPN = toBoolean(prop.HasSPN),user.DisplayName=prop.DisplayName,user.ServicePrincipalNames = prop.ServicePrincipalNames,user.Email=prop.Email,user.domain=prop.Domain';
+            let query = 'UNWIND {props} AS prop MERGE (user:User {name: upper(prop.AccountName)}) SET user.Enabled = toBoolean(prop.Enabled),user.PwdLastSet = toInt(prop.PwdLastSet),user.LastLogon = toInt(prop.LastLogon),user.Sid = prop.Sid,user.SidHistory = prop.SidHistory,user.HasSPN = toBoolean(prop.HasSPN),user.DisplayName=prop.DisplayName,user.ServicePrincipalNames = prop.ServicePrincipalNames,user.Email=prop.Email,user.domain=prop.Domain,user.Title=prop.Title,user.HomeDir=prop.HomeDirectory';
 
             await session.run(query, {props:currentChunk});
         }else if (filetype === 'compprops'){

@@ -17,7 +17,7 @@ export default class UserNodeData extends Component {
             driversessions : [],
             propertyMap: {},
             ServicePrincipalNames: [],
-            displayMap: {"DisplayName":"Display Name", "PwdLastSet":"Password Last Changed", "LastLogon": "Last Logon", "Enabled":"Enabled","Email":"Email"}
+            displayMap: {"DisplayName":"Display Name", "PwdLastSet":"Password Last Changed", "LastLogon": "Last Logon", "Enabled":"Enabled","Email":"Email", "Title":"Title", "HomeDir":"Home Directory"}
         };
 
         emitter.on('userNodeClicked', this.getNodeData.bind(this));
