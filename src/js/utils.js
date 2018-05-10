@@ -631,7 +631,7 @@ export function buildACLProps(rows) {
             rights.push("AddMember");
         }
 
-        if (rel.includes("Owner")){
+        if (rel === "Owner"){
             rights.push("Owns");
         }
 
