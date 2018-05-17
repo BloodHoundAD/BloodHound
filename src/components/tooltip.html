@@ -36,13 +36,13 @@
      </li>
      {{/type_group}}
      {{#type_gpo}}
-     <li onclick="emitter.emit('setStart', '{{type}}:{{guid}}')">
+     <li onclick="emitter.emit('setStart', '{{type}}:{{label}}')">
          <i class="glyphicon glyphicon-screenshot"> </i> Set as Starting Node
      </li>
-     <li onclick="emitter.emit('setEnd', '{{type}}:{{guid}}')">
+     <li onclick="emitter.emit('setEnd', '{{type}}:{{label}}')">
          <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
-     <li onclick="emitter.emit('query', 'MATCH (n:GPO {name:{name}}),(m),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.guid={guid} RETURN p', {name: '{{name}}'})">
+     <li onclick="emitter.emit('query', 'MATCH (n:GPO {name:{name}}),(m),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'})">
          <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
      </li>
      {{/type_gpo}}
