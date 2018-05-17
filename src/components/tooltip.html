@@ -42,7 +42,7 @@
      <li onclick="emitter.emit('setEnd', '{{type}}:{{guid}}')">
          <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
-     <li onclick="emitter.emit('query', 'MATCH (n:GPO {name:{name}}),(m),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.guid={guid} RETURN p', {name: '{{name}}'})">
+     <li onclick="emitter.emit('query', 'MATCH (n:GPO {guid:{guid}}),(m),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.guid={guid} RETURN p', {guid: '{{guid}}'})">
          <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
      </li>
      {{/type_gpo}}
