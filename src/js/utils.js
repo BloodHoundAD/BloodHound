@@ -543,7 +543,7 @@ export function buildGplinkProps(rows){
                 });
             } else {
                 datadict[type] = {
-                    statement: 'UNWIND {props} as prop MERGE (a:GPO {name: prop.gponame}) WITH a,prop MERGE (b:OU {guid: prop.objectGuid}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.guid=prop.gpoGuid,b.name=prop.objectName,a.domain=prop.gpoDomain,b.domain=prop.objectDomain',
+                    statement: 'UNWIND {props} as prop MERGE (a:GPO {name: prop.gponame}) WITH a,prop MERGE (b:OU {guid: prop.objectGuid}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.guid=prop.gpoGuid,b.name=prop.objectname,a.domain=prop.gpoDomain,a.name=prop.gponame,b.domain=prop.objectDomain',
                     props: [{
                         gponame: gpoName,
                         objectname: objectName,
@@ -567,7 +567,7 @@ export function buildGplinkProps(rows){
                 });
             } else {
                 datadict[type] = {
-                    statement: 'UNWIND {props} as prop MERGE (a:GPO {name: prop.gponame}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.guid=prop.gpoGuid,a.domain=prop.gpoDomain,b.domain=prop.objectDomain'.format(type),
+                    statement: 'UNWIND {props} as prop MERGE (a:GPO {name: prop.gponame}) WITH a,prop MERGE (b:{} {name: prop.objectname}) WITH a,b,prop MERGE (a)-[r:GpLink {enforced: toBoolean(prop.enforced), isACL: false}]->(b) SET a.guid=prop.gpoGuid,a.domain=prop.gpoDomain,a.name=prop.gponame,b.name=prop.objectname,b.domain=prop.objectDomain'.format(type),
                     props: [{
                         gponame: gpoName,
                         objectname: objectName,
@@ -650,7 +650,7 @@ export function buildACLProps(rows) {
                     });
                 } else {
                     datadict[hash] = {
-                        statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:GPO {guid: prop.principal}) WITH a,b,prop MERGE (a)-[r:{} {isACL:true}]->(b) SET b.guid=prop.guid'.format(atype, record),
+                        statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:GPO {name: prop.principal}) WITH a,b,prop MERGE (a)-[r:{} {isACL:true}]->(b) SET b.guid=prop.guid'.format(atype, record),
                         props: [{ account: a, principal: b, guid:row.ObjectGuid }]
                     };
                 }
