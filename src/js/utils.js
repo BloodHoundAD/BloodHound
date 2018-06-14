@@ -641,32 +641,19 @@ export function buildACLProps(rows) {
                 return;
             }
 
-            if (btype === 'GPO'){
-                if (datadict[hash]) {
-                    datadict[hash].props.push({
-                        account: a,
-                        principal: b,
-                        guid: row.ObjectGuid
-                    });
-                } else {
-                    datadict[hash] = {
-                        statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:GPO {guid: prop.principal}) WITH a,b,prop MERGE (a)-[r:{} {isACL:true}]->(b) SET b.guid=prop.guid'.format(atype, record),
-                        props: [{ account: a, principal: b, guid:row.ObjectGuid }]
-                    };
-                }
-            }else{
-                if (datadict[hash]) {
-                    datadict[hash].props.push({
-                        account: a,
-                        principal: b
-                    });
-                } else {
-                    datadict[hash] = {
-                        statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:{} {name: prop.principal}) WITH a,b,prop MERGE (a)-[r:{} {isACL:true}]->(b)'.format(atype, btype, record),
-                        props: [{ account: a, principal: b }]
-                    };
-                }
-            }            
+            
+            if (datadict[hash]) {
+                datadict[hash].props.push({
+                    account: a,
+                    principal: b
+                });
+            } else {
+                datadict[hash] = {
+                    statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:{} {name: prop.principal}) WITH a,b,prop MERGE (a)-[r:{} {isACL:true}]->(b)'.format(atype, btype, record),
+                    props: [{ account: a, principal: b }]
+                };
+            }
+            
         });
     });
 
