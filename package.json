@@ -1,11 +1,16 @@
 {
   "name": "bloodhound",
+<<<<<<< HEAD
   "version": "1.2.1",
+=======
+  "version": "1.5.2",
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
   "description": "Graph Theory for Active Directory",
   "keywords": [
     "Graph",
     "Active Directory"
   ],
+<<<<<<< HEAD
   "homepage": "https://github.com/adaptivethreat/Bloodhound",
   "repository": {
     "type": "git",
@@ -14,6 +19,16 @@
   "bugs": "https://github.com/adaptivethreat/Bloodhound/issues",
   "license": "GPL-3.0",
   "author": "Rohan Vazarkar <rvazarkr@gmail.com> (https://www.twitter.com/cptjesus)",
+=======
+  "homepage": "https://github.com/BloodHoundAD/Bloodhound",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BloodHoundAD/Bloodhound.git"
+  },
+  "bugs": "https://github.com/BloodHoundAD/Bloodhound/issues",
+  "license": "GPL-3.0",
+  "author": "Rohan Vazarkar <rvazarkr@gmail.com> (https://blog.cptjesus.com)",
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
   "contributors": [
     "Andy Robbins <robbins.andy@gmail.com> (https://www.wald0.com)",
     "Will Schroeder <will@harmj0y.net> (https://www.harmj0y.net)"
@@ -22,18 +37,25 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development electron .",
     "dev": "concurrently -k \"babel-node server.js\" \"npm start\"",
+<<<<<<< HEAD
     "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --icon=src/img/icon.ico",
     "macbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=darwin --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --icon=src/img/icon.icns",
     "linuxbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=linux --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb"
+=======
+    "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --ignore=node_modules/\\.bin --icon=src/img/icon.ico",
+    "macbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=darwin --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --ignore=node_modules/\\.bin --icon=src/img/icon.icns",
+    "linuxbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=linux --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --ignore=node_modules/\\.bin"
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
   },
   "babel": {
     "presets": [
-      "es2015",
+      "env",
       "stage-0",
       "react"
     ]
   },
   "devDependencies": {
+<<<<<<< HEAD
     "babel-cli": "^6.22.2",
     "babel-core": "^6.22.1",
     "babel-loader": "^7.0.0",
@@ -66,5 +88,40 @@
     "react-dom": "^15.4.2",
     "react-if": "^2.1.0",
     "react-transition-group": "^1.1.3"
+=======
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "concurrently": "^3.5.1",
+    "cross-env": "^5.1.3",
+    "electron": "^1.7.10",
+    "express": "^4.16.2",
+    "webpack": "^3.10.0",
+    "webpack-dev-middleware": "^2.0.4",
+    "webpack-hot-middleware": "^2.21.0"
+  },
+  "dependencies": {
+    "async": "^2.6.0",
+    "bootstrap": "^3.3.7",
+    "bootstrap-3-typeahead": "^4.0.2",
+    "dagre": "^0.7.4",
+    "electron-store": "^1.3.0",
+    "eventemitter2": "^4.1.0",
+    "fast-csv": "^2.4.1",
+    "jquery": "^3.2.1",
+    "linkurious": "^1.5.1",
+    "mustache": "^2.3.0",
+    "neo4j-driver": "^1.5.2",
+    "react": "^16.2.0",
+    "react-bootstrap": "^0.32.0",
+    "react-dom": "^16.2.0",
+    "react-if": "^2.1.0",
+    "react-transition-group": "^2.2.1",
+    "unzipper": "^0.8.9"
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
   }
 }

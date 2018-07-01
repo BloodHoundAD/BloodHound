@@ -3,7 +3,8 @@
 #root {
     position: absolute;
     width: 100%;
-    height: 100%;    
+    height: 100%;
+    overflow: hidden;
 }
 
 .max{
@@ -29,7 +30,28 @@ html,
 body {
     font-family: 'Roboto', sans-serif;
     height: 100%;
+    overflow: hidden;
     background-color: lightgray;
+    overflow: hidden;
+}
+
+.customQueryGlyph{
+    font-size: small;
+    vertical-align: middle;
+    top: -1px;
+    left: 5px;
+    cursor: pointer;
+}
+
+div.tooltip-inner-custom {
+    max-width: 250px;
+}
+
+.aboutscroll{
+    width: 100%;
+    overflow: auto;
+    height: 150px;
+    white-space: pre-wrap;
 }
 
 .customQueryGlyph{
@@ -56,6 +78,7 @@ div.tooltip-inner-custom {
     left: 50%;
     width: 70%;
     transform: translateX(-50%);
+    pointer-events: auto;
 }
 
 .bottomdiv {
@@ -64,8 +87,13 @@ div.tooltip-inner-custom {
     bottom: 0;
     overflow: auto;
     width: 100%;
+<<<<<<< HEAD
 }
 
+=======
+    pointer-events: none;
+}
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 
 .slideupbutton {
     position: relative;
@@ -76,6 +104,7 @@ div.tooltip-inner-custom {
     transform: translateX(-50%);
     border-radius: 20px 20px 0 0;
     background-color: white;
+    pointer-events: auto;
 }
 
 .slideupbutton:focus {
@@ -90,6 +119,13 @@ div.tooltip-inner-custom {
     width: 100%;
     height: 100%;
     background-color: lightgray;
+    overflow: hidden;
+}
+
+.dropdown-item > i{
+    float:right;
+    margin-top:3px;
+    margin-left: 2px;
 }
 
 .graph:focus {
@@ -183,6 +219,15 @@ div.tooltip-inner-custom {
     margin-bottom: 1em;
 }
 
+<<<<<<< HEAD
+=======
+.dl-horizontal > h4 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: blue;
+}
+
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 .dl-horizontal{
     margin-right: 10px;
 }
@@ -402,6 +447,7 @@ div.tooltip-inner-custom {
 
 .savecontainer{
     margin-top:10px;
+<<<<<<< HEAD
 }
 
 .buttoncontainer {
@@ -415,6 +461,21 @@ div.tooltip-inner-custom {
     display:inline-block;
 }
 
+=======
+}
+
+.buttoncontainer {
+    width: 50%;
+    display:inline-block;
+    text-align: right;
+}
+
+.logincheck {
+    width: 50%;
+    display:inline-block;
+}
+
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 .has-spinner.activate .button-spinner {
     width: auto;
     opacity: 1;
@@ -753,13 +814,25 @@ div.tooltip-inner-custom {
     margin:auto;
 }
 
+<<<<<<< HEAD
+=======
+.queryNodeItemPreWrap > p{
+    white-space: pre-wrap;
+}
+
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 .tab-content > div:last-child > div{
     max-height: 200px;
     overflow-y: auto;
 }
 
 .tab-content > div:nth-last-child(2) > div{
+<<<<<<< HEAD
     height: 600px;
     overflow-y: auto;
     resize: vertical;
+=======
+    max-height: 600px;
+    overflow-y: auto;
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 }

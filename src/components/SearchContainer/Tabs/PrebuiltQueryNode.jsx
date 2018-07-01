@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 export default class PrebuiltQueryNode extends Component {
+<<<<<<< HEAD
 	render() {
 		var c;
 		if (this.props.info.requireNodeSelect){
@@ -19,4 +20,23 @@ export default class PrebuiltQueryNode extends Component {
 			</div>
 		);
 	}
+=======
+    render() {
+        var c;
+        
+        c = function(){
+            if (appStore.prebuiltQuery.length === 0){
+                appStore.prebuiltQuery = JSON.parse(JSON.stringify(this.props.info.queryList));
+                emitter.emit('prebuiltQueryStart');
+            }
+        }.bind(this);
+
+        return (
+            <div>
+                <a href="#" onClick={c}>{this.props.info.name}</a>
+                <br />
+            </div>
+        );
+    }
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 }

@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import AppContainer from './AppContainer';
+<<<<<<< HEAD
 import Login from './components/Float/Login'
 import { getStorageData, storageHasKey, storageSetKey } from './js/utils.js';
 
@@ -28,6 +29,33 @@ String.prototype.format = function() {
     });
 };
 
+=======
+import Login from './components/Float/Login';
+import { getStorageData, storageHasKey, storageSetKey } from './js/utils.js';
+
+const { app } = require('electron').remote;
+var fs = require('fs');
+const path = require('path');
+
+const ConfigStore = require('electron-store');
+
+global.conf = new ConfigStore();
+var e = require('eventemitter2').EventEmitter2;
+global.emitter = new e({});
+global.renderEmit = new e({});
+global.neo4j = require('neo4j-driver').v1;
+
+global.Mustache = require('mustache');
+
+String.prototype.format = function() {
+    var i = 0,
+        args = arguments;
+    return this.replace(/{}/g, function() {
+        return typeof args[i] !== 'undefined' ? args[i++] : '';
+    });
+};
+
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 String.prototype.formatAll = function() {
     var args = arguments;
     return this.replace(/{}/g, args[0]);
@@ -52,6 +80,17 @@ if (!Array.prototype.last) {
         return this[this.length - 1];
     };
 };
+<<<<<<< HEAD
+
+sigma.renderers.def = sigma.renderers.canvas;
+
+sigma.classes.graph.addMethod('outboundNodes', function(id) {
+    return this.outNeighborsIndex.get(id).keyList();
+});
+
+sigma.classes.graph.addMethod('inboundNodes', function(id) {
+    return this.inNeighborsIndex.get(id).keyList();
+=======
 
 sigma.renderers.def = sigma.renderers.canvas;
 
@@ -63,10 +102,19 @@ sigma.classes.graph.addMethod('inboundNodes', function(id) {
     return this.inNeighborsIndex.get(id).keyList();
 });
 
+sigma.classes.graph.addMethod('outNeighbors', function (id) {
+    return this.outNeighborsIndex.get(id).keyList();
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
+});
+
 global.appStore = {
     dagre: false,
     startNode: null,
     endNode: null,
+<<<<<<< HEAD
+=======
+    prebuiltQuery: [],
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
     highlightedEdges: [],
     spotlightData: {},
     queryStack: [],
@@ -96,6 +144,18 @@ global.appStore = {
                 content: '\uF0AC',
                 scale: 1.5,
                 color: '#17E6B9'
+            },
+            'OU': {
+                font: 'FontAwesome',
+                content: '\uF0E8',
+                scale: 1.25,
+                color: '#FFAA00'
+            },
+            'GPO': {
+                font: 'FontAwesome',
+                content: '\uF03A',
+                scale: 1.25,
+                color: '#7F72FD'
             }
         },
         edgeScheme: {
@@ -106,6 +166,7 @@ global.appStore = {
             'ForceChangePassword': 'tapered',
             'GenericAll': 'tapered',
             'GenericWrite': 'tapered',
+<<<<<<< HEAD
             'WriteDACL': 'tapered',
             'WriteOwner': 'tapered',
             'AddMembers': 'tapered',
@@ -133,6 +194,39 @@ global.appStore = {
             'TrustedBy': 'curvedArrow'
         }
     },
+=======
+            'WriteDacl': 'tapered',
+            'WriteOwner': 'tapered',
+            'AddMember': 'tapered',
+            'TrustedBy': 'curvedArrow',
+            'DCSync' : 'tapered',
+            'Contains': 'tapered',
+            'GpLink':'tapered',
+            'Owns':'tapered'
+        }
+    },
+    lowResPalette: {
+        colorScheme: {
+            'User': '#17E625',
+            'Computer': '#E67873',
+            'Group': '#DBE617',
+            'Domain': '#17E6B9'
+        },
+        edgeScheme: {
+            'AdminTo': 'line',
+            'MemberOf': 'line',
+            'HasSession': 'line',
+            'AllExtendedRights': 'line',
+            'ForceChangePassword': 'line',
+            'GenericAll': 'line',
+            'GenericWrite': 'line',
+            'WriteDACL': 'line',
+            'WriteOwner': 'line',
+            'AddMember': 'line',
+            'TrustedBy': 'curvedArrow'
+        }
+    },
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
     highResStyle: {
         nodes: {
             label: {
@@ -179,13 +273,18 @@ global.appStore = {
             }
         }
     }
+<<<<<<< HEAD
 }
+=======
+};
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 
 if (typeof conf.get('performance') === 'undefined') {
     conf.set('performance', {
         edge: 5,
         sibling: 10,
         lowGraphics: false,
+<<<<<<< HEAD
         nodeLabels: 1
     })
 }
@@ -213,3 +312,38 @@ renderEmit.on('logout', function() {
 })
 
 ReactDOM.render( < Login / > , document.getElementById('root'))
+=======
+        nodeLabels: 0,
+        edgeLabels: 0
+    });
+}
+
+var custompath = path.join(app.getPath('userData'), 'customqueries.json');
+
+fs.stat(custompath, function(err, stats) {
+    if (err) {
+        fs.writeFile(custompath, "[]");
+    }
+});
+
+appStore.performance = conf.get('performance');
+
+if (typeof appStore.performance.edgeLabels === 'undefined'){
+    appStore.performance.edgeLabels = 0;
+    conf.set('performance', appStore.performance);
+}
+
+renderEmit.on('login', function() {
+    emitter.removeAllListeners();
+    ReactDOM.unmountComponentAtNode(document.getElementById('root'));
+    ReactDOM.render( < AppContainer / > , document.getElementById('root'));
+});
+
+renderEmit.on('logout', function() {
+    emitter.removeAllListeners();
+    ReactDOM.unmountComponentAtNode(document.getElementById('root'));
+    ReactDOM.render( < Login / > , document.getElementById('root'));
+});
+
+ReactDOM.render( < Login / > , document.getElementById('root'));
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a

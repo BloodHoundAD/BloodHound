@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
 	"queries": [
 		{
 			"name": "Find all Domain Admins",
@@ -89,4 +90,173 @@
 			"props": {}
 		}
 	]
+=======
+    "queries": [
+        {
+            "name": "Find all Domain Admins",
+            "queryList": [
+                {
+                    "final": true,
+                    "title": "Select a domain...",
+                    "query": "MATCH (n:Group) WHERE n.name =~ {name} WITH n MATCH p=(n)<-[r:MemberOf*1..]-(m) RETURN p",
+                    "props": {
+                        "name": "(?i).*DOMAIN ADMINS.*"
+                    },
+                    "allowCollapse": false
+                }
+            ]
+        },
+        {
+            "name": "Find Shortest Paths to Domain Admins",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain Admin group...",
+                    "query": "MATCH (n:Group) WHERE n.name =~ {name} RETURN n.name ORDER BY n.name DESC",
+                    "props": {
+                        "name": "(?i).*DOMAIN ADMINS.*"
+                    }
+                },
+                {
+                    "final": true,
+                    "query": "MATCH (n:User),(m:Group {name:{result}}),p=shortestPath((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p",
+                    "allowCollapse": true,
+                    "endNode":"{}"
+                }
+            ]
+        },
+        {
+            "name": "Find logged in Admins",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p=(a:Computer)-[r:HasSession]->(b:User) WITH a,b,r MATCH p=shortestPath((b)-[:AdminTo|MemberOf*1..]->(a)) RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Top Ten Users with Most Sessions",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)-[r:HasSession]->(n) RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Top Ten Computers with Most Sessions",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:User),(m:Computer), (n)<-[r:HasSession]-(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH m, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)-[r:HasSession]->(n) RETURN n,r,m",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Top Ten Users with Most Local Admin Rights",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH n, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)<-[r:AdminTo]-(n) RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Top Ten Computers with Most Admins",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:User),(m:Computer), (n)-[r:AdminTo]->(m) WHERE NOT n.name STARTS WITH 'ANONYMOUS LOGON' AND NOT n.name='' WITH m, count(r) as rel_count order by rel_count desc LIMIT 10 MATCH p=(m)<-[r:AdminTo]-(n) RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Users with Foreign Domain Group Membership",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select source domain...",
+                    "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name DESC"
+                },
+                {
+                    "final": true,
+                    "query": "MATCH (n:User) WITH n MATCH (m:Group) WITH n,m MATCH p=(n)-[r:MemberOf]->(m) WHERE n.domain={result} AND NOT m.domain=n.domain RETURN p",
+                    "startNode": "{}",
+                    "allowCollapse": false
+                }
+            ]
+        },
+        {
+            "name": "Groups with Foreign Domain Group Membership",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select source domain...",
+                    "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name DESC"
+                },
+                {
+                    "final": true,
+                    "query": "MATCH (n:Group) WITH n MATCH (m:Group) WITH n,m MATCH p=(n)-[r:MemberOf]->(m) WHERE n.domain={result} AND NOT m.domain=n.domain AND NOT n.name=m.name RETURN p",
+                    "startNode": "{}",
+                    "allowCollapse": false
+                }
+            ]
+        },
+        {
+            "name": "Map Domain Trusts",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p=(n:Domain)-[r]-(m:Domain) RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Shortest Path from SPN User",
+            "queryList":[
+                {
+                    "final": false,
+                    "title":"Select a domain...",
+                    "query":"MATCH (n:Domain) RETURN n.name ORDER BY n.name DESC"
+                },
+                {
+                    "final": false,
+                    "title": "Select a user",
+                    "query": "MATCH (n:User) WHERE n.domain={result} AND n.HasSPN=true RETURN n.name, n.PwdLastSet ORDER BY n.PwdLastSet ASC"
+                },
+                {
+                    "final": true,
+                    "query": "MATCH n=shortestPath((a:User {name:{result}})-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(b:Computer)) RETURN n",
+                    "startNode":"{}",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Shortest Paths to Domain Admins from SPN Users",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain Admin group...",
+                    "query": "MATCH (n:Group) WHERE n.name =~ {name} RETURN n.name ORDER BY n.name DESC",
+                    "props": {
+                        "name": "(?i).*DOMAIN ADMINS.*"
+                    }
+                },
+                {
+                    "final": true,
+                    "query": "MATCH (n:User),(m:Group {name:{result}}),p=shortestPath((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) WHERE n.HasSPN=true RETURN p",
+                    "allowCollapse": true,
+                    "endNode": "{}"
+                }
+            ]
+        }
+    ]
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 }
