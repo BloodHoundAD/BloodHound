@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
+<<<<<<< HEAD
+import GlyphiconSpan from '../GlyphiconSpan'
+import Icon from '../Icon'
+import TabContainer from './TabContainer'
+=======
 import GlyphiconSpan from '../GlyphiconSpan';
 import Icon from '../Icon';
 import TabContainer from './TabContainer';
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 
 export default class SearchContainer extends Component {
     constructor(props){
@@ -12,6 +18,11 @@ export default class SearchContainer extends Component {
             pathfindingIsOpen: false,
             mainValue: "",
             pathfindValue: ""
+<<<<<<< HEAD
+        }
+    }
+
+=======
         };
     }
 
@@ -455,6 +466,7 @@ export default class SearchContainer extends Component {
         });
     }
 
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
     _onPathfindClick(){
         jQuery(this.refs.pathfinding).slideToggle();
         var p = !this.state.pathfindingIsOpen;
@@ -466,6 +478,13 @@ export default class SearchContainer extends Component {
     }
 
     _onPlayClick(){
+<<<<<<< HEAD
+        var start = jQuery(this.refs.searchbar).val()
+        var end = jQuery(this.refs.pathbar).val()
+        if (start !== "" && end !== ""){
+            emitter.emit('pathQuery', start, end)
+        }
+=======
         let start = jQuery(this.refs.searchbar).val();
         let end = jQuery(this.refs.pathbar).val();
 
@@ -527,6 +546,7 @@ export default class SearchContainer extends Component {
         query += " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
 
         emitter.emit('query', query, { aprop: start, bprop: end });
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
     }
 
     _onExpandClick(){
@@ -540,6 +560,50 @@ export default class SearchContainer extends Component {
         }
     }
 
+<<<<<<< HEAD
+    componentDidMount() {
+        jQuery(this.refs.pathfinding).slideToggle(0);
+        jQuery(this.refs.tabs).slideToggle(0);
+        emitter.on('userNodeClicked', this.openNodeTab.bind(this))
+        emitter.on('groupNodeClicked', this.openNodeTab.bind(this))
+        emitter.on('computerNodeClicked', this.openNodeTab.bind(this))
+        emitter.on('domainNodeClicked', this.openNodeTab.bind(this))
+        emitter.on('setStart', function(payload){
+            jQuery(this.refs.searchbar).val(payload);
+        }.bind(this))
+
+        emitter.on('setEnd', function(payload){
+            jQuery(this.refs.pathbar).val(payload);
+            var e = jQuery(this.refs.pathfinding)
+            if (!(e.is(":visible"))){
+                e.slideToggle()
+            }
+        }.bind(this))
+
+        jQuery(this.refs.searchbar).typeahead({
+            source: function(query, process) {
+                var session = driver.session()
+                var t = '(?i).*' + query + '.*'
+                var data = []
+                session.run("MATCH (n) WHERE n.name =~ {name} RETURN n LIMIT 10", {name:t})
+                    .then(function(results){
+                        $.each(results.records, function(index, record){
+                            data.push(record._fields[0].properties.name + "#" + record._fields[0].labels[0])
+                        })
+                        session.close()
+                        return process(data)
+                    })
+            },
+            afterSelect: function(selected) {
+                if (!this.state.pathfindingIsOpen) {
+                    var statement = "MATCH (n) WHERE n.name = {name} RETURN n"
+                    emitter.emit('searchQuery', statement, {name: selected.split("#")[0]})
+                } else {
+                    var start = jQuery(this.refs.searchbar).val();
+                    var end = jQuery(this.refs.pathbar).val();
+                    if (start !== "" && end !== "") {
+                        emitter.emit('pathQuery', start, end);
+=======
     _inputKeyPress(e){
         let key = e.keyCode ? e.keyCode : e.which;
         let start = jQuery(this.refs.searchbar).val();
@@ -650,14 +714,158 @@ export default class SearchContainer extends Component {
                         query += "MATCH (m:{}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}".format(type);
                     } else {
                         query += "MATCH (m:{}) WHERE m.name =~ {bprop}".format(type);
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
                     }
                 } else {
                     query += "MATCH (m) WHERE m.name =~ {bprop}";
                 }
+<<<<<<< HEAD
+            }.bind(this),
+            autoSelect: false,
+            updater: function(item){
+                return item.split("#")[0]
+            },
+            highlighter: function(item) {
+                var parts = item.split("#")
+                var query = this.query;
+                var icon = "";
+                var html = ""
+                switch (parts[1]){
+                    case "Group":
+                        icon = "<i style=\"float:right\" class=\"fa fa-users\"></i>"
+                        break;
+                    case "User":
+                        icon = "<i style=\"float:right\" class=\"fa fa-user\"></i>"
+                        break;
+                    case "Computer":
+                        icon = "<i style=\"float:right\" class=\"fa fa-desktop\"></i>"
+                        break;
+                    case "Domain":
+                        icon = "<i style=\"float:right\" class=\"fa fa-globe\"></i>"
+                        break
+                }
+
+                html = '<div>' + parts[0] + ' ' + icon + '</div>'
+
+                var reEscQuery = query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+                var reQuery = new RegExp('(' + reEscQuery + ')', "gi");
+
+                var jElem = $(html)
+                var textNodes = $(jElem.find('*')).add(jElem).contents().filter(function () { return this.nodeType === 3; });
+                textNodes.replaceWith(function() {
+                    return $(this).text().replace(reQuery, '<strong>$1</strong>')
+                });
+
+                return jElem.html();
+            }
+            }
+        )
+
+        jQuery(this.refs.pathbar).typeahead({
+            source: function(query, process) {
+                var session = driver.session()
+                var t = '(?i).*' + query + '.*'
+                var data = []
+                session.run("MATCH (n) WHERE n.name =~ {name} RETURN n LIMIT 10", {name:t})
+                    .then(function(results){
+                        $.each(results.records, function(index, record){
+                            data.push(record._fields[0].properties.name + "#" + record._fields[0].labels[0])
+                        })
+                        session.close()
+                        return process(data)
+                    })
+            },
+            afterSelect: function(selected) {
+                var start = jQuery(this.refs.searchbar).val();
+                var end = jQuery(this.refs.pathbar).val();
+                if (start !== "" && end !== "") {
+                    emitter.emit('pathQuery', start, end);
+                }
+            }.bind(this),
+            autoSelect: false,
+            updater: function(item){
+                return item.split("#")[0]
+            },
+            highlighter: function(item) {
+                var parts = item.split("#")
+                var query = this.query;
+                var icon = "";
+                var html = ""
+                switch (parts[1]){
+                    case "Group":
+                        icon = "<i style=\"float:right\" class=\"fa fa-users\"></i>"
+                        break;
+                    case "User":
+                        icon = "<i style=\"float:right\" class=\"fa fa-user\"></i>"
+                        break;
+                    case "Computer":
+                        icon = "<i style=\"float:right\" class=\"fa fa-desktop\"></i>"
+                        break;
+                    case "Domain":
+                        icon = "<i style=\"float:right\" class=\"fa fa-globe\"></i>"
+                        break
+                }
+
+                html = '<div>' + parts[0] + ' ' + icon + '</div>'
+
+                var reEscQuery = query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+                var reQuery = new RegExp('(' + reEscQuery + ')', "gi");
+
+                var jElem = $(html)
+                var textNodes = $(jElem.find('*')).add(jElem).contents().filter(function () { return this.nodeType === 3; });
+                textNodes.replaceWith(function() {
+                    return $(this).text().replace(reQuery, '<strong>$1</strong>')
+                });
+
+                return jElem.html();
+            }
+            }
+        )
+    }
+
+    _inputKeyPress(e){
+        var key = e.keyCode ? e.keyCode : e.which
+        var start = jQuery(this.refs.searchbar).val();
+        var end = jQuery(this.refs.pathbar).val();
+        var stop = false;
+
+        if (key === 13){
+            if (!$('.searchSelectorS > ul').is(':hidden')){
+                $('.searchSelectorS > ul li').each(function(i){
+                    if($(this).hasClass('active')){
+                        stop = true
+                    }
+                })    
+            }
+
+            if (!$('.searchSelectorP > ul').is(':hidden')){
+                $('.searchSelectorP > ul li').each(function(i){
+                    if($(this).hasClass('active')){
+                        stop = true
+                    }
+                })
+            }
+            if (stop){
+                return;
+            }
+            if (!this.state.pathfindingIsOpen) {
+                if (start !== ""){
+                    var statement = "MATCH (n) WHERE n.name =~ {regex} RETURN n";
+                    var regex = '(?i).*' + start + '.*'
+                    emitter.emit('searchQuery', statement, {regex:regex})
+                }
+            } else {
+                var start = jQuery(this.refs.searchbar).val();
+                var end = jQuery(this.refs.pathbar).val();
+                if (start !== "" && end !== "") {
+                    emitter.emit('pathQuery', start, end);
+                }
+=======
 
                 query += " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
 
                 emitter.emit('query', query, { aprop: start, bprop: end });
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
             }
         }
     }
@@ -675,10 +883,17 @@ export default class SearchContainer extends Component {
                         <Icon glyph="menu-hamburger" extraClass="menuglyph" />
                     </GlyphiconSpan>
                     <input ref="searchbar" onKeyDown={this._inputKeyPress.bind(this)} type="search" className="form-control searchbox" autoComplete="off" placeholder={this.state.mainPlaceholder} />
+<<<<<<< HEAD
+                    <GlyphiconSpan tooltip={true} tooltipDir="bottom"
+                    tooltipTitle="Pathfinding"
+                    classes="input-group-addon spanfix"
+                    click={this._onPathfindClick.bind(this)}>
+=======
                     <GlyphiconSpan tooltip tooltipDir="bottom"
                         tooltipTitle="Pathfinding"
                         classes="input-group-addon spanfix"
                         click={this._onPathfindClick.bind(this)}>
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
                         <Icon glyph="road" extraClass="menuglyph" />
                     </GlyphiconSpan>
                     <GlyphiconSpan 
@@ -687,7 +902,11 @@ export default class SearchContainer extends Component {
                         tooltipTitle="Back" 
                         classes="input-group-addon spanfix"
                         click={function(){
+<<<<<<< HEAD
+                            emitter.emit('graphBack')
+=======
                             emitter.emit('graphBack');
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
                         }}>
                         <Icon glyph="step-backward" extraClass="menuglyph" />
                     </GlyphiconSpan>

@@ -41,7 +41,13 @@ export default class MenuButton extends Component {
 }
 
 MenuButton.propTypes =  {
+<<<<<<< HEAD
+	hoverVal : React.PropTypes.string.isRequired,
+	glyphicon : React.PropTypes.string.isRequired,
+	click : React.PropTypes.func.isRequired
+=======
 	hoverVal : PropTypes.string.isRequired,
 	glyphicon : PropTypes.string.isRequired,
 	click : PropTypes.func.isRequired
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 }

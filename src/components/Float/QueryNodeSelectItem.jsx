@@ -2,6 +2,14 @@ import React, { Component } from 'react';
 import { ListGroupItem } from 'react-bootstrap'
 
 export default class QueryNodeSelectItem extends Component {
+<<<<<<< HEAD
+
+	render() {
+		return (
+			<ListGroupItem href="#" onClick={this.props.click}>{this.props.label}</ListGroupItem>
+		);
+	}
+=======
     convertToDisplayProp() {
         var str = "";
         $.each(Object.keys(this.props.extraProps), function(index, prop){
@@ -50,4 +58,5 @@ export default class QueryNodeSelectItem extends Component {
             </ListGroupItem>
         );
     }
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 }

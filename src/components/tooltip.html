@@ -3,6 +3,15 @@
 </div>
 <ul>
      {{#type_user}}
+<<<<<<< HEAD
+     <li onclick="emitter.emit('setStart', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node
+     </li>
+     <li onclick="emitter.emit('setEnd', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
+     </li>
+     <li onclick="emitter.emit('query', 'MATCH (n:User {name:{name}}),(m:User),p=shortestPath((m)-[r*1..]->(n)) RETURN p', {name: '{{label}}'}, '{{label}}')">
+=======
      <li onclick="emitter.emit('setStart', '{{type}}:{{label}}')">
           <i class="glyphicon glyphicon-screenshot"></i> Set as Starting Node
      </li>
@@ -10,10 +19,20 @@
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
      <li onclick="emitter.emit('query', 'MATCH (n:User {name:{name}}),(m:User),p=shortestPath((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
           <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
      </li>
      {{/type_user}} 
      {{#type_computer}}
+<<<<<<< HEAD
+     <li onclick="emitter.emit('setStart', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Set as Starting Node
+     </li>
+     <li onclick="emitter.emit('setEnd', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
+     </li>
+     <li onclick="emitter.emit('query', 'MATCH (n:Computer {name:{name}}),(m:User),p=allShortestPaths((m)-[r*1..]->(n)) RETURN p', {name: '{{label}}'}, '{{label}}')">
+=======
      <li onclick="emitter.emit('setStart', '{{type}}:{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Starting Node
      </li>
@@ -21,10 +40,23 @@
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
      </li>
      <li onclick="emitter.emit('query', 'MATCH (n:Computer {name:{name}}),(m:User),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
           <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
      </li>
      {{/type_computer}} 
      {{#type_group}}
+<<<<<<< HEAD
+     <li onclick="emitter.emit('setStart', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Set as Starting Node
+     </li>
+     <li onclick="emitter.emit('setEnd', '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
+     </li>
+     <li onclick="emitter.emit('query', 'MATCH (n:Group {name:{name}}),(m:User),p=allShortestPaths((m)-[r*1..]->(n)) RETURN p', {name: '{{label}}'}, '{{label}}')">
+          <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
+     </li>
+     {{/type_group}} 
+=======
      <li onclick="emitter.emit('setStart', '{{type}}:{{label}}')">
           <i class="glyphicon glyphicon-screenshot"> </i> Set as Starting Node
      </li>
@@ -68,6 +100,7 @@
          <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
      </li>
      {{/type_domain}}
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
      {{#expand}}
      <li onclick="emitter.emit('unfoldNode', {{id}}); appStore.currentTooltip.close()">
           <i class="glyphicon glyphicon-screenshot"> </i> Expand

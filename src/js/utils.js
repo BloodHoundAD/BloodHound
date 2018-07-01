@@ -10,6 +10,34 @@ export function generateUniqueId(sigmaInstance, isNode) {
         }
     }
 
+<<<<<<< HEAD
+    return i
+}
+
+//Recursive function to highlight paths to start/end nodes
+export function findGraphPath(sigmaInstance, reverse, nodeid) {
+    var target = reverse ? appStore.startNode : appStore.endNode
+        //This is our stop condition for recursing
+    if (nodeid !== target.id) {
+        var edges = sigmaInstance.graph.adjacentEdges(nodeid)
+        var nodes = reverse ? sigmaInstance.graph.inboundNodes(nodeid) : sigmaInstance.graph.outboundNodes(nodeid)
+            //Loop over the nodes near us and the edges connecting to those nodes
+        $.each(nodes, function(index, node) {
+            $.each(edges, function(index, edge) {
+                var check = reverse ? edge.source : edge.target
+                    //If an edge is pointing in the right direction, set its color
+                    //Push the edge into our store and then 
+                node = parseInt(node)
+                if (check === node) {
+                    edge.color = reverse ? 'blue' : 'red';
+                    appStore.highlightedEdges.push(edge);
+                    findGraphPath(sigmaInstance, reverse, node);
+                }
+            })
+        })
+    } else {
+        return
+=======
     return i;
 }
 
@@ -37,6 +65,7 @@ export function findGraphPath(sigmaInstance, reverse, nodeid, traversed) {
         });
     } else {
         return;
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
     }
 }
 
@@ -46,6 +75,20 @@ export function clearSessions(){
 }
 
 function deleteSessions(){
+<<<<<<< HEAD
+    var session = driver.session()
+    session.run("MATCH ()-[r:HasSession]-() WITH r LIMIT 100000 DELETE r RETURN count(r)")
+        .then(function(results) {
+            session.close()
+            emitter.emit("refreshDBData")
+            var count = results.records[0]._fields[0].low
+            if (count === 0) {
+                emitter.emit('hideDBClearModal')
+            } else {
+                deleteSessions();
+            }
+        })
+=======
     var session = driver.session();
     session.run("MATCH ()-[r:HasSession]-() WITH r LIMIT 100000 DELETE r RETURN count(r)")
         .then(function(results) {
@@ -58,10 +101,166 @@ function deleteSessions(){
                 deleteSessions();
             }
         });
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 }
 
 export function clearDatabase() {
     emitter.emit('openClearingModal');
+<<<<<<< HEAD
+    deleteEdges()
+}
+
+function deleteEdges() {
+    var session = driver.session()
+    session.run("MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)")
+        .then(function(results) {
+            emitter.emit("refreshDBData");
+            session.close()
+            var count = results.records[0]._fields[0].low
+            if (count === 0) {
+                deleteNodes()
+            } else {
+                deleteEdges()
+            }
+        })
+}
+
+function deleteNodes() {
+    var session = driver.session()
+    session.run("MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)")
+        .then(function(results) {
+            emitter.emit("refreshDBData")
+            session.close()
+            var count = results.records[0]._fields[0].low
+            if (count === 0) {
+                emitter.emit('hideDBClearModal')
+            } else {
+                deleteNodes()
+            }
+        })
+}
+
+export function buildGroupMembershipProps(rows) {
+    var users = []
+    var groups = []
+    var computers = []
+    $.each(rows, function(index, row) {
+        switch (row.AccountType) {
+            case 'user':
+                users.push({ account: row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase() })
+                break
+            case 'computer':
+                computers.push({ account: row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase() })
+                break
+            case 'group':
+                groups.push({ account: row.AccountName.toUpperCase(), group: row.GroupName.toUpperCase() })
+                break
+        }
+    })
+
+    return { users: users, groups: groups, computers: computers }
+}
+
+export function buildLocalAdminProps(rows) {
+    var users = []
+    var groups = []
+    var computers = []
+    $.each(rows, function(index, row) {
+        if (row.AccountName.startsWith('@')) {
+            return
+        }
+        switch (row.AccountType) {
+            case 'user':
+                users.push({ account: row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase() })
+                break;
+            case 'group':
+                groups.push({ account: row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase() })
+                break;
+            case 'computer':
+                computers.push({ account: row.AccountName.toUpperCase(), computer: row.ComputerName.toUpperCase() })
+                break
+        }
+    })
+    return { users: users, groups: groups, computers: computers }
+}
+
+export function buildSessionProps(rows) {
+    var sessions = []
+    $.each(rows, function(index, row) {
+        if (row.UserName === 'ANONYMOUS LOGON@UNKNOWN' || row.UserName === '') {
+            return
+        }
+        sessions.push({ account: row.UserName.toUpperCase(), computer: row.ComputerName.toUpperCase(), weight: row.Weight })
+    })
+
+    return sessions
+}
+
+export function buildDomainProps(rows) {
+    var domains = []
+    $.each(rows, function(index, row) {
+        switch (row.TrustDirection) {
+            case 'Inbound':
+                domains.push({ domain1: row.TargetDomain.toUpperCase(), domain2: row.SourceDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive })
+                break;
+            case 'Outbound':
+                domains.push({ domain1: row.SourceDomain.toUpperCase(), domain2: row.TargetDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive })
+                break;
+            case 'Bidirectional':
+                domains.push({ domain1: row.TargetDomain.toUpperCase(), domain2: row.SourceDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive })
+                domains.push({ domain1: row.SourceDomain.toUpperCase(), domain2: row.TargetDomain.toUpperCase(), trusttype: row.TrustType, transitive: row.Transitive })
+                break
+        }
+    })
+
+    return domains
+}
+
+export function buildACLProps(rows) {
+    var datadict = {}
+
+    $.each(rows, function(index, row) {
+        var b = row.ObjectName.toUpperCase()
+        var a = row.PrincipalName.toUpperCase()
+        var btype = row.ObjectType.toTitleCase()
+        var atype = row.PrincipalType.toTitleCase()
+        var rel = row.ActiveDirectoryRights
+        var extright = row.ACEType
+
+        if (extright === 'All'){
+            rel = "AllExtendedRights"
+        }else if (extright === 'User-Force-Change-Password'){
+            rel = "ForceChangePassword"
+        }else if (rel === "ExtendedRight"){
+            rel = extright
+        }
+
+        rel = rel.replace(/-/g,"")
+
+        if (rel.includes('WriteOwner')){
+            rel = 'WriteOwner'
+        }
+
+        var hash = (atype + rel + btype).toUpperCase()
+        if (btype === 'Computer') {
+            return
+        }
+
+        if (datadict[hash]) {
+            datadict[hash].props.push({
+                account: a,
+                principal: b
+            })
+        } else {
+            datadict[hash] = {
+                statement: 'UNWIND {props} AS prop MERGE (a:{} {name:prop.account}) WITH a,prop MERGE (b:{} {name: prop.principal}) WITH a,b,prop MERGE (a)-[r:{} {isACL:true}]->(b)'.format(atype, btype, rel),
+                props: [{ account: a, principal: b }]
+            }
+        }
+    })
+
+    return datadict
+=======
     deleteEdges();
 }
 
@@ -658,4 +857,5 @@ export function buildACLProps(rows) {
     });
 
     return datadict;
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 }

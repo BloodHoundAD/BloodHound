@@ -1,11 +1,19 @@
 # Downloading BloodHound Binaries
+<<<<<<< HEAD
+Pre-Compiled BloodHound binaries can be found [here](https://github.com/adaptivethreat/BloodHound/releases). 
+=======
 Pre-Compiled BloodHound binaries can be found [here](https://github.com/BloodHoundAD/BloodHound/releases). 
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 
 The rolling release will always be updated to the most recent source. Tagged releases are considered "stable" but will likely not have new features or fixes.
 
 # About BloodHound
 
+<<<<<<< HEAD
+To get started with BloodHound, check out the [BloodHound Github Wiki.](https://github.com/adaptivethreat/Bloodhound/wiki)
+=======
 To get started with BloodHound, check out the [BloodHound Github Wiki.](https://github.com/BloodHoundAD/Bloodhound/wiki)
+>>>>>>> 4f3aa29e672caec387091d0747c8dded0431f77a
 
 BloodHound is a single page Javascript web application, built on top of [Linkurious](http://linkurio.us/), compiled with [Electron](http://electron.atom.io/), with a [Neo4j](https://neo4j.com/) database fed by a PowerShell ingestor.
 
