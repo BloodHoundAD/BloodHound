@@ -34,6 +34,7 @@ export default class NodeCypherLink extends Component {
                 query += ' RETURN COUNT(n)';
             }
             let domain = '@' + newProps.target.split('@').last();
+            this.setState({domain:domain});
             session.run(query, {name: newProps.target, domain: domain})
                 .then(function(result){
                     this.setState({
@@ -58,7 +59,7 @@ export default class NodeCypherLink extends Component {
                             emitter.emit(
                                 'query',
                                 this.props.baseQuery + ' RETURN p',
-                                {name:this.props.target}, this.props.start, this.props.end
+                                {name:this.props.target, domain:this.state.domain}, this.props.start, this.props.end
                             );
                         }.bind(this)} 
                     />

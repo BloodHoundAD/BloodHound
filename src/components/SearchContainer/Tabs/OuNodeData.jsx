@@ -51,7 +51,12 @@ export default class OuNodeData extends Component {
                         {this.state.blocks}
                     </dd>
                     <NodeCypherNoNumberLink query="MATCH p = (d)-[r:Contains*1..]->(o:OU {guid:{name}}) RETURN p" target={this.state.guid} property="See OU Within Domain Tree" />
+                    
                     <br />
+
+                    <h4>Affecting GPOs</h4>
+                    <NodeCypherLink property="GPOs Directly Affecting This OU" target={this.state.guid} baseQuery={"MATCH p=(n:GPO)-[r:GpLink]->(o:OU {guid:{name}})"} />
+                    <NodeCypherLink property="GPOs Affecting This OU" target={this.state.guid} baseQuery={"MATCH p=(n:GPO)-[r:GpLink|Contains*1..]->(o:OU {guid:{name}})"} />
 
                     <h4>Descendant Objects</h4>
                     <NodeCypherLink property="Total User Objects" target={this.state.guid} baseQuery={"MATCH p=(o:OU {guid:{name}})-[r:Contains*1..]->(n:User)"} distinct />

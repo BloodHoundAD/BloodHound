@@ -141,7 +141,7 @@ export default class SearchContainer extends Component {
                             }
                         });
 
-                        if (type === 'OU') {
+                        if (type === 'OU' || type === 'GPO') {
                             query += "MATCH (n:{}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}".format(type);
                         } else {
                             query += "MATCH (n:{}) WHERE n.name =~ {aprop}".format(type);
@@ -164,7 +164,7 @@ export default class SearchContainer extends Component {
                             }
                         });
 
-                        if (type === 'OU') {
+                        if (type === 'OU' || type === 'GPO') {
                             query += "MATCH (m:{}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}".format(type);
                         } else {
                             query += "MATCH (m:{}) WHERE m.name =~ {bprop}".format(type);
@@ -344,7 +344,7 @@ export default class SearchContainer extends Component {
                         }
                     });
 
-                    if (type === 'OU') {
+                    if (type === 'OU' || type === 'GPO') {
                         query += "MATCH (n:{}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}".format(type);
                     } else {
                         query += "MATCH (n:{}) WHERE n.name =~ {aprop}".format(type);
@@ -367,7 +367,7 @@ export default class SearchContainer extends Component {
                         }
                     });
 
-                    if (type === 'OU') {
+                    if (type === 'OU' || type === 'GPO') {
                         query += "MATCH (m:{}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}".format(type);
                     } else {
                         query += "MATCH (m:{}) WHERE m.name =~ {bprop}".format(type);
@@ -492,7 +492,7 @@ export default class SearchContainer extends Component {
                 }
             });
 
-            if (type === 'OU') {
+            if (type === 'OU' || type === 'GPO') {
                 query += "MATCH (n:{}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}".format(type);
             } else {
                 query += "MATCH (n:{}) WHERE n.name =~ {aprop}".format(type);
@@ -515,7 +515,7 @@ export default class SearchContainer extends Component {
                 }
             });
 
-            if (type === 'OU') {
+            if (type === 'OU' || type === 'GPO') {
                 query += "MATCH (m:{}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}".format(type);
             } else {
                 query += "MATCH (m:{}) WHERE m.name =~ {bprop}".format(type);
@@ -623,7 +623,7 @@ export default class SearchContainer extends Component {
                         }
                     });
 
-                    if (type === 'OU') {
+                    if (type === 'OU' || type === 'GPO') {
                         query += "MATCH (n:{}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}".format(type);
                     } else {
                         query += "MATCH (n:{}) WHERE n.name =~ {aprop}".format(type);
@@ -646,7 +646,7 @@ export default class SearchContainer extends Component {
                         }
                     });
 
-                    if (type === 'OU') {
+                    if (type === 'OU' || type === 'GPO') {
                         query += "MATCH (m:{}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}".format(type);
                     } else {
                         query += "MATCH (m:{}) WHERE m.name =~ {bprop}".format(type);
