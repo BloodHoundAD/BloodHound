@@ -659,3 +659,7 @@ export function buildACLProps(rows) {
 
     return datadict;
 }
+
+export function escapeRegExp(str) {
+    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}

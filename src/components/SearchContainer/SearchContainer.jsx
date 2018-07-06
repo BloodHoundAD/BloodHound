@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import GlyphiconSpan from '../GlyphiconSpan';
 import Icon from '../Icon';
 import TabContainer from './TabContainer';
+import {escapeRegExp} from 'utils';
 
 export default class SearchContainer extends Component {
     constructor(props){
@@ -44,6 +45,7 @@ export default class SearchContainer extends Component {
                     let sp = query.split(':');
                     let type = sp[0];
                     let term = sp[1];
+                    term = escapeRegExp(term);
                     let t = '(?i).*' + term + '.*';
                     
                     let labels = ["OU","GPO","User","Computer","Group","Domain"];
@@ -76,7 +78,8 @@ export default class SearchContainer extends Component {
                         }.bind(this));
                     
                 }else{
-                    let t = '(?i).*' + query + '.*';
+                    let q = escapeRegExp(query);
+                    let t = '(?i).*' + q + '.*';
                     let data = [];
                     session.run("MATCH (n) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10", { name: t })
                         .then(function (results) {
@@ -260,6 +263,7 @@ export default class SearchContainer extends Component {
                     let sp = query.split(':');
                     let type = sp[0];
                     let term = sp[1];
+                    term = escapeRegExp(term);
                     let t = '(?i).*' + term + '.*';
 
                     let labels = ["OU", "GPO", "User", "Computer", "Group", "Domain"];
@@ -292,7 +296,8 @@ export default class SearchContainer extends Component {
                         }.bind(this));
 
                 } else {
-                    let t = '(?i).*' + query + '.*';
+                    let q = escapeRegExp(query);
+                    let t = '(?i).*' + q + '.*';
                     let data = [];
                     session.run("MATCH (n) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10", { name: t })
                         .then(function (results) {
@@ -454,6 +459,8 @@ export default class SearchContainer extends Component {
             }
         });
     }
+
+    
 
     _onPathfindClick(){
         jQuery(this.refs.pathfinding).slideToggle();
