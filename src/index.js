@@ -68,7 +68,7 @@ sigma.classes.graph.addMethod("outNeighbors", function(id) {
 });
 
 global.appStore = {
-    dagre: false,
+    dagre: true,
     startNode: null,
     endNode: null,
     prebuiltQuery: [],
