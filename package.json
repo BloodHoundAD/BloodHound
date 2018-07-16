@@ -61,6 +61,7 @@
     "linkurious": "^1.5.1",
     "mustache": "^2.3.0",
     "neo4j-driver": "^1.6.2",
+    "prop-types": "^15.6.2",
     "react": "^16.2.0",
     "react-bootstrap": "^0.32.0",
     "react-dom": "^16.2.0",
@@ -68,5 +69,8 @@
     "react-transition-group": "^2.2.1",
     "stream-json": "^1.1.0",
     "unzipper": "^0.8.9"
+  },
+  "jshintConfig": {
+    "esversion": "6"
   }
 }

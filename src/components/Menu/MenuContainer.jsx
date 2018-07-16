@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import MenuButton from './MenuButton';
 import ProgressBarMenuButton from './ProgressBarMenuButton';
-import { buildGpoAdminJson, buildSessionJson, buildUserJson,buildComputerJson, buildDomainJson, buildGpoJson, buildGroupJson, buildOuJson, buildDomainProps, buildSessionProps, buildLocalAdminProps, buildGroupMembershipProps, buildACLProps, findObjectType, buildStructureProps, buildGplinkProps} from 'utils';
+import { buildGpoAdminJson, buildSessionJson, buildUserJson,buildComputerJson, buildDomainJson, buildGpoJson, buildGroupJson, buildOuJson} from 'utils';
 import { If, Then, Else } from 'react-if';
 const { dialog, app } = require('electron').remote;
 var fs = require('fs');
@@ -165,6 +165,12 @@ export default class MenuContainer extends Component {
         let sent = 0;
         let chunk = []
         //Start a timer for fun
+
+        this.setState({
+            uploading: true,
+            progress: 0
+        });
+
         console.time('IngestTime')
 
         pipeline.on('data', async function(data){

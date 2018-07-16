@@ -53,7 +53,7 @@ export default class GpoNodeData extends Component {
 
                     <NodeCypherLink property="Explicit Object Controllers" target={this.state.label} baseQuery={"MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:GPO {name:{name}})"} end={this.state.label} distinct />
 
-                    <NodeCypherLink property="Unrolled Object Controllers" target={this.state.label} baseQuery={"MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:GPO {name: {name}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = g2.name) AND NOT n.name = g2.name AND r1.isACL=true"} end={this.state.label} distinct />
+                    <NodeCypherLink property="Unrolled Object Controllers" target={this.state.label} baseQuery={"MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:GPO {name: {name}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = g2.name) AND NOT n.name = g2.name AND r1.isacl=true"} end={this.state.label} distinct />
 
                     <NodeCypherLink property="Transitive Object Controllers" target={this.state.label} baseQuery={"MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:GPO {name:{name}}))"} end={this.state.label} distinct />
                 </dl>

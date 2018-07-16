@@ -85,7 +85,7 @@ export default class DatabaseDataDisplay extends Component {
                 s4.close();
             }.bind(this));
             
-        s6.run("MATCH ()-[r {isACL: true}]->() RETURN count(r)")
+        s6.run("MATCH ()-[r {isacl: true}]->() RETURN count(r)")
             .then(function(result){
                 this.setState({'num_acls':result.records[0]._fields[0].low});
                 s6.close();

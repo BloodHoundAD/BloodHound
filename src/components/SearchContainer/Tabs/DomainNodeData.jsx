@@ -140,7 +140,7 @@ export default class DomainNodeData extends Component {
 
                     <NodeCypherLink property="Foreign Admins" target={this.state.label} baseQuery={"MATCH (n) WHERE NOT n.domain={name} WITH n MATCH (b:Computer) WHERE b.domain={name} WITH n,b MATCH p=shortestPath((n)-[r:AdminTo|MemberOf*1..]->(b))"} />
 
-                    <NodeCypherLink property="Foreign GPO Controllers" target={this.state.label} baseQuery={"MATCH (n) WHERE NOT n.domain={name} WITH n MATCH (b:GPO) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r]->(b) WHERE r.isACL=true"} />
+                    <NodeCypherLink property="Foreign GPO Controllers" target={this.state.label} baseQuery={"MATCH (n) WHERE NOT n.domain={name} WITH n MATCH (b:GPO) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r]->(b) WHERE r.isacl=true"} />
 
                     <h4>Inbound Trusts</h4>
                     <NodeCypherLink property="First Degree Trusts" target={this.state.label} baseQuery={"MATCH p=(a:Domain {name:{name}})<-[r:TrustedBy]-(n:Domain)"} />
@@ -154,9 +154,9 @@ export default class DomainNodeData extends Component {
 
                     <h4>Inbound Controllers</h4>
 
-                    <NodeCypherLink property="First Degree Controllers" target={this.state.label} baseQuery={"MATCH p=(n)-[r]->(u:Domain {name: {name}}) WHERE r.isACL=true"} distinct />
+                    <NodeCypherLink property="First Degree Controllers" target={this.state.label} baseQuery={"MATCH p=(n)-[r]->(u:Domain {name: {name}}) WHERE r.isacl=true"} distinct />
 
-                    <NodeCypherLink property="Unrolled Controllers" target={this.state.label} baseQuery={"MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1]->(u:Domain {name: {name}}) WHERE r1.isACL=true"} distinct />
+                    <NodeCypherLink property="Unrolled Controllers" target={this.state.label} baseQuery={"MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1]->(u:Domain {name: {name}}) WHERE r1.isacl=true"} distinct />
 
                     <NodeCypherLink property="Transitive Controllers" target={this.state.label} baseQuery={"MATCH p=shortestPath((n)-[r1:MemberOf|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns|DCSync*1..]->(u:Domain {name: {name}})) WHERE NOT n.name={name}"} distinct />
 

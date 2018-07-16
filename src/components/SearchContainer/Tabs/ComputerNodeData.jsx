@@ -86,9 +86,9 @@ export default class ComputerNodeData extends Component {
                     <NodeCypherLink property="Derivative Local Admin" target={this.state.label} baseQuery={"MATCH (m:Computer {name:{name}}), (n:Computer) WHERE NOT n.name={name} MATCH p=shortestPath((m)-[r:AdminTo|MemberOf*1..]->(n))"} start={this.state.label} distinct />
 
                     <h4>Outbound Object Control</h4>
-                    <NodeCypherLink property="First Degree Object Control" target={this.state.label} baseQuery={"MATCH p = (c:Computer {name:{name}})-[r]->(n) WHERE r.isACL=true"} start={this.state.label} distinct />
+                    <NodeCypherLink property="First Degree Object Control" target={this.state.label} baseQuery={"MATCH p = (c:Computer {name:{name}})-[r]->(n) WHERE r.isacl=true"} start={this.state.label} distinct />
 
-                    <NodeCypherLink property="Group Delegated Object Control" target={this.state.label} baseQuery={"MATCH p = (c:Computer {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2]->(n) WHERE r2.isACL=true"} start={this.state.label} distinct />
+                    <NodeCypherLink property="Group Delegated Object Control" target={this.state.label} baseQuery={"MATCH p = (c:Computer {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2]->(n) WHERE r2.isacl=true"} start={this.state.label} distinct />
 
                     <NodeCypherLink property="Transitive Object Control" target={this.state.label} baseQuery={"MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((c:Computer {name:{name}})-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))"} start={this.state.label} distinct />
                 </dl>
