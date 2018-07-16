@@ -4,7 +4,7 @@ export default class Login extends Component {
     constructor() {
         super();
         this.state = {
-            url: "",
+            url: "bolt://localhost:7687",
             icon: null,
             loginEnabled: false,
             user: "",
