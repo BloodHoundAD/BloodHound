@@ -23,6 +23,7 @@ import { withParser } from "stream-json/filters/Pick";
 import { streamArray } from "stream-json/streamers/StreamArray";
 import { chain } from "stream-chain";
 import { connectTo } from "stream-json/Assembler";
+var iszip = require('is-zip-file');
 
 export default class MenuContainer extends Component {
     constructor() {
@@ -168,7 +169,7 @@ export default class MenuContainer extends Component {
             var path = files[index].path;
             var name = files[index].name;
 
-            if (path.endsWith(".zip")) {
+            if (iszip.isZipSync(path)) {
                 await createReadStream(path)
                     .pipe(Parse())
                     .on("entry", function(entry) {
