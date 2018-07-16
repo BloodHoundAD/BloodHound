@@ -47,8 +47,13 @@ export default class MenuContainer extends Component {
         );
     }
 
-    _refreshClick() {
-        emitter.emit("graphRefresh");
+    _refreshClick(event) {
+        if (event.ctrlKey){
+            emitter.emit("graphReload");
+        }else{
+            emitter.emit("graphRefresh");
+        }
+        
     }
 
     _changeLayoutClick() {

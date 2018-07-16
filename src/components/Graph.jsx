@@ -127,6 +127,7 @@ export default class GraphContainer extends Component {
         emitter.on("query", this.doGenericQuery.bind(this));
         emitter.on("spotlightClick", this.spotlightClickHandler.bind(this));
         emitter.on("graphRefresh", this.relayout.bind(this));
+        emitter.on("graphReload", this.reload.bind(this));
         emitter.on("export", this.export.bind(this));
         emitter.on("import", this.import.bind(this));
         emitter.on("clearDB", this.clearGraph.bind(this));
@@ -161,6 +162,10 @@ export default class GraphContainer extends Component {
         } else {
             sigma.layouts.startForceLink();
         }
+    }
+
+    reload(){
+        this.doQueryNative(this.state.currentQuery);
     }
 
     export(payload) {
@@ -238,7 +243,8 @@ export default class GraphContainer extends Component {
                     edges: this.state.sigmaInstance.graph.edges(),
                     spotlight: appStore.spotlightData,
                     startNode: appStore.startNode,
-                    endNode: appStore.endNode
+                    endNode: appStore.endNode,
+                    params: this.state.currentQuery
                 });
             }
             $.each(graph.nodes, function(i, node) {
@@ -305,7 +311,8 @@ export default class GraphContainer extends Component {
                         edges: this.state.sigmaInstance.graph.edges(),
                         spotlight: appStore.spotlightData,
                         startNode: appStore.startNode,
-                        endNode: appStore.endNode
+                        endNode: appStore.endNode,
+                        params: this.state.currentQuery
                     });
 
                     appStore.spotlightData = graph.spotlight;
@@ -444,6 +451,7 @@ export default class GraphContainer extends Component {
                 nodes: query.nodes,
                 edges: query.edges
             });
+            this.setState({currentQuery: query.params})
             this.applyDesign();
             appStore.spotlightData = query.spotlight;
             (appStore.startNode = query.startNode),
@@ -504,6 +512,7 @@ export default class GraphContainer extends Component {
         emitter.emit("showLoadingIndicator", true);
         emitter.emit("updateLoadingText", "Querying Database");
         emitter.emit("resetSpotlight");
+        this.setState({"currentQuery": params})
         session.run(params.statement, params.props).subscribe({
             onNext: function(result) {
                 $.each(
