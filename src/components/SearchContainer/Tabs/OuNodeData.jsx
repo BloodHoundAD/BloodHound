@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import NodeCypherLink from "./NodeCypherLink.jsx";
 import NodeCypherNoNumberLink from "./NodeCypherNoNumberLink";
+import NodeProps from "./NodeProps";
 
 export default class OuNodeData extends Component {
     constructor() {
@@ -10,7 +11,11 @@ export default class OuNodeData extends Component {
         this.state = {
             label: "",
             guid: "",
-            blocks: ""
+            blocks: "",
+            propertyMap: {},
+            displayMap: {
+                "description":"Description"
+            }
         };
 
         emitter.on("ouNodeClicked", this.getNodeData.bind(this));
@@ -25,6 +30,17 @@ export default class OuNodeData extends Component {
             guid: guid,
             blocks: bi
         });
+
+        let props = driver.session();
+        props
+            .run("MATCH (n:OU {guid:{name}}) RETURN n", { name: guid })
+            .then(
+                function(result) {
+                    var properties = result.records[0]._fields[0].properties;
+                    this.setState({ propertyMap: properties });
+                    props.close();
+                }.bind(this)
+            );
     }
 
     render() {
@@ -37,6 +53,11 @@ export default class OuNodeData extends Component {
                     <dd>{this.state.guid}</dd>
                     <dt>Blocks Inheritance</dt>
                     <dd>{this.state.blocks}</dd>
+                    <NodeProps
+                        properties={this.state.propertyMap}
+                        displayMap={this.state.displayMap}
+                        ServicePrincipalNames={[]}
+                    />
                     <NodeCypherNoNumberLink
                         query="MATCH p = (d)-[r:Contains*1..]->(o:OU {guid:{name}}) RETURN p"
                         target={this.state.guid}

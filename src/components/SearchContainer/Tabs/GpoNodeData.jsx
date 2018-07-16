@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import NodeCypherLink from "./NodeCypherLink.jsx";
 import NodeCypherLinkComplex from "./NodeCypherLinkComplex.jsx";
+import NodeProps from "./NodeProps";
 
 export default class GpoNodeData extends Component {
     constructor() {
@@ -9,7 +10,12 @@ export default class GpoNodeData extends Component {
 
         this.state = {
             label: "",
-            guid: ""
+            guid: "",
+            propertyMap: {},
+            displayMap: {
+                "description":"Description",
+                "gpcpath":"GPO File Path"
+            }
         };
 
         emitter.on("gpoNodeClicked", this.getNodeData.bind(this));
@@ -20,6 +26,17 @@ export default class GpoNodeData extends Component {
             label: payload,
             guid: guid
         });
+
+        let props = driver.session();
+        props
+            .run("MATCH (n:GPO {name:{name}}) RETURN n", { name: payload })
+            .then(
+                function(result) {
+                    var properties = result.records[0]._fields[0].properties;
+                    this.setState({ propertyMap: properties });
+                    props.close();
+                }.bind(this)
+            );
     }
 
     render() {
@@ -30,6 +47,11 @@ export default class GpoNodeData extends Component {
                     <dd>{this.state.label}</dd>
                     <dt>GUID</dt>
                     <dd>{this.state.guid}</dd>
+                    <NodeProps
+                        properties={this.state.propertyMap}
+                        displayMap={this.state.displayMap}
+                        ServicePrincipalNames={[]}
+                    />
                     <br />
                     <h4>Affected Objects</h4>
                     <NodeCypherLink

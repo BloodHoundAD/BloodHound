@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import NodeCypherLink from "./NodeCypherLink.jsx";
 import NodeCypherNoNumberLink from "./NodeCypherNoNumberLink";
 import NodeCypherLinkComplex from "./NodeCypherLinkComplex";
+import NodeProps from "./NodeProps";
 
 export default class DomainNodeData extends Component {
     constructor() {
@@ -16,7 +17,12 @@ export default class DomainNodeData extends Component {
             computers: -1,
             ous: -1,
             gpos: -1,
-            driversessions: []
+            driversessions: [],
+            propertyMap: {},
+            displayMap: {
+                "description":"Description",
+                "functionallevel":"Domain Functional Level"
+            }
         };
 
         emitter.on("domainNodeClicked", this.getNodeData.bind(this));
@@ -26,6 +32,7 @@ export default class DomainNodeData extends Component {
         $.each(this.state.driversessions, function(index, record) {
             record.close();
         });
+
         this.setState({
             label: payload,
             users: -1,
@@ -34,6 +41,17 @@ export default class DomainNodeData extends Component {
             ous: -1,
             gpos: -1
         });
+
+        let props = driver.session();
+        props
+            .run("MATCH (n:Domain {name:{name}}) RETURN n", { name: payload })
+            .then(
+                function(result) {
+                    var properties = result.records[0]._fields[0].properties;
+                    this.setState({ propertyMap: properties });
+                    props.close();
+                }.bind(this)
+            );
 
         let s1 = driver.session();
         let s2 = driver.session();
@@ -95,7 +113,11 @@ export default class DomainNodeData extends Component {
                 <dl className="dl-horizontal">
                     <dt>Domain</dt>
                     <dd>{this.state.label}</dd>
-                    <br />
+                    <NodeProps
+                        properties={this.state.propertyMap}
+                        displayMap={this.state.displayMap}
+                        ServicePrincipalNames={[]}
+                    />
                     <dt>Users</dt>
                     <dd>
                         <LoadLabel

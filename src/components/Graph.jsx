@@ -671,8 +671,8 @@ export default class GraphContainer extends Component {
         };
 
         if (data.hasOwnProperty("properties")) {
-            if (data.properties.hasOwnProperty("blocksInheritance")) {
-                node.blocksInheritance = data.properties.blocksInheritance;
+            if (data.properties.hasOwnProperty("blocksinheritance")) {
+                node.blocksInheritance = data.properties.blocksinheritance;
             }
 
             if (data.properties.hasOwnProperty("guid")) {

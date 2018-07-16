@@ -410,14 +410,15 @@ export function buildGpoJson(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            "UNWIND {props} AS prop MERGE (n:GPO {name:prop.name}) SET n.guid=prop.guid",
+            "UNWIND {props} AS prop MERGE (n:GPO {name:prop.name}) SET n.guid=prop.guid, n+=prop.map",
         props: []
     };
 
     $.each(chunk, function(_, gpo) {
         let name = gpo.Name;
         let guid = gpo.Guid;
-        queries.properties.props.push({ name: name, guid: guid });
+        let properties = gpo.Properties;
+        queries.properties.props.push({ name: name, guid: guid, map:properties });
 
         let aces = gpo.Aces;
         processAceArray(aces, name, "GPO", queries);
