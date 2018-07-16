@@ -119,7 +119,7 @@ export default class Login extends Component {
         var btn = jQuery(this.refs.loginButton);
         var pwf = jQuery(this.refs.password);
 
-        var driver = neo4j.driver(this.state.url, neo4j.auth.basic(this.state.user, this.state.password));
+        var driver = neo4j.driver(this.state.url, neo4j.auth.basic(this.state.user, this.state.password), {encrypted:'ENCRYPTION_ON'});
         driver.onError = function(error){
             console.log(error);
             if (error.message.includes("authentication failure")){
@@ -161,7 +161,7 @@ export default class Login extends Component {
                 onError: function(error){
                     btn.removeClass('activate');
                     var url = this.state.url.replace('bolt://','http://').replace('7687','7474');
-                    if (error.fields && error.fields[0].code === "Neo.ClientError.Security.CredentialsExpired"){
+                    if (error.code === "Neo.ClientError.Security.CredentialsExpired"){
                         pwf.attr('data-original-title', 'Credentials need to be changed from the neo4j browser first. Go to {} and change them.'.format(url))
                             .tooltip('fixTitle')
                             .tooltip('show');
