@@ -540,6 +540,12 @@ export default class GraphContainer extends Component {
         var id = data.identity.low;
         var type = data.labels[0];
         var label = data.properties.name;
+        var guid = data.properties.guid;
+
+        if (label == null){
+            label = guid;
+        }
+        
         var node = {
             id: id,
             type: type,

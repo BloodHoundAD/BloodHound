@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
 import MenuButton from './MenuButton';
 import ProgressBarMenuButton from './ProgressBarMenuButton';
-import { buildDomainProps, buildSessionProps, buildLocalAdminProps, buildGroupMembershipProps, buildACLProps, findObjectType, buildStructureProps, buildGplinkProps} from 'utils';
+import { buildGpoAdminJson, buildSessionJson, buildUserJson,buildComputerJson, buildDomainJson, buildGpoJson, buildGroupJson, buildOuJson, buildDomainProps, buildSessionProps, buildLocalAdminProps, buildGroupMembershipProps, buildACLProps, findObjectType, buildStructureProps, buildGplinkProps} from 'utils';
 import { If, Then, Else } from 'react-if';
-const { dialog, clipboard, app } = require('electron').remote;
+const { dialog, app } = require('electron').remote;
 var fs = require('fs');
 var async = require('async');
 var unzip = require('unzipper');
 var fpath = require('path');
 var csv = require('fast-csv');
+
+const Pick = require('stream-json/filters/Pick');
+const {streamArray} = require('stream-json/streamers/StreamArray');
+const {chain}  = require('stream-chain');
+const Asm = require('stream-json/Assembler');
 
 export default class MenuContainer extends Component {
     constructor(){
@@ -74,7 +79,7 @@ export default class MenuContainer extends Component {
         this.unzipNecessary(fileNames).then(function(results){
             async.eachSeries(results, function(file, callback){
                 emitter.emit('showAlert', 'Processing file {}'.format(file.name));
-                this.processFile(file.path, callback);
+                this.getFileMeta(file.path, callback);
             }.bind(this),
             function done(){
                 setTimeout(function(){
@@ -120,8 +125,93 @@ export default class MenuContainer extends Component {
     _aboutClick(){
         emitter.emit('showAbout');
     }
+
+    getFileMeta(file, callback){
+        let acceptableTypes = ["sessions","ous","groups","gpoadmins","gpos","computers","users","domains"];
+        let count;
+        let type;
+
+        console.log(file)
+
+        let pipeline = chain([
+            fs.createReadStream(file, {encoding: 'utf8'}),
+            Pick.withParser({filter:'meta'})
+        ]);
+
+        let asm = Asm.connectTo(pipeline);
+        asm.on('done', function(asm){
+            let data = asm.current
+            count = data.count
+            type = data.type
+
+            if (!acceptableTypes.includes(type)){
+                emitter.emit('showAlert', 'Unrecognized JSON Type');
+                callback();
+            }
+
+            this.processJson(file, callback, count, type)
+        }.bind(this))
+
+    }
+
+    processJson(file, callback, count, type){
+        let pipeline = chain([
+            fs.createReadStream(file, {encoding: 'utf8'}),
+            Pick.withParser({filter:type}),
+            streamArray()
+        ])
+
+        let localcount = 0;
+        let sent = 0;
+        let chunk = []
+        //Start a timer for fun
+        console.time('IngestTime')
+
+        pipeline.on('data', async function(data){
+            chunk.push(data.value)
+            localcount++;
+
+            if (localcount % 100 === 0){
+                pipeline.pause();
+                await this.uploadDataNew(chunk, type)
+                sent += chunk.length;
+                this.setState({
+                    progress: Math.floor(sent / count * 100)
+                });
+                chunk = []
+                pipeline.resume();
+            }
+            
+        }.bind(this)).on('end', async function(){
+            await this.uploadDataNew(chunk, type)
+            this.setState({progress:100});
+            emitter.emit('refreshDBData');
+            console.timeEnd('IngestTime');
+            callback()
+        }.bind(this))
+    }
+
+    //DO NOT USE THIS FUNCTION FOR ANYTHING, ITS ONLY FOR TESTING
+    sleep_test(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async uploadDataNew(chunk, type){
+        let session = driver.session();
+        let funcMap = {'computers' : buildComputerJson, 'domains': buildDomainJson, 'gpos': buildGpoJson, 'users': buildUserJson,
+                        'groups': buildGroupJson, 'ous': buildOuJson, 'sessions': buildSessionJson, 'gpoadmins':buildGpoAdminJson}
+        let data = funcMap[type](chunk)
+
+        for (let key in data){
+            await session.run(data[key].statement, {props: data[key].props}).catch(function(error){
+                console.log(error)
+            })
+        }
+        
+        session.close();
+    }
     
-    processFile(file, callback){
+    processFileOld(file, callback){
         console.log(file);
         var count = 0;
         var header = "";
@@ -206,6 +296,8 @@ export default class MenuContainer extends Component {
             }.bind(this));
         }.bind(this));
     }
+
+    
     
     async uploadData(currentChunk, filetype, total){
         var index = 0;
