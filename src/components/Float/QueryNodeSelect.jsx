@@ -1,20 +1,19 @@
-import React, { Component } from 'react';
-import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap';
-import { If, Then, Else } from 'react-if';
-import QueryNodeSelectItem from './QueryNodeSelectItem';
-import QueryNodeSelectHeader from './QueryNodeSelectHeader';
+import React, { Component } from "react";
+import { ListGroup, Panel } from "react-bootstrap";
+import { If, Then, Else } from "react-if";
+import QueryNodeSelectItem from "./QueryNodeSelectItem";
 
 export default class QueryNodeSelect extends Component {
-    constructor(){
+    constructor() {
         super();
 
         this.state = {
-            data:[],
+            data: [],
             currentQueryTitle: ""
         };
 
-        emitter.on('prebuiltQueryStart', this.getEventInfo.bind(this));
-        emitter.on('prebuiltQueryStep', this.doQueryStep.bind(this));
+        emitter.on("prebuiltQueryStart", this.getEventInfo.bind(this));
+        emitter.on("prebuiltQueryStep", this.doQueryStep.bind(this));
     }
 
     componentDidMount() {
@@ -23,29 +22,31 @@ export default class QueryNodeSelect extends Component {
 
     getEventInfo() {
         var query = appStore.prebuiltQuery.shift();
-        if (query.final){
-            emitter.emit('query',
+        if (query.final) {
+            emitter.emit(
+                "query",
                 query.query,
                 query.props,
                 null,
                 null,
-                query.allowCollapse);
-        }else{
+                query.allowCollapse
+            );
+        } else {
             this.setState({
                 currentQueryTitle: query.title
             });
             $(this.refs.outer).fadeToggle(true);
             var session = driver.session();
-            session.run(query.query, query.props)
-                .then(function (results) {
-                    var y = $.map(results.records, function (x) {
-                        let a = x.keys.map(function (e, i) {
+            session.run(query.query, query.props).then(
+                function(results) {
+                    var y = $.map(results.records, function(x) {
+                        let a = x.keys.map(function(e, i) {
                             let obj = {};
-                            obj[e.split('.')[1]] = x._fields[i];
+                            obj[e.split(".")[1]] = x._fields[i];
                             return obj;
                         });
                         let b = {};
-                        $.each(a, function (index, o) {
+                        $.each(a, function(_, o) {
                             Object.assign(b, o);
                         });
 
@@ -53,21 +54,30 @@ export default class QueryNodeSelect extends Component {
                     });
                     this.setState({ data: y });
                     session.close();
-                }.bind(this));
+                }.bind(this)
+            );
         }
     }
 
-    doQueryStep(querydata){
+    doQueryStep(querydata) {
         var query = appStore.prebuiltQuery.shift();
         if (query.final) {
-            let start = typeof query.startNode !== 'undefined' ? query.startNode.format(querydata) : "";
-            let end = typeof query.endNode !== 'undefined' ? query.endNode.format(querydata) : "";
-            emitter.emit('query',
+            let start =
+                typeof query.startNode !== "undefined"
+                    ? query.startNode.format(querydata)
+                    : "";
+            let end =
+                typeof query.endNode !== "undefined"
+                    ? query.endNode.format(querydata)
+                    : "";
+            emitter.emit(
+                "query",
                 query.query,
-                {"result":querydata},
+                { result: querydata },
                 start,
                 end,
-                query.allowCollapse);
+                query.allowCollapse
+            );
             appStore.prebuiltQuery = [];
             this._dismiss();
         } else {
@@ -75,44 +85,50 @@ export default class QueryNodeSelect extends Component {
                 currentQueryTitle: query.title
             });
             var session = driver.session();
-            session.run(query.query, {"result":querydata})
-                .then(function (results) {
-                    var y = $.map(results.records, function (x) {
-                        let a = x.keys.map(function(e, i){
+            session.run(query.query, { result: querydata }).then(
+                function(results) {
+                    var y = $.map(results.records, function(x) {
+                        let a = x.keys.map(function(e, i) {
                             let obj = {};
-                            obj[e.split('.')[1]] = x._fields[i];
+                            obj[e.split(".")[1]] = x._fields[i];
                             return obj;
                         });
                         let b = {};
-                        $.each(a, function(index, o){
+                        $.each(a, function(index, o) {
                             Object.assign(b, o);
                         });
-                        
+
                         return b;
                     });
-                    if (y.length === 0){
-                        emitter.emit('showAlert', "No data returned from query");
+                    if (y.length === 0) {
+                        emitter.emit(
+                            "showAlert",
+                            "No data returned from query"
+                        );
                         appStore.prebuiltQuery = [];
                         this._dismiss();
-                    }else{
+                    } else {
                         this.setState({ data: y });
                     }
                     session.close();
-                }.bind(this));
+                }.bind(this)
+            );
         }
     }
 
-    _dismiss(){
+    _dismiss() {
         $(this.refs.outer).fadeToggle(false);
     }
 
-    handleClick(event){
-        emitter.emit('query',
+    handleClick(event) {
+        emitter.emit(
+            "query",
             this.state.queryData.onFinish.formatAll(event.target.text),
-            {result:event.target.text},
+            { result: event.target.text },
             this.state.queryData.start.format(event.target.text),
             this.state.queryData.end.format(event.target.text),
-            this.state.queryData.allowCollapse);
+            this.state.queryData.allowCollapse
+        );
         $(this.refs.outer).fadeToggle(false);
     }
 
@@ -128,17 +144,22 @@ export default class QueryNodeSelect extends Component {
                         <If condition={this.state.data.length > 0}>
                             <Then>
                                 <ListGroup ref="list">
-                                    {
-                                        this.state.data.map(function(key){
-                                            var x = <QueryNodeSelectItem key={key.name} label={key.name} extraProps={key} />;
+                                    {this.state.data.map(
+                                        function(key) {
+                                            var x = (
+                                                <QueryNodeSelectItem
+                                                    key={key.name}
+                                                    label={key.name}
+                                                    extraProps={key}
+                                                />
+                                            );
                                             return x;
-                                        }.bind(this))
-                                    }
+                                        }.bind(this)
+                                    )}
                                 </ListGroup>
                             </Then>
-                            <Else>{() => 
-                                <img src="src/img/loading.gif" />
-                            }
+                            <Else>
+                                {() => <img src="src/img/loading.gif" />}
                             </Else>
                         </If>
                     </Panel.Body>

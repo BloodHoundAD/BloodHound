@@ -1,17 +1,17 @@
-import React, { Component } from 'react';
-import DatabaseDataDisplay from './Tabs/DatabaseDataDisplay';
-import PrebuiltQueriesDisplay from './Tabs/PrebuiltQueriesDisplay';
-import NoNodeData from './Tabs/NoNodeData';
-import UserNodeData from './Tabs/UserNodeData';
-import GroupNodeData from './Tabs/GroupNodeData';
-import ComputerNodeData from './Tabs/ComputerNodeData';
-import DomainNodeData from './Tabs/DomainNodeData';
-import GpoNodeData from './Tabs/GpoNodeData';
-import OuNodeData from './Tabs/OuNodeData';
-import { Tabs, Tab } from 'react-bootstrap';
+import React, { Component } from "react";
+import DatabaseDataDisplay from "./Tabs/DatabaseDataDisplay";
+import PrebuiltQueriesDisplay from "./Tabs/PrebuiltQueriesDisplay";
+import NoNodeData from "./Tabs/NoNodeData";
+import UserNodeData from "./Tabs/UserNodeData";
+import GroupNodeData from "./Tabs/GroupNodeData";
+import ComputerNodeData from "./Tabs/ComputerNodeData";
+import DomainNodeData from "./Tabs/DomainNodeData";
+import GpoNodeData from "./Tabs/GpoNodeData";
+import OuNodeData from "./Tabs/OuNodeData";
+import { Tabs, Tab } from "react-bootstrap";
 
 export default class TabContainer extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -24,17 +24,17 @@ export default class TabContainer extends Component {
             selected: 1
         };
     }
-    
+
     componentDidMount() {
-        emitter.on('userNodeClicked', this._userNodeClicked.bind(this));
-        emitter.on('groupNodeClicked', this._groupNodeClicked.bind(this));
-        emitter.on('computerNodeClicked', this._computerNodeClicked.bind(this));
-        emitter.on('domainNodeClicked', this._domainNodeClicked.bind(this));
-        emitter.on('gpoNodeClicked', this._gpoNodeClicked.bind(this));
-        emitter.on('ouNodeClicked', this._ouNodeClicked.bind(this));
+        emitter.on("userNodeClicked", this._userNodeClicked.bind(this));
+        emitter.on("groupNodeClicked", this._groupNodeClicked.bind(this));
+        emitter.on("computerNodeClicked", this._computerNodeClicked.bind(this));
+        emitter.on("domainNodeClicked", this._domainNodeClicked.bind(this));
+        emitter.on("gpoNodeClicked", this._gpoNodeClicked.bind(this));
+        emitter.on("ouNodeClicked", this._ouNodeClicked.bind(this));
     }
 
-    _userNodeClicked(){
+    _userNodeClicked() {
         this.setState({
             userVisible: true,
             computerVisible: false,
@@ -43,10 +43,10 @@ export default class TabContainer extends Component {
             gpoVisible: false,
             ouVisible: false
         });
-        this.setState({selected: 2});
+        this.setState({ selected: 2 });
     }
 
-    _groupNodeClicked(){
+    _groupNodeClicked() {
         this.setState({
             userVisible: false,
             computerVisible: false,
@@ -55,10 +55,10 @@ export default class TabContainer extends Component {
             gpoVisible: false,
             ouVisible: false
         });
-        this.setState({selected: 2});
+        this.setState({ selected: 2 });
     }
 
-    _computerNodeClicked(){
+    _computerNodeClicked() {
         this.setState({
             userVisible: false,
             computerVisible: true,
@@ -67,10 +67,10 @@ export default class TabContainer extends Component {
             gpoVisible: false,
             ouVisible: false
         });
-        this.setState({selected: 2});
+        this.setState({ selected: 2 });
     }
 
-    _domainNodeClicked(){
+    _domainNodeClicked() {
         this.setState({
             userVisible: false,
             computerVisible: false,
@@ -79,10 +79,10 @@ export default class TabContainer extends Component {
             gpoVisible: false,
             ouVisible: false
         });
-        this.setState({selected: 2});
+        this.setState({ selected: 2 });
     }
 
-    _gpoNodeClicked(){
+    _gpoNodeClicked() {
         this.setState({
             userVisible: false,
             computerVisible: false,
@@ -105,26 +105,42 @@ export default class TabContainer extends Component {
         });
         this.setState({ selected: 2 });
     }
-    
-    _handleSelect(index, last){
-        this.setState({selected: index});
+
+    _handleSelect(index, last) {
+        this.setState({ selected: index });
     }
 
     render() {
         return (
             <div>
-                <Tabs id="tab-style" bsStyle="pills" activeKey={this.state.selected} onSelect={this._handleSelect.bind(this)}>
+                <Tabs
+                    id="tab-style"
+                    bsStyle="pills"
+                    activeKey={this.state.selected}
+                    onSelect={this._handleSelect.bind(this)}
+                >
                     <Tab eventKey={1} title="Database Info">
                         <DatabaseDataDisplay />
                     </Tab>
 
                     <Tab eventKey={2} title="Node Info">
-                        <NoNodeData visible={!this.state.userVisible && !this.state.computerVisible && !this.state.groupVisible && !this.state.domainVisible && !this.state.gpoVisible && !this.state.ouVisible}/>
-                        <UserNodeData visible={this.state.userVisible}/>
-                        <GroupNodeData visible={this.state.groupVisible}/>
-                        <ComputerNodeData visible={this.state.computerVisible}/>
-                        <DomainNodeData visible={this.state.domainVisible}/>
-                        <GpoNodeData visible={this.state.gpoVisible}/>
+                        <NoNodeData
+                            visible={
+                                !this.state.userVisible &&
+                                !this.state.computerVisible &&
+                                !this.state.groupVisible &&
+                                !this.state.domainVisible &&
+                                !this.state.gpoVisible &&
+                                !this.state.ouVisible
+                            }
+                        />
+                        <UserNodeData visible={this.state.userVisible} />
+                        <GroupNodeData visible={this.state.groupVisible} />
+                        <ComputerNodeData
+                            visible={this.state.computerVisible}
+                        />
+                        <DomainNodeData visible={this.state.domainVisible} />
+                        <GpoNodeData visible={this.state.gpoVisible} />
                         <OuNodeData visible={this.state.ouVisible} />
                     </Tab>
 

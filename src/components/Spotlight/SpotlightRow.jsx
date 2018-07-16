@@ -1,15 +1,19 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 export default class SpotlightRow extends Component {
-    _handleClick(){
-        emitter.emit('spotlightClick', this.props.nodeId, this.props.parentNodeId);
+    _handleClick() {
+        emitter.emit(
+            "spotlightClick",
+            this.props.nodeId,
+            this.props.parentNodeId
+        );
     }
 
     render() {
         var nodeIcon = "";
         var parentIcon = "";
-        switch (this.props.nodeType){
+        switch (this.props.nodeType) {
             case "Group":
                 nodeIcon = "fa fa-users";
                 break;
@@ -33,7 +37,7 @@ export default class SpotlightRow extends Component {
                 break;
         }
 
-        switch (this.props.parentNodeType){
+        switch (this.props.parentNodeType) {
             case "Group":
                 parentIcon = "fa fa-users";
                 break;
@@ -57,19 +61,28 @@ export default class SpotlightRow extends Component {
                 break;
         }
         return (
-            <tr style={{cursor: 'pointer'}} onClick={this._handleClick.bind(this)} data-id={this.props.nodeId} data-parent-id={this.props.parentNodeId}>
-                <td>{this.props.nodeLabel} <i className={nodeIcon}></i></td>
-                <td>{this.props.parentNodeLabel} <i className={parentIcon}></i></td>
+            <tr
+                style={{ cursor: "pointer" }}
+                onClick={this._handleClick.bind(this)}
+                data-id={this.props.nodeId}
+                data-parent-id={this.props.parentNodeId}
+            >
+                <td>
+                    {this.props.nodeLabel} <i className={nodeIcon} />
+                </td>
+                <td>
+                    {this.props.parentNodeLabel} <i className={parentIcon} />
+                </td>
             </tr>
         );
     }
 }
 
 SpotlightRow.propTypes = {
-    nodeId : PropTypes.number.isRequired,
-    parentNodeId : PropTypes.number.isRequired,
-    nodeLabel : PropTypes.string.isRequired,
-    parentNodeLabel : PropTypes.string.isRequired,
+    nodeId: PropTypes.number.isRequired,
+    parentNodeId: PropTypes.number.isRequired,
+    nodeLabel: PropTypes.string.isRequired,
+    parentNodeLabel: PropTypes.string.isRequired,
     nodeType: PropTypes.string.isRequired,
     parentNodeType: PropTypes.string.isRequired
 };

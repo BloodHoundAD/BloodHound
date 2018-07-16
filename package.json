@@ -1,6 +1,6 @@
 {
   "name": "bloodhound",
-  "version": "1.5.2",
+  "version": "2.0",
   "description": "Graph Theory for Active Directory",
   "keywords": [
     "Graph",
@@ -56,7 +56,6 @@
     "dagre": "^0.7.4",
     "electron-store": "^1.3.0",
     "eventemitter2": "^4.1.0",
-    "fast-csv": "^2.4.1",
     "jquery": "^3.2.1",
     "linkurious": "^1.5.1",
     "mustache": "^2.3.0",
@@ -69,8 +68,5 @@
     "react-transition-group": "^2.2.1",
     "stream-json": "^1.1.0",
     "unzipper": "^0.8.9"
-  },
-  "jshintConfig": {
-    "esversion": "6"
   }
 }

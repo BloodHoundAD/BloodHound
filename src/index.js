@@ -1,30 +1,30 @@
-import 'babel-polyfill'; // generators
-import React from 'react';
-import ReactDOM from 'react-dom';
+import "babel-polyfill"; // generators
+import React from "react";
+import ReactDOM from "react-dom";
 
-import AppContainer from './AppContainer';
-import Login from './components/Float/Login';
-import { getStorageData, storageHasKey, storageSetKey } from './js/utils.js';
+import AppContainer from "./AppContainer";
+import Login from "./components/Float/Login";
 
-const { app } = require('electron').remote;
-var fs = require('fs');
-const path = require('path');
+import { remote } from "electron";
+const { app } = remote;
+import { stat, writeFile } from "fs";
+import { join } from "path";
 
-const ConfigStore = require('electron-store');
+import ConfigStore from "electron-store";
 
 global.conf = new ConfigStore();
-var e = require('eventemitter2').EventEmitter2;
+import { EventEmitter2 as e } from "eventemitter2";
 global.emitter = new e({});
 global.renderEmit = new e({});
-global.neo4j = require('neo4j-driver').v1;
+global.neo4j = require("neo4j-driver").v1;
 
-global.Mustache = require('mustache');
+global.Mustache = require("mustache");
 
 String.prototype.format = function() {
     var i = 0,
         args = arguments;
     return this.replace(/{}/g, function() {
-        return typeof args[i] !== 'undefined' ? args[i++] : '';
+        return typeof args[i] !== "undefined" ? args[i++] : "";
     });
 };
 
@@ -34,14 +34,14 @@ String.prototype.formatAll = function() {
 };
 
 String.prototype.toTitleCase = function() {
-    return this.replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+    return this.replace(/\w\S*/g, function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
 };
 
 Array.prototype.allEdgesSameType = function() {
-
     for (var i = 1; i < this.length; i++) {
-        if (this[i].neo4j_type !== this[0].neo4j_type)
-            return false;
+        if (this[i].neo4j_type !== this[0].neo4j_type) return false;
     }
 
     return true;
@@ -51,19 +51,19 @@ if (!Array.prototype.last) {
     Array.prototype.last = function() {
         return this[this.length - 1];
     };
-};
+}
 
 sigma.renderers.def = sigma.renderers.canvas;
 
-sigma.classes.graph.addMethod('outboundNodes', function(id) {
+sigma.classes.graph.addMethod("outboundNodes", function(id) {
     return this.outNeighborsIndex.get(id).keyList();
 });
 
-sigma.classes.graph.addMethod('inboundNodes', function(id) {
+sigma.classes.graph.addMethod("inboundNodes", function(id) {
     return this.inNeighborsIndex.get(id).keyList();
 });
 
-sigma.classes.graph.addMethod('outNeighbors', function (id) {
+sigma.classes.graph.addMethod("outNeighbors", function(id) {
     return this.outNeighborsIndex.get(id).keyList();
 });
 
@@ -78,132 +78,132 @@ global.appStore = {
     currentTooltip: null,
     highResPalette: {
         iconScheme: {
-            'User': {
-                font: 'FontAwesome',
-                content: '\uF007',
+            User: {
+                font: "FontAwesome",
+                content: "\uF007",
                 scale: 1.5,
-                color: '#17E625'
+                color: "#17E625"
             },
-            'Computer': {
-                font: 'FontAwesome',
-                content: '\uF108',
+            Computer: {
+                font: "FontAwesome",
+                content: "\uF108",
                 scale: 1.2,
-                color: '#E67873'
+                color: "#E67873"
             },
-            'Group': {
-                font: 'FontAwesome',
-                content: '\uF0C0',
+            Group: {
+                font: "FontAwesome",
+                content: "\uF0C0",
                 scale: 1.5,
-                color: '#DBE617'
+                color: "#DBE617"
             },
-            'Domain': {
-                font: 'FontAwesome',
-                content: '\uF0AC',
+            Domain: {
+                font: "FontAwesome",
+                content: "\uF0AC",
                 scale: 1.5,
-                color: '#17E6B9'
+                color: "#17E6B9"
             },
-            'OU': {
-                font: 'FontAwesome',
-                content: '\uF0E8',
+            OU: {
+                font: "FontAwesome",
+                content: "\uF0E8",
                 scale: 1.25,
-                color: '#FFAA00'
+                color: "#FFAA00"
             },
-            'GPO': {
-                font: 'FontAwesome',
-                content: '\uF03A',
+            GPO: {
+                font: "FontAwesome",
+                content: "\uF03A",
                 scale: 1.25,
-                color: '#7F72FD'
+                color: "#7F72FD"
             }
         },
         edgeScheme: {
-            'AdminTo': 'tapered',
-            'MemberOf': 'tapered',
-            'HasSession': 'tapered',
-            'AllExtendedRights': 'tapered',
-            'ForceChangePassword': 'tapered',
-            'GenericAll': 'tapered',
-            'GenericWrite': 'tapered',
-            'WriteDacl': 'tapered',
-            'WriteOwner': 'tapered',
-            'AddMember': 'tapered',
-            'TrustedBy': 'curvedArrow',
-            'DCSync' : 'tapered',
-            'Contains': 'tapered',
-            'GpLink':'tapered',
-            'Owns':'tapered'
+            AdminTo: "tapered",
+            MemberOf: "tapered",
+            HasSession: "tapered",
+            AllExtendedRights: "tapered",
+            ForceChangePassword: "tapered",
+            GenericAll: "tapered",
+            GenericWrite: "tapered",
+            WriteDacl: "tapered",
+            WriteOwner: "tapered",
+            AddMember: "tapered",
+            TrustedBy: "curvedArrow",
+            DCSync: "tapered",
+            Contains: "tapered",
+            GpLink: "tapered",
+            Owns: "tapered"
         }
     },
     lowResPalette: {
         colorScheme: {
-            'User': '#17E625',
-            'Computer': '#E67873',
-            'Group': '#DBE617',
-            'Domain': '#17E6B9'
+            User: "#17E625",
+            Computer: "#E67873",
+            Group: "#DBE617",
+            Domain: "#17E6B9"
         },
         edgeScheme: {
-            'AdminTo': 'line',
-            'MemberOf': 'line',
-            'HasSession': 'line',
-            'AllExtendedRights': 'line',
-            'ForceChangePassword': 'line',
-            'GenericAll': 'line',
-            'GenericWrite': 'line',
-            'WriteDACL': 'line',
-            'WriteOwner': 'line',
-            'AddMember': 'line',
-            'TrustedBy': 'curvedArrow'
+            AdminTo: "line",
+            MemberOf: "line",
+            HasSession: "line",
+            AllExtendedRights: "line",
+            ForceChangePassword: "line",
+            GenericAll: "line",
+            GenericWrite: "line",
+            WriteDACL: "line",
+            WriteOwner: "line",
+            AddMember: "line",
+            TrustedBy: "curvedArrow"
         }
     },
     highResStyle: {
         nodes: {
             label: {
-                by: 'label'
+                by: "label"
             },
             size: {
-                by: 'degree',
+                by: "degree",
                 bins: 5,
                 min: 10,
                 max: 20
             },
             icon: {
-                by: 'type',
-                scheme: 'iconScheme'
+                by: "type",
+                scheme: "iconScheme"
             }
         },
         edges: {
             type: {
-                by: 'type',
-                scheme: 'edgeScheme'
+                by: "type",
+                scheme: "edgeScheme"
             }
         }
     },
     lowResStyle: {
         nodes: {
             label: {
-                by: 'label'
+                by: "label"
             },
             size: {
-                by: 'degree',
+                by: "degree",
                 bins: 10,
                 min: 10,
                 max: 20
             },
             color: {
-                by: 'type',
-                scheme: 'colorScheme'
+                by: "type",
+                scheme: "colorScheme"
             }
         },
         edges: {
             type: {
-                by: 'type',
-                scheme: 'edgeScheme'
+                by: "type",
+                scheme: "edgeScheme"
             }
         }
     }
 };
 
-if (typeof conf.get('performance') === 'undefined') {
-    conf.set('performance', {
+if (typeof conf.get("performance") === "undefined") {
+    conf.set("performance", {
         edge: 5,
         sibling: 10,
         lowGraphics: false,
@@ -212,31 +212,31 @@ if (typeof conf.get('performance') === 'undefined') {
     });
 }
 
-var custompath = path.join(app.getPath('userData'), 'customqueries.json');
+var custompath = join(app.getPath("userData"), "customqueries.json");
 
-fs.stat(custompath, function(err, stats) {
+stat(custompath, function(err, stats) {
     if (err) {
-        fs.writeFile(custompath, "[]");
+        writeFile(custompath, "[]");
     }
 });
 
-appStore.performance = conf.get('performance');
+appStore.performance = conf.get("performance");
 
-if (typeof appStore.performance.edgeLabels === 'undefined'){
+if (typeof appStore.performance.edgeLabels === "undefined") {
     appStore.performance.edgeLabels = 0;
-    conf.set('performance', appStore.performance);
+    conf.set("performance", appStore.performance);
 }
 
-renderEmit.on('login', function() {
+renderEmit.on("login", function() {
     emitter.removeAllListeners();
-    ReactDOM.unmountComponentAtNode(document.getElementById('root'));
-    ReactDOM.render( < AppContainer / > , document.getElementById('root'));
+    ReactDOM.unmountComponentAtNode(document.getElementById("root"));
+    ReactDOM.render(<AppContainer />, document.getElementById("root"));
 });
 
-renderEmit.on('logout', function() {
+renderEmit.on("logout", function() {
     emitter.removeAllListeners();
-    ReactDOM.unmountComponentAtNode(document.getElementById('root'));
-    ReactDOM.render( < Login / > , document.getElementById('root'));
+    ReactDOM.unmountComponentAtNode(document.getElementById("root"));
+    ReactDOM.render(<Login />, document.getElementById("root"));
 });
 
-ReactDOM.render( < Login / > , document.getElementById('root'));
+ReactDOM.render(<Login />, document.getElementById("root"));

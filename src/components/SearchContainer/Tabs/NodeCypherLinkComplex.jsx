@@ -1,12 +1,11 @@
-import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
-import NodeALink from './NodeALink';
+import React, { Component, Fragment } from "react";
+import PropTypes from "prop-types";
+import NodeALink from "./NodeALink";
 
 export default class NodeCypherLinkComplex extends Component {
     constructor(props) {
         super(props);
     }
-
 
     componentWillMount() {
         this.setState({
@@ -15,11 +14,10 @@ export default class NodeCypherLinkComplex extends Component {
         });
     }
 
-
     componentWillReceiveProps(newProps) {
         if (this.props.target !== newProps.target) {
             var session = driver.session();
-            if (typeof this.state.session !== 'undefined') {
+            if (typeof this.state.session !== "undefined") {
                 this.state.session.close();
             }
 
@@ -28,39 +26,39 @@ export default class NodeCypherLinkComplex extends Component {
                 ready: false
             });
             let query = this.props.countQuery;
-            let domain = '@' + newProps.target.split('@').last();
-            session.run(query, { name: newProps.target, domain: domain })
-                .then(function (result) {
+            let domain = "@" + newProps.target.split("@").last();
+            session.run(query, { name: newProps.target, domain: domain }).then(
+                function(result) {
                     this.setState({
                         value: result.records[0]._fields[0].low,
                         ready: true
                     });
-                }.bind(this));
+                }.bind(this)
+            );
         }
     }
 
     render() {
         return (
             <Fragment>
-                <dt>
-                    {this.props.property
-                    }</dt>
+                <dt>{this.props.property}</dt>
                 <dd>
                     <NodeALink
                         ready={this.state.ready}
                         value={this.state.value}
-                        click={function () {
+                        click={function() {
                             emitter.emit(
-                                'query',
+                                "query",
                                 this.props.graphQuery,
-                                { name: this.props.target }, this.props.start, this.props.end
+                                { name: this.props.target },
+                                this.props.start,
+                                this.props.end
                             );
                         }.bind(this)}
                     />
                 </dd>
             </Fragment>
         );
-
     }
 }
 

@@ -1,29 +1,32 @@
-import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component, Fragment } from "react";
+import PropTypes from "prop-types";
 
 export default class NodeCypherNoNumberLink extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
-    render(){
-        let c = function(){
+    render() {
+        let c = function() {
             emitter.emit(
-                'query',
+                "query",
                 this.props.query,
-                { name: this.props.target }, this.props.start, this.props.end
+                { name: this.props.target },
+                this.props.start,
+                this.props.end
             );
         }.bind(this);
-        
+
         return (
             <Fragment>
                 <dt>
-                    <a href="#" onClick={c}>{this.props.property}</a>
+                    <a href="#" onClick={c}>
+                        {this.props.property}
+                    </a>
                 </dt>
                 <dd />
             </Fragment>
         );
-        
     }
 }
 

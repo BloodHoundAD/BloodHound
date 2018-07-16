@@ -90,7 +90,7 @@
     z-index: 29;
     max-height: 400px;
     display: inline-block;
-    background-color: rgba(255, 255, 255, .95);
+    background-color: rgba(255, 255, 255, 0.95);
     border-radius: 12px;
     position: absolute;
     top: 100px;
