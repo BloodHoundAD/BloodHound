@@ -10,12 +10,11 @@ export default class componentName extends Component {
         var type = typeof obj;
         if (type === "undefined") {
             return null;
-        } else if (obj.hasOwnProperty("low")) {
-            var t = obj.low;
-            if (t === 0 || t === -1) {
+        } else if (type === "number") {
+            if (obj === 0 || obj === -1) {
                 return "Never";
             } else {
-                return new Date(obj.low * 1000).toUTCString();
+                return new Date(obj * 1000).toUTCString();
             }
         } else if (type === "boolean") {
             return obj.toString().toTitleCase();
