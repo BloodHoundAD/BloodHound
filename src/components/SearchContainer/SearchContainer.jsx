@@ -650,7 +650,7 @@ export default class SearchContainer extends Component {
         }
 
         query +=
-            " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
+            " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|CanRDP|ExecuteDCOM*1..]->(m)) RETURN p";
 
         emitter.emit("query", query, { aprop: start, bprop: end });
     }
@@ -809,7 +809,7 @@ export default class SearchContainer extends Component {
                 }
 
                 query +=
-                    " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
+                    " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|CanRDP|ExecuteDCOM*1..]->(m)) RETURN p";
 
                 emitter.emit("query", query, { aprop: start, bprop: end });
             }

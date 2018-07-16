@@ -9,7 +9,7 @@
     <li onclick="emitter.emit('setEnd', '{{type}}:{{label}}')">
         <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
     </li>
-    <li onclick="emitter.emit('query', 'MATCH (n:User {name:{name}}),(m:User),p=shortestPath((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
+    <li onclick="emitter.emit('query', 'MATCH (n:User {name:{name}}),(m:User),p=shortestPath((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|CanRDP|ExecuteDCOM*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
         <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
     </li>
     {{/type_user}} {{#type_computer}}
@@ -19,7 +19,7 @@
     <li onclick="emitter.emit('setEnd', '{{type}}:{{label}}')">
         <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
     </li>
-    <li onclick="emitter.emit('query', 'MATCH (n:Computer {name:{name}}),(m:User),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
+    <li onclick="emitter.emit('query', 'MATCH (n:Computer {name:{name}}),(m:User),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|CanRDP|ExecuteDCOM*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
         <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
     </li>
     {{/type_computer}} {{#type_group}}
@@ -29,7 +29,7 @@
     <li onclick="emitter.emit('setEnd', '{{type}}:{{label}}')">
         <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
     </li>
-    <li onclick="emitter.emit('query', 'MATCH (n:Group {name:{name}}),(m:User),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
+    <li onclick="emitter.emit('query', 'MATCH (n:Group {name:{name}}),(m:User),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|CanRDP|ExecuteDCOM*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
         <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
     </li>
     {{/type_group}} {{#type_gpo}}
@@ -39,7 +39,7 @@
     <li onclick="emitter.emit('setEnd', '{{type}}:{{guid}}')">
         <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
     </li>
-    <li onclick="emitter.emit('query', 'MATCH (n:GPO {name:{name}}),(m),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.guid={guid} RETURN p', {name: '{{name}}'})">
+    <li onclick="emitter.emit('query', 'MATCH (n:GPO {name:{name}}),(m),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|CanRDP|ExecuteDCOM*1..]->(n)) WHERE NOT m.guid={guid} RETURN p', {name: '{{name}}'})">
         <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
     </li>
     {{/type_gpo}} {{#type_ou}}
@@ -49,7 +49,7 @@
     <li onclick="emitter.emit('setEnd', '{{type}}:{{guid}}')">
         <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
     </li>
-    <li onclick="emitter.emit('query', 'MATCH (n:OU {guid:{guid}}),(m),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.guid={guid} RETURN p', {guid: '{{guid}}'})">
+    <li onclick="emitter.emit('query', 'MATCH (n:OU {guid:{guid}}),(m),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|CanRDP|ExecuteDCOM*1..]->(n)) WHERE NOT m.guid={guid} RETURN p', {guid: '{{guid}}'})">
         <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
     </li>
     {{/type_ou}} {{#type_domain}}
@@ -59,7 +59,7 @@
     <li onclick="emitter.emit('setEnd', '{{type}}:{{label}}')">
         <i class="glyphicon glyphicon-screenshot"> </i> Set as Ending Node
     </li>
-    <li onclick="emitter.emit('query', 'MATCH (n:Domain {name:{name}}),(m:User),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}} ')">
+    <li onclick="emitter.emit('query', 'MATCH (n:Domain {name:{name}}),(m:User),p=allShortestPaths((m)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|CanRDP|ExecuteDCOM*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}} ')">
         <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
     </li>
     {{/type_domain}} {{#expand}}

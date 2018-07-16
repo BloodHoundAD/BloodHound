@@ -39,6 +39,8 @@ export default class Login extends Component {
 
         if (this.state.password !== "") {
             this.checkDBCreds();
+        }else{
+            this.checkDBPresence();
         }
     }
 
@@ -59,8 +61,6 @@ export default class Login extends Component {
     checkDBPresence() {
         var url = this.state.url;
         var icon = this.state.icon;
-        var jicon = jQuery(icon);
-        var btn = jQuery(this.refs.loginButton);
 
         if (url === "") {
             return;

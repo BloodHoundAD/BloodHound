@@ -1,6 +1,6 @@
 {
   "name": "bloodhound",
-  "version": "2.0",
+  "version": "2.0.0",
   "description": "Graph Theory for Active Directory",
   "keywords": [
     "Graph",
@@ -58,6 +58,7 @@
     "eventemitter2": "^4.1.0",
     "jquery": "^3.2.1",
     "linkurious": "^1.5.1",
+    "magic-number": "^0.1.6",
     "mustache": "^2.3.0",
     "neo4j-driver": "^1.6.2",
     "prop-types": "^15.6.2",

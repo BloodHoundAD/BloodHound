@@ -2,7 +2,6 @@ const electron = require('electron')
 var platform = require('os').platform()
 // Module to control application life.
 const app = electron.app
-const Tray = electron.Tray
 const Menu = electron.Menu
 
 // Module to create native browser window.

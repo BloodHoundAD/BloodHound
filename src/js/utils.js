@@ -593,6 +593,7 @@ export function buildComputerJson(chunk) {
         let localadmins = comp.LocalAdmins;
         let rdpers = comp.RemoteDesktopUsers;
         let primarygroup = comp.PrimaryGroup;
+        let dcom = comp.DcomUsers;
 
         if (!queries.properties) {
             if (primarygroup === null) {
@@ -631,6 +632,18 @@ export function buildComputerJson(chunk) {
             let aType = rdp.Type;
             let aName = rdp.Name;
             let rel = "CanRDP";
+
+            let hash = rel + aType;
+
+            let statement = baseQuery.format(aType, rel);
+            let p = { name: name, target: aName };
+            insert(queries, hash, statement, p);
+        });
+
+        $.each(dcom, function(_, dcomu) {
+            let aType = dcomu.Type;
+            let aName = dcomu.Name;
+            let rel = "ExecuteDCOM";
 
             let hash = rel + aType;
 

@@ -12,16 +12,17 @@ import {
     buildOuJson
 } from "utils";
 import { If, Then, Else } from "react-if";
-const { dialog, app } = require("electron").remote;
-var fs = require("fs");
-var async = require("async");
-var unzip = require("unzipper");
-var fpath = require("path");
+import { remote } from "electron";
+const { dialog, app } = remote;
+import { unlinkSync, createReadStream, createWriteStream } from "fs";
+import { eachSeries } from "async";
+import { Parse } from "unzipper";
+import { join } from "path";
 
-const Pick = require("stream-json/filters/Pick");
-const { streamArray } = require("stream-json/streamers/StreamArray");
-const { chain } = require("stream-chain");
-const Asm = require("stream-json/Assembler");
+import { withParser } from "stream-json/filters/Pick";
+import { streamArray } from "stream-json/streamers/StreamArray";
+import { chain } from "stream-chain";
+import { connectTo } from "stream-json/Assembler";
 
 export default class MenuContainer extends Component {
     constructor() {
@@ -35,6 +36,42 @@ export default class MenuContainer extends Component {
         };
 
         emitter.on("cancelUpload", this.cancelUpload.bind(this));
+        emitter.on("filedrop", this.fileDrop.bind(this))
+    }
+
+    fileDrop(e){
+        let fileNames = []
+        $.each(e.dataTransfer.files, function(_, file){
+            fileNames.push({ path: file.path, name: file.name });
+        })
+
+        this.unzipNecessary(fileNames).then(
+            function(results) {
+                eachSeries(
+                    results,
+                    function(file, callback) {
+                        emitter.emit(
+                            "showAlert",
+                            "Processing file {}".format(file.name)
+                        );
+                        this.getFileMeta(file.path, callback);
+                    }.bind(this),
+                    function done() {
+                        setTimeout(
+                            function() {
+                                this.setState({ uploading: false });
+                            }.bind(this),
+                            3000
+                        );
+                        $.each(results, function(_, file) {
+                            if (file.delete) {
+                                unlinkSync(file.path);
+                            }
+                        });
+                    }.bind(this)
+                );
+            }.bind(this)
+        );
     }
 
     cancelUpload() {
@@ -88,13 +125,13 @@ export default class MenuContainer extends Component {
         var input = jQuery(this.refs.fileInput);
         var fileNames = [];
 
-        $.each(input[0].files, function(index, file) {
+        $.each(input[0].files, function(_, file) {
             fileNames.push({ path: file.path, name: file.name });
         });
 
         this.unzipNecessary(fileNames).then(
             function(results) {
-                async.eachSeries(
+                eachSeries(
                     results,
                     function(file, callback) {
                         emitter.emit(
@@ -112,7 +149,7 @@ export default class MenuContainer extends Component {
                         );
                         $.each(results, function(index, file) {
                             if (file.delete) {
-                                fs.unlinkSync(file.path);
+                                unlinkSync(file.path);
                             }
                         });
                     }.bind(this)
@@ -132,12 +169,11 @@ export default class MenuContainer extends Component {
             var name = files[index].name;
 
             if (path.endsWith(".zip")) {
-                await fs
-                    .createReadStream(path)
-                    .pipe(unzip.Parse())
+                await createReadStream(path)
+                    .pipe(Parse())
                     .on("entry", function(entry) {
-                        var output = fpath.join(tempPath, entry.path);
-                        entry.pipe(fs.createWriteStream(output));
+                        var output = join(tempPath, entry.path);
+                        entry.pipe(createWriteStream(output));
                         processed.push({
                             path: output,
                             name: entry.path,
@@ -175,11 +211,11 @@ export default class MenuContainer extends Component {
         console.log(file);
 
         let pipeline = chain([
-            fs.createReadStream(file, { encoding: "utf8" }),
-            Pick.withParser({ filter: "meta" })
+            createReadStream(file, { encoding: "utf8" }),
+            withParser({ filter: "meta" })
         ]);
 
-        let asm = Asm.connectTo(pipeline);
+        let asm = connectTo(pipeline);
         asm.on(
             "done",
             function(asm) {
@@ -199,8 +235,8 @@ export default class MenuContainer extends Component {
 
     processJson(file, callback, count, type) {
         let pipeline = chain([
-            fs.createReadStream(file, { encoding: "utf8" }),
-            Pick.withParser({ filter: type }),
+            createReadStream(file, { encoding: "utf8" }),
+            withParser({ filter: type }),
             streamArray()
         ]);
 

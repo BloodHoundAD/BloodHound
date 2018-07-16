@@ -20,6 +20,19 @@ import About from "./components/Modals/About.jsx";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 export default class AppContainer extends Component {
+    componentDidMount(){
+        document.addEventListener('dragover', function(event){
+            event.preventDefault();
+            return false;
+        }, false)
+
+        document.addEventListener('drop', function(event){
+            emitter.emit("filedrop", event)
+            event.preventDefault();
+            return false;
+        }, false)
+    }
+
     render() {
         return (
             <TransitionGroup className="max">
