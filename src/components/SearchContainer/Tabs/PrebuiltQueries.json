@@ -5,11 +5,10 @@
             "queryList": [
                 {
                     "final": true,
-                    "title": "Select a domain...",
                     "query":
-                        "MATCH (n:Group) WHERE n.name =~ {name} WITH n MATCH p=(n)<-[r:MemberOf*1..]-(m) RETURN p",
+                        "MATCH (n:Group) WHERE n.objectsid =~ {name} WITH n MATCH p=(n)<-[r:MemberOf*1..]-(m) RETURN p",
                     "props": {
-                        "name": "(?i).*DOMAIN ADMINS.*"
+                        "name": "(?i)S-1-5-.*-512"
                     },
                     "allowCollapse": false
                 }
@@ -22,15 +21,15 @@
                     "final": false,
                     "title": "Select a Domain Admin group...",
                     "query":
-                        "MATCH (n:Group) WHERE n.name =~ {name} RETURN n.name ORDER BY n.name DESC",
+                        "MATCH (n:Group) WHERE n.objectsid =~ {name} RETURN n.name ORDER BY n.name DESC",
                     "props": {
-                        "name": "(?i).*DOMAIN ADMINS.*"
+                        "name": "(?i)S-1-5-.*-512"
                     }
                 },
                 {
                     "final": true,
                     "query":
-                        "MATCH (n:User),(m:Group {name:{result}}),p=shortestPath((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p",
+                        "MATCH (n:User),(m:Group {name:{result}}),p=shortestPath((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|CanRDP|ExecuteDCOM*1..]->(m)) RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
                 }
