@@ -58,7 +58,7 @@ export default class componentName extends Component {
                         <b>Version:</b> {this.state.version}
                     </h5>
                     <h5>
-                        <b>Github:</b>{" "}
+                        <b>GitHub:</b>{" "}
                         <a
                             href="#"
                             onClick={function() {
@@ -68,6 +68,19 @@ export default class componentName extends Component {
                             }}
                         >
                             https://www.github.com/BloodHoundAD/BloodHound
+                        </a>
+                    </h5>
+                    <h5>
+                        <b>BloodHound Slack:</b>{" "}
+                        <a
+                            href="#"
+                            onClick={function() {
+                                shell.openExternal(
+                                    "https://bloodhoundgang.herokuapp.com/"
+                                );
+                            }}
+                        >
+                            https://bloodhoundgang.herokuapp.com/
                         </a>
                     </h5>
                     <h5>
