@@ -174,6 +174,12 @@ global.appStore = {
             type: {
                 by: "type",
                 scheme: "edgeScheme"
+            },
+            size: {
+                by: "degree",
+                bins: 1,
+                min: 4,
+                max: 4
             }
         }
     },
@@ -197,6 +203,12 @@ global.appStore = {
             type: {
                 by: "type",
                 scheme: "edgeScheme"
+            },
+            size: {
+                by: "degree",
+                bins: 1,
+                min: 4,
+                max: 4
             }
         }
     }
