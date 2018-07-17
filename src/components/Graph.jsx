@@ -791,6 +791,19 @@ export default class GraphContainer extends Component {
         if (typeof props === "undefined") {
             props = {};
         }
+
+        let edges = []
+        let stat = appStore.edgeincluded;
+
+        $.each(Object.keys(stat), function(_, key){
+            if (stat[key]){
+                edges.push(key);
+            }
+        })
+
+        let finaledges = edges.join('|');
+        statement = statement.format(finaledges)
+
         this.doQueryNative({
             statement: statement,
             allowCollapse: allowCollapse,

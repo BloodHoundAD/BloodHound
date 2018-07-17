@@ -212,13 +212,25 @@ if (typeof conf.get("performance") === "undefined") {
     });
 }
 
-var custompath = join(app.getPath("userData"), "customqueries.json");
+if (typeof conf.get("edgeincluded") === "undefined"){
+    conf.set("edgeincluded", {
+        MemberOf : true,
+        HasSession: true,
+        AdminTo: true,
+        AllExtendedRights: true,
+        AddMember: true,
+        ForceChangePassword: true,
+        GenericAll:true,
+        GenericWrite:true,
+        Owns: true,
+        WriteDacl: true,
+        WriteOwner: true,
+        CanRDP:true,
+        ExecuteDCOM:true
+    })
+}
 
-stat(custompath, function(err, stats) {
-    if (err) {
-        writeFile(custompath, "[]");
-    }
-});
+appStore.edgeincluded = conf.get("edgeincluded");
 
 appStore.performance = conf.get("performance");
 
@@ -226,6 +238,14 @@ if (typeof appStore.performance.edgeLabels === "undefined") {
     appStore.performance.edgeLabels = 0;
     conf.set("performance", appStore.performance);
 }
+
+var custompath = join(app.getPath("userData"), "customqueries.json");
+
+stat(custompath, function(err, stats) {
+    if (err) {
+        writeFile(custompath, "{}");
+    }
+});
 
 renderEmit.on("login", function() {
     emitter.removeAllListeners();

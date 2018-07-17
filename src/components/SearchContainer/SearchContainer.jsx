@@ -12,13 +12,47 @@ export default class SearchContainer extends Component {
             mainPlaceholder: "Start typing to search for a node...",
             pathfindingIsOpen: false,
             mainValue: "",
-            pathfindValue: ""
+            pathfindValue: "",
+            edgeincluded: {
+                MemberOf: true,
+                HasSession: true,
+                AdminTo: true,
+                AllExtendedRights: true,
+                AddMember: true,
+                ForceChangePassword: true,
+                GenericAll: true,
+                GenericWrite: true,
+                Owns: true,
+                WriteDacl: true,
+                WriteOwner: true,
+                CanRDP: true,
+                ExecuteDCOM: true
+            }
         };
+    }
+
+    handleChange(event){
+        let current = this.state.edgeincluded;
+        let eName = event.target.getAttribute("name");
+        current[eName] = !current[eName];
+        this.setState({edgeincluded: current});
+
+        appStore.edgeincluded = current;
+        conf.set("edgeincluded", current);
     }
 
     componentDidMount() {
         jQuery(this.refs.pathfinding).slideToggle(0);
         jQuery(this.refs.tabs).slideToggle(0);
+        jQuery(this.refs.edgeFilter).animate(
+            {
+                height: "toggle",
+                width: "toggle"
+            },
+            "fast"
+        );
+
+        this.setState({edgeincluded: appStore.edgeincluded});
         emitter.on("userNodeClicked", this.openNodeTab.bind(this));
         emitter.on("groupNodeClicked", this.openNodeTab.bind(this));
         emitter.on("computerNodeClicked", this.openNodeTab.bind(this));
@@ -228,7 +262,7 @@ export default class SearchContainer extends Component {
                     }
 
                     query +=
-                        " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
+                        " WITH m,n MATCH p=allShortestPaths((n)-[r:{}}*1..]->(m)) RETURN p";
 
                     emitter.emit("query", query, { aprop: start, bprop: end });
                 }
@@ -484,7 +518,7 @@ export default class SearchContainer extends Component {
                 }
 
                 query +=
-                    " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(m)) RETURN p";
+                    " WITH m,n MATCH p=allShortestPaths((n)-[r:{}}*1..]->(m)) RETURN p";
 
                 emitter.emit("query", query, { aprop: start, bprop: end });
             }.bind(this),
@@ -574,6 +608,16 @@ export default class SearchContainer extends Component {
         });
     }
 
+    _onFilterClick() {
+        jQuery(this.refs.edgeFilter).animate(
+            {
+                height: "toggle",
+                width: "toggle"
+            },
+            "medium"
+        );
+    }
+
     _onPathfindClick() {
         jQuery(this.refs.pathfinding).slideToggle();
         var p = !this.state.pathfindingIsOpen;
@@ -650,7 +694,7 @@ export default class SearchContainer extends Component {
         }
 
         query +=
-            " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|CanRDP|ExecuteDCOM*1..]->(m)) RETURN p";
+            " WITH m,n MATCH p=allShortestPaths((n)-[r:{}*1..]->(m)) RETURN p";
 
         emitter.emit("query", query, { aprop: start, bprop: end });
     }
@@ -809,7 +853,7 @@ export default class SearchContainer extends Component {
                 }
 
                 query +=
-                    " WITH m,n MATCH p=allShortestPaths((n)-[r:MemberOf|AdminTo|HasSession|Contains|GpLink|Owns|DCSync|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|CanRDP|ExecuteDCOM*1..]->(m)) RETURN p";
+                    " WITH m,n MATCH p=allShortestPaths((n)-[r:{}*1..]->(m)) RETURN p";
 
                 emitter.emit("query", query, { aprop: start, bprop: end });
             }
@@ -818,7 +862,151 @@ export default class SearchContainer extends Component {
 
     render() {
         return (
-            <div className="searchdiv">
+            <div id="searchdiv" className="searchdiv">
+                <div ref="edgeFilter" className="edgeFilter">
+                    <div>
+                        <h3>Edge Filtering</h3>
+                        <i
+                            data-toggle="tooltip"
+                            data-placement="right"
+                            title="Filters edges outside prebuilt queries"
+                            className="glyphicon glyphicon-question-sign"
+                        />
+                    </div>
+                    <h4>Default Edges</h4>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            checked={this.state.edgeincluded.MemberOf}
+                            onChange={this.handleChange.bind(this)}
+                            name="MemberOf"
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="MemberOf"> MemberOf</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="HasSession"
+                            checked={this.state.edgeincluded.HasSession}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="HasSession"> HasSession</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="AdminTo"
+                            checked={this.state.edgeincluded.AdminTo}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="AdminTo"> AdminTo</label>
+                    </div>
+                    <h4>ACL Edges</h4>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="AllExtendedRights"
+                            checked={this.state.edgeincluded.AllExtendedRights}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="AllExtendedRights"> AllExtendedRights</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="AddMember"
+                            checked={this.state.edgeincluded.AddMember}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="AddMember"> AddMember</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="ForceChangePassword"
+                            checked={this.state.edgeincluded.ForceChangePassword}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="ForceChangePassword"> ForceChangePassword</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="GenericAll"
+                            checked={this.state.edgeincluded.GenericAll}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="GenericAll"> GenericAll</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="GenericWrite"
+                            checked={this.state.edgeincluded.GenericWrite}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="GenericWrite"> GenericWrite</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="Owns"
+                            checked={this.state.edgeincluded.Owns}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="Owns"> Owns</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="WriteDacl"
+                            checked={this.state.edgeincluded.WriteDacl}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="WriteDacl"> WriteDacl</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="WriteOwner"
+                            checked={this.state.edgeincluded.WriteOwner}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="WriteOwner"> WriteOwner</label>
+                    </div>
+                    <h4>Unprivileged Execution</h4>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="CanRDP"
+                            checked={this.state.edgeincluded.CanRDP}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="CanRDP"> CanRDP</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="ExecuteDCOM"
+                            checked={this.state.edgeincluded.ExecuteDCOM}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="ExecuteDCOM"> ExecuteDCOM</label>
+                    </div>
+                </div>
                 <div className="input-group input-group-unstyled searchSelectorS">
                     <GlyphiconSpan
                         tooltip
@@ -856,6 +1044,15 @@ export default class SearchContainer extends Component {
                         }}
                     >
                         <Icon glyph="step-backward" extraClass="menuglyph" />
+                    </GlyphiconSpan>
+                    <GlyphiconSpan
+                        tooltip
+                        tooltipDir="bottom"
+                        tooltipTitle="Filter Edge Types"
+                        classes="input-group-addon spanfix"
+                        click={this._onFilterClick.bind(this)}
+                    >
+                        <Icon glyph="filter" extraClass="menuglyph" />
                     </GlyphiconSpan>
                 </div>
                 <div ref="pathfinding">
