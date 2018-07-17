@@ -12,6 +12,9 @@
     <li onclick="emitter.emit('query', 'MATCH (n:User {name:{name}}),(m),p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
         <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
     </li>
+    <li onclick="emitter.emit('editnode', '{{label}}', 'user')">
+        <i class="glyphicon glyphicon-screenshot"> </i> Edit Node
+    </li>
     {{/type_user}} {{#type_computer}}
     <li onclick="emitter.emit('setStart', '{{type}}:{{label}}')">
         <i class="glyphicon glyphicon-screenshot"> </i> Set as Starting Node
@@ -31,6 +34,9 @@
     </li>
     <li onclick="emitter.emit('query', 'MATCH (n:Group {name:{name}}),(m),p=allShortestPaths((m)-[r:{}*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
         <i class="glyphicon glyphicon-screenshot"> </i> Shortest Paths to Here
+    </li>
+    <li onclick="emitter.emit('editnode', '{{label}}', 'group')">
+        <i class="glyphicon glyphicon-screenshot"> </i> Edit Node
     </li>
     {{/type_group}} {{#type_gpo}}
     <li onclick="emitter.emit('setStart', '{{type}}:{{guid}}')">

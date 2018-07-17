@@ -169,6 +169,58 @@ div.tooltip-inner-custom {
     white-space: nowrap;
 }
 
+.nodeEditor{
+    position: absolute;
+    z-index: 20;
+    top: 1em;
+    right: 10em;
+    overflow: auto;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+.heighthack{
+    height: 1px;
+}
+
+.nodeEditor .panel-heading{
+    cursor: move;
+}
+
+
+.nodeEditTableContainer{
+    overflow: auto;
+    max-height: 20em;
+}
+
+.nodeEditRow *[contenteditable="true"]{
+    background-color: white;
+    border: 1px solid lightgray;
+}
+
+.nodeEditRow > td{
+    padding: 5px !important;
+}
+
+.nodeEditString{
+    resize: none;
+    max-width: 400px;
+}
+
+.nodeEditNumber{
+    resize: none;
+}
+
+.nodeEditArray{
+    resize: none;
+    max-height: 200px;
+    width: 100%;
+    height:100%;
+    max-width: 400px;
+    overflow-y: scroll;
+    white-space: pre-line;
+}
+
 @media all and (min-width: 600px) {
     .searchdiv {
         position: absolute;
@@ -657,6 +709,10 @@ div.tooltip-inner-custom {
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
+.settingsDiv .panel-heading{
+    cursor: move;
+}
+
 .sliderinput {
     float: left;
     width: 3em;
@@ -738,6 +794,11 @@ div.tooltip-inner-custom {
 
 .displaynone {
     display: none;
+}
+
+.form-override:focus{
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    border: 1px solid rgb(204,204,204);
 }
 
 .menubutton {

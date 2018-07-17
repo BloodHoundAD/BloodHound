@@ -17,7 +17,8 @@ export default class ComputerNodeData extends Component {
             displayMap: {
                 operatingsystem: "OS",
                 enabled: "Enabled",
-                unconstraineddelegation: "Allows Unconstrained Delegation"
+                unconstraineddelegation: "Allows Unconstrained Delegation",
+                owned: "Compromised"
             }
         };
 

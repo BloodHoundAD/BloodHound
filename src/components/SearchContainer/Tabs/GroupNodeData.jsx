@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import NodeCypherLink from "./NodeCypherLink";
+import NodeProps from "./NodeProps";
 
 export default class GroupNodeData extends Component {
     constructor() {
@@ -8,7 +9,10 @@ export default class GroupNodeData extends Component {
 
         this.state = {
             label: "",
-            driversessions: []
+            driversessions: [],
+            propertyMap: {},
+            displayMap: {"description":"Description","admincount":"Admin Count"},
+            ServicePrincipalNames: []
         };
 
         emitter.on("groupNodeClicked", this.getNodeData.bind(this));
@@ -22,6 +26,17 @@ export default class GroupNodeData extends Component {
         this.setState({
             label: payload
         });
+
+        var propCollection = driver.session();
+        propCollection
+            .run("MATCH (c:Group {name:{name}}) RETURN c", { name: payload })
+            .then(
+                function(result) {
+                    var properties = result.records[0]._fields[0].properties;
+                    this.setState({ propertyMap: properties });
+                    propCollection.close();
+                }.bind(this)
+            );
     }
 
     render() {
@@ -31,6 +46,11 @@ export default class GroupNodeData extends Component {
                     <h4>Node Info</h4>
                     <dt>Name</dt>
                     <dd>{this.state.label}</dd>
+                    <NodeProps
+                        properties={this.state.propertyMap}
+                        displayMap={this.state.displayMap}
+                        ServicePrincipalNames={this.state.ServicePrincipalNames}
+                    />
                     <NodeCypherLink
                         property="Sessions"
                         target={this.state.label}

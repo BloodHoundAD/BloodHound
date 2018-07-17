@@ -64,6 +64,7 @@ export default class MenuContainer extends Component {
                             }.bind(this),
                             3000
                         );
+                        this.addOwnedProp();
                         $.each(results, function(_, file) {
                             if (file.delete) {
                                 unlinkSync(file.path);
@@ -148,7 +149,8 @@ export default class MenuContainer extends Component {
                             }.bind(this),
                             3000
                         );
-                        $.each(results, function(index, file) {
+                        this.addOwnedProp();
+                        $.each(results, function(_, file) {
                             if (file.delete) {
                                 unlinkSync(file.path);
                             }
@@ -159,6 +161,13 @@ export default class MenuContainer extends Component {
                 input.val("");
             }.bind(this)
         );
+    }
+
+    async addOwnedProp(){
+        let s = driver.session();
+        await s.run("MATCH (n:User) WHERE NOT EXISTS(n.owned) SET n.owned=false");
+        await s.run("MATCH (n:Computer) WHERE NOT EXISTS(n.owned) SET n.owned=false");
+        s.close();
     }
 
     async unzipNecessary(files) {
@@ -210,6 +219,10 @@ export default class MenuContainer extends Component {
         let type;
 
         console.log(file);
+        this.setState({
+            uploading: true,
+            progress: 0
+        });
 
         let pipeline = chain([
             createReadStream(file, { encoding: "utf8" }),
@@ -226,6 +239,9 @@ export default class MenuContainer extends Component {
 
                 if (!acceptableTypes.includes(type)) {
                     emitter.emit("showAlert", "Unrecognized JSON Type");
+                    this.setState({
+                        uploading: false
+                    });
                     callback();
                 }
 

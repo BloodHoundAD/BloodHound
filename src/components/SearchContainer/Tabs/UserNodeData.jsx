@@ -24,7 +24,8 @@ export default class UserNodeData extends Component {
                 homedirectory: "Home Directory",
                 description: "Description",
                 userpassword: "User Password",
-                admincount: "AdminCount"
+                admincount: "AdminCount",
+                owned: "Compromised"
             }
         };
 
