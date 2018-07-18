@@ -5,6 +5,7 @@ import SpotlightContainer from "./components/Spotlight/SpotlightContainer";
 import LogoutModal from "./components/Modals/LogoutModal";
 import DeleteEdgeModal from "./components/Modals/DeleteEdgeModal";
 import DeleteNodeModal from "./components/Modals/DeleteNodeModal";
+import AddNodeModal from "./components/Modals/AddNodeModal";
 import CancelUploadModal from "./components/Modals/CancelUploadModal";
 import ClearWarnModal from "./components/Modals/ClearWarnModal";
 import ClearConfirmModal from "./components/Modals/ClearConfirmModal";
@@ -50,6 +51,7 @@ export default class AppContainer extends Component {
                         <LogoutModal />
                         <DeleteEdgeModal />
                         <DeleteNodeModal />
+                        <AddNodeModal />
                         <ClearWarnModal />
                         <ClearConfirmModal />
                         <ClearingModal />

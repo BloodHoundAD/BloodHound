@@ -68,6 +68,7 @@
     "react-if": "^2.1.0",
     "react-transition-group": "^2.2.1",
     "stream-json": "^1.1.0",
-    "unzipper": "^0.8.9"
+    "unzipper": "^0.8.9",
+    "uuid": "^3.3.2"
   }
 }

@@ -516,16 +516,15 @@ export function buildSessionJson(chunk) {
     let queries = {};
     queries.sessions = {
         statement:
-            "UNWIND {props} AS prop MERGE (n:User {name:prop.user}) MERGE (m:Computer {name:prop.comp}) MERGE (m)-[r:HasSession {weight: prop.weight, isacl:false}]->(n)",
+            "UNWIND {props} AS prop MERGE (n:User {name:prop.user}) MERGE (m:Computer {name:prop.comp}) MERGE (m)-[r:HasSession {isacl:false}]->(n)",
         props: []
     };
 
     $.each(chunk, function(_, session) {
         let name = session.UserName;
         let comp = session.ComputerName;
-        let weight = session.Weight;
 
-        queries.sessions.props.push({ user: name, comp: comp, weight: weight });
+        queries.sessions.props.push({ user: name, comp: comp});
     });
     return queries;
 }

@@ -1,11 +1,12 @@
 import React, { Component } from "react";
-import { findGraphPath } from "utils";
+import { findGraphPath, generateUniqueId } from "utils";
 import { writeFile, readFile } from "fs";
 import { fork } from "child_process";
 var child;
 import { join } from "path";
 import { remote } from "electron";
 const { dialog } = remote;
+const uuidv4 = require('uuid/v4');
 
 export default class GraphContainer extends Component {
     constructor(props) {
@@ -159,6 +160,8 @@ export default class GraphContainer extends Component {
         emitter.on("changeEdgeLabels", this.changeEdgeLabelMode.bind(this));
         emitter.on("deleteEdgeConfirm", this.deleteEdge.bind(this));
         emitter.on("deleteNodeConfirm", this.deleteNode.bind(this));
+        emitter.on("changeLayout", this.changeLayout.bind(this));
+        emitter.on("addNodeFinal", this.addNode.bind(this));
     }
 
     componentDidMount() {
@@ -174,13 +177,55 @@ export default class GraphContainer extends Component {
         });
     }
 
+    addNode(name, type){
+        let q = driver.session();
+        let guid = uuidv4();
+
+        let key = type === "OU" ? "guid" : "name";
+        let varn = type === "OU" ? guid : name;
+        let typevar = `type_${type.toLowerCase()}`;
+
+        let statement = `MERGE (n:${type} {${key}:{name}})`
+        q.run(statement, {name:varn}).then(x => {
+            let instance = this.state.sigmaInstance;
+            let id = generateUniqueId(instance, true);
+            let node = {
+                id: id,
+                label: varn,
+                type: type,
+                x: this.state.tooltipPos.x,
+                y: this.state.tooltipPos.y,
+                folded:{
+                    nodes: [],
+                    edges: []
+                },
+                groupedNode: false,
+                degree: 1
+            }
+            node[typevar] = true;
+            instance.graph.addNode(node);
+            this.applyDesign()
+            q.close();
+        })
+    }
+
     relayout() {
+        if (appStore.currentTooltip != null){
+            appStore.currentTooltip.close();
+        }
         sigma.layouts.stopForceLink();
         if (appStore.dagre) {
             sigma.layouts.dagre.start(this.state.sigmaInstance);
         } else {
             sigma.layouts.startForceLink();
         }
+    }
+
+    changeLayout(){
+        appStore.dagre = !appStore.dagre;
+        var type = appStore.dagre ? "Hierarchical" : "Directed";
+        emitter.emit("showAlert", "Changed Layout to " + type);
+        this.relayout();
     }
 
     deleteNode(id){
@@ -220,6 +265,9 @@ export default class GraphContainer extends Component {
     }
 
     reload(){
+        if (appStore.currentTooltip !== null){
+            appStore.currentTooltip.close();
+        }
         this.doQueryNative(this.state.currentQuery);
     }
 
@@ -904,6 +952,71 @@ export default class GraphContainer extends Component {
         }
     }
 
+    //Function taken from the DragNodes code https://github.com/jacomyal/sigma.js/blob/master/plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js
+    calculateOffset(element) {
+        var style = window.getComputedStyle(element);
+        var getCssProperty = function(prop) {
+          return parseInt(style.getPropertyValue(prop).replace('px', '')) || 0;
+        };
+        return {
+          left: element.getBoundingClientRect().left + getCssProperty('padding-left'),
+          top: element.getBoundingClientRect().top + getCssProperty('padding-top')
+        };
+    };
+
+    //Function taken from the DragNodes code https://github.com/jacomyal/sigma.js/blob/master/plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js
+    calculateClickPos(clientX, clientY){
+        let _s = this.state.sigmaInstance;
+        let _camera = _s.camera;
+        let _prefix = _s.renderers[0].options.prefix;
+        var offset = this.calculateOffset(_s.renderers[0].container),
+            x = clientX - offset.left,
+            y = clientY - offset.top,
+            cos = Math.cos(_camera.angle),
+            sin = Math.sin(_camera.angle),
+            nodes = _s.graph.nodes(),
+            ref = [];
+
+        // Getting and derotating the reference coordinates.
+        for (var i = 0; i < 2; i++) {
+          var n = nodes[i];
+          var aux = {
+            x: n.x * cos + n.y * sin,
+            y: n.y * cos - n.x * sin,
+            renX: n[_prefix + 'x'],
+            renY: n[_prefix + 'y'],
+          };
+          ref.push(aux);
+        }
+
+        // Applying linear interpolation.
+        // if the nodes are on top of each other, we use the camera ratio to interpolate
+        if (ref[0].x === ref[1].x && ref[0].y === ref[1].y) {
+          var xRatio = (ref[0].renX === 0) ? 1 : ref[0].renX;
+          var yRatio = (ref[0].renY === 0) ? 1 : ref[0].renY;
+          x = (ref[0].x / xRatio) * (x - ref[0].renX) + ref[0].x;
+          y = (ref[0].y / yRatio) * (y - ref[0].renY) + ref[0].y;
+        } else {
+          var xRatio = (ref[1].renX - ref[0].renX) / (ref[1].x - ref[0].x);
+          var yRatio = (ref[1].renY - ref[0].renY) / (ref[1].y - ref[0].y);
+
+          // if the coordinates are the same, we use the other ratio to interpolate
+          if (ref[1].x === ref[0].x) {
+            xRatio = yRatio;
+          }
+
+          if (ref[1].y === ref[0].y) {
+            yRatio = xRatio;
+          }
+
+          x = (x - ref[0].renX) / xRatio + ref[0].x;
+          y = (y - ref[0].renY) / yRatio + ref[0].y;
+        }
+
+        // Rotating the coordinates.
+        return {x:x * cos - y * sin, y:y * cos + x * sin}
+    }
+
     initializeSigma() {
         let sigmaInstance, design;
 
@@ -992,6 +1105,15 @@ export default class GraphContainer extends Component {
                 }
             }.bind(this)
         );
+
+        sigmaInstance.bind("rightClickStage", event => {
+            let x = event.data.captor.clientX;
+            let y = event.data.captor.clientY;
+
+            let newPos = this.calculateClickPos(x,y)
+
+            this.setState({tooltipPos: {x: newPos.x, y: newPos.y}})
+        })
 
         //Some key binds
         $(window).on(
@@ -1083,9 +1205,9 @@ export default class GraphContainer extends Component {
                         show: "rightClickStage",
                         cssClass: "new-tooltip",
                         autoadjust: true,
-                        renderer: function(edge){
+                        renderer: function(){
                             var template = this.state.stageTemplate;
-                            return Mustache.render(template, edge);
+                            return Mustache.render(template);
                         }.bind(this)
                     }
                 ]

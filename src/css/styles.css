@@ -226,6 +226,13 @@ div.tooltip-inner-custom {
     white-space: pre-line;
 }
 
+.add-modal-check-style{
+    position: relative;
+    font-size: 24px;
+    margin-right: 5px;
+    top: 5px;
+}
+
 @media all and (min-width: 600px) {
     .searchdiv {
         position: absolute;

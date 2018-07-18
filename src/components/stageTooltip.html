@@ -2,22 +2,22 @@
         Graph Options
 </div>
 <ul>
-    <li onclick="">
+    <li onclick="emitter.emit('addNode')">
         <i class="fa fa-plus"></i> Add Node
     </li>
-    <li onclick="">
+    <li onclick="emitter.emit('graphRefresh')">
         <i class="fa fa-refresh"></i> Refresh Layout
     </li>
-    <li onclick="">
+    <li onclick="emitter.emit('graphReload')">
         <i class="fa fa-retweet"></i> Reload Query
     </li>
-    <li onclick="">
+    <li onclick="emitter.emit('changeLayout')">
         <i class="fa fa-line-chart"></i> Change Layout
     </li>
-    <li onclick="">
+    <li onclick="emitter.emit('importShim')">
         <i class="fa fa-download"></i> Import Graph
     </li>
-    <li onclick="">
+    <li onclick="emitter.emit('showExport')">
         <i class="fa fa-upload"></i> Export Graph
     </li>
 </ul>

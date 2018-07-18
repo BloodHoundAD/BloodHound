@@ -38,6 +38,7 @@ export default class MenuContainer extends Component {
 
         emitter.on("cancelUpload", this.cancelUpload.bind(this));
         emitter.on("filedrop", this.fileDrop.bind(this))
+        emitter.on("importShim", this._importClick.bind(this))
     }
 
     fileDrop(e){
@@ -96,10 +97,7 @@ export default class MenuContainer extends Component {
     }
 
     _changeLayoutClick() {
-        appStore.dagre = !appStore.dagre;
-        emitter.emit("graphRefresh");
-        var type = appStore.dagre ? "Hierarchical" : "Directed";
-        emitter.emit("showAlert", "Changed Layout to " + type);
+        emitter.emit("changeLayout");
     }
 
     _exportClick() {
@@ -107,6 +105,9 @@ export default class MenuContainer extends Component {
     }
 
     _importClick() {
+        if (appStore.currentTooltip !== null){
+            appStore.currentTooltip.close();
+        }
         var fname = dialog.showOpenDialog({
             properties: ["openFile"]
         });
