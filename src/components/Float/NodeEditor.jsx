@@ -6,8 +6,8 @@ export default class NodeEditor extends Component {
         super();
 
         this.state = {
-            label: "DOMAIN ADMINS@TESTLAB.LOCAL",
-            type: "group",
+            label: "",
+            type: "",
             properties: {}
         };
     }
@@ -29,21 +29,21 @@ export default class NodeEditor extends Component {
         appStore.currentTooltip.close();
         $(this.refs.outer).fadeIn();
         let q = driver.session();
-        this.setState({ label: name, type: type });
+        this.setState({ label: name, type: type, dname: name });
         let statement = "MATCH (n:{} {{}:{name}}) RETURN n";
         let key;
-        if (type === "ou") {
+        if (type === "OU") {
             key = "guid";
         } else {
             key = "name";
         }
 
-        q.run(statement.format(type.toTitleCase(), key), { name: name }).then(
+        q.run(statement.format(type, key), { name: name }).then(
             function(result) {
                 let props = result.records[0]._fields[0].properties;
                 let label = props.name;
                 delete props.name;
-                this.setState({ properties: props, label: label });
+                this.setState({ properties: props, dname: label });
                 q.close()
             }.bind(this)
         );
@@ -75,14 +75,14 @@ export default class NodeEditor extends Component {
         }
 
         let key;
-        if (this.state.type === "ou") {
+        if (this.state.type === "OU") {
             key = "guid";
         } else {
             key = "name";
         }
 
         let q = driver.session();
-        let statement = "MATCH (n:{} {{}:{name}}) SET n.{}={newprop} RETURN n".format(this.state.type.toTitleCase(), key, val)
+        let statement = "MATCH (n:{} {{}:{name}}) SET n.{}={newprop} RETURN n".format(this.state.type, key, val)
 
         q.run(statement, {name: this.state.label, newprop: newval}).then(result => {
             let props = result.records[0]._fields[0].properties;
@@ -95,7 +95,7 @@ export default class NodeEditor extends Component {
 
     updateHandler(attrName, newVal) {
         let key;
-        if (this.state.type === "ou") {
+        if (this.state.type === "OU") {
             key = "guid";
         } else {
             key = "name";
@@ -107,12 +107,12 @@ export default class NodeEditor extends Component {
             }
 
             if (newVal.length > 0){
-                statement = "MATCH (n:{} {{}:{name}}) SET n.{}={newprop}, n.hasspn=true RETURN n".format(this.state.type.toTitleCase(), key, attrName)
+                statement = "MATCH (n:{} {{}:{name}}) SET n.{}={newprop}, n.hasspn=true RETURN n".format(this.state.type, key, attrName)
             }else{
-                statement = "MATCH (n:{} {{}:{name}}) SET n.{}={newprop}, n.hasspn=false RETURN n".format(this.state.type.toTitleCase(), key, attrName)
+                statement = "MATCH (n:{} {{}:{name}}) SET n.{}={newprop}, n.hasspn=false RETURN n".format(this.state.type, key, attrName)
             }
         }else{
-            statement = "MATCH (n:{} {{}:{name}}) SET n.{}={newprop} RETURN n".format(this.state.type.toTitleCase(), key, attrName)
+            statement = "MATCH (n:{} {{}:{name}}) SET n.{}={newprop} RETURN n".format(this.state.type, key, attrName)
         }
         
         let q = driver.session();
@@ -126,13 +126,13 @@ export default class NodeEditor extends Component {
 
     deletePropHandler(attrName) {
         let key;
-        if (this.state.type === "ou") {
+        if (this.state.type === "OU") {
             key = "guid";
         } else {
             key = "name";
         }
         let statement = "MATCH (n:{} {{}:{name}}) REMOVE n.{} RETURN n".format(
-            this.state.type.toTitleCase(),
+            this.state.type,
             key,
             attrName
         );
@@ -157,7 +157,7 @@ export default class NodeEditor extends Component {
         return (
             <div ref="outer" className="nodeEditor panel panel-default">
                 <div className="panel-heading" id="nodeEditOuter">
-                    {this.state.label}
+                    {this.state.dname}
                     <button
                         type="button"
                         className="close"
