@@ -4,18 +4,18 @@
 <ul>
     {{#type_ou}}
     <li onclick="emitter.emit('setStart', '{{type}}:{{guid}}')">
-        <i class="fa fa-bullseye"></i> Set as Starting Node
+        <i class="fa fa-map-marker"></i> Set as Starting Node
     </li>
     <li onclick="emitter.emit('setEnd', '{{type}}:{{guid}}')">
-        <i class="fa fa-bullseye"> </i> Set as Ending Node
+        <i class="fa fa-map-marker"> </i> Set as Ending Node
     </li>
     {{/type_ou}}
     {{^type_ou}}
     <li onclick="emitter.emit('setStart', '{{type}}:{{label}}')">
-        <i class="fa fa-bullseye"></i> Set as Starting Node
+        <i class="fa fa-map-marker"></i> Set as Starting Node
     </li>
     <li onclick="emitter.emit('setEnd', '{{type}}:{{label}}')">
-        <i class="fa fa-bullseye"> </i> Set as Ending Node
+        <i class="fa fa-map-marker"> </i> Set as Ending Node
     </li>
     {{/type_ou}}
     {{#type_user}}
@@ -58,15 +58,15 @@
     </li>
     {{#expand}}
     <li onclick="emitter.emit('unfoldNode', {{id}}); appStore.currentTooltip.close()">
-        <i class="fa fa-expand"> </i> Expand
+        <i class="fa fa-object-ungroup"> </i> Expand
     </li>
     {{/expand}} {{#collapse}}
     <li onclick="emitter.emit('collapseNode', {{id}}); appStore.currentTooltip.close()">
-        <i class="fa fa-compress"> </i> Collapse
+        <i class="fa fa-object-group"> </i> Collapse
     </li>
     {{/collapse}} {{#groupedNode}}
     <li onclick="emitter.emit('ungroupNode', {{id}}); appStore.currentTooltip.close()">
-        <i class="fa fa-expand"> </i> Expand
+        <i class="fa fa-object-ungroup"> </i> Expand
     </li>
     {{/groupedNode}}
 </ul>

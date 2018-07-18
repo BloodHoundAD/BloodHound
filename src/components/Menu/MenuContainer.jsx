@@ -337,21 +337,21 @@ export default class MenuContainer extends Component {
                     <MenuButton
                         click={this._refreshClick.bind(this)}
                         hoverVal="Refresh"
-                        glyphicon="glyphicon glyphicon-refresh"
+                        glyphicon="fa fa-refresh"
                     />
                 </div>
                 <div>
                     <MenuButton
                         click={this._exportClick.bind(this)}
                         hoverVal="Export Graph"
-                        glyphicon="glyphicon glyphicon-export"
+                        glyphicon="fa fa-download"
                     />
                 </div>
                 <div>
                     <MenuButton
                         click={this._importClick.bind(this)}
                         hoverVal="Import Graph"
-                        glyphicon="glyphicon glyphicon-import"
+                        glyphicon="fa fa-upload"
                     />
                 </div>
                 <div>

@@ -42,6 +42,14 @@ export default class GraphContainer extends Component {
             }.bind(this)
         });
 
+        $.ajax({
+            url: "src/components/stageTooltip.html",
+            type: "GET",
+            success: function(response) {
+                this.setState({ stageTemplate: response });
+            }.bind(this)
+        });
+
         child.stdout.on("data", data => {
             console.log(`stdout: ${data}`);
         });
@@ -1059,17 +1067,28 @@ export default class GraphContainer extends Component {
                         }.bind(this)
                     }
                 ],
-            edge: [
-                {
-                    show: "rightClickEdge",
-                    cssClass: "new-tooltip",
-                    autoadjust: true,
-                    renderer: function(edge){
-                        var template = this.state.edgeTemplate;
-                        return Mustache.render(template, edge);
-                    }.bind(this)
-                }
-            ]
+                edge: [
+                    {
+                        show: "rightClickEdge",
+                        cssClass: "new-tooltip",
+                        autoadjust: true,
+                        renderer: function(edge){
+                            var template = this.state.edgeTemplate;
+                            return Mustache.render(template, edge);
+                        }.bind(this)
+                    }
+                ],
+                stage: [
+                    {
+                        show: "rightClickStage",
+                        cssClass: "new-tooltip",
+                        autoadjust: true,
+                        renderer: function(edge){
+                            var template = this.state.stageTemplate;
+                            return Mustache.render(template, edge);
+                        }.bind(this)
+                    }
+                ]
             }
         );
 
