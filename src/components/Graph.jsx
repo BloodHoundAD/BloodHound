@@ -889,7 +889,7 @@ export default class GraphContainer extends Component {
         sigmaInstance.settings({
             edgeColor: "default",
             edgeHoverColor: "default",
-            defaultEdgeHoverColor: "#000",
+            defaultEdgeHoverColor: "green",
             enableEdgeHovering: true,
             nodeColor: "default",
             minEdgeSize: 1,
