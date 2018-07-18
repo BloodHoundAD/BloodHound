@@ -251,7 +251,7 @@ export default class DomainNodeData extends Component {
                         property="Transitive Controllers"
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=shortestPath((n)-[r1:MemberOf|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns|DCSync*1..]->(u:Domain {name: {name}})) WHERE NOT n.name={name}"
+                            "MATCH p=shortestPath((n)-[r1:MemberOf|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(u:Domain {name: {name}})) WHERE NOT n.name={name}"
                         }
                         distinct
                     />
@@ -260,10 +260,10 @@ export default class DomainNodeData extends Component {
                         property="Calculated Principals with DCSync Privileges"
                         target={this.state.label}
                         countQuery={
-                            "MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH n1 MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u:Domain {name: {name}}) WITH n1 MATCH (n2)-[:MemberOf|DCSync*1..]->(u:Domain {name: {name}}) WITH collect(distinct(n1))+collect(distinct(n2)) as results UNWIND results as x WITH x WHERE x:User OR x:Computer RETURN count(distinct(x))"
+                            "MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH n1 MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u:Domain {name: {name}}) WITH n1 MATCH (n2)-[:MemberOf|GenericAll|AllExtendedRights*1..]->(u:Domain {name: {name}}) WITH collect(distinct(n1))+collect(distinct(n2)) as results UNWIND results as x WITH x WHERE x:User OR x:Computer RETURN count(distinct(x))"
                         }
                         graphQuery={
-                            "MATCH p=(n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH p,n1 MATCH p2=(n1)-[:MemberOf|GetChangesAll*1..]->(u:Domain {name: {name}}) WITH p,p2 MATCH p3=(n2)-[:MemberOf|DCSync*1..]->(u:Domain {name: {name}}) RETURN p,p2,p3"
+                            "MATCH p=(n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH p,n1 MATCH p2=(n1)-[:MemberOf|GetChangesAll*1..]->(u:Domain {name: {name}}) WITH p,p2 MATCH p3=(n2)-[:MemberOf|GenericAll|AllExtendedRights*1..]->(u:Domain {name: {name}}) RETURN p,p2,p3"
                         }
                     />
                 </dl>
