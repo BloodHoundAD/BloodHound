@@ -36,6 +36,24 @@
             ]
         },
         {
+            "name": "Find DCSyncers",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain...",
+                    "query":
+                        "MATCH (n:Domain) RETURN n.name ORDER BY n.name DESC"
+                },
+                {
+                    "final": true,
+                    "query":
+                        "MATCH p=(n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {result}}) WITH p,n1 MATCH p2=(n1)-[:MemberOf|GetChangesAll*1..]->(u:Domain {name: {result}}) WITH p,p2 MATCH p3=(n2)-[:MemberOf|GenericAll|AllExtendedRights*1..]->(u:Domain {name: {result}}) RETURN p,p2,p3",
+                    "allowCollapse": true,
+                    "endNode": "{}"
+                }
+            ]
+        },
+        {
             "name": "Find logged in Admins",
             "queryList": [
                 {
