@@ -150,6 +150,7 @@ export default class GraphContainer extends Component {
         emitter.on("changeNodeLabels", this.changeNodeLabelMode.bind(this));
         emitter.on("changeEdgeLabels", this.changeEdgeLabelMode.bind(this));
         emitter.on("deleteEdgeConfirm", this.deleteEdge.bind(this));
+        emitter.on("deleteNodeConfirm", this.deleteNode.bind(this));
     }
 
     componentDidMount() {
@@ -174,12 +175,28 @@ export default class GraphContainer extends Component {
         }
     }
 
+    deleteNode(id){
+        let instance = this.state.sigmaInstance;
+        let node = instance.graph.nodes(id);
+        let type = node.type;
+        let key = type === "OU" ? 'guid' : 'name';
+        let val = type === "OU" ? node.guid : node.label;
+
+        let statement = "MATCH (n:{} {{}:{key}}) DETACH DELETE n".format(type, key);
+
+        instance.graph.dropNode(node.id);
+        instance.refresh()
+
+        let q = driver.session();
+        q.run(statement, {key:val}).then(x => {q.close()});
+        
+    }
+
     deleteEdge(id){
         let instance = this.state.sigmaInstance;
         let edge = instance.graph.edges(id);
         let sourcenode = instance.graph.nodes(edge.source);
         let targetnode = instance.graph.nodes(edge.target);
-
 
         let sourcekey = sourcenode.type === "OU" ? 'guid' : 'name';
         let targetkey = targetnode.type === "OU" ? 'guid' : 'name';

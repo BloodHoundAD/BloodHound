@@ -53,19 +53,20 @@
         <i class="fa fa-edit"> </i> Edit Node
     </li>
     {{/type_ou}}
-
+    <li onclick="emitter.emit('deletenode', '{{id}}')">
+        <i class="fa fa-trash"> </i> Delete Node
+    </li>
     {{#expand}}
     <li onclick="emitter.emit('unfoldNode', {{id}}); appStore.currentTooltip.close()">
-        <i class="glyphicon glyphicon-screenshot"> </i> Expand
+        <i class="fa fa-expand"> </i> Expand
     </li>
     {{/expand}} {{#collapse}}
     <li onclick="emitter.emit('collapseNode', {{id}}); appStore.currentTooltip.close()">
-        <i class="glyphicon glyphicon-screenshot"> </i> Collapse
+        <i class="fa fa-compress"> </i> Collapse
     </li>
     {{/collapse}} {{#groupedNode}}
     <li onclick="emitter.emit('ungroupNode', {{id}}); appStore.currentTooltip.close()">
-        <i class="glyphicon glyphicon-screenshot"> </i> Expand
+        <i class="fa fa-expand"> </i> Expand
     </li>
     {{/groupedNode}}
-    
 </ul>
