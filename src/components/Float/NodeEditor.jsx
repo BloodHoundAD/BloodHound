@@ -22,9 +22,11 @@ export default class NodeEditor extends Component {
             },
             handle: "#nodeEditOuter"
         });
+        $(this.refs.outer).fadeToggle(false);
     }
 
     getNodeData(name, type) {
+        appStore.currentTooltip.close();
         $(this.refs.outer).fadeIn();
         let q = driver.session();
         this.setState({ label: name, type: type });
@@ -42,6 +44,7 @@ export default class NodeEditor extends Component {
                 let label = props.name;
                 delete props.name;
                 this.setState({ properties: props, label: label });
+                q.close()
             }.bind(this)
         );
     }
@@ -50,8 +53,75 @@ export default class NodeEditor extends Component {
         $(this.refs.outer).fadeToggle(false);
     }
 
+    addAttrib(){
+        let input = $(this.refs.newAttrName);
+        let typeinput = $(this.refs.newAttrType);
+        let val = input.val();
+        let type = typeinput.val();
+        if (val === ""){
+            input.css("border", "3px solid red")
+            return;
+        }
+
+        let newval;
+        if (type === "boolean"){
+            newval = false;
+        }else if (type === "number"){
+            newval = 0;
+        }else if (type === "string"){
+            newval = "placeholder";
+        }else{
+            newval = [];
+        }
+
+        let key;
+        if (this.state.type === "ou") {
+            key = "guid";
+        } else {
+            key = "name";
+        }
+
+        let q = driver.session();
+        let statement = "MATCH (n:{} {{}:{name}}) SET n.{}={newprop} RETURN n".format(this.state.type.toTitleCase(), key, val)
+
+        q.run(statement, {name: this.state.label, newprop: newval}).then(result => {
+            let props = result.records[0]._fields[0].properties;
+            let label = props.name;
+            delete props.name;
+            this.setState({ properties: props, label: label });
+        });
+
+    }
+
     updateHandler(attrName, newVal) {
-        console.log(attrName, newVal)
+        let key;
+        if (this.state.type === "ou") {
+            key = "guid";
+        } else {
+            key = "name";
+        }
+        let statement;
+        if (attrName === "serviceprincipalnames" && this.state.type === "user"){
+            if (newVal[0] === "" && newVal.length === 1){
+                newVal = []
+            }
+
+            if (newVal.length > 0){
+                statement = "MATCH (n:{} {{}:{name}}) SET n.{}={newprop}, n.hasspn=true RETURN n".format(this.state.type.toTitleCase(), key, attrName)
+            }else{
+                statement = "MATCH (n:{} {{}:{name}}) SET n.{}={newprop}, n.hasspn=false RETURN n".format(this.state.type.toTitleCase(), key, attrName)
+            }
+        }else{
+            statement = "MATCH (n:{} {{}:{name}}) SET n.{}={newprop} RETURN n".format(this.state.type.toTitleCase(), key, attrName)
+        }
+        
+        let q = driver.session();
+        q.run(statement, {name: this.state.label, newprop: newVal}).then(result => {
+            let props = result.records[0]._fields[0].properties;
+            let label = props.name;
+            delete props.name;
+            this.setState({ properties: props, label: label });
+        });
     }
 
     deletePropHandler(attrName) {
@@ -73,8 +143,14 @@ export default class NodeEditor extends Component {
                 let label = props.name;
                 delete props.name;
                 this.setState({ properties: props, label: label });
+                q.close();
             }.bind(this)
         );
+    }
+
+    removeValidation(){
+        let input = $(this.refs.newAttrName);
+        input.css("border", "")
     }
 
     render() {
@@ -126,21 +202,24 @@ export default class NodeEditor extends Component {
                             </tbody>
                         </table>
                     </div>
-                    <form className="form-inline pull-right">
-                        <input
-                            type="text"
-                            className="form-control form-override"
-                            ref="newAttrName"
-                        />
-                        <select className="form-control" ref="newAttrType">
-                            <option>Boolean</option>
-                            <option>String</option>
-                            <option>Number</option>
-                            <option>Array</option>
-                        </select>
-                        <button className="form-control">
-                            <span className="fa fa-plus" /> Add
-                        </button>
+                    <form onSubmit={x => x.preventDefault()} className="form-inline pull-right">
+                        <div onFocus={this.removeValidation.bind(this)} className="form-group">
+                            <input
+                                type="text"
+                                className="form-control form-override"
+                                ref="newAttrName"
+                                placeholder="New Attribute Name"
+                            />
+                            <select className="form-control" ref="newAttrType">
+                                <option>boolean</option>
+                                <option>string</option>
+                                <option>number</option>
+                                <option>array</option>
+                            </select>
+                            <button className="form-control formButtonFix" onClick={this.addAttrib.bind(this)}>
+                                <span className="fa fa-plus" /> Add
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>

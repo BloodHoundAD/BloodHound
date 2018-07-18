@@ -34,7 +34,7 @@ export default class NodeEditorRow extends Component {
         } else if (input.is("textarea")){
             let tempval = val.join("\n");
             input.attr("disabled", "");
-            input.val(tempval);   
+            input.val(tempval); 
         }else {
             input.attr("disabled", "");
         }
@@ -42,18 +42,24 @@ export default class NodeEditorRow extends Component {
     }
 
     saveEdit() {
-        console.log(this.state);
         let input = jQuery(this.refs.input);
         let val;
         if (input.is("div")) {
             val = input.html();
+            input.removeAttr("contenteditable");
         } else if (input.is("textarea")){
-            val = input.val();
+            let tempval = input.val();
+            val = tempval.split("\n");
+            input.attr("disabled", "");
         } else {
             val = this.state.val;
+            input.attr("disabled", "");
         }
-
-        console.log(val);
+        if (this.state.valtype === "number"){
+            val = parseInt(val);
+        }
+        this.setState({editing: false});
+        this.props.updateHandler(this.props.attributeName, val)
     }
 
     enableEdit() {

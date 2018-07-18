@@ -3,6 +3,7 @@ import GraphContainer from "./components/Graph";
 import SearchContainer from "./components/SearchContainer/SearchContainer";
 import SpotlightContainer from "./components/Spotlight/SpotlightContainer";
 import LogoutModal from "./components/Modals/LogoutModal";
+import DeleteEdgeModal from "./components/Modals/DeleteEdgeModal";
 import CancelUploadModal from "./components/Modals/CancelUploadModal";
 import ClearWarnModal from "./components/Modals/ClearWarnModal";
 import ClearConfirmModal from "./components/Modals/ClearConfirmModal";
@@ -46,6 +47,7 @@ export default class AppContainer extends Component {
                         <GraphContainer />
                         <SearchContainer />
                         <LogoutModal />
+                        <DeleteEdgeModal />
                         <ClearWarnModal />
                         <ClearConfirmModal />
                         <ClearingModal />

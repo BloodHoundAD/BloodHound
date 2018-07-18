@@ -21,15 +21,24 @@ export default class GraphContainer extends Component {
             design: null,
             dragged: false,
             firstDraw: true,
-            template: null,
+            nodeTemplate: null,
+            edgeTemplate: null,
             session: driver.session()
         };
 
         $.ajax({
-            url: "src/components/tooltip.html",
+            url: "src/components/nodeTooltip.html",
             type: "GET",
             success: function(response) {
-                this.setState({ template: response });
+                this.setState({ nodeTemplate: response });
+            }.bind(this)
+        });
+
+        $.ajax({
+            url: "src/components/edgeTooltip.html",
+            type: "GET",
+            success: function(response) {
+                this.setState({ edgeTemplate: response });
             }.bind(this)
         });
 
@@ -140,6 +149,7 @@ export default class GraphContainer extends Component {
         emitter.on("zoomOut", this.zoomOut.bind(this));
         emitter.on("changeNodeLabels", this.changeNodeLabelMode.bind(this));
         emitter.on("changeEdgeLabels", this.changeEdgeLabelMode.bind(this));
+        emitter.on("deleteEdgeConfirm", this.deleteEdge.bind(this));
     }
 
     componentDidMount() {
@@ -162,6 +172,26 @@ export default class GraphContainer extends Component {
         } else {
             sigma.layouts.startForceLink();
         }
+    }
+
+    deleteEdge(id){
+        let instance = this.state.sigmaInstance;
+        let edge = instance.graph.edges(id);
+        let sourcenode = instance.graph.nodes(edge.source);
+        let targetnode = instance.graph.nodes(edge.target);
+
+
+        let sourcekey = sourcenode.type === "OU" ? 'guid' : 'name';
+        let targetkey = targetnode.type === "OU" ? 'guid' : 'name';
+        
+        let statement = "MATCH (n:{} {{}:{sname}}) MATCH (m:{} {{}:{tname}}) MATCH (n)-[r:{}]->(m) DELETE r".format(sourcenode.type, sourcekey, targetnode.type, targetkey, edge.label);
+
+        instance.graph.dropEdge(edge.id);
+        instance.refresh();
+
+        let q = driver.session();
+        q.run(statement, {sname: sourcenode.label, tname: targetnode.label}).then(x => {q.close()})
+        
     }
 
     reload(){
@@ -858,6 +888,9 @@ export default class GraphContainer extends Component {
 
         sigmaInstance.settings({
             edgeColor: "default",
+            edgeHoverColor: "default",
+            defaultEdgeHoverColor: "#000",
+            enableEdgeHovering: true,
             nodeColor: "default",
             minEdgeSize: 1,
             maxEdgeSize: 2.5,
@@ -988,7 +1021,7 @@ export default class GraphContainer extends Component {
                         cssClass: "new-tooltip",
                         autoadjust: true,
                         renderer: function(node) {
-                            var template = this.state.template;
+                            var template = this.state.nodeTemplate;
                             node.expand = false;
                             node.collapse = false;
                             if (
@@ -1008,7 +1041,18 @@ export default class GraphContainer extends Component {
                             return Mustache.render(template, node);
                         }.bind(this)
                     }
-                ]
+                ],
+            edge: [
+                {
+                    show: "rightClickEdge",
+                    cssClass: "new-tooltip",
+                    autoadjust: true,
+                    renderer: function(edge){
+                        var template = this.state.edgeTemplate;
+                        return Mustache.render(template, edge);
+                    }.bind(this)
+                }
+            ]
             }
         );
 
