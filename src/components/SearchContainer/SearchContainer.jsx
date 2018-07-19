@@ -62,6 +62,7 @@ export default class SearchContainer extends Component {
         emitter.on(
             "setStart",
             function(payload) {
+                appStore.currentTooltip.close()
                 jQuery(this.refs.searchbar).val(payload);
             }.bind(this)
         );
@@ -69,6 +70,7 @@ export default class SearchContainer extends Component {
         emitter.on(
             "setEnd",
             function(payload) {
+                appStore.currentTooltip.close()
                 jQuery(this.refs.pathbar).val(payload);
                 var e = jQuery(this.refs.pathfinding);
                 if (!e.is(":visible")) {
@@ -375,7 +377,6 @@ export default class SearchContainer extends Component {
         }
 
         let [query, startTerm, endTerm] = buildSelectQuery(start, end);
-
         emitter.emit("query", query, { aprop: startTerm, bprop: endTerm }, startTerm, endTerm);
     }
 
@@ -629,7 +630,7 @@ export default class SearchContainer extends Component {
                         tooltip
                         tooltipDir="bottom"
                         tooltipTitle="More Info"
-                        classes="input-group-addon spanfix"
+                        classes="input-group-addon spanfix glyph-hover-style"
                         click={this._onExpandClick.bind(this)}
                     >
                         <Icon glyph="menu-hamburger" extraClass="menuglyph" />
@@ -646,7 +647,7 @@ export default class SearchContainer extends Component {
                         tooltip
                         tooltipDir="bottom"
                         tooltipTitle="Pathfinding"
-                        classes="input-group-addon spanfix"
+                        classes="input-group-addon spanfix glyph-hover-style"
                         click={this._onPathfindClick.bind(this)}
                     >
                         <Icon glyph="road" extraClass="menuglyph" />
@@ -655,7 +656,7 @@ export default class SearchContainer extends Component {
                         tooltip
                         tooltipDir="bottom"
                         tooltipTitle="Back"
-                        classes="input-group-addon spanfix"
+                        classes="input-group-addon spanfix glyph-hover-style"
                         click={function() {
                             emitter.emit("graphBack");
                         }}
@@ -666,7 +667,7 @@ export default class SearchContainer extends Component {
                         tooltip
                         tooltipDir="bottom"
                         tooltipTitle="Filter Edge Types"
-                        classes="input-group-addon spanfix"
+                        classes="input-group-addon spanfix glyph-hover-style"
                         click={this._onFilterClick.bind(this)}
                     >
                         <Icon glyph="filter" extraClass="menuglyph" />

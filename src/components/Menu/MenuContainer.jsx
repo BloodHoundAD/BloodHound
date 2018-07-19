@@ -338,7 +338,7 @@ export default class MenuContainer extends Component {
                     <MenuButton
                         click={this._refreshClick.bind(this)}
                         hoverVal="Refresh"
-                        glyphicon="fa fa-refresh"
+                        glyphicon="fas fa-sync-alt"
                     />
                 </div>
                 <div>
@@ -381,7 +381,7 @@ export default class MenuContainer extends Component {
                     <MenuButton
                         click={this._changeLayoutClick.bind(this)}
                         hoverVal="Change Layout Type"
-                        glyphicon="fa fa-line-chart"
+                        glyphicon="fa fa-chart-line"
                     />
                 </div>
                 <div>

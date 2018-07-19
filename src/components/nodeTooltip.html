@@ -4,18 +4,18 @@
 <ul class="tooltip-ul">
     {{#type_ou}}
     <li onclick="emitter.emit('setStart', '{{type}}:{{guid}}')">
-        <i class="fa fa-map-marker"></i> Set as Starting Node
+        <i class="fa fa-map-marker-alt"></i> Set as Starting Node
     </li>
     <li onclick="emitter.emit('setEnd', '{{type}}:{{guid}}')">
-        <i class="fa fa-map-marker"> </i> Set as Ending Node
+        <i class="fa fa-bullseye"> </i> Set as Ending Node
     </li>
     {{/type_ou}}
     {{^type_ou}}
     <li onclick="emitter.emit('setStart', '{{type}}:{{label}}')">
-        <i class="fa fa-map-marker"></i> Set as Starting Node
+        <i class="fa fa-map-marker-alt"></i> Set as Starting Node
     </li>
     <li onclick="emitter.emit('setEnd', '{{type}}:{{label}}')">
-        <i class="fa fa-map-marker"> </i> Set as Ending Node
+        <i class="fa fa-bullseye"> </i> Set as Ending Node
     </li>
     {{/type_ou}}
     {{#type_user}}
@@ -55,12 +55,12 @@
     {{/type_ou}}
     {{#owned}}
     <li onclick="emitter.emit('setOwned', '{{id}}', false)">
-        <i class="fa fa-exclamation"> </i> Mark Node as Not Owned
+        <i class="fa fa-exclamation"> </i> Mark {{type}} as Not Owned
     </li>
     {{/owned}}
     {{#notowned}}
     <li onclick="emitter.emit('setOwned', '{{id}}', true)">
-        <i class="fa fa-exclamation"> </i> Mark Node Owned
+        <i class="fa fa-exclamation"> </i> Mark {{type}} Owned
     </li>
     {{/notowned}}
     <li onclick="emitter.emit('deletenode', '{{id}}')">

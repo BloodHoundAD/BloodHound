@@ -79,37 +79,37 @@ global.appStore = {
     highResPalette: {
         iconScheme: {
             User: {
-                font: "FontAwesome",
-                content: "\uF007",
+                font: "'Font Awesome 5 Free'",
+                content: "\uf007",
                 scale: 1.5,
                 color: "#17E625"
             },
             Computer: {
-                font: "FontAwesome",
+                font: "'Font Awesome 5 Free'",
                 content: "\uF108",
                 scale: 1.2,
                 color: "#E67873"
             },
             Group: {
-                font: "FontAwesome",
+                font: "'Font Awesome 5 Free'",
                 content: "\uF0C0",
                 scale: 1.5,
                 color: "#DBE617"
             },
             Domain: {
-                font: "FontAwesome",
+                font: "'Font Awesome 5 Free'",
                 content: "\uF0AC",
                 scale: 1.5,
                 color: "#17E6B9"
             },
             OU: {
-                font: "FontAwesome",
+                font: "'Font Awesome 5 Free'",
                 content: "\uF0E8",
                 scale: 1.25,
                 color: "#FFAA00"
             },
             GPO: {
-                font: "FontAwesome",
+                font: "'Font Awesome 5 Free'",
                 content: "\uF03A",
                 scale: 1.25,
                 color: "#7F72FD"

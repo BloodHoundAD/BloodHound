@@ -138,7 +138,7 @@ export default class DatabaseDataDisplay extends Component {
                 </dl>
 
                 <div className="text-center">
-                    <div className="btn-group btn-group-sm dbbuttons">
+                    <div className="btn-group-vertical btn-group-sm dbbuttons">
                         <button
                             type="button"
                             className="btn btn-success"
@@ -150,17 +150,19 @@ export default class DatabaseDataDisplay extends Component {
                         </button>
                         <button
                             type="button"
-                            className="btn btn-info"
-                            onClick={this.toggleSessionClearModal}
-                        >
-                            Clear Sessions
-                        </button>
-                        <button
-                            type="button"
                             className="btn btn-warning"
                             onClick={this.toggleLogoutModal}
                         >
                             Log Out/Switch DB
+                        </button>
+                    </div>
+                    <div className="btn-group-vertical btn-group-sm dbbuttons">
+                    <button
+                            type="button"
+                            className="btn btn-info"
+                            onClick={this.toggleSessionClearModal}
+                        >
+                            Clear Sessions
                         </button>
                         <button
                             type="button"

@@ -7,6 +7,7 @@ import { join } from "path";
 import { remote } from "electron";
 const { dialog } = remote;
 const uuidv4 = require('uuid/v4');
+var observer = require('fontfaceobserver');
 
 export default class GraphContainer extends Component {
     constructor(props) {
@@ -166,6 +167,13 @@ export default class GraphContainer extends Component {
     }
 
     componentDidMount() {
+        var font = new observer("Font Awesome 5 Free");
+        font.load().then(x => {
+            this.inita();
+        })
+    }
+
+    inita(){
         this.initializeSigma();
 
         this.doQueryNative({
@@ -182,17 +190,34 @@ export default class GraphContainer extends Component {
         if (appStore.currentTooltip !== null){
             appStore.currentTooltip.close();
         }
-        let node = this.state.sigmaInstance.graph.nodes(id);
+        let instance = this.state.sigmaInstance;
+        let node = instance.graph.nodes(id);
         if (status){
             node.owned = true;
             node.notowned = false;
+            node.glyphs.push({
+                position: "top-left",
+                font: '"Font Awesome 5 Free"',
+                content: "\uf54c",
+                fillColor: "black",
+                fontScale: 2.0,
+                fontStyle: "900"
+            })
         }else{
+            let newglyphs = [];
+            $.each(node.glyphs, (_, glyph) => {
+                if (glyph.position !== "top-left"){
+                    newglyphs.push(glyph)
+                }
+            })
+            node.glyphs = newglyphs;
             node.notowned = true;
             node.owned = false;
-        }
+        }        
 
         let q = driver.session();
         q.run(`MATCH (n:${node.type} {name:{node}}) SET n.owned={status}`, {node: node.label, status: status}).then(x => {
+            this.relayout();
             q.close();
         })
     }
@@ -812,10 +837,11 @@ export default class GraphContainer extends Component {
             node.start = true;
             node.glyphs.push({
                 position: "bottom-right",
-                font: "FontAwesome",
-                content: "\uF21D",
+                font: '"Font Awesome 5 Free"',
+                content: "\uF3C5",
                 fillColor: "#3399FF",
-                fontScale: 1.5
+                fontScale: 1.5,
+                fontStyle: "900"
             });
         }
 
@@ -823,10 +849,22 @@ export default class GraphContainer extends Component {
             node.end = true;
             node.glyphs.push({
                 position: "bottom-right",
-                font: "FontAwesome",
+                font: '"Font Awesome 5 Free"',
                 fillColor: "#990000",
-                content: "\uF05B",
-                fontScale: 1.5
+                content: "\uF140",
+                fontScale: 1.5,
+                fontStyle: "900"
+            });
+        }
+
+        if (node.owned){
+            node.glyphs.push({
+                position: "top-left",
+                font: '"Font Awesome 5 Free"',
+                content: "\uf54c",
+                fillColor: "black",
+                fontScale: 2.0,
+                fontStyle: "900"
             });
         }
 
@@ -1033,6 +1071,32 @@ export default class GraphContainer extends Component {
             scalingMode: "inside"
         });
 
+        //Monkeypatch the drawIcon function to add font-weight to the canvas drawing for drawIcon
+        //Kill me.
+        sigma.utils.canvas.drawIcon = function(node, x, y, size, context, threshold){
+            var font = node.icon.font || 'Arial',
+            fgColor = node.icon.color || '#F00',
+            text = node.icon.content || '?',
+            px = node.icon.x || 0.5,
+            py = node.icon.y || 0.5,
+            height = size,
+            width = size;
+            var fontSizeRatio = 0.70;
+            if (typeof node.icon.scale === "number") {
+            fontSizeRatio = Math.abs(Math.max(0.01, node.icon.scale));
+            }
+
+            var fontSize = Math.round(fontSizeRatio * height);
+
+            context.save();
+            context.fillStyle = fgColor;
+            context.font = '900 ' + fontSize + 'px ' + font;
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillText(text, x, y);
+            context.restore();
+        }
+
         //Bind sigma events
         sigmaInstance.renderers[0].bind("render", function(e) {
             sigmaInstance.renderers[0].glyphs();
@@ -1102,6 +1166,12 @@ export default class GraphContainer extends Component {
             let newPos = this.calculateClickPos(x,y)
 
             this.setState({tooltipPos: {x: newPos.x, y: newPos.y}})
+        })
+
+        sigmaInstance.bind("clickStage", event => {
+            if (appStore.currentTooltip !== null){
+                appStore.currentTooltip.close()
+            }
         })
 
         //Some key binds

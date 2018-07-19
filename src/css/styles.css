@@ -246,8 +246,13 @@ div.tooltip-inner-custom {
 }
 
 .tooltip-ul i{
-    width: 14px;
+    width: 20px;
     text-align: center;
+}
+
+.glyph-hover-style:hover{
+    background-color: #247BA0;
+    color: white;
 }
 
 @media all and (min-width: 600px) {
@@ -823,6 +828,7 @@ div.tooltip-inner-custom {
 
 .dbbuttons {
     padding-bottom: 1em;
+    width: 50%;
 }
 
 .displaynone {

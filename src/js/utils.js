@@ -1,4 +1,4 @@
-let labels = [
+var labels = [
     "OU",
     "GPO",
     "User",
@@ -23,13 +23,14 @@ export function generateUniqueId(sigmaInstance, isNode) {
 }
 
 function getRealLabel(label){
+    let ret = null;
     $.each(labels, (_, l) =>  {
         if (l.toLowerCase() === label.toLowerCase()) {
-            return l;
+            ret = l;
         }
     });
 
-    return null;
+    return ret;
 }
 
 export function buildSearchQuery(searchterm){
