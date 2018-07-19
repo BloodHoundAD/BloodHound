@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import GlyphiconSpan from "../GlyphiconSpan";
 import Icon from "../Icon";
 import TabContainer from "./TabContainer";
-import { escapeRegExp } from "utils";
+import { buildSearchQuery, buildSelectQuery } from "utils";
 
 export default class SearchContainer extends Component {
     constructor(props) {
@@ -81,108 +81,35 @@ export default class SearchContainer extends Component {
         jQuery(this.refs.searchbar).typeahead({
             source: function(query, process) {
                 let session = driver.session();
-                if (query.includes(":")) {
-                    let sp = query.split(":");
-                    let type = sp[0];
-                    let term = sp[1];
-                    term = escapeRegExp(term);
-                    let t = "(?i).*" + term + ".*";
+                let [statement, term] = buildSearchQuery(query);
 
-                    let labels = [
-                        "OU",
-                        "GPO",
-                        "User",
-                        "Computer",
-                        "Group",
-                        "Domain"
-                    ];
-                    $.each(labels, function(_, l) {
-                        if (l.toLowerCase() === type.toLowerCase()) {
-                            type = l;
-                        }
-                    });
-
+                session.run(statement, {name: term}).then(x => {
                     let data = [];
-                    session
-                        .run(
-                            "MATCH (n:{}) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10".format(
-                                type
-                            ),
-                            { name: t }
-                        )
-                        .then(
-                            function(results) {
-                                let data = [];
-                                let map = {};
+                    let map = {};
+                    $.each(x.records, (index,record) => {
+                        let props = record._fields[0].properties;
+                        Object.assign(props, {
+                            type: record._fields[0].labels[0]
+                        });
+                        map[index] = props;
+                        data.push(`${props.name}#${index}`);
+                        index++;
+                    })
 
-                                $.each(results.records, function(
-                                    index,
-                                    record
-                                ) {
-                                    let props = {};
-                                    props = record._fields[0].properties;
-                                    Object.assign(props, {
-                                        type: record._fields[0].labels[0]
-                                    });
-                                    map[index] = props;
-                                    data.push(
-                                        "{}#{}".format(props.name, index)
-                                    );
-                                    index++;
-                                });
-                                this.map = map;
-                                session.close();
-                                return process(data);
-                            }.bind(this)
-                        );
-                } else {
-                    let q = escapeRegExp(query);
-                    let t = "(?i).*" + q + ".*";
-                    session
-                        .run(
-                            "MATCH (n) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10",
-                            { name: t }
-                        )
-                        .then(
-                            function(results) {
-                                let data = [];
-                                let map = {};
-
-                                $.each(results.records, function(
-                                    index,
-                                    record
-                                ) {
-                                    let props = {};
-                                    props = record._fields[0].properties;
-                                    Object.assign(props, {
-                                        type: record._fields[0].labels[0]
-                                    });
-                                    map[index] = props;
-                                    data.push(
-                                        "{}#{}".format(props.name, index)
-                                    );
-                                    index++;
-                                });
-                                this.map = map;
-                                session.close();
-                                return process(data);
-                            }.bind(this)
-                        );
-                }
+                    this.map = map;
+                    session.close();
+                    return process(data);
+                })
             },
             afterSelect: function(selected) {
                 if (!this.state.pathfindingIsOpen) {
                     let props = {};
                     let statement = "";
                     if (selected.type === "OU") {
-                        statement = "MATCH (n:{}) WHERE n.guid = {guid} RETURN n".format(
-                            selected.type
-                        );
+                        statement = `MATCH (n:${selected.type}) WHERE n.guid = {guid} RETURN n`
                         props = { guid: selected.guid };
                     } else {
-                        statement = "MATCH (n:{}) WHERE n.name = {name} RETURN n".format(
-                            selected.type
-                        );
+                        statement = `MATCH (n:${selected.type}) WHERE n.name = {name} RETURN n`
                         props = { name: selected.name };
                     }
 
@@ -199,72 +126,9 @@ export default class SearchContainer extends Component {
                         return;
                     }
 
-                    let query = "";
+                    let [query, startTerm, endTerm] = buildSelectQuery(start, end);
 
-                    let labels = [
-                        "OU",
-                        "GPO",
-                        "User",
-                        "Computer",
-                        "Group",
-                        "Domain"
-                    ];
-                    if (start.includes(":")) {
-                        let spl = start.split(":");
-                        let type = spl[0];
-                        let search = spl[1];
-                        start = search;
-
-                        $.each(labels, function(_, l) {
-                            if (l.toLowerCase() === type.toLowerCase()) {
-                                type = l;
-                            }
-                        });
-
-                        if (type === "OU" || type === "GPO") {
-                            query += "MATCH (n:{}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}".format(
-                                type
-                            );
-                        } else {
-                            query += "MATCH (n:{}) WHERE n.name =~ {aprop}".format(
-                                type
-                            );
-                        }
-                    } else {
-                        query += "MATCH (n) WHERE n.name =~ {aprop}";
-                    }
-
-                    query += " WITH n ";
-
-                    if (end.includes(":")) {
-                        let spl = end.split(":");
-                        let type = spl[0];
-                        let search = spl[1];
-                        end = search;
-
-                        $.each(labels, function(_, l) {
-                            if (l.toLowerCase() === type.toLowerCase()) {
-                                type = l;
-                            }
-                        });
-
-                        if (type === "OU" || type === "GPO") {
-                            query += "MATCH (m:{}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}".format(
-                                type
-                            );
-                        } else {
-                            query += "MATCH (m:{}) WHERE m.name =~ {bprop}".format(
-                                type
-                            );
-                        }
-                    } else {
-                        query += "MATCH (m) WHERE m.name =~ {bprop}";
-                    }
-
-                    query +=
-                        " WITH m,n MATCH p=allShortestPaths((n)-[r:{}}*1..]->(m)) RETURN p";
-
-                    emitter.emit("query", query, { aprop: start, bprop: end });
+                    emitter.emit("query", query, { aprop: startTerm, bprop: endTerm }, startTerm, endTerm);
                 }
             }.bind(this),
             autoSelect: false,
@@ -355,93 +219,25 @@ export default class SearchContainer extends Component {
         jQuery(this.refs.pathbar).typeahead({
             source: function(query, process) {
                 let session = driver.session();
-                if (query.includes(":")) {
-                    let sp = query.split(":");
-                    let type = sp[0];
-                    let term = sp[1];
-                    term = escapeRegExp(term);
-                    let t = "(?i).*" + term + ".*";
+                let [statement, term] = buildSearchQuery(query);
 
-                    let labels = [
-                        "OU",
-                        "GPO",
-                        "User",
-                        "Computer",
-                        "Group",
-                        "Domain"
-                    ];
-                    $.each(labels, function(_, l) {
-                        if (l.toLowerCase() === type.toLowerCase()) {
-                            type = l;
-                        }
-                    });
+                session.run(statement, {name: term}).then(x => {
+                    let data = [];
+                    let map = {};
+                    $.each(x.records, (index,record) => {
+                        let props = record._fields[0].properties;
+                        Object.assign(props, {
+                            type: record._fields[0].labels[0]
+                        });
+                        map[index] = props;
+                        data.push(`${props.name}#${index}`);
+                        index++;
+                    })
 
-                    session
-                        .run(
-                            "MATCH (n:{}) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10".format(
-                                type
-                            ),
-                            { name: t }
-                        )
-                        .then(
-                            function(results) {
-                                let data = [];
-                                let map = {};
-
-                                $.each(results.records, function(
-                                    index,
-                                    record
-                                ) {
-                                    let props = {};
-                                    props = record._fields[0].properties;
-                                    Object.assign(props, {
-                                        type: record._fields[0].labels[0]
-                                    });
-                                    map[index] = props;
-                                    data.push(
-                                        "{}#{}".format(props.name, index)
-                                    );
-                                    index++;
-                                });
-                                this.map = map;
-                                session.close();
-                                return process(data);
-                            }.bind(this)
-                        );
-                } else {
-                    let q = escapeRegExp(query);
-                    let t = "(?i).*" + q + ".*";
-                    session
-                        .run(
-                            "MATCH (n) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10",
-                            { name: t }
-                        )
-                        .then(
-                            function(results) {
-                                let data = [];
-                                let map = {};
-
-                                $.each(results.records, function(
-                                    index,
-                                    record
-                                ) {
-                                    let props = {};
-                                    props = record._fields[0].properties;
-                                    Object.assign(props, {
-                                        type: record._fields[0].labels[0]
-                                    });
-                                    map[index] = props;
-                                    data.push(
-                                        "{}#{}".format(props.name, index)
-                                    );
-                                    index++;
-                                });
-                                this.map = map;
-                                session.close();
-                                return process(data);
-                            }.bind(this)
-                        );
-                }
+                    this.map = map;
+                    session.close();
+                    return process(data);
+                })
             },
             afterSelect: function(_) {
                 let start = jQuery(this.refs.searchbar).val();
@@ -455,72 +251,9 @@ export default class SearchContainer extends Component {
                     return;
                 }
 
-                let query = "";
+                let [query, startTerm, endTerm] = buildSelectQuery(start, end);
 
-                let labels = [
-                    "OU",
-                    "GPO",
-                    "User",
-                    "Computer",
-                    "Group",
-                    "Domain"
-                ];
-                if (start.includes(":")) {
-                    let spl = start.split(":");
-                    let type = spl[0];
-                    let search = spl[1];
-                    start = search;
-
-                    $.each(labels, function(_, l) {
-                        if (l.toLowerCase() === type.toLowerCase()) {
-                            type = l;
-                        }
-                    });
-
-                    if (type === "OU" || type === "GPO") {
-                        query += "MATCH (n:{}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}".format(
-                            type
-                        );
-                    } else {
-                        query += "MATCH (n:{}) WHERE n.name =~ {aprop}".format(
-                            type
-                        );
-                    }
-                } else {
-                    query += "MATCH (n) WHERE n.name =~ {aprop}";
-                }
-
-                query += " WITH n ";
-
-                if (end.includes(":")) {
-                    let spl = end.split(":");
-                    let type = spl[0];
-                    let search = spl[1];
-                    end = search;
-
-                    $.each(labels, function(_, l) {
-                        if (l.toLowerCase() === type.toLowerCase()) {
-                            type = l;
-                        }
-                    });
-
-                    if (type === "OU" || type === "GPO") {
-                        query += "MATCH (m:{}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}".format(
-                            type
-                        );
-                    } else {
-                        query += "MATCH (m:{}) WHERE m.name =~ {bprop}".format(
-                            type
-                        );
-                    }
-                } else {
-                    query += "MATCH (m) WHERE m.name =~ {bprop}";
-                }
-
-                query +=
-                    " WITH m,n MATCH p=allShortestPaths((n)-[r:{}}*1..]->(m)) RETURN p";
-
-                emitter.emit("query", query, { aprop: start, bprop: end });
+                emitter.emit("query", query, { aprop: startTerm, bprop: endTerm }, startTerm, endTerm);
             }.bind(this),
             autoSelect: false,
             updater: function(item) {
@@ -642,61 +375,9 @@ export default class SearchContainer extends Component {
             return;
         }
 
-        let query = "";
+        let [query, startTerm, endTerm] = buildSelectQuery(start, end);
 
-        let labels = ["OU", "GPO", "User", "Computer", "Group", "Domain"];
-        if (start.includes(":")) {
-            let spl = start.split(":");
-            let type = spl[0];
-            let search = spl[1];
-            start = search;
-
-            $.each(labels, function(_, l) {
-                if (l.toLowerCase() === type.toLowerCase()) {
-                    type = l;
-                }
-            });
-
-            if (type === "OU" || type === "GPO") {
-                query += "MATCH (n:{}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}".format(
-                    type
-                );
-            } else {
-                query += "MATCH (n:{}) WHERE n.name =~ {aprop}".format(type);
-            }
-        } else {
-            query += "MATCH (n) WHERE n.name =~ {aprop}";
-        }
-
-        query += " WITH n ";
-
-        if (end.includes(":")) {
-            let spl = end.split(":");
-            let type = spl[0];
-            let search = spl[1];
-            end = search;
-
-            $.each(labels, function(_, l) {
-                if (l.toLowerCase() === type.toLowerCase()) {
-                    type = l;
-                }
-            });
-
-            if (type === "OU" || type === "GPO") {
-                query += "MATCH (m:{}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}".format(
-                    type
-                );
-            } else {
-                query += "MATCH (m:{}) WHERE m.name =~ {bprop}".format(type);
-            }
-        } else {
-            query += "MATCH (m) WHERE m.name =~ {bprop}";
-        }
-
-        query +=
-            " WITH m,n MATCH p=allShortestPaths((n)-[r:{}*1..]->(m)) RETURN p";
-
-        emitter.emit("query", query, { aprop: start, bprop: end });
+        emitter.emit("query", query, { aprop: startTerm, bprop: endTerm }, startTerm, endTerm);
     }
 
     _onExpandClick() {
@@ -790,72 +471,9 @@ export default class SearchContainer extends Component {
                     return;
                 }
 
-                let query = "";
+                let [query, startTerm, endTerm] = buildSelectQuery(start, end);
 
-                let labels = [
-                    "OU",
-                    "GPO",
-                    "User",
-                    "Computer",
-                    "Group",
-                    "Domain"
-                ];
-                if (start.includes(":")) {
-                    let spl = start.split(":");
-                    let type = spl[0];
-                    let search = spl[1];
-                    start = search;
-
-                    $.each(labels, function(_, l) {
-                        if (l.toLowerCase() === type.toLowerCase()) {
-                            type = l;
-                        }
-                    });
-
-                    if (type === "OU" || type === "GPO") {
-                        query += "MATCH (n:{}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}".format(
-                            type
-                        );
-                    } else {
-                        query += "MATCH (n:{}) WHERE n.name =~ {aprop}".format(
-                            type
-                        );
-                    }
-                } else {
-                    query += "MATCH (n) WHERE n.name =~ {aprop}";
-                }
-
-                query += " WITH n ";
-
-                if (end.includes(":")) {
-                    let spl = end.split(":");
-                    let type = spl[0];
-                    let search = spl[1];
-                    end = search;
-
-                    $.each(labels, function(_, l) {
-                        if (l.toLowerCase() === type.toLowerCase()) {
-                            type = l;
-                        }
-                    });
-
-                    if (type === "OU" || type === "GPO") {
-                        query += "MATCH (m:{}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}".format(
-                            type
-                        );
-                    } else {
-                        query += "MATCH (m:{}) WHERE m.name =~ {bprop}".format(
-                            type
-                        );
-                    }
-                } else {
-                    query += "MATCH (m) WHERE m.name =~ {bprop}";
-                }
-
-                query +=
-                    " WITH m,n MATCH p=allShortestPaths((n)-[r:{}*1..]->(m)) RETURN p";
-
-                emitter.emit("query", query, { aprop: start, bprop: end });
+                emitter.emit("query", query, { aprop: startTerm, bprop: endTerm }, startTerm, endTerm);
             }
         }
     }

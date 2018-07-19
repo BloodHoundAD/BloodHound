@@ -1,0 +1,372 @@
+import React, { Component } from "react";
+import { Modal } from "react-bootstrap";
+import { buildSearchQuery } from 'utils';
+
+export default class AddEdgeModal extends Component {
+    constructor() {
+        super();
+        this.state = {
+            open: false,
+            source: null,
+            target: null
+        };
+    }
+
+    closeModal() {
+        this.setState({ open: false });
+    }
+
+    openModal() {
+        if (appStore.currentTooltip !== null){
+            appStore.currentTooltip.close();
+        }
+        this.setState( {open: true });
+        jQuery(this.refs.errora).hide();
+        jQuery(this.refs.errorb).hide();
+        jQuery(this.refs.edgeError).hide();
+        jQuery(this.refs.complete).hide();
+
+        this.bindSearchBars(jQuery(this.refs.source), "source");
+        this.bindSearchBars(jQuery(this.refs.target), "target");
+        
+    }
+
+    bindSearchBars(element,which){
+        element.typeahead({
+            autoSelect: false,
+            source: function(query, process) {
+                let session = driver.session();
+                let [statement, searchterm] = buildSearchQuery(query);
+
+                session.run(statement, {name: searchterm}).then(x => {
+                    let data = [];
+                    let map = {};
+                    $.each(x.records, (index, record) => {
+                        let props = record._fields[0].properties;
+                        Object.assign(props, {
+                            type: record._fields[0].labels[0]
+                        });
+                        map[index] = props;
+                        data.push(`${props.name}#${index}`);
+                    })
+
+                    this.map = map;
+                    session.close();
+                    return process(data);
+                })
+            },
+            updater: function(item){
+                let [_, index] = item.split('#');
+                return this.map[index];
+            },
+            matcher: function(item){
+                let [name,index] = item.split('#');
+                let obj = this.map[index];
+                let searchTerm = this.query.includes(':') ? this.query.split(':')[1] : this.query;
+
+                if (name.toLowerCase().indexOf(searchTerm.toLowerCase() !== -1)){
+                    return true;
+                }else if (obj.guid && obj.guid.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1){
+                    return true;
+                }else{
+                    return false;
+                }
+            },
+            highlighter: function(item){
+                let [name,index] = item.split('#');
+                let obj = this.map[index];
+                let searchTerm = this.query.includes(':') ? this.query.split(':')[1] : this.query;
+                let type = obj.type;
+                let icon;
+
+                switch (type) {
+                    case "Group":
+                        icon =
+                            '<i style="float:right" class="fa fa-users"></i>';
+                        break;
+                    case "User":
+                        icon = '<i style="float:right" class="fa fa-user"></i>';
+                        break;
+                    case "Computer":
+                        icon =
+                            '<i style="float:right" class="fa fa-desktop"></i>';
+                        break;
+                    case "Domain":
+                        icon =
+                            '<i style="float:right" class="fa fa-globe"></i>';
+                        break;
+                    case "GPO":
+                        icon = '<i style="float:right" class="fa fa-list"></i>';
+                        break;
+                    case "OU":
+                        icon =
+                            '<i style="float:right" class="fa fa-sitemap"></i>';
+                        break;
+                }
+
+                let html = "<div>{}".format(name);
+
+                if (searchTerm !== "") {
+                    let reQuery = new RegExp("(" + searchTerm + ")", "gi");
+
+                    html = html.replace(reQuery, "<strong>$1</strong>");
+                }
+                html += icon + "</div>";
+                let jElem = $(html);
+
+                return jElem.html();
+            },
+            afterSelect: item =>{
+                let p = {};
+                p[which] = item;
+                this.setState(p)
+            }
+        })
+    }
+
+    validate(){
+        let source = this.state.source;
+        let target = this.state.target;
+        let edge = jQuery(this.refs.type).val();
+        let edgeError = jQuery(this.refs.edgeError);
+        let edgeValid = jQuery(this.refs.validateedge)
+        let sourceValid = jQuery(this.refs.validatea);
+        let targetValid = jQuery(this.refs.validateb);
+        let sourceError = jQuery(this.refs.errora);
+        let targetError = jQuery(this.refs.errorb);
+        let complete = jQuery(this.refs.complete);
+
+        edgeValid.removeClass("has-error");
+        edgeError.hide();
+
+        if (source === null){
+            sourceValid.addClass("has-error");
+            sourceError.html("Source node not validated!");
+            sourceError.show();
+            return;
+        }
+
+        if (target === null){
+            targetValid.addClass("has-error");
+            targetError.html("Target node not validated!");
+            targetError.show();
+            return;
+        }
+
+        if (source.name === target.name){
+            targetValid.addClass("has-error");
+            targetError.html("Source and target cannot be identical!");
+            targetError.show();
+            sourceValid.addClass("has-error");
+            sourceError.html("Source and target cannot be identical");
+            sourceError.show();
+            return;
+        }
+
+        let q = driver.session();
+        let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${target.type} {name:{target}}) MATCH (n)-[r:${edge}]->(m) RETURN r`
+        q.run(statement, {source: source.name, target: target.name}).then(x => {
+            q.close();
+            if (x.records.length > 0){
+                edgeValid.addClass("has-error");
+                edgeError.html("Edge already exists");
+                edgeError.show();
+            }else{
+                let s = driver.session();
+                let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${target.type} {name:{target}}) MERGE (n)-[r:${edge}]->(m) RETURN r`
+                s.run(statement, {source: source.name, target: target.name}).then(x =>{
+                    s.close();
+                    complete.show();
+                    setTimeout(x => {this.closeModal()}, 500);
+                })
+            }
+        });
+    }
+
+    clearFocus(){
+        let validate = jQuery(this.refs.validate);
+        let error = jQuery(this.refs.error);
+
+        validate.removeClass("has-error");
+        error.hide();
+    }
+
+    targetBlur(){
+        if (this.state.target === null){
+            let source = jQuery(this.refs.source).val();
+            let q = driver.session();
+            q.run("MATCH (n) WHERE n.name = {name} RETURN n", {name: source}).then(x => {
+                if (x.records.length === 0){
+                    let validate = jQuery(this.refs.validateb);
+                    let error = jQuery(this.refs.errorb);
+                    validate.addClass("has-error");
+                    error.html("Node not found");
+                    error.show();
+                }else if (x.records.length > 1){
+                    let validate = jQuery(this.refs.validateb);
+                    let error = jQuery(this.refs.errorb);
+                    validate.addClass("has-error");
+                    error.html("Multiple possible nodes found. Click on item from dropdown to set type");
+                    error.show();
+                }else{
+                    let props = x._fields[0].properties;
+                    Object.assign(props, {
+                        type: x._fields[0].labels[0]
+                    });
+                    this.setState({source: props})
+                }          
+                q.close();
+            })
+        }
+    }
+
+    targetChanged(){
+        let target = jQuery(this.refs.target).val();
+        if (this.state.target && target !== this.state.target.name){
+            this.setState({target: null})
+        }
+    }
+
+    targetFocus(){
+        let validate = jQuery(this.refs.validateb);
+        let error = jQuery(this.refs.errorb);
+        validate.removeClass("has-error");
+        error.hide()
+
+        if (this.state.source !== null){
+            validate = jQuery(this.refs.validatea);
+            error = jQuery(this.refs.errora);
+            validate.removeClass("has-error");
+            error.hide();
+        }
+    }
+
+    sourceBlur(){
+        if (this.state.source === null){
+            let source = jQuery(this.refs.source).val();
+            let q = driver.session();
+            q.run("MATCH (n) WHERE n.name = {name} RETURN n", {name: source}).then(x => {
+                if (x.records.length === 0){
+                    let validate = jQuery(this.refs.validatea);
+                    let error = jQuery(this.refs.errora);
+                    validate.addClass("has-error");
+                    error.html("Node not found");
+                    error.show();
+                }else if (x.records.length > 1){
+                    let validate = jQuery(this.refs.validatea);
+                    let error = jQuery(this.refs.errora);
+                    validate.addClass("has-error");
+                    error.html("Multiple possible nodes found. Click on item from dropdown to set type");
+                    error.show();
+                }else{
+                    let props = x._fields[0].properties;
+                    Object.assign(props, {
+                        type: x._fields[0].labels[0]
+                    });
+                    this.setState({source: props})
+                }          
+                q.close();
+            })
+        }
+    }
+
+    sourceChanged(){
+        let source = jQuery(this.refs.source).val();
+        if (this.state.source && source !== this.state.source.name){
+            this.setState({source: null})
+        }
+    }
+
+    sourceFocus(){
+        let validate = jQuery(this.refs.validatea);
+        let error = jQuery(this.refs.errora);
+        validate.removeClass("has-error");
+        error.hide()
+
+        if (this.state.target !== null){
+            validate = jQuery(this.refs.validateb);
+            error = jQuery(this.refs.errorb);
+            validate.removeClass("has-error");
+            error.hide();
+        }
+    }
+
+    componentDidMount() {
+        emitter.on("addEdge", this.openModal.bind(this));   
+    }
+
+    render() {
+        return (
+            <Modal
+                show={this.state.open}
+                onHide={this.closeModal.bind(this)}
+                aria-labelledby="AddEdgeModalHeader"
+            >
+                <Modal.Header closeButton={true}>
+                    <Modal.Title id="AddEdgeModalHeader">Add Node</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    <form onSubmit={x => {x.preventDefault(); this.validate()}} className="needs-validation" noValidate>
+                        <div ref="validatea" className={"form-group"}>
+                            <label htmlFor="sourceNode" required>Source Node</label>
+                            <input onFocus={this.sourceFocus.bind(this)} onInput={this.sourceChanged.bind(this)} onBlur={this.sourceBlur.bind(this)} type="search" autoComplete="off" placeholder="Source Node" ref="source" className={"form-control"} id="sourceNode" />
+                            <span className="help-block" ref="errora">
+                                Looks good!
+                            </span>
+                        </div>
+                        <div className={"form-group"} ref="validateedge">
+                            <label htmlFor="addEdgeType">Edge Type</label>
+                            <select ref="type" className={"form-control"} id="addEdgeType">
+                                <option>MemberOf</option>
+                                <option>HasSession</option>
+                                <option>AdminTo</option>
+                                <option>AllExtendedRights</option>
+                                <option>AddMember</option>
+                                <option>ForceChangePassword</option>
+                                <option>GenericAll</option>
+                                <option>GenericWrite</option>
+                                <option>Owns</option>
+                                <option>WriteDacl</option>
+                                <option>WriteOwner</option>
+                                <option>CanRDP</option>
+                                <option>ExecuteDCOM</option>
+                            </select>
+                            <span className="help-block" ref="edgeError">
+                                Looks good!
+                            </span>
+                        </div>
+                        <div ref="validateb" className={"form-group"}>
+                            <label htmlFor="targetNode" required>Target Node</label>
+                            <input onFocus={this.targetFocus.bind(this)} onInput={this.targetChanged.bind(this)} onBlur={this.targetBlur.bind(this)} type="search" autoComplete="off" placeholder="Target Node" ref="target" className={"form-control"} id="targetNode" />
+                            <span className="help-block" ref="errorb">
+                                Looks good!
+                            </span>
+                        </div>
+                    </form>
+                </Modal.Body>
+
+                <Modal.Footer>
+                    <i
+                        ref="complete"
+                        className="fa fa-check-circle green-icon-color add-modal-check-style"
+                    />
+                    <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={this.validate.bind(this)}
+                    >
+                        Confirm
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={this.closeModal.bind(this)}
+                    >
+                        Cancel
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}

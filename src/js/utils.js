@@ -1,3 +1,12 @@
+let labels = [
+    "OU",
+    "GPO",
+    "User",
+    "Computer",
+    "Group",
+    "Domain"
+];
+
 export function generateUniqueId(sigmaInstance, isNode) {
     var i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
     if (isNode) {
@@ -11,6 +20,71 @@ export function generateUniqueId(sigmaInstance, isNode) {
     }
 
     return i;
+}
+
+function getRealLabel(label){
+    $.each(labels, (_, l) =>  {
+        if (l.toLowerCase() === type.toLowerCase()) {
+            return type;
+        }
+    });
+
+    return null;
+}
+
+export function buildSearchQuery(searchterm){
+    if (searchterm.includes(":")) {
+        let [type,term] = searchterm.split(":");
+        term = escapeRegExp(term);
+        let t = "(?i).*" + term + ".*";
+        type = getRealLabel(type);
+
+        let statement = `MATCH (n:${type}) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10`;
+
+        return [statement, t];
+    }else{
+        let q = escapeRegExp(searchterm);
+        let t = "(?i).*" + q + ".*";
+
+        return ["MATCH (n) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10",t];
+    }
+}
+
+export function buildSelectQuery(start, end){
+    let startTerm, endTerm, apart, bpart;
+    
+    if (start.includes(':')){
+        let [type, search] = start.split(':')
+        startTerm = search;
+        type = getRealLabel(type);
+
+        if (type === "OU" || type === "GPO"){
+            apart = `MATCH (n:${type}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}`;
+        }else{
+            apart = `MATCH (n:${type}) WHERE n.name =~ {aprop}`;
+        }
+    }else{
+        startTerm = start;
+        apart = "MATCH (n) WHERE n.name =~ {aprop}"
+    }
+
+    if (end.includes(':')){
+        let [type, search] = end.split(':')
+        endTerm = search;
+        type = getRealLabel(type);
+
+        if (type === "OU" || type === "GPO"){
+            bpart = `MATCH (m:${type}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}`;
+        }else{
+            bpart = `MATCH (m:${type}) WHERE m.name =~ {bprop}`;
+        }
+    }else{
+        endTerm = end;
+        bpart = "MATCH (m) WHERE m.name =~ {bprop}"
+    }
+
+    let query = `${apart} ${bpart} MATCH p=allShortestPaths((n)-[r:{}*1..]->(m)) RETURN p`
+    return [query, startTerm, endTerm];
 }
 
 //Recursive function to highlight paths to start/end nodes

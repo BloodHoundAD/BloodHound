@@ -28,6 +28,7 @@ export default class NodeEditor extends Component {
     getNodeData(name, type) {
         appStore.currentTooltip.close();
         $(this.refs.outer).fadeIn();
+        $(this.refs.newAttrName).val("");
         let q = driver.session();
         this.setState({ label: name, type: type, dname: name });
         let statement = "MATCH (n:{} {{}:{name}}) RETURN n";
