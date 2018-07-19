@@ -22,6 +22,7 @@ export default class GpoNodeData extends Component {
     }
 
     getNodeData(payload, guid) {
+        jQuery(this.refs.complete).hide();
         this.setState({
             label: payload,
             guid: guid
@@ -33,10 +34,37 @@ export default class GpoNodeData extends Component {
             .then(
                 function(result) {
                     var properties = result.records[0]._fields[0].properties;
-                    this.setState({ propertyMap: properties });
+                    let notes;
+                    if (!properties.notes){
+                        notes = null;
+                    }else{
+                        notes = properties.notes;
+                    }
+                    this.setState({ propertyMap: properties, notes: notes });
                     props.close();
                 }.bind(this)
             );
+    }
+
+    notesChanged(event){
+        this.setState({notes: event.target.value})
+    }
+
+    notesBlur(event){
+        let notes = this.state.notes === null || this.state.notes === "" ? null : this.state.notes;
+        let q = driver.session();
+        if (notes === null){
+            q.run("MATCH (n:GPO {name:{name}}) REMOVE n.notes", {name: this.state.label}).then(x => {
+                q.close();
+            });
+        }else{
+            q.run("MATCH (n:GPO {name:{name}}) SET n.notes = {notes}", {name: this.state.label, notes: this.state.notes}).then(x =>{
+                q.close();
+            });
+        }
+        let check = jQuery(this.refs.complete);
+        check.show();
+        check.fadeOut(2000);
     }
 
     render() {
@@ -126,6 +154,14 @@ export default class GpoNodeData extends Component {
                         distinct
                     />
                 </dl>
+                <div>
+                    <h4 className={"inline"}>Notes</h4>
+                    <i
+                        ref="complete"
+                        className="fa fa-check-circle green-icon-color notes-check-style"
+                    />
+                </div>
+                <textarea onBlur={this.notesBlur.bind(this)} onChange={this.notesChanged.bind(this)} value={this.state.notes === null ? "" : this.state.notes} className={"node-notes-textarea"} ref="notes" />
             </div>
         );
     }

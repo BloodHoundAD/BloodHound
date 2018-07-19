@@ -93,7 +93,6 @@ export default class SearchContainer extends Component {
                         });
                         map[index] = props;
                         data.push(`${props.name}#${index}`);
-                        index++;
                     })
 
                     this.map = map;

@@ -15,13 +15,15 @@ export default class OuNodeData extends Component {
             propertyMap: {},
             displayMap: {
                 "description":"Description"
-            }
+            },
+            notes: null
         };
 
         emitter.on("ouNodeClicked", this.getNodeData.bind(this));
     }
 
     getNodeData(payload, guid, blocksInheritance) {
+        jQuery(this.refs.complete).hide();
         let bi = "" + blocksInheritance;
         bi = bi.toTitleCase();
 
@@ -37,10 +39,42 @@ export default class OuNodeData extends Component {
             .then(
                 function(result) {
                     var properties = result.records[0]._fields[0].properties;
-                    this.setState({ propertyMap: properties });
+                    let notes;
+                    if (!properties.notes){
+                        notes = null;
+                    }else{
+                        notes = properties.notes;
+                    }
+                    this.setState({
+                        ServicePrincipalNames:spn,
+                        propertyMap: properties,
+                        notes: notes
+                    });
+                    this.setState({ propertyMap: properties, notes: notes });
                     props.close();
                 }.bind(this)
             );
+    }
+
+    notesChanged(event){
+        this.setState({notes: event.target.value})
+    }
+
+    notesBlur(event){
+        let notes = this.state.notes === null || this.state.notes === "" ? null : this.state.notes;
+        let q = driver.session();
+        if (notes === null){
+            q.run("MATCH (n:OU {guid:{name}}) REMOVE n.notes", {name: this.state.guid}).then(x => {
+                q.close();
+            });
+        }else{
+            q.run("MATCH (n:OU {guid:{name}}) SET n.notes = {notes}", {name: this.state.guid, notes: this.state.notes}).then(x =>{
+                q.close();
+            });
+        }
+        let check = jQuery(this.refs.complete);
+        check.show();
+        check.fadeOut(2000);
     }
 
     render() {
@@ -119,6 +153,14 @@ export default class OuNodeData extends Component {
                         distinct
                     />
                 </dl>
+                <div>
+                    <h4 className={"inline"}>Notes</h4>
+                    <i
+                        ref="complete"
+                        className="fa fa-check-circle green-icon-color notes-check-style"
+                    />
+                </div>
+                <textarea onBlur={this.notesBlur.bind(this)} onChange={this.notesChanged.bind(this)} value={this.state.notes === null ? "" : this.state.notes} className={"node-notes-textarea"} ref="notes" />
             </div>
         );
     }

@@ -24,8 +24,8 @@ export function generateUniqueId(sigmaInstance, isNode) {
 
 function getRealLabel(label){
     $.each(labels, (_, l) =>  {
-        if (l.toLowerCase() === type.toLowerCase()) {
-            return type;
+        if (l.toLowerCase() === label.toLowerCase()) {
+            return l;
         }
     });
 

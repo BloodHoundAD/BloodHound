@@ -226,11 +226,23 @@ div.tooltip-inner-custom {
     white-space: pre-line;
 }
 
+.node-notes-textarea{
+    resize: none;
+    width: 98%;
+    height: 100px;
+}
+
 .add-modal-check-style{
     position: relative;
     font-size: 24px;
     margin-right: 5px;
     top: 5px;
+}
+
+.notes-check-style{
+    position:relative;
+    font-size: 18px;
+    margin-left: 5px;
 }
 
 @media all and (min-width: 600px) {
@@ -287,6 +299,10 @@ div.tooltip-inner-custom {
 
 .mainfade-appear {
     opacity: 0.01;
+}
+
+.inline{
+    display: inline;
 }
 
 .mainfade-appear.mainfade-appear-active {
