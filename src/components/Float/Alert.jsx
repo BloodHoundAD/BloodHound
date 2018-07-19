@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Alert } from "react-bootstrap";
 
+
 export default class GenericAlert extends Component {
     constructor() {
         super();
@@ -21,9 +22,9 @@ export default class GenericAlert extends Component {
     _show(val) {
         clearTimeout(this.state.timeout);
         var t = setTimeout(
-            function() {
+            _ => {
                 this._dismiss();
-            }.bind(this),
+            },
             2500
         );
 
@@ -40,7 +41,7 @@ export default class GenericAlert extends Component {
                 <Alert
                     className="alertdiv"
                     bsStyle="danger"
-                    onDismiss={this._dismiss.bind(this)}
+                    onDismiss={x => this._dismiss}
                 >
                     {this.state.text}
                 </Alert>

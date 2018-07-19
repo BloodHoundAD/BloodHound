@@ -43,11 +43,6 @@ export default class QueryNodeSelectItem extends Component {
             emitter.emit("prebuiltQueryStep", this.props.label);
         }.bind(this);
         let str = this.convertToDisplayProp();
-        if (this.props.extraProps.hasOwnProperty("PwdLastSet")) {
-            var pwd = new Date(
-                this.props.extraProps.PwdLastSet.low * 1000
-            ).toUTCString();
-        }
         return (
             <ListGroupItem
                 className="queryNodeItemPreWrap"

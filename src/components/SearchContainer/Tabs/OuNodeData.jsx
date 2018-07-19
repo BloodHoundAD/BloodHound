@@ -46,7 +46,7 @@ export default class OuNodeData extends Component {
                         notes = properties.notes;
                     }
                     this.setState({
-                        ServicePrincipalNames:spn,
+                        ServicePrincipalNames:[],
                         propertyMap: properties,
                         notes: notes
                     });

@@ -80,9 +80,9 @@ export default class MenuContainer extends Component {
     cancelUpload() {
         this.setState({ cancelled: true });
         setTimeout(
-            function() {
+            _ => {
                 this.setState({ uploading: false });
-            }.bind(this),
+            },
             1000
         );
     }
@@ -133,34 +133,34 @@ export default class MenuContainer extends Component {
         });
 
         this.unzipNecessary(fileNames).then(
-            function(results) {
+            results => {
                 eachSeries(
                     results,
-                    function(file, callback) {
+                    (file, callback) => {
                         emitter.emit(
                             "showAlert",
                             "Processing file {}".format(file.name)
                         );
                         this.getFileMeta(file.path, callback);
-                    }.bind(this),
+                    },
                     function done() {
                         setTimeout(
-                            function() {
+                            _ => {
                                 this.setState({ uploading: false });
-                            }.bind(this),
+                            },
                             3000
                         );
                         this.addOwnedProp();
-                        $.each(results, function(_, file) {
+                        $.each(results, (_, file) => {
                             if (file.delete) {
                                 unlinkSync(file.path);
                             }
                         });
-                    }.bind(this)
+                    }
                 );
 
                 input.val("");
-            }.bind(this)
+            }
         );
     }
 

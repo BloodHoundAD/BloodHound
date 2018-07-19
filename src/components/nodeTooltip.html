@@ -1,7 +1,7 @@
 <div class="header">
     {{label}}
 </div>
-<ul>
+<ul class="tooltip-ul">
     {{#type_ou}}
     <li onclick="emitter.emit('setStart', '{{type}}:{{guid}}')">
         <i class="fa fa-map-marker"></i> Set as Starting Node
@@ -53,6 +53,16 @@
         <i class="fa fa-edit"> </i> Edit Node
     </li>
     {{/type_ou}}
+    {{#owned}}
+    <li onclick="emitter.emit('setOwned', '{{id}}', false)">
+        <i class="fa fa-exclamation"> </i> Mark Node as Not Owned
+    </li>
+    {{/owned}}
+    {{#notowned}}
+    <li onclick="emitter.emit('setOwned', '{{id}}', true)">
+        <i class="fa fa-exclamation"> </i> Mark Node Owned
+    </li>
+    {{/notowned}}
     <li onclick="emitter.emit('deletenode', '{{id}}')">
         <i class="fa fa-trash"> </i> Delete Node
     </li>

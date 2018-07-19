@@ -90,7 +90,7 @@ export default class Login extends Component {
             session.close();
             driver.close();
         };
-        driver.onError = function(error) {
+        driver.onError = error => {
             if (error.code.includes("Unauthorized")) {
                 icon.removeClass();
                 icon.addClass(
@@ -112,7 +112,7 @@ export default class Login extends Component {
             }
             session.close();
             driver.close();
-        }.bind(this);
+        };
     }
 
     checkDBCreds() {
@@ -132,7 +132,7 @@ export default class Login extends Component {
             neo4j.auth.basic(this.state.user, this.state.password),
             { encrypted: "ENCRYPTION_ON" }
         );
-        driver.onError = function(error) {
+        driver.onError = error => {
             console.log(error);
             if (error.message.includes("authentication failure")) {
                 btn.removeClass("activate");
@@ -171,10 +171,10 @@ export default class Login extends Component {
                 });
             }
             driver.close();
-        }.bind(this);
+        };
         var session = driver.session();
         session.run("MATCH (n) RETURN (n) LIMIT 1").subscribe({
-            onError: function(error) {
+            onError: error => {
                 btn.removeClass("activate");
                 var url = this.state.url
                     .replace("bolt://", "http://")
@@ -216,9 +216,9 @@ export default class Login extends Component {
                         loginEnabled: true
                     });
                 }
-            }.bind(this),
-            onNext: function() {},
-            onCompleted: function() {
+            },
+            onNext: _ => {},
+            onCompleted: _ => {
                 btn.toggleClass("activate");
                 btn.removeClass("btn-default");
                 btn.addClass("btn-success");
@@ -242,11 +242,11 @@ export default class Login extends Component {
                 jQuery(this.refs.password).tooltip("hide");
                 jQuery(this.refs.urlspinner).tooltip("hide");
                 setTimeout(
-                    function() {
-                        jQuery(this.refs.outer).fadeOut(400, function() {
+                    _ => {
+                        jQuery(this.refs.outer).fadeOut(400, _ => {
                             renderEmit.emit("login");
                         });
-                    }.bind(this),
+                    },
                     1500
                 );
                 driver.close();
@@ -254,7 +254,7 @@ export default class Login extends Component {
                     this.state.url,
                     neo4j.auth.basic(this.state.user, this.state.password)
                 );
-            }.bind(this)
+            }
         });
 
         btn.toggleClass("activate");

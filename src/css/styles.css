@@ -245,6 +245,11 @@ div.tooltip-inner-custom {
     margin-left: 5px;
 }
 
+.tooltip-ul i{
+    width: 14px;
+    text-align: center;
+}
+
 @media all and (min-width: 600px) {
     .searchdiv {
         position: absolute;

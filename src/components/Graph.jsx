@@ -162,6 +162,7 @@ export default class GraphContainer extends Component {
         emitter.on("deleteNodeConfirm", this.deleteNode.bind(this));
         emitter.on("changeLayout", this.changeLayout.bind(this));
         emitter.on("addNodeFinal", this.addNode.bind(this));
+        emitter.on("setOwned", this.setOwned.bind(this));
     }
 
     componentDidMount() {
@@ -175,6 +176,25 @@ export default class GraphContainer extends Component {
             allowCollapse: false,
             props: {}
         });
+    }
+
+    setOwned(id, status){
+        if (appStore.currentTooltip !== null){
+            appStore.currentTooltip.close();
+        }
+        let node = this.state.sigmaInstance.graph.nodes(id);
+        if (status){
+            node.owned = true;
+            node.notowned = false;
+        }else{
+            node.notowned = true;
+            node.owned = false;
+        }
+
+        let q = driver.session();
+        q.run(`MATCH (n:${node.type} {name:{node}}) SET n.owned={status}`, {node: node.label, status: status}).then(x => {
+            q.close();
+        })
     }
 
     addNode(name, type){
@@ -210,9 +230,6 @@ export default class GraphContainer extends Component {
     }
 
     relayout() {
-        if (appStore.currentTooltip != null){
-            appStore.currentTooltip.close();
-        }
         sigma.layouts.stopForceLink();
         if (appStore.dagre) {
             sigma.layouts.dagre.start(this.state.sigmaInstance);
@@ -449,8 +466,8 @@ export default class GraphContainer extends Component {
         $.each(
             this.state.sigmaInstance.graph.nodes(),
             function(_, node) {
-                if (node.hasOwnProperty("blocksInheritance")) {
-                    if (node.blocksInheritance === true) {
+                if (node.hasOwnProperty("blocksinheritance")) {
+                    if (node.blocksinheritance === true) {
                         let targets = [];
                         $.each(
                             this.state.sigmaInstance.graph.outNeighbors(
@@ -606,9 +623,9 @@ export default class GraphContainer extends Component {
         if (appStore.performance.debug) {
             emitter.emit("setRawQuery", params.statement);
         }
-        var nodes = {};
-        var edges = {};
-        var session = driver.session();
+        let nodes = {};
+        let edges = {};
+        let session = driver.session();
         if (typeof params.props === "undefined") {
             params.props = {};
         }
@@ -626,15 +643,15 @@ export default class GraphContainer extends Component {
                                 $.each(
                                     field.segments,
                                     function(_, segment) {
-                                        var end = this.createNodeFromRow(
+                                        let end = this.createNodeFromRow(
                                             segment.end,
                                             params
                                         );
-                                        var start = this.createNodeFromRow(
+                                        let start = this.createNodeFromRow(
                                             segment.start,
                                             params
                                         );
-                                        var edge = this.createEdgeFromRow(
+                                        let edge = this.createEdgeFromRow(
                                             segment.relationship
                                         );
 
@@ -657,7 +674,7 @@ export default class GraphContainer extends Component {
                                         field,
                                         function(_, value) {
                                             if (value !== null) {
-                                                var id = value.identity.low;
+                                                let id = value.identity.low;
                                                 if (value.end && !edges.id) {
                                                     edges[
                                                         id
@@ -676,7 +693,7 @@ export default class GraphContainer extends Component {
                                         }.bind(this)
                                     );
                                 } else {
-                                    var id = field.identity.low;
+                                    let id = field.identity.low;
                                     if (field.end && !edges.id) {
                                         edges[id] = this.createEdgeFromRow(
                                             field
@@ -775,11 +792,19 @@ export default class GraphContainer extends Component {
 
         if (data.hasOwnProperty("properties")) {
             if (data.properties.hasOwnProperty("blocksinheritance")) {
-                node.blocksInheritance = data.properties.blocksinheritance;
+                node.blocksinheritance = data.properties.blocksinheritance;
             }
 
             if (data.properties.hasOwnProperty("guid")) {
                 node.guid = data.properties.guid;
+            }
+
+            if (data.properties.hasOwnProperty("owned")){
+                if (data.properties.owned){
+                    node.owned = true;
+                }else{
+                    node.notowned = true;
+                }
             }
         }
 
@@ -944,7 +969,7 @@ export default class GraphContainer extends Component {
                     "ouNodeClicked",
                     n.data.node.label,
                     n.data.node.guid,
-                    n.data.node.blocksInheritance
+                    n.data.node.blocksinheritance
                 );
             }
         } else {
@@ -976,42 +1001,6 @@ export default class GraphContainer extends Component {
             sin = Math.sin(_camera.angle),
             nodes = _s.graph.nodes(),
             ref = [];
-
-        // Getting and derotating the reference coordinates.
-        for (var i = 0; i < 2; i++) {
-          var n = nodes[i];
-          var aux = {
-            x: n.x * cos + n.y * sin,
-            y: n.y * cos - n.x * sin,
-            renX: n[_prefix + 'x'],
-            renY: n[_prefix + 'y'],
-          };
-          ref.push(aux);
-        }
-
-        // Applying linear interpolation.
-        // if the nodes are on top of each other, we use the camera ratio to interpolate
-        if (ref[0].x === ref[1].x && ref[0].y === ref[1].y) {
-          var xRatio = (ref[0].renX === 0) ? 1 : ref[0].renX;
-          var yRatio = (ref[0].renY === 0) ? 1 : ref[0].renY;
-          x = (ref[0].x / xRatio) * (x - ref[0].renX) + ref[0].x;
-          y = (ref[0].y / yRatio) * (y - ref[0].renY) + ref[0].y;
-        } else {
-          var xRatio = (ref[1].renX - ref[0].renX) / (ref[1].x - ref[0].x);
-          var yRatio = (ref[1].renY - ref[0].renY) / (ref[1].y - ref[0].y);
-
-          // if the coordinates are the same, we use the other ratio to interpolate
-          if (ref[1].x === ref[0].x) {
-            xRatio = yRatio;
-          }
-
-          if (ref[1].y === ref[0].y) {
-            yRatio = xRatio;
-          }
-
-          x = (x - ref[0].renX) / xRatio + ref[0].x;
-          y = (y - ref[0].renY) / yRatio + ref[0].y;
-        }
 
         // Rotating the coordinates.
         return {x:x * cos - y * sin, y:y * cos + x * sin}

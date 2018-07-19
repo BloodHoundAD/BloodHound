@@ -38,15 +38,15 @@ export default class QueryNodeSelect extends Component {
             $(this.refs.outer).fadeToggle(true);
             var session = driver.session();
             session.run(query.query, query.props).then(
-                function(results) {
-                    var y = $.map(results.records, function(x) {
-                        let a = x.keys.map(function(e, i) {
+                results => {
+                    var y = $.map(results.records, x => {
+                        let a = x.keys.map((e, i) => {
                             let obj = {};
                             obj[e.split(".")[1]] = x._fields[i];
                             return obj;
                         });
                         let b = {};
-                        $.each(a, function(_, o) {
+                        $.each(a, (_, o) => {
                             Object.assign(b, o);
                         });
 
@@ -54,7 +54,7 @@ export default class QueryNodeSelect extends Component {
                     });
                     this.setState({ data: y });
                     session.close();
-                }.bind(this)
+                }
             );
         }
     }

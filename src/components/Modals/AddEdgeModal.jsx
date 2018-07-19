@@ -172,8 +172,14 @@ export default class AddEdgeModal extends Component {
                 edgeError.html("Edge already exists");
                 edgeError.show();
             }else{
+                let edgepart;
+                if (edge === "GenericAll" || edge === "GenericWrite" || edge === "AllExtendedRights" || edge === "AddMember" || edge === "ForceChangePassword" || edge === "Owns" || edge === "WriteDacl" || edge === "WriteOwner"){
+                    edgepart = `[r:${edge} {isacl:true}]`
+                }else{
+                    edgepart = `[r:${edge} {isacl:false}]`
+                }
                 let s = driver.session();
-                let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${target.type} {name:{target}}) MERGE (n)-[r:${edge}]->(m) RETURN r`
+                let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${target.type} {name:{target}}) MERGE (n)-${edgepart}->(m) RETURN r`
                 s.run(statement, {source: source.name, target: target.name}).then(x =>{
                     s.close();
                     complete.show();

@@ -27,9 +27,9 @@ process.on("message", function(m) {
     var result = collapseEdgeNodes(sigmaInstance, params, spotlightData);
     sigmaInstance = result[0];
     spotlightData = result[1];
-    result = collapseSiblingNodes(sigmaInstance, params, spotlightData);
-    sigmaInstance = result[0];
-    spotlightData = result[1];
+    //result = collapseSiblingNodes(sigmaInstance, params, spotlightData);
+    //sigmaInstance = result[0];
+    //spotlightData = result[1];
     sigmaInstance.graph.nodes().forEach(function(node) {
         if (!spotlightData.hasOwnProperty(node.id)) {
             spotlightData[node.id] = [node.label, 0, "", node.type, ""];

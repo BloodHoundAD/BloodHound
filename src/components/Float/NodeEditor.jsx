@@ -15,7 +15,7 @@ export default class NodeEditor extends Component {
     componentDidMount() {
         emitter.on("editnode", this.getNodeData.bind(this));
         $(this.refs.outer).draggable({
-            stop: function(event, ui) {
+            stop: (event,_) => {
                 let target = jQuery(event.target);
                 target.css("width", "auto");
                 target.css("height", "auto");
@@ -80,6 +80,12 @@ export default class NodeEditor extends Component {
             key = "guid";
         } else {
             key = "name";
+        }
+
+        if (Object.keys(this.state.properties).includes(val)){
+            input.css("border", "3px solid red")
+            emitter.emit("showAlert", "Node property already exists");
+            return;
         }
 
         let q = driver.session();
@@ -208,8 +214,14 @@ export default class NodeEditor extends Component {
                             <input
                                 type="text"
                                 className="form-control form-override"
+                                ref="newAttrDisplay"
+                                placeholder="Display Name"
+                            />
+                            <input
+                                type="text"
+                                className="form-control form-override"
                                 ref="newAttrName"
-                                placeholder="New Attribute Name"
+                                placeholder="Internal Name"
                             />
                             <select className="form-control" ref="newAttrType">
                                 <option>boolean</option>
@@ -221,6 +233,7 @@ export default class NodeEditor extends Component {
                                 <span className="fa fa-plus" /> Add
                             </button>
                         </div>
+                        
                     </form>
                 </div>
             </div>

@@ -127,7 +127,7 @@ export default class Settings extends Component {
                 </div>
 
                 <div className="panel-body sliderfix">
-                    <div>
+                    {/* <div>
                         <strong>Sibling Collapse Threshold</strong>
                         <i
                             data-toggle="tooltip"
@@ -147,7 +147,7 @@ export default class Settings extends Component {
                                 ref="siblinginput"
                             />
                         </span>
-                    </div>
+                    </div> */}
 
                     <div>
                         <strong>Node Collapse Threshold</strong>
