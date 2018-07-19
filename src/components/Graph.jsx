@@ -658,7 +658,20 @@ export default class GraphContainer extends Component {
         emitter.emit("updateLoadingText", "Querying Database");
         emitter.emit("resetSpotlight");
         this.setState({"currentQuery": params})
-        session.run(params.statement, params.props).subscribe({
+
+        let edgearr = []
+        let stat = appStore.edgeincluded;
+
+        $.each(Object.keys(stat), function(_, key){
+            if (stat[key]){
+                edgearr.push(key);
+            }
+        })
+
+        let finaledges = edgearr.join('|');
+        let statement = params.statement.format(finaledges)
+
+        session.run(statement, params.props).subscribe({
             onNext: function(result) {
                 $.each(
                     result._fields,
@@ -957,18 +970,6 @@ export default class GraphContainer extends Component {
         if (typeof props === "undefined") {
             props = {};
         }
-
-        let edges = []
-        let stat = appStore.edgeincluded;
-
-        $.each(Object.keys(stat), function(_, key){
-            if (stat[key]){
-                edges.push(key);
-            }
-        })
-
-        let finaledges = edges.join('|');
-        statement = statement.format(finaledges)
 
         this.doQueryNative({
             statement: statement,

@@ -16,12 +16,11 @@ export default class QueryNodeSelectItem extends Component {
                 let val = null;
                 if (type === "undefined") {
                     val = null;
-                } else if (obj.hasOwnProperty("low")) {
-                    var t = obj.low;
-                    if (t === 0) {
+                } else if (type === "number") {
+                    if (obj === 0) {
                         val = "Never";
                     } else {
-                        val = new Date(obj.low * 1000).toUTCString();
+                        val = new Date(obj * 1000).toUTCString();
                     }
                 } else if (type === "boolean") {
                     val = obj.toString().toTitleCase();

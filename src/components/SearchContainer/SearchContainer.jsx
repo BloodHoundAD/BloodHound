@@ -702,7 +702,7 @@ export default class SearchContainer extends Component {
                             tooltip
                             tooltipDir="bottom"
                             tooltipTitle="Find Path"
-                            classes="input-group-addon spanfix"
+                            classes="input-group-addon spanfix glyph-hover-style"
                             click={this._onPlayClick.bind(this)}
                         >
                             <Icon glyph="play" extraClass="menuglyph" />

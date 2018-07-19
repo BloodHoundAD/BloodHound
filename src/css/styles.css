@@ -338,6 +338,11 @@ div.tooltip-inner-custom {
     width: auto;
     padding-right: 1em;
     text-align: left;
+    pointer-events: none;
+}
+
+.dl-horizontal dd:hover {
+    background-color: #ecf0f1;
 }
 
 .dl-horizontal dd {
