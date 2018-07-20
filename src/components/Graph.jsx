@@ -164,6 +164,7 @@ export default class GraphContainer extends Component {
         emitter.on("changeLayout", this.changeLayout.bind(this));
         emitter.on("addNodeFinal", this.addNode.bind(this));
         emitter.on("setOwned", this.setOwned.bind(this));
+        emitter.on("setHighValue", this.setHighVal.bind(this))
     }
 
     componentDidMount() {
@@ -217,6 +218,42 @@ export default class GraphContainer extends Component {
 
         let q = driver.session();
         q.run(`MATCH (n:${node.type} {name:{node}}) SET n.owned={status}`, {node: node.label, status: status}).then(x => {
+            instance.renderers[0].glyphs();
+            q.close();
+        })
+    }
+
+    setHighVal(id, status){
+        if (appStore.currentTooltip !== null){
+            appStore.currentTooltip.close();
+        }
+        let instance = this.state.sigmaInstance;
+        let node = instance.graph.nodes(id);
+        node.highvalue = status;
+        if (status){
+            node.glyphs.push({
+                position: "top-right",
+                font: '"Font Awesome 5 Free"',
+                content: "\uf3a5",
+                fillColor: "black",
+                fontScale: 1.5,
+                fontStyle: "900"
+            })
+        }else{
+            let newglyphs = [];
+            $.each(node.glyphs, (_, glyph) => {
+                if (glyph.position !== "top-right"){
+                    newglyphs.push(glyph)
+                }
+            })
+            node.glyphs = newglyphs;
+        }
+
+        let key = node.type === "OU" ? "guid" : "name";
+        let keyVal = node.type === "OU" ? node.guid : node.label;
+
+        let q = driver.session();
+        q.run(`MATCH (n:${node.type} {${key}:{node}}) SET n.highvalue={status}`, {node: keyVal, status: status}).then(x => {
             instance.renderers[0].glyphs();
             q.close();
         })
@@ -844,6 +881,8 @@ export default class GraphContainer extends Component {
                     node.notowned = true;
                 }
             }
+
+            node.highvalue = data.properties.highvalue;
         }
 
         if (label === params.start) {
@@ -877,6 +916,17 @@ export default class GraphContainer extends Component {
                 content: "\uf54c",
                 fillColor: "black",
                 fontScale: 2.0,
+                fontStyle: "900"
+            });
+        }
+
+        if (node.highvalue){
+            node.glyphs.push({
+                position: "top-right",
+                font: '"Font Awesome 5 Free"',
+                content: "\uf3a5",
+                fillColor: "black",
+                fontScale: 1.5,
                 fontStyle: "900"
             });
         }

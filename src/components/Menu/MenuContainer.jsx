@@ -327,6 +327,7 @@ export default class MenuContainer extends Component {
             await session
                 .run(data[key].statement, { props: data[key].props })
                 .catch(function(error) {
+                    console.log(data[key].props)
                     console.log(error);
                 });
         }

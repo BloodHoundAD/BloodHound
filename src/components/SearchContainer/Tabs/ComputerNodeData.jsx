@@ -55,8 +55,16 @@ export default class ComputerNodeData extends Component {
                     }else{
                         notes = properties.notes;
                     }
+
+                    let del;
+                    if (!properties.allowedtodelegate){
+                        del = []
+                    }else{
+                        del = properties.allowedtodelegate;
+                    }
                     this.setState({
                         ServicePrincipalNames:spn,
+                        AllowedToDelegate: del,
                         propertyMap: properties,
                         notes: notes
                     });
@@ -99,6 +107,7 @@ export default class ComputerNodeData extends Component {
                         properties={this.state.propertyMap}
                         displayMap={this.state.displayMap}
                         ServicePrincipalNames={this.state.ServicePrincipalNames}
+                        AllowedToDelegate={this.state.AllowedToDelegate}
                     />
 
                     <NodeCypherLink

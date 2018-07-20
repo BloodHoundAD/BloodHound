@@ -27,6 +27,7 @@ export default class componentName extends Component {
 
     render() {
         let l = [];
+        let count = 0;
 
         $.each(
             this.props.displayMap,
@@ -40,10 +41,19 @@ export default class componentName extends Component {
             }.bind(this)
         );
 
-        if (this.props.ServicePrincipalNames.length > 0) {
+        if (this.props.ServicePrincipalNames && this.props.ServicePrincipalNames.length > 0) {
             l.push(<dt key="spn">Service Principal Names</dt>);
-            $.each(this.props.ServicePrincipalNames, function(index, value) {
-                l.push(<dd key={index}>{value}</dd>);
+            $.each(this.props.ServicePrincipalNames, function(_, value) {
+                l.push(<dd key={count}>{value}</dd>);
+                count++;
+            });
+        }
+
+        if (this.props.AllowedToDelegate && this.props.AllowedToDelegate.length > 0){
+            l.push(<dt key="delegate">Allowed To Delegate</dt>);
+            $.each(this.props.AllowedToDelegate, function(_, value) {
+                l.push(<dd key={count}>{value}</dd>);
+                count++;
             });
         }
 

@@ -211,12 +211,12 @@ export default class NodeEditor extends Component {
                     </div>
                     <form onSubmit={x => x.preventDefault()} className="form-inline pull-right">
                         <div onFocus={this.removeValidation.bind(this)} className="form-group">
-                            <input
+                            {/* <input
                                 type="text"
                                 className="form-control form-override"
                                 ref="newAttrDisplay"
                                 placeholder="Display Name"
-                            />
+                            /> */}
                             <input
                                 type="text"
                                 className="form-control form-override"

@@ -236,64 +236,16 @@ function dropIndexes(indexes) {
     }
 }
 
-function addConstraints() {
-    var s1 = driver.session();
-    var s2 = driver.session();
-    var s3 = driver.session();
-    var s4 = driver.session();
-    var s5 = driver.session();
-    var s6 = driver.session();
+async function addConstraints() {
+    let session = driver.session();
+    await session.run("CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE");
+    await session.run("CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE")
+    await session.run("CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE")
+    await session.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE")
+    await session.run("CREATE CONSTRAINT ON (c:OU) ASSERT c.guid IS UNIQUE")
+    await session.run("CREATE CONSTRAINT ON (c:GPO) ASSERT c.name IS UNIQUE")
 
-    s1.run("CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE")
-        .then(function() {
-            s1.close();
-            s2.run("CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE")
-                .then(function() {
-                    s2.close();
-                    s3.run(
-                        "CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE"
-                    )
-                        .then(function() {
-                            s3.close();
-                            s4.run(
-                                "CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE"
-                            )
-                                .then(function() {
-                                    s4.close();
-                                    s5.run(
-                                        "CREATE CONSTRAINT on (c:OU) ASSERT c.guid IS UNIQUE"
-                                    )
-                                        .then(function() {
-                                            s5.close();
-                                            s6.run(
-                                                "CREATE CONSTRAINT on (c:GPO) ASSERT c.name is UNIQUE"
-                                            )
-                                                .then(function() {
-                                                    s6.close();
-                                                })
-                                                .catch(function() {
-                                                    s6.close();
-                                                });
-                                        })
-                                        .catch(function() {
-                                            s5.close();
-                                        });
-                                })
-                                .catch(function() {
-                                    s4.close();
-                                });
-                        })
-                        .catch(function() {
-                            s3.close();
-                        });
-                })
-                .catch(function() {
-                    s2.close();
-                });
-        })
-        .catch(function() {
-            s1.close();
-        });
+    session.close()
 
     emitter.emit("hideDBClearModal");
 }
