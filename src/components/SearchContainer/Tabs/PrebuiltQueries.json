@@ -187,6 +187,18 @@
                     "endNode": "{}"
                 }
             ]
+        },
+        {
+            "name": "Shortest Paths to High Value Targets",
+            "queryList": [
+                {
+                    "final": true,
+                    "query":
+                        "MATCH (n),(m),p=shortestPath((n)-[r:{}*1..]->(m)) WHERE m.highvalue=true AND NOT m = n RETURN p",
+                    "allowCollapse": true,
+                    "endNode": "{}"
+                }
+            ]
         }
     ]
 }
