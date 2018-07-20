@@ -217,7 +217,7 @@ export default class GraphContainer extends Component {
 
         let q = driver.session();
         q.run(`MATCH (n:${node.type} {name:{node}}) SET n.owned={status}`, {node: node.label, status: status}).then(x => {
-            this.relayout();
+            instance.renderers[0].glyphs();
             q.close();
         })
     }
