@@ -238,11 +238,16 @@ if (typeof conf.get("edgeincluded") === "undefined"){
         WriteDacl: true,
         WriteOwner: true,
         CanRDP:true,
-        ExecuteDCOM:true
+        ExecuteDCOM:true,
+        AllowedToDelegate: true
     })
 }
 
 appStore.edgeincluded = conf.get("edgeincluded");
+if (!appStore.edgeincluded.hasOwnProperty("AllowedToDelegate")){
+    appStore.edgeincluded.AllowedToDelegate = true;
+    conf.set("edgeincluded", appStore.edgeincluded)
+}
 
 appStore.performance = conf.get("performance");
 

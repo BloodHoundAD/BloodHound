@@ -624,6 +624,11 @@ export function buildGpoAdminJson(chunk) {
 export function buildUserJson(chunk) {
     let queries = {};
 
+    queries.delegate = {
+        statement: "UNWIND {props} AS prop MERGE (n:User {name: prop.name}) MERGE (m:Computer {name: prop.comp}) MERGE (n)-[r:AllowedToDelegate {isacl: false}]->(m)",
+        props: []
+    }
+
     $.each(chunk, function(_, user) {
         let name = user.Name;
         let properties = user.Properties;
@@ -653,6 +658,11 @@ export function buildUserJson(chunk) {
 
         let aces = user.Aces;
         processAceArray(aces, name, "User", queries);
+
+        let allowedToDelegate = user.AllowedToDelegate;
+        $.each(allowedToDelegate, (_, comp) =>{
+            queries.delegate.props.push({name: name, comp: comp});
+        });
     });
     return queries;
 }
@@ -661,6 +671,11 @@ export function buildComputerJson(chunk) {
     let queries = {};
     let baseQuery =
         "UNWIND {props} AS prop MERGE (n:Computer {name:prop.name}) MERGE (m:{} {name:prop.target}) MERGE (m)-[r:{} {isacl: false}]->(n)";
+
+    queries.delegate = {
+        statement: "UNWIND {props} AS prop MERGE (n:Computer {name: prop.name}) MERGE (m:Computer {name: prop.comp}) MERGE (n)-[r:AllowedToDelegate {isacl: false}]->(m)",
+        props: []
+    }
 
     $.each(chunk, function(_, comp) {
         let name = comp.Name;
@@ -725,6 +740,11 @@ export function buildComputerJson(chunk) {
             let statement = baseQuery.format(aType, rel);
             let p = { name: name, target: aName };
             insert(queries, hash, statement, p);
+        });
+
+        let allowedToDelegate = comp.AllowedToDelegate;
+        $.each(allowedToDelegate, (_, comp) =>{
+            queries.delegate.props.push({name: name, comp: comp});
         });
     });
     return queries;

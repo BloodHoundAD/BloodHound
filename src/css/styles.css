@@ -135,6 +135,16 @@ div.tooltip-inner-custom {
     display: none;
 }
 
+.edge-filter-heading > h4{
+    display: inline;
+    margin-right: 5px;
+}
+
+.edge-filter-heading > button{
+    height: 20px;
+    width: 30px;
+}
+
 .edgeFilter{
     position: absolute;
     left: 100%;

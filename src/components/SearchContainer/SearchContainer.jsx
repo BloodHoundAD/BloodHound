@@ -26,9 +26,62 @@ export default class SearchContainer extends Component {
                 WriteDacl: true,
                 WriteOwner: true,
                 CanRDP: true,
-                ExecuteDCOM: true
+                ExecuteDCOM: true,
+                AllowedToDelegate: true
             }
         };
+    }
+
+    clearSection(section){
+        let current = this.state.edgeincluded;
+        if (section === "default"){
+            current.MemberOf = false;
+            current.HasSession = false;
+            current.AdminTo = false;
+        }else if (section === "acl"){
+            current.AllExtendedRights = false;
+            current.AddMember = false;
+            current.ForceChangePassword = false;
+            current.GenericAll = false;
+            current.GenericWrite = false;
+            current.Owns = false;
+            current.WriteDacl = false;
+            current.WriteOwner = false
+        }else{
+            current.CanRDP = false;
+            current.ExecuteDCOM = false;
+            current.AllowedToDelegate = false;
+        }
+
+        this.setState({edgeincluded: current});
+        appStore.edgeincluded = current;
+        conf.set("edgeincluded", current);
+    }
+
+    setSection(section){
+        let current = this.state.edgeincluded;
+        if (section === "default"){
+            current.MemberOf = true;
+            current.HasSession = true;
+            current.AdminTo = true;
+        }else if (section === "acl"){
+            current.AllExtendedRights = true;
+            current.AddMember = true;
+            current.ForceChangePassword = true;
+            current.GenericAll = true;
+            current.GenericWrite = true;
+            current.Owns = true;
+            current.WriteDacl = true;
+            current.WriteOwner = true
+        }else{
+            current.CanRDP = true;
+            current.ExecuteDCOM = true;
+            current.AllowedToDelegate = true;
+        }
+
+        this.setState({edgeincluded: current});
+        appStore.edgeincluded = current;
+        conf.set("edgeincluded", current);
     }
 
     handleChange(event){
@@ -491,7 +544,11 @@ export default class SearchContainer extends Component {
                             className="glyphicon glyphicon-question-sign"
                         />
                     </div>
-                    <h4>Default Edges</h4>
+                    <div className={"edge-filter-heading"}>
+                        <h4>Default Edges</h4>
+                        <button onClick={x => this.setSection("default")} className={"fa fa-check-double"} data-toggle="tooltip" data-placement="top" title="Check all default edges" />
+                        <button onClick={x => this.clearSection("default")} className={"fa fa-eraser"} data-toggle="tooltip" data-placement="top" title="Clear all default edges"/>
+                    </div>
                     <div>
                         <input
                             className="checkbox-inline"
@@ -522,7 +579,11 @@ export default class SearchContainer extends Component {
                         />
                         <label onClick={this.handleChange.bind(this)} name="AdminTo"> AdminTo</label>
                     </div>
-                    <h4>ACL Edges</h4>
+                    <div className={"edge-filter-heading"}>
+                        <h4>ACL Edges</h4>
+                        <button onClick={x => this.setSection("acl")} className={"fa fa-check-double"} data-toggle="tooltip" data-placement="top" title="Check all ACL edges" />
+                        <button onClick={x => this.clearSection("acl")} className={"fa fa-eraser"} data-toggle="tooltip" data-placement="top" title="Clear all ACL edges"/>
+                    </div>
                     <div>
                         <input
                             className="checkbox-inline"
@@ -603,7 +664,11 @@ export default class SearchContainer extends Component {
                         />
                         <label onClick={this.handleChange.bind(this)} name="WriteOwner"> WriteOwner</label>
                     </div>
-                    <h4>Unprivileged Execution</h4>
+                    <div className={"edge-filter-heading"}>
+                        <h4>Special</h4>
+                        <button onClick={x => this.setSection("special")} className={"fa fa-check-double"} data-toggle="tooltip" data-placement="top" title="Check all special edges" />
+                        <button onClick={x => this.clearSection("special")} className={"fa fa-eraser"} data-toggle="tooltip" data-placement="top" title="Clear all special edges"/>
+                    </div>
                     <div>
                         <input
                             className="checkbox-inline"
@@ -623,6 +688,16 @@ export default class SearchContainer extends Component {
                             onChange={this.handleChange.bind(this)}
                         />
                         <label onClick={this.handleChange.bind(this)} name="ExecuteDCOM"> ExecuteDCOM</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="AllowedToDelegate"
+                            checked={this.state.edgeincluded.AllowedToDelegate}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="AllowedToDelegate"> AllowedToDelegate</label>
                     </div>
                 </div>
                 <div className="input-group input-group-unstyled searchSelectorS">
