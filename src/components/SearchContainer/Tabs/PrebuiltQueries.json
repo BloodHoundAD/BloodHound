@@ -130,9 +130,9 @@
                     "final": false,
                     "title": "Select a Domain Admin group...",
                     "query":
-                        "MATCH (n:Group) WHERE n.name =~ {name} RETURN n.name ORDER BY n.name DESC",
+                        "MATCH (n:Group) WHERE n.objectsid =~ {name} RETURN n.name ORDER BY n.name DESC",
                     "props": {
-                        "name": "(?i).*DOMAIN ADMINS.*"
+                        "name": "(?i)S-1-5-.*-512"
                     }
                 },
                 {
@@ -165,6 +165,26 @@
                         "MATCH n=shortestPath((a {name:{result}})-[r:{}*1..]->(b:Computer)) RETURN n",
                     "startNode": "{}",
                     "allowCollapse": true
+                }
+            ]
+        },{
+            "name": "Shortest Paths to Domain Admins from Owned Principal",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain Admin group...",
+                    "query":
+                        "MATCH (n:Group) WHERE n.objectsid =~ {name} RETURN n.name ORDER BY n.name DESC",
+                    "props": {
+                        "name": "(?i)S-1-5-.*-512"
+                    }
+                },
+                {
+                    "final": true,
+                    "query":
+                        "MATCH (n),(m:Group {name:{result}}),p=shortestPath((n)-[r:{}*1..]->(m)) WHERE n.owned=true RETURN p",
+                    "allowCollapse": true,
+                    "endNode": "{}"
                 }
             ]
         }
