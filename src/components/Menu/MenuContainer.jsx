@@ -321,6 +321,9 @@ export default class MenuContainer extends Component {
         let data = funcMap[type](chunk);
 
         for (let key in data) {
+            if (data[key].props.length === 0){
+                continue;
+            }
             await session
                 .run(data[key].statement, { props: data[key].props })
                 .catch(function(error) {
