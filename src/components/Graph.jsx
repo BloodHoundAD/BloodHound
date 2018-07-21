@@ -164,7 +164,8 @@ export default class GraphContainer extends Component {
         emitter.on("changeLayout", this.changeLayout.bind(this));
         emitter.on("addNodeFinal", this.addNode.bind(this));
         emitter.on("setOwned", this.setOwned.bind(this));
-        emitter.on("setHighValue", this.setHighVal.bind(this))
+        emitter.on("setHighVal", this.setHighVal.bind(this))
+        emitter.on("getHelp", this.getHelpEdge.bind(this))
     }
 
     componentDidMount() {
@@ -178,13 +179,21 @@ export default class GraphContainer extends Component {
         this.initializeSigma();
 
         this.doQueryNative({
-            statement:
-                'MATCH (n:Group) WHERE n.objectsid =~ "(?i)S-1-5.*-512" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
-            //statement: 'MATCH (n)-[r]->(m) RETURN n,r,m',
+            //statement:'MATCH (n:Group) WHERE n.objectsid =~ "(?i)S-1-5.*-512" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
+            statement: 'MATCH (n)-[r:AddMember]->(m) RETURN n,r,m LIMIT 5',
             //statement: 'MATCH p=(n:Domain)-[r]-(m:Domain) RETURN p',
             allowCollapse: false,
             props: {}
         });
+    }
+
+    getHelpEdge(id){
+        appStore.currentTooltip.close();
+        let instance = this.state.sigmaInstance.graph;
+        let edge = instance.edges(id);
+        let source = instance.nodes(edge.source);
+        let target = instance.nodes(edge.target);
+        emitter.emit("displayHelp", edge, source, target);
     }
 
     setOwned(id, status){
@@ -214,11 +223,13 @@ export default class GraphContainer extends Component {
             node.glyphs = newglyphs;
             node.notowned = true;
             node.owned = false;
-        }        
+        }
+
+        instance.renderers[0].glyphs();
+        instance.refresh();
 
         let q = driver.session();
         q.run(`MATCH (n:${node.type} {name:{node}}) SET n.owned={status}`, {node: node.label, status: status}).then(x => {
-            instance.renderers[0].glyphs();
             q.close();
         })
     }
@@ -251,10 +262,12 @@ export default class GraphContainer extends Component {
 
         let key = node.type === "OU" ? "guid" : "name";
         let keyVal = node.type === "OU" ? node.guid : node.label;
+        instance.renderers[0].glyphs();
+        instance.refresh();
 
         let q = driver.session();
+        
         q.run(`MATCH (n:${node.type} {${key}:{node}}) SET n.highvalue={status}`, {node: keyVal, status: status}).then(x => {
-            instance.renderers[0].glyphs();
             q.close();
         })
     }
@@ -705,12 +718,21 @@ export default class GraphContainer extends Component {
             }
         })
 
+        if (edgearr.length === 0){
+            emitter.emit("showAlert", "Must specify at least one edge type!");
+            emitter.emit("updateLoadingText", "Done!");
+            setTimeout(function() {
+                emitter.emit("showLoadingIndicator", false);
+            }, 1500);
+            return;
+        }
+
         let finaledges = edgearr.join('|');
         let statement = params.statement.format(finaledges)
-
+        let promises = [];
         session.run(statement, params.props).subscribe({
-            onNext: function(result) {
-                $.each(
+            onNext: async function(result) {
+                $.each( 
                     result._fields,
                     function(_, field) {
                         if (field !== null) {

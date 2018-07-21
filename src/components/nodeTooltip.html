@@ -19,27 +19,27 @@
     </li>
     {{/type_ou}}
     {{#type_user}}
-    <li onclick="emitter.emit('query', 'MATCH (n:User {name:{name}}),(m),p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
+    <li onclick="emitter.emit('query', 'MATCH (n:User {name:{name}}),(m),p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p', {name: '{{label}}'}, '{{label}}')">
         <i class="fa fa-random"> </i> Shortest Paths to Here
     </li>
     {{/type_user}} {{#type_computer}}
-    <li onclick="emitter.emit('query', 'MATCH (n:Computer {name:{name}}),(m),p=allShortestPaths((m)-[r:{}*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
+    <li onclick="emitter.emit('query', 'MATCH (n:Computer {name:{name}}),(m),p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p', {name: '{{label}}'}, '{{label}}')">
         <i class="fa fa-random"> </i> Shortest Paths to Here
     </li>
     {{/type_computer}} {{#type_group}}
-    <li onclick="emitter.emit('query', 'MATCH (n:Group {name:{name}}),(m),p=allShortestPaths((m)-[r:{}*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}}')">
+    <li onclick="emitter.emit('query', 'MATCH (n:Group {name:{name}}),(m),p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p', {name: '{{label}}'}, '{{label}}')">
         <i class="fa fa-random"> </i> Shortest Paths to Here
     </li>
     {{/type_group}} {{#type_gpo}}
-    <li onclick="emitter.emit('query', 'MATCH (n:GPO {name:{name}}),(m),p=allShortestPaths((m)-[r:{}*1..]->(n)) WHERE NOT m.guid={guid} RETURN p', {name: '{{name}}'})">
+    <li onclick="emitter.emit('query', 'MATCH (n:GPO {name:{name}}),(m),p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p', {name: '{{name}}'})">
         <i class="fa fa-random"> </i> Shortest Paths to Here
     </li>
     {{/type_gpo}} {{#type_ou}}
-    <li onclick="emitter.emit('query', 'MATCH (n:OU {guid:{guid}}),(m),p=allShortestPaths((m)-[r:{}*1..]->(n)) WHERE NOT m.guid={guid} RETURN p', {guid: '{{guid}}'})">
+    <li onclick="emitter.emit('query', 'MATCH (n:OU {guid:{guid}}),(m),p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p', {guid: '{{guid}}'})">
         <i class="fa fa-random"> </i> Shortest Paths to Here
     </li>
     {{/type_ou}} {{#type_domain}}
-    <li onclick="emitter.emit('query', 'MATCH (n:Domain {name:{name}}),(m),p=allShortestPaths((m)-[r:{}*1..]->(n)) WHERE NOT m.name={name} RETURN p', {name: '{{label}}'}, '{{label}} ')">
+    <li onclick="emitter.emit('query', 'MATCH (n:Domain {name:{name}}),(m),p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p', {name: '{{label}}'}, '{{label}} ')">
         <i class="fa fa-random"> </i> Shortest Paths to Here
     </li>
     {{/type_domain}}
@@ -69,7 +69,7 @@
     </li>
     {{/highvalue}}
     {{^highvalue}}
-    <li onclick="emitter.emit('setHighVal', '{{id}}', false)">
+    <li onclick="emitter.emit('setHighVal', '{{id}}', true)">
         <i class="fa fa-exclamation"> </i> Mark {{type}} as High Value
     </li>
     {{/highvalue}}

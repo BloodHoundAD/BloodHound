@@ -179,6 +179,13 @@ div.tooltip-inner-custom {
     white-space: nowrap;
 }
 
+#help-tab-container > div div{
+    white-space: pre-line;
+    margin-top: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
 .nodeEditor{
     position: absolute;
     z-index: 20;
@@ -943,4 +950,8 @@ div.tooltip-inner-custom {
 .tab-content > div:nth-last-child(2) > div {
     max-height: 600px;
     overflow-y: auto;
+}
+
+.help-modal-width > div{
+    width: 40%;
 }

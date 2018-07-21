@@ -21,6 +21,7 @@ import ZoomContainer from "./components/Zoom/ZoomContainer";
 import QueryNodeSelect from "./components/Float/QueryNodeSelect";
 import SessionClearModal from "./components/Modals/SessionClearModal";
 import About from "./components/Modals/About.jsx";
+import HelpModal from "./components/Modals/HelpModal.jsx";
 import NodeEditor from "./components/Float/NodeEditor";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
@@ -66,6 +67,7 @@ export default class AppContainer extends Component {
                         <QueryNodeSelect />
                         <About />
                         <NodeEditor />
+                        <HelpModal />
                     </div>
                 </CSSTransition>
             </TransitionGroup>

@@ -5,20 +5,25 @@ import ReactDOM from "react-dom";
 import AppContainer from "./AppContainer";
 import Login from "./components/Float/Login";
 
-import { remote } from "electron";
+import { remote, shell } from "electron";
 const { app } = remote;
 import { stat, writeFile } from "fs";
 import { join } from "path";
 
 import ConfigStore from "electron-store";
-
 global.conf = new ConfigStore();
 import { EventEmitter2 as e } from "eventemitter2";
 global.emitter = new e({});
 global.renderEmit = new e({});
 global.neo4j = require("neo4j-driver").v1;
-
 global.Mustache = require("mustache");
+
+
+//open links externally by default
+$(document).on('click', 'a[href^="http"]', function(event) {
+    event.preventDefault();
+    shell.openExternal(this.href);
+});
 
 String.prototype.format = function() {
     var i = 0,
@@ -277,3 +282,5 @@ renderEmit.on("logout", function() {
 });
 
 ReactDOM.render(<Login />, document.getElementById("root"));
+
+

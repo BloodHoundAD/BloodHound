@@ -6,7 +6,7 @@ import { readFileSync, readFile } from "fs";
 import { remote } from "electron";
 const { app, shell } = remote;
 
-export default class componentName extends Component {
+export default class About extends Component {
     constructor() {
         super();
 
