@@ -60,17 +60,17 @@
     {{/owned}}
     {{#notowned}}
     <li onclick="emitter.emit('setOwned', '{{id}}', true)">
-        <i class="fa fa-exclamation"> </i> Mark {{type}} Owned
+        <i class="fa fa-exclamation"> </i> Mark {{type}} as Owned
     </li>
     {{/notowned}}
     {{#highvalue}}
     <li onclick="emitter.emit('setHighVal', '{{id}}', false)">
-        <i class="fa fa-exclamation"> </i> Unmark {{type}} as High Value
+        <i class="fa fa-gem"> </i> Unmark {{type}} as High Value
     </li>
     {{/highvalue}}
     {{^highvalue}}
     <li onclick="emitter.emit('setHighVal', '{{id}}', true)">
-        <i class="fa fa-exclamation"> </i> Mark {{type}} as High Value
+        <i class="fa fa-gem"> </i> Mark {{type}} as High Value
     </li>
     {{/highvalue}}
     <li onclick="emitter.emit('deletenode', '{{id}}')">
