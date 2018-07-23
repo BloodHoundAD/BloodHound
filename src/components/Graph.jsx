@@ -67,65 +67,7 @@ export default class GraphContainer extends Component {
             }.bind(this)
         );
 
-        let s1 = driver.session();
-        let s2 = driver.session();
-        let s3 = driver.session();
-        let s4 = driver.session();
-        let s5 = driver.session();
-        let s6 = driver.session();
-
-        s1.run("CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE")
-            .then(function() {
-                s1.close();
-                s2.run(
-                    "CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE"
-                )
-                    .then(function() {
-                        s2.close();
-                        s3.run(
-                            "CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE"
-                        )
-                            .then(function() {
-                                s3.close();
-                                s4.run(
-                                    "CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE"
-                                )
-                                    .then(function() {
-                                        s4.close();
-                                        s5.run(
-                                            "CREATE CONSTRAINT on (c:OU) ASSERT c.guid IS UNIQUE"
-                                        )
-                                            .then(function() {
-                                                s5.close();
-                                                s6.run(
-                                                    "CREATE CONSTRAINT on (c:GPO) ASSERT c.name is UNIQUE"
-                                                )
-                                                    .then(function() {
-                                                        s6.close();
-                                                    })
-                                                    .catch(function() {
-                                                        s6.close();
-                                                    });
-                                            })
-                                            .catch(function() {
-                                                s5.close();
-                                            });
-                                    })
-                                    .catch(function() {
-                                        s4.close();
-                                    });
-                            })
-                            .catch(function() {
-                                s3.close();
-                            });
-                    })
-                    .catch(function() {
-                        s2.close();
-                    });
-            })
-            .catch(function() {
-                s1.close();
-            });
+        this.setConstraints();
 
         emitter.on(
             "doLogout",
@@ -172,7 +114,19 @@ export default class GraphContainer extends Component {
         var font = new observer("Font Awesome 5 Free");
         font.load().then(x => {
             this.inita();
-        })
+        });
+    }
+
+    async setConstraints() {
+        let s = driver.session();
+        await s.run("CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE");
+        await s.run("CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE");
+        await s.run("CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE");
+        await s.run("CREATE CONSTRAINT ON (c:GPO) ASSERT c.name IS UNIQUE");
+        await s.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE");
+        await s.run("CREATE CONSTRAINT ON (c:OU) ASSERT c.guid IS UNIQUE");
+
+        s.close();
     }
 
     inita(){
@@ -180,7 +134,7 @@ export default class GraphContainer extends Component {
 
         this.doQueryNative({
             //statement:'MATCH (n:Group) WHERE n.objectsid =~ "(?i)S-1-5.*-512" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
-            statement: 'MATCH (n)-[r:AddMember]->(m) RETURN n,r,m LIMIT 5',
+            statement: 'MATCH (n)-[r:WriteDacl]->(m) RETURN n,r,m LIMIT 5',
             //statement: 'MATCH p=(n:Domain)-[r]-(m:Domain) RETURN p',
             allowCollapse: false,
             props: {}
