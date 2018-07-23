@@ -10,20 +10,20 @@ export default class LoadingContainer extends Component {
 
         emitter.on(
             "updateLoadingText",
-            function(payload) {
+            payload => {
                 this.setState({ text: payload });
-            }.bind(this)
-        );
+            });
+        
 
         emitter.on(
             "showLoadingIndicator",
-            function(payload) {
+            payload => {
                 if (payload) {
                     jQuery(this.refs.load).fadeIn();
                 } else {
                     jQuery(this.refs.load).fadeOut();
                 }
-            }.bind(this)
+            }
         );
     }
 

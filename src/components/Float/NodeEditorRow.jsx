@@ -5,6 +5,34 @@ export default class NodeEditorRow extends Component {
         super();
     }
 
+    componentDidMount() {
+        let type = typeof this.props.val;
+        if (type === "object") {
+            type = "array";
+        }
+        this.setState({
+            editing: false,
+            val: this.props.val,
+            deleting: false,
+            valtype: type
+        });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.val !== this.props.val && nextProps.val !== this.state.val) {
+            let type = typeof nextProps.val;
+            if (type === "object") {
+                type = "array";
+            }
+            this.setState({
+                val: nextProps.val,
+                editing: false,
+                deleting: false,
+                valtype: type
+            });
+        }
+    }
+
     saveDelete() {
         this.setState({ deleting: false });
         this.props.deleteHandler(this.props.attributeName);
@@ -74,37 +102,6 @@ export default class NodeEditorRow extends Component {
         this.setState({ editing: true });
     }
 
-    componentDidMount() {
-        let type = typeof this.props.val;
-        if (type == "object") {
-            type = "array";
-        }
-        this.setState({
-            editing: false,
-            val: this.props.val,
-            deleting: false,
-            valtype: type
-        });
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (
-            nextProps.val != this.props.val &&
-            nextProps.val != this.state.val
-        ) {
-            let type = typeof nextProps.val
-            if (type == "object") {
-                type = "array";
-            }
-            this.setState({
-                val: nextProps.val,
-                editing: false,
-                deleting: false,
-                valtype: type
-            });
-        }
-    }
-
     render() {
         let type = this.state ? this.state.valtype : typeof this.props.val;
         let valcolumn;
@@ -116,7 +113,7 @@ export default class NodeEditorRow extends Component {
                     className="checkbox"
                     type="checkbox"
                     checked={!this.state ? false : this.state.val}
-                    disabled={true}
+                    disabled
                     onChange={this.changeVal.bind(this)}
                 />
             );
@@ -134,7 +131,7 @@ export default class NodeEditorRow extends Component {
             );
         } else if (type === "object" || type === "array") {
             valcolumn = (
-                <textarea disabled={true} className={"nodeEditArray"} ref="input" defaultValue={!this.state
+                <textarea disabled className={"nodeEditArray"} ref="input" defaultValue={!this.state
                     ? this.props.val.join("\n")
                     : this.state.val.join("\n")} />
             );

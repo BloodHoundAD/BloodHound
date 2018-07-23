@@ -33,9 +33,9 @@ export default class DatabaseDataDisplay extends Component {
 
     createInterval() {
         var x = setInterval(
-            function() {
+            () => {
                 this.refreshDBData();
-            }.bind(this),
+            },
             60000
         );
         this.setState({
@@ -66,51 +66,51 @@ export default class DatabaseDataDisplay extends Component {
         s1.run(
             "MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)"
         ).then(
-            function(result) {
+            result => {
                 this.setState({ num_users: result.records[0]._fields[0].low });
                 s1.close();
-            }.bind(this)
+            }
         );
 
         s2.run("MATCH (n:Group) RETURN count(n)").then(
-            function(result) {
+            result => {
                 this.setState({ num_groups: result.records[0]._fields[0].low });
                 s2.close();
-            }.bind(this)
+            }
         );
 
         s3.run("MATCH (n:Computer) RETURN count(n)").then(
-            function(result) {
+            result => {
                 this.setState({
                     num_computers: result.records[0]._fields[0].low
                 });
                 s3.close();
-            }.bind(this)
+            }
         );
 
         s4.run("MATCH ()-[r:HasSession]->() RETURN count(r)").then(
-            function(result) {
+            result => {
                 this.setState({
                     num_sessions: result.records[0]._fields[0].low
                 });
                 s4.close();
-            }.bind(this)
+            }
         );
 
         s6.run("MATCH ()-[r {isacl: true}]->() RETURN count(r)").then(
-            function(result) {
+            result => {
                 this.setState({ num_acls: result.records[0]._fields[0].low });
                 s6.close();
-            }.bind(this)
+            }
         );
 
         s5.run("MATCH ()-[r]->() RETURN count(r)").then(
-            function(result) {
+            result => {
                 this.setState({
                     num_relationships: result.records[0]._fields[0].low
                 });
                 s5.close();
-            }.bind(this)
+            }
         );
     }
 
@@ -158,10 +158,10 @@ export default class DatabaseDataDisplay extends Component {
                     </div>
                     <div className="btn-group-vertical btn-group-sm dbbuttons">
                     <button
-                            type="button"
-                            className="btn btn-info"
-                            onClick={this.toggleSessionClearModal}
-                        >
+                        type="button"
+                        className="btn btn-info"
+                        onClick={this.toggleSessionClearModal}
+                    >
                             Clear Sessions
                         </button>
                         <button

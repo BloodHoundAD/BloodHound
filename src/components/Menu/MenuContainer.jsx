@@ -14,7 +14,7 @@ import {
 import { If, Then, Else } from "react-if";
 import { remote } from "electron";
 const { dialog, app } = remote;
-import { unlinkSync, createReadStream, createWriteStream } from "fs";
+import { unlinkSync, createReadStream, createWriteStream, statSync } from "fs";
 import { eachSeries } from "async";
 import { Parse } from "unzipper";
 import { join } from "path";
@@ -23,7 +23,7 @@ import { withParser } from "stream-json/filters/Pick";
 import { streamArray } from "stream-json/streamers/StreamArray";
 import { chain } from "stream-chain";
 import { connectTo } from "stream-json/Assembler";
-var iszip = require('is-zip-file');
+import { isZipSync } from 'is-zip-file';
 
 export default class MenuContainer extends Component {
     constructor() {
@@ -45,24 +45,24 @@ export default class MenuContainer extends Component {
         let fileNames = []
         $.each(e.dataTransfer.files, function(_, file){
             fileNames.push({ path: file.path, name: file.name });
-        })
+        });
 
         this.unzipNecessary(fileNames).then(
-            function(results) {
+            results => {
                 eachSeries(
                     results,
-                    function(file, callback) {
+                    (file, callback) => {
                         emitter.emit(
                             "showAlert",
                             "Processing file {}".format(file.name)
                         );
                         this.getFileMeta(file.path, callback);
-                    }.bind(this),
-                    function done() {
+                    },
+                    () => {
                         setTimeout(
-                            function() {
+                            () => {
                                 this.setState({ uploading: false });
-                            }.bind(this),
+                            },
                             3000
                         );
                         this.addOwnedProp();
@@ -71,9 +71,9 @@ export default class MenuContainer extends Component {
                                 unlinkSync(file.path);
                             }
                         });
-                    }.bind(this)
+                    }
                 );
-            }.bind(this)
+            }
         );
     }
 
@@ -179,7 +179,7 @@ export default class MenuContainer extends Component {
             var path = files[index].path;
             var name = files[index].name;
 
-            if (iszip.isZipSync(path)) {
+            if (isZipSync(path)) {
                 await createReadStream(path)
                     .pipe(Parse())
                     .on("entry", function(entry) {
@@ -205,7 +205,45 @@ export default class MenuContainer extends Component {
         emitter.emit("showAbout");
     }
 
-    getFileMeta(file, callback) {
+    getFileMeta(file, callback){
+        let acceptableTypes = [
+            "sessions",
+            "ous",
+            "groups",
+            "gpoadmins",
+            "gpos",
+            "computers",
+            "users",
+            "domains"
+        ];
+        let count;
+        let type;
+        
+
+        this.setState({
+            uploading: true,
+            progress: 0
+        });
+
+        let size = statSync(file).size;
+        createReadStream(file, {encoding: 'utf8', start: size-100, end: size}).on('data', chunk => {
+            type = /type.?:\s?"(\w*)"/g.exec(chunk)[1];
+            count = /count.?:\s?(\d*)/g.exec(chunk)[1];
+
+            if (!acceptableTypes.includes(type)){
+                emitter.emit("showAlert", "Unrecognized JSON Type");
+                this.setState({
+                    uploading: false
+                });
+                callback();
+                return;
+            }
+
+            this.processJson(file, callback, parseInt(count), type)
+        });
+    }
+
+    getFileMetaOld(file, callback) {
         let acceptableTypes = [
             "sessions",
             "ous",

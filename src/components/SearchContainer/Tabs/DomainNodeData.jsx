@@ -31,7 +31,7 @@ export default class DomainNodeData extends Component {
 
     getNodeData(payload) {
         jQuery(this.refs.complete).hide();
-        $.each(this.state.driversessions, function(index, record) {
+        $.each(this.state.driversessions, (_, record) => {
             record.close();
         });
 

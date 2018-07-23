@@ -13,85 +13,8 @@ export default class SearchContainer extends Component {
             pathfindingIsOpen: false,
             mainValue: "",
             pathfindValue: "",
-            edgeincluded: {
-                MemberOf: true,
-                HasSession: true,
-                AdminTo: true,
-                AllExtendedRights: true,
-                AddMember: true,
-                ForceChangePassword: true,
-                GenericAll: true,
-                GenericWrite: true,
-                Owns: true,
-                WriteDacl: true,
-                WriteOwner: true,
-                CanRDP: true,
-                ExecuteDCOM: true,
-                AllowedToDelegate: true
-            }
+            edgeincluded: appStore.edgeincluded
         };
-    }
-
-    clearSection(section){
-        let current = this.state.edgeincluded;
-        if (section === "default"){
-            current.MemberOf = false;
-            current.HasSession = false;
-            current.AdminTo = false;
-        }else if (section === "acl"){
-            current.AllExtendedRights = false;
-            current.AddMember = false;
-            current.ForceChangePassword = false;
-            current.GenericAll = false;
-            current.GenericWrite = false;
-            current.Owns = false;
-            current.WriteDacl = false;
-            current.WriteOwner = false
-        }else{
-            current.CanRDP = false;
-            current.ExecuteDCOM = false;
-            current.AllowedToDelegate = false;
-        }
-
-        this.setState({edgeincluded: current});
-        appStore.edgeincluded = current;
-        conf.set("edgeincluded", current);
-    }
-
-    setSection(section){
-        let current = this.state.edgeincluded;
-        if (section === "default"){
-            current.MemberOf = true;
-            current.HasSession = true;
-            current.AdminTo = true;
-        }else if (section === "acl"){
-            current.AllExtendedRights = true;
-            current.AddMember = true;
-            current.ForceChangePassword = true;
-            current.GenericAll = true;
-            current.GenericWrite = true;
-            current.Owns = true;
-            current.WriteDacl = true;
-            current.WriteOwner = true
-        }else{
-            current.CanRDP = true;
-            current.ExecuteDCOM = true;
-            current.AllowedToDelegate = true;
-        }
-
-        this.setState({edgeincluded: current});
-        appStore.edgeincluded = current;
-        conf.set("edgeincluded", current);
-    }
-
-    handleChange(event){
-        let current = this.state.edgeincluded;
-        let eName = event.target.getAttribute("name");
-        current[eName] = !current[eName];
-        this.setState({edgeincluded: current});
-
-        appStore.edgeincluded = current;
-        conf.set("edgeincluded", current);
     }
 
     componentDidMount() {
@@ -105,7 +28,6 @@ export default class SearchContainer extends Component {
             "fast"
         );
 
-        this.setState({edgeincluded: appStore.edgeincluded});
         emitter.on("userNodeClicked", this.openNodeTab.bind(this));
         emitter.on("groupNodeClicked", this.openNodeTab.bind(this));
         emitter.on("computerNodeClicked", this.openNodeTab.bind(this));
@@ -114,7 +36,7 @@ export default class SearchContainer extends Component {
         emitter.on("ouNodeClicked", this.openNodeTab.bind(this));
         emitter.on(
             "setStart",
-            function(payload) {
+            function (payload) {
                 appStore.currentTooltip.close()
                 jQuery(this.refs.searchbar).val(payload);
             }.bind(this)
@@ -122,7 +44,7 @@ export default class SearchContainer extends Component {
 
         emitter.on(
             "setEnd",
-            function(payload) {
+            function (payload) {
                 appStore.currentTooltip.close()
                 jQuery(this.refs.pathbar).val(payload);
                 var e = jQuery(this.refs.pathfinding);
@@ -134,14 +56,14 @@ export default class SearchContainer extends Component {
         );
 
         jQuery(this.refs.searchbar).typeahead({
-            source: function(query, process) {
+            source: function (query, process) {
                 let session = driver.session();
                 let [statement, term] = buildSearchQuery(query);
 
-                session.run(statement, {name: term}).then(x => {
+                session.run(statement, { name: term }).then(x => {
                     let data = [];
                     let map = {};
-                    $.each(x.records, (index,record) => {
+                    $.each(x.records, (index, record) => {
                         let props = record._fields[0].properties;
                         Object.assign(props, {
                             type: record._fields[0].labels[0]
@@ -155,7 +77,7 @@ export default class SearchContainer extends Component {
                     return process(data);
                 })
             },
-            afterSelect: function(selected) {
+            afterSelect: function (selected) {
                 if (!this.state.pathfindingIsOpen) {
                     let props = {};
                     let statement = "";
@@ -186,13 +108,13 @@ export default class SearchContainer extends Component {
                 }
             }.bind(this),
             autoSelect: false,
-            updater: function(item) {
+            updater: function (item) {
                 let spl = item.split("#");
                 let index = spl[1];
                 let obj = this.map[index];
                 return obj;
             },
-            matcher: function(item) {
+            matcher: function (item) {
                 let spl = item.split("#");
                 let name = spl[0];
                 let index = spl[1];
@@ -217,7 +139,7 @@ export default class SearchContainer extends Component {
                     return false;
                 }
             },
-            highlighter: function(item) {
+            highlighter: function (item) {
                 let spl = item.split("#");
                 let name = spl[0];
                 let index = spl[1];
@@ -271,14 +193,14 @@ export default class SearchContainer extends Component {
         });
 
         jQuery(this.refs.pathbar).typeahead({
-            source: function(query, process) {
+            source: function (query, process) {
                 let session = driver.session();
                 let [statement, term] = buildSearchQuery(query);
 
-                session.run(statement, {name: term}).then(x => {
+                session.run(statement, { name: term }).then(x => {
                     let data = [];
                     let map = {};
-                    $.each(x.records, (index,record) => {
+                    $.each(x.records, (index, record) => {
                         let props = record._fields[0].properties;
                         Object.assign(props, {
                             type: record._fields[0].labels[0]
@@ -293,7 +215,7 @@ export default class SearchContainer extends Component {
                     return process(data);
                 })
             },
-            afterSelect: function(_) {
+            afterSelect: function (_) {
                 let start = jQuery(this.refs.searchbar).val();
                 let end = jQuery(this.refs.pathbar).val();
 
@@ -310,13 +232,13 @@ export default class SearchContainer extends Component {
                 emitter.emit("query", query, { aprop: startTerm, bprop: endTerm }, startTerm, endTerm);
             }.bind(this),
             autoSelect: false,
-            updater: function(item) {
+            updater: function (item) {
                 let spl = item.split("#");
                 let index = spl[1];
                 let obj = this.map[index];
                 return obj;
             },
-            matcher: function(item) {
+            matcher: function (item) {
                 let spl = item.split("#");
                 let name = spl[0];
                 let index = spl[1];
@@ -341,7 +263,7 @@ export default class SearchContainer extends Component {
                     return false;
                 }
             },
-            highlighter: function(item) {
+            highlighter: function (item) {
                 let spl = item.split("#");
                 let name = spl[0];
                 let index = spl[1];
@@ -393,6 +315,68 @@ export default class SearchContainer extends Component {
                 return jElem.html();
             }
         });
+    }
+
+    clearSection(section){
+        let current = this.state.edgeincluded;
+        if (section === "default"){
+            current.MemberOf = false;
+            current.HasSession = false;
+            current.AdminTo = false;
+        }else if (section === "acl"){
+            current.AllExtendedRights = false;
+            current.AddMember = false;
+            current.ForceChangePassword = false;
+            current.GenericAll = false;
+            current.GenericWrite = false;
+            current.Owns = false;
+            current.WriteDacl = false;
+            current.WriteOwner = false;
+        }else{
+            current.CanRDP = false;
+            current.ExecuteDCOM = false;
+            current.AllowedToDelegate = false;
+        }
+
+        this.setState({edgeincluded: current});
+        appStore.edgeincluded = current;
+        conf.set("edgeincluded", current);
+    }
+
+    setSection(section){
+        let current = this.state.edgeincluded;
+        if (section === "default"){
+            current.MemberOf = true;
+            current.HasSession = true;
+            current.AdminTo = true;
+        }else if (section === "acl"){
+            current.AllExtendedRights = true;
+            current.AddMember = true;
+            current.ForceChangePassword = true;
+            current.GenericAll = true;
+            current.GenericWrite = true;
+            current.Owns = true;
+            current.WriteDacl = true;
+            current.WriteOwner = true;
+        }else{
+            current.CanRDP = true;
+            current.ExecuteDCOM = true;
+            current.AllowedToDelegate = true;
+        }
+
+        this.setState({edgeincluded: current});
+        appStore.edgeincluded = current;
+        conf.set("edgeincluded", current);
+    }
+
+    handleChange(event){
+        let current = this.state.edgeincluded;
+        let eName = event.target.getAttribute("name");
+        current[eName] = !current[eName];
+        this.setState({edgeincluded: current});
+
+        appStore.edgeincluded = current;
+        conf.set("edgeincluded", current);
     }
 
     _onFilterClick() {

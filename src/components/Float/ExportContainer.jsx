@@ -9,6 +9,13 @@ export default class ExportContainer extends Component {
             imageActive: false
         };
     }
+    
+    componentDidMount() {
+        $(this.refs.outer).fadeToggle(0);
+        $(this.refs.outer).draggable();
+        emitter.on("showExport", this._show.bind(this));
+    }
+
     _dismiss() {
         $(this.refs.outer).fadeToggle(false);
     }
@@ -18,12 +25,6 @@ export default class ExportContainer extends Component {
             appStore.currentTooltip.close();
         }
         $(this.refs.outer).fadeToggle(true);
-    }
-
-    componentDidMount() {
-        $(this.refs.outer).fadeToggle(0);
-        $(this.refs.outer).draggable();
-        emitter.on("showExport", this._show.bind(this));
     }
 
     _jsonClick() {

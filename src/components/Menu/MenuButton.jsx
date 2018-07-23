@@ -2,6 +2,12 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 export default class MenuButton extends Component {
+    componentDidMount() {
+        $(this.refs.btn).html(
+            '<span class="{}"></span>'.format(this.props.glyphicon)
+        );
+    }
+    
     _leave(e) {
         var target = $(e.target);
         target.css("width", "auto");
@@ -34,12 +40,6 @@ export default class MenuButton extends Component {
                 width: newWidth + "px"
             },
             100
-        );
-    }
-
-    componentDidMount() {
-        $(this.refs.btn).html(
-            '<span class="{}"></span>'.format(this.props.glyphicon)
         );
     }
 
