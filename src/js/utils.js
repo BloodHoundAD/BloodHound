@@ -277,19 +277,19 @@ function processAceArray(array, objname, objtype, output) {
             rights.push(acetype);
         }
 
-        if (right.includes("GenericAll")) {
+        if (right === "GenericAll") {
             rights.push("GenericAll");
         }
 
-        if (right.includes("WriteDacl")) {
+        if (right === "WriteDacl") {
             rights.push("WriteDacl");
         }
 
-        if (right.includes("WriteOwner")) {
+        if (right === "WriteOwner") {
             rights.push("WriteOwner");
         }
 
-        if (right.includes("GenericWrite")) {
+        if (right === "GenericWrite") {
             rights.push("GenericWrite");
         }
 
