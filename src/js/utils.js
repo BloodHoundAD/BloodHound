@@ -297,6 +297,10 @@ function processAceArray(array, objname, objtype, output) {
             rights.push("Owns");
         }
 
+        if (right === "ReadLAPSPassword"){
+            rights.push("ReadLAPSPassword");
+        }
+
         $.each(rights, function(_, right) {
             let hash = right + principaltype;
             let formatted = baseAceQuery.format(
