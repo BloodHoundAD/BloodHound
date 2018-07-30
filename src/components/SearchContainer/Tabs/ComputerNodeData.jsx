@@ -41,7 +41,7 @@ export default class ComputerNodeData extends Component {
         propCollection
             .run("MATCH (c:Computer {name:{name}}) RETURN c", { name: payload })
             .then(
-                function(result) {
+                result => {
                     var properties = result.records[0]._fields[0].properties;
                     let spn;
                     if (!properties.serviceprincipalnames){
@@ -69,7 +69,7 @@ export default class ComputerNodeData extends Component {
                         notes: notes
                     });
                     propCollection.close();
-                }.bind(this)
+                }
             );
 
         this.setState({ driversessions: [propCollection] });
@@ -83,11 +83,11 @@ export default class ComputerNodeData extends Component {
         let notes = this.state.notes === null || this.state.notes === "" ? null : this.state.notes;
         let q = driver.session();
         if (notes === null){
-            q.run("MATCH (n:Computer {name:{name}}) REMOVE n.notes", {name: this.state.label}).then(x => {
+            q.run("MATCH (n:Computer {name:{name}}) REMOVE n.notes", {name: this.state.label}).then(() => {
                 q.close();
             });
         }else{
-            q.run("MATCH (n:Computer {name:{name}}) SET n.notes = {notes}", {name: this.state.label, notes: this.state.notes}).then(x =>{
+            q.run("MATCH (n:Computer {name:{name}}) SET n.notes = {notes}", {name: this.state.label, notes: this.state.notes}).then(() =>{
                 q.close();
             });
         }

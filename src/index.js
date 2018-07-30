@@ -254,6 +254,11 @@ if (!appStore.edgeincluded.hasOwnProperty("AllowedToDelegate")){
     conf.set("edgeincluded", appStore.edgeincluded)
 }
 
+if (!appStore.edgeincluded.hasOwnProperty("ReadLAPSPassword")) {
+    appStore.edgeincluded.ReadLAPSPassword = true;
+    conf.set("edgeincluded", appStore.edgeincluded)
+}
+
 appStore.performance = conf.get("performance");
 
 if (typeof appStore.performance.edgeLabels === "undefined") {

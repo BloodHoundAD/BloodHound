@@ -12,6 +12,10 @@ export default class AddEdgeModal extends Component {
         };
     }
 
+    componentDidMount() {
+        emitter.on("addEdge", this.openModal.bind(this));
+    }
+
     closeModal() {
         this.setState({ open: false });
     }
@@ -119,7 +123,15 @@ export default class AddEdgeModal extends Component {
             afterSelect: item =>{
                 let p = {};
                 p[which] = item;
-                this.setState(p)
+                this.setState(p);
+                if (which === "source"){
+                    this.sourceFocus();
+                    this.sourceBlur();
+                }else{
+                    this.targetFocus();
+                    this.targetBlur();
+                }
+                
             }
         })
     }
@@ -173,10 +185,10 @@ export default class AddEdgeModal extends Component {
                 edgeError.show();
             }else{
                 let edgepart;
-                if (edge === "GenericAll" || edge === "GenericWrite" || edge === "AllExtendedRights" || edge === "AddMember" || edge === "ForceChangePassword" || edge === "Owns" || edge === "WriteDacl" || edge === "WriteOwner"){
-                    edgepart = `[r:${edge} {isacl:true}]`
+                if (edge === "GenericAll" || edge === "GenericWrite" || edge === "AllExtendedRights" || edge === "AddMember" || edge === "ForceChangePassword" || edge === "Owns" || edge === "WriteDacl" || edge === "WriteOwner" || edge === "ReadLAPSPassword"){
+                    edgepart = `[r:${edge} {isacl:true}]`;
                 }else{
-                    edgepart = `[r:${edge} {isacl:false}]`
+                    edgepart = `[r:${edge} {isacl:false}]`;
                 }
                 let s = driver.session();
                 let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${target.type} {name:{target}}) MERGE (n)-${edgepart}->(m) RETURN r`
@@ -297,10 +309,6 @@ export default class AddEdgeModal extends Component {
         }
     }
 
-    componentDidMount() {
-        emitter.on("addEdge", this.openModal.bind(this));   
-    }
-
     render() {
         return (
             <Modal
@@ -309,7 +317,7 @@ export default class AddEdgeModal extends Component {
                 aria-labelledby="AddEdgeModalHeader"
             >
                 <Modal.Header closeButton={true}>
-                    <Modal.Title id="AddEdgeModalHeader">Add Node</Modal.Title>
+                    <Modal.Title id="AddEdgeModalHeader">Add Edge</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>

@@ -182,7 +182,7 @@ export default class MenuContainer extends Component {
             if (isZipSync(path)) {
                 await createReadStream(path)
                     .pipe(Parse())
-                    .on("entry", function(entry) {
+                    .on("entry", function (entry) {
                         var output = join(tempPath, entry.path);
                         entry.pipe(createWriteStream(output));
                         processed.push({
@@ -190,6 +190,8 @@ export default class MenuContainer extends Component {
                             name: entry.path,
                             delete: true
                         });
+                    }).on("error", function(error){
+                        emitter.emit('showAlert', `${name} is corrupted or password protected`);
                     })
                     .promise();
             } else {

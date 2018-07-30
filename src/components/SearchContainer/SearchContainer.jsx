@@ -648,6 +648,16 @@ export default class SearchContainer extends Component {
                         />
                         <label onClick={this.handleChange.bind(this)} name="WriteOwner"> WriteOwner</label>
                     </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="ReadLAPSPassword"
+                            checked={this.state.edgeincluded.ReadLAPSPassword}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="ReadLAPSPassword"> ReadLAPSPassword</label>
+                    </div>
                     <div className={"edge-filter-heading"}>
                         <h4>Special</h4>
                         <button onClick={x => this.setSection("special")} className={"fa fa-check-double"} data-toggle="tooltip" data-placement="top" title="Check all special edges" />
