@@ -524,7 +524,7 @@ export default class SearchContainer extends Component {
                         <i
                             data-toggle="tooltip"
                             data-placement="right"
-                            title="Filters edges outside prebuilt queries"
+                            title="Filters edges in shortest path queries"
                             className="glyphicon glyphicon-question-sign"
                         />
                     </div>

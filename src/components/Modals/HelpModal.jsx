@@ -101,9 +101,9 @@ export default class HelpModal extends Component {
         }else if (edge.label === "AllowedToDelegate"){
             let text = `The {} {} has the constrained delegation privilege to the computer {}.
             
-            The constrained delegation privilege allows a principal to authenticate to specific services (found in the msds-AllowedToDelegateTo LDAP property in the source node tab) on the target computer. This includes principals such as Domain Admins.
+            The constrained delegation primitive allows a principal to authenticate as any user to specific services (found in the msds-AllowedToDelegateTo LDAP property in the source node tab) on the target computer. That is, a node with this privilege can impersonate any domain principal (including Domain Admins) to the specific service on the target host.
             
-            An issue exists in constrained delegation that allows an attacker to modify the target service to any service of their choice.`;
+            An issue exists in the constrained delegation where the service name (sname) of the resulting ticket is not a part of the protected ticket information, meaning that an attacker can modify the target service name to any service of their choice. For example, if msds-AllowedToDelegateTo is “HTTP/host.domain.com”, tickets can be modified for LDAP/HOST/etc. service names, resulting in complete server compromise, regardless of the specific service listed.`;
             formatted = text.format(sourceType, sourceName, targetName);
         }else if (edge.label === "GetChanges"){
             let text = `${this.groupSpecialFormat(source)} the DS-Replication-Get-Changes privilege on the domain ${targetName}.
@@ -848,7 +848,7 @@ export default class HelpModal extends Component {
             let text = ``;
             formatted = text.format(sourceType, sourceName, targetName);
         }else if (edge.label === "AllowedToDelegate"){
-            let text = `Abusing this privilege will require either kekeo on a compromised host, or impacket with a way to proxy traffic into the network. See the references tab for more detailed information on exploiting this privilege.`;
+            let text = `Abusing this privilege will require either using Benjamin Delpy’s Kekeo project on a compromised host, or proxying in traffic generated from the Impacket library. See the references tab for more detailed information on exploiting this privilege.`;
             formatted = text.format(sourceType, sourceName, targetName);
         }else if (edge.label === "GetChanges"){
             let text = `With both GetChanges and GetChangesAll privileges in BloodHound, you may perform a dcsync attack to get the password hash of an arbitrary principal using mimikatz:
@@ -937,13 +937,15 @@ export default class HelpModal extends Component {
             let text = `This depends on the target object and how to take advantage of this privilege. Opsec considerations for each abuse primitive are documented on the specific abuse edges and on the BloodHound wiki.`;
             formatted = text;
         }else if (edge.label === "CanRDP"){
-            let text = ``;
+            let text = `If the target computer is a workstation and a user is currently logged on, one of two things will happen. If the user you are abusing is the same user as the one logged on, you will effectively take over their session and kick the logged on user off, resulting in a message to the user. If the users are different, you will be prompted to kick the currently logged on user off the system and log on. If the target computer is a server, you will be able to initiate the connection without issue provided the user you are abusing is not currently logged in.
+            
+            Remote desktop will create Logon and Logoff events with the access type RemoteInteractive.`;
             formatted = text;
         }else if (edge.label === "ExecuteDCOM"){
             let text = ``;
             formatted = text;
         }else if (edge.label === "AllowedToDelegate"){
-            let text = ``;
+            let text = `As mentioned in the abuse info, in order to currently abuse this primitive either the Kekeo binary will need to be dropped to disk on the target or traffic from Impacket will need to be proxied in. See the References for more information.`;
             formatted = text;
         }else if (edge.label === "GetChanges"){
             let text = `For detailed information on detection of dcsync as well as opsec considerations, see the adsecurity post in the references tab.`;
@@ -1042,7 +1044,9 @@ export default class HelpModal extends Component {
             let text = ``;
             formatted = text;
         }else if (edge.label === "AllowedToDelegate"){
-            let text = `<a href="http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/">http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/</a>
+            let text = `<a href="https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/">https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/</a>
+            <a href="http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/">http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/</a>
+            <a href="https://twitter.com/gentilkiwi/status/806643377278173185">https://twitter.com/gentilkiwi/status/806643377278173185</a>
             <a href="https://www.coresecurity.com/blog/kerberos-delegation-spns-and-more">https://www.coresecurity.com/blog/kerberos-delegation-spns-and-more</a>`;
             formatted = text;
         }else if (edge.label === "GetChanges"){

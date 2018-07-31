@@ -130,10 +130,9 @@ export default class AddEdgeModal extends Component {
                 }else{
                     this.targetFocus();
                     this.targetBlur();
-                }
-                
+                }     
             }
-        })
+        });
     }
 
     validate(){
@@ -343,8 +342,10 @@ export default class AddEdgeModal extends Component {
                                 <option>Owns</option>
                                 <option>WriteDacl</option>
                                 <option>WriteOwner</option>
+                                <option>ReadLAPSPassword</option>
                                 <option>CanRDP</option>
                                 <option>ExecuteDCOM</option>
+                                <option>AllowedToDelegate</option>
                             </select>
                             <span className="help-block" ref="edgeError">
                                 Looks good!

@@ -135,7 +135,11 @@ global.appStore = {
             DCSync: "tapered",
             Contains: "tapered",
             GpLink: "tapered",
-            Owns: "tapered"
+            Owns: "tapered",
+            CanRDP: "tapered",
+            ExecuteDCOM: "tapered",
+            ReadLAPSPassword: "tapered",
+            AllowedToDelegate: "tapered"
         }
     },
     lowResPalette: {
@@ -143,7 +147,9 @@ global.appStore = {
             User: "#17E625",
             Computer: "#E67873",
             Group: "#DBE617",
-            Domain: "#17E6B9"
+            Domain: "#17E6B9",
+            OU: "#FFAA00",
+            GPO: "#7F72FD"
         },
         edgeScheme: {
             AdminTo: "line",
@@ -153,10 +159,18 @@ global.appStore = {
             ForceChangePassword: "line",
             GenericAll: "line",
             GenericWrite: "line",
-            WriteDACL: "line",
+            WriteDacl: "line",
             WriteOwner: "line",
             AddMember: "line",
-            TrustedBy: "curvedArrow"
+            TrustedBy: "curvedArrow",
+            DCSync: "line",
+            Contains: "line",
+            GpLink: "line",
+            Owns: "line",
+            CanRDP: "line",
+            ExecuteDCOM: "line",
+            ReadLAPSPassword: "line",
+            AllowedToDelegate: "line"
         }
     },
     highResStyle: {

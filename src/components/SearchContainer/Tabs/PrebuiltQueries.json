@@ -100,7 +100,7 @@
             ]
         },
         {
-            "name": "Shortest Path from Kerberoastable Users",
+            "name": "Shortest Paths from Kerberoastable Users",
             "queryList": [
                 {
                     "final": false,
