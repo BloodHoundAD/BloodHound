@@ -59,8 +59,8 @@ export default class Login extends Component {
     }
 
     checkDBPresence() {
-        var url = this.state.url;
-        var icon = this.state.icon;
+        let url = this.state.url;
+        let icon = jQuery(this.refs.urlspinner);
 
         if (url === "") {
             return;

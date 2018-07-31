@@ -259,6 +259,7 @@ export default class GraphContainer extends Component {
     }
 
     relayout() {
+        appStore.currentTooltip.close();
         sigma.layouts.stopForceLink();
         if (appStore.dagre) {
             sigma.layouts.dagre.start(this.state.sigmaInstance);

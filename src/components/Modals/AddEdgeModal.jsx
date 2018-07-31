@@ -343,6 +343,8 @@ export default class AddEdgeModal extends Component {
                                 <option>WriteDacl</option>
                                 <option>WriteOwner</option>
                                 <option>ReadLAPSPassword</option>
+                                <option>Contains</option>
+                                <option>GpLink</option>
                                 <option>CanRDP</option>
                                 <option>ExecuteDCOM</option>
                                 <option>AllowedToDelegate</option>

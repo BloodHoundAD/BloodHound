@@ -332,10 +332,13 @@ export default class SearchContainer extends Component {
             current.Owns = false;
             current.WriteDacl = false;
             current.WriteOwner = false;
-        }else{
+        }else if (section === "special"){
             current.CanRDP = false;
             current.ExecuteDCOM = false;
             current.AllowedToDelegate = false;
+        }else{
+            current.Contains = false;
+            current.GpLink = false;
         }
 
         this.setState({edgeincluded: current});
@@ -358,10 +361,13 @@ export default class SearchContainer extends Component {
             current.Owns = true;
             current.WriteDacl = true;
             current.WriteOwner = true;
-        }else{
+        }else if (section === "special"){
             current.CanRDP = true;
             current.ExecuteDCOM = true;
             current.AllowedToDelegate = true;
+        }else{
+            current.Contains = true;
+            current.GpLink = true;
         }
 
         this.setState({edgeincluded: current});
@@ -657,6 +663,31 @@ export default class SearchContainer extends Component {
                             onChange={this.handleChange.bind(this)}
                         />
                         <label onClick={this.handleChange.bind(this)} name="ReadLAPSPassword"> ReadLAPSPassword</label>
+                    </div>
+                    <div className={"edge-filter-heading"}>
+                        <h4>Containers</h4>
+                        <button onClick={x => this.setSection("containers")} className={"fa fa-check-double"} data-toggle="tooltip" data-placement="top" title="Check all Containers edges" />
+                        <button onClick={x => this.clearSection("containers")} className={"fa fa-eraser"} data-toggle="tooltip" data-placement="top" title="Clear all Containers edges" />
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="Contains"
+                            checked={this.state.edgeincluded.Contains}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="Contains"> Contains</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="GpLink"
+                            checked={this.state.edgeincluded.GpLink}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="GpLink"> GpLink</label>
                     </div>
                     <div className={"edge-filter-heading"}>
                         <h4>Special</h4>

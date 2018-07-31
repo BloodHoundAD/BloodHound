@@ -258,20 +258,24 @@ if (typeof conf.get("edgeincluded") === "undefined"){
         WriteOwner: true,
         CanRDP:true,
         ExecuteDCOM:true,
-        AllowedToDelegate: true
-    })
+        AllowedToDelegate: true,
+        ReadLAPSPassword: true,
+        Contains: true,
+        GpLink: true
+    });
 }
 
 appStore.edgeincluded = conf.get("edgeincluded");
-if (!appStore.edgeincluded.hasOwnProperty("AllowedToDelegate")){
-    appStore.edgeincluded.AllowedToDelegate = true;
-    conf.set("edgeincluded", appStore.edgeincluded)
-}
+//Code to add new edges to filter
+// if (!appStore.edgeincluded.hasOwnProperty("AllowedToDelegate")){
+//     appStore.edgeincluded.AllowedToDelegate = true;
+//     conf.set("edgeincluded", appStore.edgeincluded)
+// }
 
-if (!appStore.edgeincluded.hasOwnProperty("ReadLAPSPassword")) {
-    appStore.edgeincluded.ReadLAPSPassword = true;
-    conf.set("edgeincluded", appStore.edgeincluded)
-}
+// if (!appStore.edgeincluded.hasOwnProperty("ReadLAPSPassword")) {
+//     appStore.edgeincluded.ReadLAPSPassword = true;
+//     conf.set("edgeincluded", appStore.edgeincluded)
+// }
 
 appStore.performance = conf.get("performance");
 
