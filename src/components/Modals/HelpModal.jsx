@@ -23,21 +23,21 @@ export default class HelpModal extends Component {
         this.setState({ open: false });
     }
 
-    groupSpecialFormat(source){
-        if (source.type === "Group"){
+    groupSpecialFormat(source) {
+        if (source.type === "Group") {
             return "The members of the {} {} have";
-        }else{
+        } else {
             return "The {} {} has";
         }
     }
 
-    createGeneralInfoTab(edge, source, target){
+    createGeneralInfoTab(edge, source, target) {
         let sourceType = source.type.toLowerCase();
         let sourceName = source.label;
         let targetType = target.type.toLowerCase();
         let targetName = target.label;
         let formatted;
-        if (edge.label === "AdminTo"){
+        if (edge.label === "AdminTo") {
             let text = `${this.groupSpecialFormat(source)} admin rights to the computer {}.
 
             By default, administrators have several ways to perform remote code execution on Windows systems, including via RDP, WMI, WinRM, the Service Control Manager, and remote DCOM execution.
@@ -46,12 +46,12 @@ export default class HelpModal extends Component {
         
             Finally, administrators can often disable host-based security controls that would otherwise prevent the aforementioned techniques.`;
             formatted = text.format(sourceType, sourceName, targetName);
-        }else if (edge.label === "MemberOf"){
+        } else if (edge.label === "MemberOf") {
             let text = `The {} {} is a member of the group {}.
             
             Groups in active directory grant their members any privileges the group itself has. If a group has rights to another principal, users/computers in the group, as well as other groups inside the group inherit those permissions.`;
             formatted = text.format(sourceType, sourceName, targetName);
-        }else if (edge.label === "HasSession"){
+        } else if (edge.label === "HasSession") {
             let text = `The {} {} has a session on the computer {}.
             
             When a user authenticates to a computer, they often leave credentials exposed on the system, which can be retrieved through LSASS injection, token manipulation/theft, or injecting into a user's process.
@@ -60,81 +60,81 @@ export default class HelpModal extends Component {
             
             Note: A session does not guarantee credential material is present, only possible.`;
             formatted = text.format(sourceType, sourceName, targetName);
-        }else if (edge.label === "AllExtendedRights"){
+        } else if (edge.label === "AllExtendedRights") {
             let text = `${this.groupSpecialFormat(source)} the AllExtendedRights privilege to the {} {}. Extended rights are special rights granted on objects which allow reading of privileged attributes, as well as performing special actions. `;
             formatted = text.format(sourceType, sourceName, targetType, targetName);
-        }else if (edge.label === "AddMember"){
+        } else if (edge.label === "AddMember") {
             let text = `${this.groupSpecialFormat(source)} the ability to add arbitrary principals, including {}, to the group {}. Because of security group delegation, the members of a security group have the same privileges as that group. 
             
             By adding itself to the group, {} will gain the same privileges that {} already has.`;
             formatted = text.format(sourceType, sourceName, sourceType === "group" ? "themselves" : "itself", targetName, sourceName, targetName);
-        }else if (edge.label === "ForceChangePassword"){
+        } else if (edge.label === "ForceChangePassword") {
             let text = `${this.groupSpecialFormat(source)} the capability to change the user {}'s password without knowing that user's current password.`;
             formatted = text.format(sourceType, sourceName, targetName);
-        }else if (edge.label === "GenericAll"){
+        } else if (edge.label === "GenericAll") {
             let text = `${this.groupSpecialFormat(source)} GenericAll privileges to the {} {}. This is also known as full control. This privilege allows the trustee to manipulate the target object however they wish.`;
             formatted = text.format(sourceType, sourceName, targetType, targetName);
-        }else if (edge.label === "GenericWrite"){
+        } else if (edge.label === "GenericWrite") {
             let text = `${this.groupSpecialFormat(source)} generic write access to the {} {}. 
             
             Generic Write access grants you the ability to write to any non-protected attribute on the target object, including "members" for a group, and "serviceprincipalnames" for a user`;
             formatted = text.format(sourceType, sourceName, targetType, targetName);
-        }else if (edge.label === "Owns"){
+        } else if (edge.label === "Owns") {
             let text = `${this.groupSpecialFormat(source)} ownership of the {} {}. Object owners retain the ability to modify object security descriptors, regardless of permissions on the object's DACL`;
             formatted = text.format(sourceType, sourceName, targetType, targetName);
-        }else if (edge.label === "WriteDacl"){
+        } else if (edge.label === "WriteDacl") {
             let text = `${this.groupSpecialFormat(source)} permissions to modify the DACL (Discretionary Access Control List) on the {} {}. With write access to the target object's DACL, you can grant yourself any privilege you want on the object.`;
             formatted = text.format(sourceType, sourceName, targetType, targetName);
-        }else if (edge.label === "WriteOwner"){
+        } else if (edge.label === "WriteOwner") {
             let text = `${this.groupSpecialFormat(source)} the ability to modify the owner of the {} {}. Object owners retain the ability to modify object security descriptors, regardless of permissions on the object's DACL.`;
             formatted = text.format(sourceType, sourceName, targetType, targetName);
-        }else if (edge.label === "CanRDP"){
+        } else if (edge.label === "CanRDP") {
             let text = `${this.groupSpecialFormat(source)} the capability to create a Remote Desktop Connection with the computer {}.
             
             Remote Desktop access allows you to enter an interactive session with the target computer. If authenticating as a low privilege user, a privilege escalation may allow you to gain high privileges on the system.
             
             Note: This edge does not guarantee privileged execution.`;
             formatted = text.format(sourceType, sourceName, targetName);
-        }else if (edge.label === "ExecuteDCOM"){
+        } else if (edge.label === "ExecuteDCOM") {
             let text = `${this.groupSpecialFormat(source)} membership in the Distributed COM Users local group on the computer {}. This can allow code execution under certain conditions.`;
             formatted = text.format(sourceType, sourceName, targetName);
-        }else if (edge.label === "AllowedToDelegate"){
+        } else if (edge.label === "AllowedToDelegate") {
             let text = `The {} {} has the constrained delegation privilege to the computer {}.
             
             The constrained delegation primitive allows a principal to authenticate as any user to specific services (found in the msds-AllowedToDelegateTo LDAP property in the source node tab) on the target computer. That is, a node with this privilege can impersonate any domain principal (including Domain Admins) to the specific service on the target host.
             
             An issue exists in the constrained delegation where the service name (sname) of the resulting ticket is not a part of the protected ticket information, meaning that an attacker can modify the target service name to any service of their choice. For example, if msds-AllowedToDelegateTo is “HTTP/host.domain.com”, tickets can be modified for LDAP/HOST/etc. service names, resulting in complete server compromise, regardless of the specific service listed.`;
             formatted = text.format(sourceType, sourceName, targetName);
-        }else if (edge.label === "GetChanges"){
+        } else if (edge.label === "GetChanges") {
             let text = `${this.groupSpecialFormat(source)} the DS-Replication-Get-Changes privilege on the domain ${targetName}.
             
             Individually, this edge does not grant the ability to perform an attack. However, in conjunction with DS-Replication-Get-Changes-All, a principal may perform a DCSync attack.`;
             formatted = text.format(sourceType, sourceName, targetName);
-        }else if (edge.label === "GetChangesAll"){
+        } else if (edge.label === "GetChangesAll") {
             let text = `${this.groupSpecialFormat(source)} the DS-Replication-Get-Changes-All privilege on the domain ${targetName}.
             
             Individually, this edge does not grant the ability to perform an attack. However, in conjunction with DS-Replication-Get-Changes, a principal may perform a DCSync attack.`;
             formatted = text.format(sourceType, sourceName, targetName);
-        }else if (edge.label === "ReadLAPSPassword"){
+        } else if (edge.label === "ReadLAPSPassword") {
             let text = `${this.groupSpecialFormat(source)} the ability to read the password set by Local Administrator Password Solution (LAPS) on the computer {}. The local administrator password for a computer managed by LAPS is stored in the confidential LDAP attribute,  “ms-mcs-AdmPwd”. `;
 
             formatted = text;
-        }else if (edge.label === "Contains"){
+        } else if (edge.label === "Contains") {
             formatted = `The ${sourceType} ${sourceName} contains the ${targetType} ${targetName}. GPOs linked to a container apply to all objects that are contained by the container.`;
-        }else if (edge.label === "GpLink"){
+        } else if (edge.label === "GpLink") {
             formatted = `The GPO ${sourceName} is linked to the ${targetType} ${targetName}. A linked GPO applies its settings to objects in the linked container.`;
         }
 
-        this.setState({infoTabContent: {__html: formatted}})
+        this.setState({ infoTabContent: { __html: formatted } })
     }
 
-    createAbuseInfoTab(edge, source, target){
+    createAbuseInfoTab(edge, source, target) {
         let sourceType = source.type;
         let sourceName = source.label;
         let targetType = target.type;
         let targetName = target.label;
         let formatted;
-        if (edge.label === "AdminTo"){
+        if (edge.label === "AdminTo") {
             let text = `<h4>Lateral movement</h4>
             There are several ways to pivot to a Windows system. If using Cobalt Strike's beacon, check the help info for the commands "psexec", "psexec_psh", "wmi", and "winrm". With Empire, consider the modules for Invoke-PsExec, Invoke-DCOM, and Invoke-SMBExec. With Metasploit, consider the modules "exploit/windows/smb/psexec", "exploit/windows/winrm/winrm_script_exec", and "exploit/windows/local/ps_wmi_exec". Additionally, there are several manual methods for remotely executing code on the machine, including via RDP, with the service control binary and interaction with the remote machine's service control manager, and remotely instantiating DCOM objects. For more information about these lateral movement techniques, see the References tab.
             
@@ -149,10 +149,10 @@ export default class HelpModal extends Component {
             <h4>Disabling host-based security controls</h4>
             Several host-based controls may affect your ability to execute certain techniques, such as credential theft, process injection, command line execution, and writing files to disk. Administrators can often disable these host-based controls in various ways, such as stopping or otherwise disabling a service, unloading a driver, or making registry key changes. For more information, see the References tab.`;
             formatted = text.format(sourceType, sourceName, targetName);
-        }else if (edge.label === "MemberOf"){
+        } else if (edge.label === "MemberOf") {
             let text = `No abuse is necessary. This edge simply indicates that a principal belongs to a security group.`;
             formatted = text;
-        }else if (edge.label === "HasSession"){
+        } else if (edge.label === "HasSession") {
             let text = `<h4>Password Theft</h4>
             When a user has a session on the computer, you may be able to obtain credentials for the user via credential dumping or token impersonation. You must be able to move laterally to the computer, have administrative access on the computer, and the user must have a non-network logon session on the computer.
 
@@ -165,9 +165,9 @@ export default class HelpModal extends Component {
 
             User sessions can be short lived and only represent the sessions that were present at the time of collection. A user may have ended their session by the time you move to the computer to target them. However, users tend to use the same machines, such as the workstations or servers they are assigned to use for their job duties, so it can be valuable to check multiple times if a user session has started.`;
             formatted = text;
-        }else if (edge.label === "AllExtendedRights"){
+        } else if (edge.label === "AllExtendedRights") {
             let text;
-            if (targetType === "User"){
+            if (targetType === "User") {
                 text = `The AllExtendedRights privilege grants ${sourceName} the ability to change the password of the user ${targetName} without knowing their current password. This is equivalent to the “ForceChangePassword” edge in BloodHound.
 
                 There are at least two ways to execute this attack. The first and most obvious is by using the built-in net.exe binary in Windows (e.g.: net user dfm.a Password123! /domain). See the opsec considerations tab for why this may be a bad idea. The second, and highly recommended method, is by using the Set-DomainUserPassword function in PowerView. This function is superior to using the net.exe binary in several ways. For instance, you can supply alternate credentials, instead of needing to run a process as or logon as the user with the ForceChangePassword privilege. Additionally, you have much safer execution options than you do with spawning net.exe (see the opsec tab).
@@ -186,29 +186,29 @@ export default class HelpModal extends Component {
                 <code>Set-DomainUserPassword -Identity andy -AccountPassword $UserPassword -Credential $Cred</code>
 
                 Now that you know the target user's plain text password, you can either start a new agent as that user, or use that user's credentials in conjunction with PowerView's ACL abuse functions, or perhaps even RDP to a system the target user has access to. For more ideas and information, see the references tab.`;
-            }else if (targetType === "Computer"){
+            } else if (targetType === "Computer") {
                 text = `If LAPS is installed in the environment, the AllExtendedRights privilege grants ${sourceName} the ability to obtain the RID 500 administrator password of ${targetName}. ${sourceName} can do so by listing a computer object’s AD properties with PowerView using Get-DomainComputer {}.  The value of the ms-mcs-AdmPwd property will contain password of the administrative local account on ${targetName}.`;
-            }else if (targetType === "Domain"){
+            } else if (targetType === "Domain") {
                 text = `The AllExtendedRights privilege grants ${sourceName} both the DS-Replication-Get-Changes and DS-Replication-Get-Changes-All privileges, which combined allow a principal to replicate objects from the domain ${targetName}. This can be abused using the lsadump::dcsync command in mimikatz.`;
             }
             formatted = text;
-        }else if (edge.label === "AddMember"){
-                let text = `There are at least two ways to execute this attack. The first and most obvious is by using the built-in net.exe binary in Windows (e.g.: net group "Domain Admins" dfm.a /add /domain). See the opsec considerations tab for why this may be a bad idea. The second, and highly recommended method, is by using the Add-DomainGroupMember function in PowerView. This function is superior to using the net.exe binary in several ways. For instance, you can supply alternate credentials, instead of needing to run a process as or logon as the user with the AddMember privilege. Additionally, you have much safer execution options than you do with spawning net.exe (see the opsec tab).
+        } else if (edge.label === "AddMember") {
+            let text = `There are at least two ways to execute this attack. The first and most obvious is by using the built-in net.exe binary in Windows (e.g.: net group "Domain Admins" dfm.a /add /domain). See the opsec considerations tab for why this may be a bad idea. The second, and highly recommended method, is by using the Add-DomainGroupMember function in PowerView. This function is superior to using the net.exe binary in several ways. For instance, you can supply alternate credentials, instead of needing to run a process as or logon as the user with the AddMember privilege. Additionally, you have much safer execution options than you do with spawning net.exe (see the opsec tab).
 
-                To abuse this privilege with PowerView's Add-DomainGroupMember, first import PowerView into your agent session or into a PowerShell instance at the console. You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`} if you are not running a process as that user. To do this in conjunction with Add-DomainGroupMember, first create a PSCredential object (these examples comes from the PowerView help documentation):
-            
-                <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-                $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
-            
-                Then, use Add-DomainGroupMember, optionally specifying $Cred if you are not already running a process as ${sourceName}:
-            
-                <code>Add-DomainGroupMember -Identity 'Domain Admins' -Members 'harmj0y' -Credential $Cred</code>
-            
-                Finally, verify that the user was successfully added to the group with PowerView's Get-DomainGroupMember:
-            
-                <code>Get-DomainGroupMember -Identity 'Domain Admins'</code>`;
+            To abuse this privilege with PowerView's Add-DomainGroupMember, first import PowerView into your agent session or into a PowerShell instance at the console. You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`} if you are not running a process as that user. To do this in conjunction with Add-DomainGroupMember, first create a PSCredential object (these examples comes from the PowerView help documentation):
+        
+            <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+            $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+        
+            Then, use Add-DomainGroupMember, optionally specifying $Cred if you are not already running a process as ${sourceName}:
+        
+            <code>Add-DomainGroupMember -Identity 'Domain Admins' -Members 'harmj0y' -Credential $Cred</code>
+        
+            Finally, verify that the user was successfully added to the group with PowerView's Get-DomainGroupMember:
+        
+            <code>Get-DomainGroupMember -Identity 'Domain Admins'</code>`;
             formatted = text;
-        }else if (edge.label === "ForceChangePassword"){
+        } else if (edge.label === "ForceChangePassword") {
             let text = `There are at least two ways to execute this attack. The first and most obvious is by using the built-in net.exe binary in Windows (e.g.: net user dfm.a Password123! /domain). See the opsec considerations tab for why this may be a bad idea. The second, and highly recommended method, is by using the Set-DomainUserPassword function in PowerView. This function is superior to using the net.exe binary in several ways. For instance, you can supply alternate credentials, instead of needing to run a process as or logon as the user with the ForceChangePassword privilege. Additionally, you have much safer execution options than you do with spawning net.exe (see the opsec tab).
 
             To abuse this privilege with PowerView's Set-DomainUserPassword, first import PowerView into your agent session or into a PowerShell instance at the console. You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Set-DomainUserPassword, first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -226,9 +226,9 @@ export default class HelpModal extends Component {
 
             Now that you know the target user's plain text password, you can either start a new agent as that user, or use that user's credentials in conjunction with PowerView's ACL abuse functions, or perhaps even RDP to a system the target user has access to. For more ideas and information, see the references tab.`;
             formatted = text;
-        }else if (edge.label === "GenericAll"){
+        } else if (edge.label === "GenericAll") {
             let text;
-            if (targetType === "Group"){
+            if (targetType === "Group") {
                 text = `Full control of a group allows you to directly modify group membership of the group. 
 
                 There are at least two ways to execute this attack. The first and most obvious is by using the built-in net.exe binary in Windows (e.g.: net group "Domain Admins" harmj0y /add /domain). See the opsec considerations tab for why this may be a bad idea. The second, and highly recommended method, is by using the Add-DomainGroupMember function in PowerView. This function is superior to using the net.exe binary in several ways. For instance, you can supply alternate credentials, instead of needing to run a process as or logon as the user with the AddMember privilege. Additionally,  you have much safer execution options than you do with spawning net.exe (see the opsec tab).
@@ -245,7 +245,7 @@ export default class HelpModal extends Component {
                 Finally, verify that the user was successfully added to the group with PowerView's Get-DomainGroupMember:
 
                 <code>Get-DomainGroupMember -Identity 'Domain Admins'</code>`;
-            }else if (targetType === "User"){
+            } else if (targetType === "User") {
                 text = `Full control of a user allows you to modify properties of the user to perform a targeted kerberoast attack, and also grants the ability to reset the password of the user without knowing their current one.
 
                 <h4> Targeted Kerberoast </h4>
@@ -285,19 +285,19 @@ export default class HelpModal extends Component {
                 <code>Set-DomainUserPassword -Identity andy -AccountPassword $UserPassword -Credential $Cred</code>
 
                 Now that you know the target user's plain text password, you can either start a new agent as that user, or use that user's credentials in conjunction with PowerView's ACL abuse functions, or perhaps even RDP to a system the target user has access to. For more ideas and information, see the references tab.`;
-            }else if (targetType === "Computer"){
+            } else if (targetType === "Computer") {
                 text = `Full control of a computer object is abusable when the computer’s local admin account credential is controlled with LAPS. The clear-text password for the local administrator account is stored in an extended attribute on the computer object called ms-Mcs-AdmPwd. With full control of the computer object, you may have the ability to read this attribute, or grant yourself the ability to read the attribute by modifying the computer object’s security descriptor.`;
-            }else if (targetType === "Domain"){
+            } else if (targetType === "Domain") {
                 text = `Full control of a domain object grants you both DS-Replication-Get-Changes as well as DS-Replication-Get-Changes-All rights. The combination of these rights allows you to perform the dcsync attack using mimikatz. To grab the credential of the user harmj0y using these rights:
 
                 <code>sekurlsa::dcsync /domain:testlab.local /user:harmj0y</code>`;
-            }else if (targetType === "GPO"){
+            } else if (targetType === "GPO") {
                 text = `With full control of a GPO, you may make modifications to that GPO which will then apply to the users and computers affected by the GPO. Select the target object you wish to push an evil policy down to, then use the gpedit GUI to modify the GPO, using an evil policy that allows item-level targeting, such as a new immediate scheduled task. Then wait at least 2 hours for the group policy client to pick up and execute the new evil policy. See the references tab for a more detailed write up on this abuse`;
             }
             formatted = text;
-        }else if (edge.label === "GenericWrite"){
+        } else if (edge.label === "GenericWrite") {
             let text;
-            if (targetType === "Group"){
+            if (targetType === "Group") {
                 text = `GenericWrite to a group allows you to directly modify group membership of the group.
 
                 There are at least two ways to execute this attack. The first and most obvious is by using the built-in net.exe binary in Windows (e.g.: net group "Domain Admins" harmj0y /add /domain). See the opsec considerations tab for why this may be a bad idea. The second, and highly recommended method, is by using the Add-DomainGroupMember function in PowerView. This function is superior to using the net.exe binary in several ways. For instance, you can supply alternate credentials, instead of needing to run a process as or logon as the user with the AddMember privilege. Additionally,  you have much safer execution options than you do with spawning net.exe (see the opsec tab).
@@ -314,7 +314,7 @@ export default class HelpModal extends Component {
                 Finally, verify that the user was successfully added to the group with PowerView's Get-DomainGroupMember:
 
                 <code>Get-DomainGroupMember -Identity 'Domain Admins'</code>`;
-            }else if (targetType === "User"){
+            } else if (targetType === "User") {
                 text = `A targeted kerberoast attack can be performed using PowerView’s Set-DomainObject along with Get-DomainSPNTicket. 
 
                 You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Set-DomainObject, first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -335,9 +335,9 @@ export default class HelpModal extends Component {
                 <code>Set-DomainObject -Credential $Cred -Identity harmj0y -Clear serviceprincipalname</code>`;
             }
             formatted = text;
-        }else if (edge.label === "Owns"){
+        } else if (edge.label === "Owns") {
             let text;
-            if (targetType === "Group"){
+            if (targetType === "Group") {
                 text = `To abuse ownership of a group object, you may grant yourself the AddMember privilege. This can be accomplished using the Add-DomainObjectAcl function in PowerView.
                 
                 You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -369,7 +369,7 @@ export default class HelpModal extends Component {
                 Cleanup for this can be done using Remove-DomainObjectAcl
                 
                 <code>Remove-DomainObjectAcl - Credential $cred -TargetIdentity "Domain Admins" -Rights WriteMembers</code>`;
-            }else if (targetType === "User"){
+            } else if (targetType === "User") {
                 text = `To abuse ownership of a user object, you may grant yourself the GenericAll privilege. This can be accomplished using the Add-DomainObjectAcl function in PowerView.
                 
                 You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -422,7 +422,7 @@ export default class HelpModal extends Component {
                 Cleanup of the added ACL can be performed with Remove-DomainObjectAcl:
                 
                 <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity harmj0y -Rights All</code>`;
-            }else if (targetType === "Computer"){
+            } else if (targetType === "Computer") {
                 text = `To abuse ownership of a computer object, you may grant yourself the GenericAll privilege.
                 
                 You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -439,7 +439,7 @@ export default class HelpModal extends Component {
                 Cleanup can be done using the Remove-DomainObjectAcl function:
 
                 <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>`;
-            }else if (targetType === "Domain"){
+            } else if (targetType === "Domain") {
                 text = `To abuse ownership of a domain object, you may grant yourself the DcSync privileges.
                 
                 You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -457,7 +457,7 @@ export default class HelpModal extends Component {
                 
                 Cleanup can be done using the Remove-DomainObjectAcl function:
                 <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity testlab.local -Rights DCSync</code>`;
-            }else if (targetType === "GPO"){
+            } else if (targetType === "GPO") {
                 text = `To abuse ownership of a domain object, you may grant yourself the DcSync privileges.
                 
                 You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -475,7 +475,7 @@ export default class HelpModal extends Component {
                 <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity TestGPO -Rights All</code>`;
             }
             formatted = text;
-        }else if (edge.label === "WriteDacl"){
+        } else if (edge.label === "WriteDacl") {
             if (targetType === "Group") {
                 text = `To abuse WriteDacl to a user object, you may grant yourself the AddMember privilege. This can be accomplished using the Add-DomainObjectAcl function in PowerView.
                 
@@ -614,9 +614,9 @@ export default class HelpModal extends Component {
                 <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity TestGPO -Rights All</code>`;
             }
             formatted = text;
-        }else if (edge.label === "WriteOwner"){
+        } else if (edge.label === "WriteOwner") {
             let text;
-            if (targetType === "Group"){
+            if (targetType === "Group") {
                 text = `To change the ownership of the object, you may use the Set-DomainObjectOwner function in PowerView.
 
                 You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Set-DomainObjectOwner, first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -661,7 +661,7 @@ export default class HelpModal extends Component {
                 <code>Remove-DomainObjectAcl - Credential $cred -TargetIdentity "Domain Admins" -Rights WriteMembers</code>
                 
                 Cleanup for the owner can be done by using Set-DomainObjectOwner once again`;
-            }else if (targetType === "User"){
+            } else if (targetType === "User") {
                 text = `To change the ownership of the object, you may use the Set-DomainObjectOwner function in PowerView.
 
                 You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Set-DomainObjectOwner, first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -727,7 +727,7 @@ export default class HelpModal extends Component {
                 <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity harmj0y -Rights All</code>
                 
                 Cleanup for the owner can be done by using Set-DomainObjectOwner once again`;
-            }else if (targetType === "Computer"){
+            } else if (targetType === "Computer") {
                 text = `To change the ownership of the object, you may use the Set-DomainObjectOwner function in PowerView.
 
                 You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Set-DomainObjectOwner, first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -757,7 +757,7 @@ export default class HelpModal extends Component {
                 <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
                 
                 Cleanup for the owner can be done by using Set-DomainObjectOwner once again`;
-            }else if (targetType === "Domain"){
+            } else if (targetType === "Domain") {
                 text = `To change the ownership of the object, you may use the Set-DomainObjectOwner function in PowerView.
 
                 You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Set-DomainObjectOwner, first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -819,7 +819,7 @@ export default class HelpModal extends Component {
                 Cleanup for the owner can be done by using Set-DomainObjectOwner once again`;
             }
             formatted = text;
-        }else if (edge.label === "CanRDP"){
+        } else if (edge.label === "CanRDP") {
             let text = `Abuse of this privilege will depend heavily on the type of access you have. 
             
             <h4>PlainText Credentials with Interactive Access</h4>
@@ -848,27 +848,27 @@ export default class HelpModal extends Component {
 
             This will initiate the remote desktop connection, and will fail if Restricted Admin Mode is not enabled.`;
             formatted = text;
-        }else if (edge.label === "ExecuteDCOM"){
+        } else if (edge.label === "ExecuteDCOM") {
             let text = ``;
             formatted = text.format(sourceType, sourceName, targetName);
-        }else if (edge.label === "AllowedToDelegate"){
+        } else if (edge.label === "AllowedToDelegate") {
             let text = `Abusing this privilege will require either using Benjamin Delpy’s Kekeo project on a compromised host, or proxying in traffic generated from the Impacket library. See the references tab for more detailed information on exploiting this privilege.`;
             formatted = text.format(sourceType, sourceName, targetName);
-        }else if (edge.label === "GetChanges"){
+        } else if (edge.label === "GetChanges") {
             let text = `With both GetChanges and GetChangesAll privileges in BloodHound, you may perform a dcsync attack to get the password hash of an arbitrary principal using mimikatz:
             
             <code>sekurlsa::dcsync /domain:testlab.local /user:Administrator</code>
             
             You can also perform the more complicated ExtraSids attack to hop domain trusts. For information on this see the blod post by harmj0y in the references tab.`;
             formatted = text;
-        }else if (edge.label === "GetChangesAll"){
+        } else if (edge.label === "GetChangesAll") {
             let text = `With both GetChanges and GetChangesAll privileges in BloodHound, you may perform a dcsync attack to get the password hash of an arbitrary principal using mimikatz:
             
             <code>sekurlsa::dcsync /domain:testlab.local /user:Administrator</code>
             
             You can also perform the more complicated ExtraSids attack to hop domain trusts. For information on this see the blod post by harmj0y in the references tab.`;
             formatted = text;
-        }else if (edge.label === "ReadLAPSPassword"){
+        } else if (edge.label === "ReadLAPSPassword") {
             let text = `To abuse this privilege with PowerView's Get-DomainObject, first import PowerView into your agent session or into a PowerShell instance at the console. You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Get-DomainObject, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
             <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
@@ -884,84 +884,84 @@ export default class HelpModal extends Component {
             formatted = `There is no abuse info related to this edge.`;
         }
 
-        this.setState({abuseTabContent: {__html: formatted}})
+        this.setState({ abuseTabContent: { __html: formatted } })
     }
 
-    createOpsecTab(edge, source, target){
+    createOpsecTab(edge, source, target) {
         let sourceType = source.type;
         let sourceName = source.label;
         let targetType = target.type;
         let targetName = target.label;
         let formatted;
-        if (edge.label === "AdminTo"){
+        if (edge.label === "AdminTo") {
             let text = `There are several forensic artifacts generated by the techniques described above. For instance, lateral movement via PsExec will generate 4697 events on the target system. If the target organization is collecting and analyzing those events, they may very easily detect lateral movement via PsExec. 
             
             Additionally, an EDR product may detect your attempt to inject into lsass and alert a SOC analyst. There are many more opsec considerations to keep in mind when abusing administrator privileges. For more information, see the References tab.`;
             formatted = text;
-        }else if (edge.label === "MemberOf"){
+        } else if (edge.label === "MemberOf") {
             let text = `No opsec considerations apply to this edge.`;
             formatted = text;
-        }else if (edge.label === "HasSession"){
+        } else if (edge.label === "HasSession") {
             let text = `An EDR product may detect your attempt to inject into lsass and alert a SOC analyst. There are many more opsec considerations to keep in mind when stealing credentials or tokens. For more information, see the References tab.`;
             formatted = text;
-        }else if (edge.label === "AllExtendedRights"){
+        } else if (edge.label === "AllExtendedRights") {
             let text = `When using the PowerView functions, keep in mind that PowerShell v5 introduced several security mechanisms that make it much easier for defenders to see what's going on with PowerShell in their network, such as script block logging and AMSI. You can bypass those security mechanisms by downgrading to PowerShell v2, which all PowerView functions support.`;
             formatted = text;
-        }else if (edge.label === "AddMember"){
+        } else if (edge.label === "AddMember") {
             let text = `Executing this abuse with the net binary will require command line execution. If your target organization has command line logging enabled, this is a detection opportunity for their analysts. 
             
             Regardless of what execution procedure you use, this action will generate a 4728 event on the domain controller that handled the request. This event may be centrally collected and analyzed by security analysts, especially for groups that are obviously very high privilege groups (i.e.: Domain Admins). Also be mindful that Powershell 5 introduced several key security features such as script block logging and AMSI that provide security analysts another detection opportunity. 
             
             You may be able to completely evade those features by downgrading to PowerShell v2.`;
             formatted = text;
-        }else if (edge.label === "ForceChangePassword"){
+        } else if (edge.label === "ForceChangePassword") {
             let text = `Executing this abuse with the net binary will necessarily require command line execution. If your target organization has command line logging enabled, this is a detection opportunity for their analysts. 
             
             Regardless of what execution procedure you use, this action will generate a 4724 event on the domain controller that handled the request. This event may be centrally collected and analyzed by security analysts, especially for users that are obviously very high privilege groups (i.e.: Domain Admin users). Also be mindful that PowerShell v5 introduced several key security features such as script block logging and AMSI that provide security analysts another detection opportunity. You may be able to completely evade those features by downgrading to PowerShell v2. 
             
             Finally, by changing a service account password, you may cause that service to stop functioning properly. This can be bad not only from an opsec perspective, but also a client management perspective. Be careful!`;
             formatted = text;
-        }else if (edge.label === "GenericAll"){
+        } else if (edge.label === "GenericAll") {
             let text = `This depends on the target object and how to take advantage of this privilege. Opsec considerations for each abuse primitive are documented on the specific abuse edges and on the BloodHound wiki.`;
             formatted = text;
-        }else if (edge.label === "GenericWrite"){
+        } else if (edge.label === "GenericWrite") {
             let text = `This depends on the target object and how to take advantage of this privilege. Opsec considerations for each abuse primitive are documented on the specific abuse edges and on the BloodHound wiki.`;
             formatted = text;
-        }else if (edge.label === "Owns"){
+        } else if (edge.label === "Owns") {
             let text = `When using the PowerView functions, keep in mind that PowerShell v5 introduced several security mechanisms that make it much easier for defenders to see what's going on with PowerShell in their network, such as script block logging and AMSI. You can bypass those security mechanisms by downgrading to PowerShell v2, which all PowerView functions support.
 
             Modifying permissions on an object will generate 4670 and 4662 events on the domain controller that handled the request.
             
             Additional opsec considerations depend on the target object and how to take advantage of this privilege. Opsec considerations for each abuse primitive are documented on the specific abuse edges and on the BloodHound wiki.`;
             formatted = text;
-        }else if (edge.label === "WriteDacl"){
+        } else if (edge.label === "WriteDacl") {
             let text = `When using the PowerView functions, keep in mind that PowerShell v5 introduced several security mechanisms that make it much easier for defenders to see what's going on with PowerShell in their network, such as script block logging and AMSI. You can bypass those security mechanisms by downgrading to PowerShell v2, which all PowerView functions support.
 
             Modifying permissions on an object will generate 4670 and 4662 events on the domain controller that handled the request.
             
             Additional opsec considerations depend on the target object and how to take advantage of this privilege. Opsec considerations for each abuse primitive are documented on the specific abuse edges and on the BloodHound wiki.`;
             formatted = text;
-        }else if (edge.label === "WriteOwner"){
+        } else if (edge.label === "WriteOwner") {
             let text = `This depends on the target object and how to take advantage of this privilege. Opsec considerations for each abuse primitive are documented on the specific abuse edges and on the BloodHound wiki.`;
             formatted = text;
-        }else if (edge.label === "CanRDP"){
+        } else if (edge.label === "CanRDP") {
             let text = `If the target computer is a workstation and a user is currently logged on, one of two things will happen. If the user you are abusing is the same user as the one logged on, you will effectively take over their session and kick the logged on user off, resulting in a message to the user. If the users are different, you will be prompted to kick the currently logged on user off the system and log on. If the target computer is a server, you will be able to initiate the connection without issue provided the user you are abusing is not currently logged in.
             
             Remote desktop will create Logon and Logoff events with the access type RemoteInteractive.`;
             formatted = text;
-        }else if (edge.label === "ExecuteDCOM"){
+        } else if (edge.label === "ExecuteDCOM") {
             let text = ``;
             formatted = text;
-        }else if (edge.label === "AllowedToDelegate"){
+        } else if (edge.label === "AllowedToDelegate") {
             let text = `As mentioned in the abuse info, in order to currently abuse this primitive either the Kekeo binary will need to be dropped to disk on the target or traffic from Impacket will need to be proxied in. See the References for more information.`;
             formatted = text;
-        }else if (edge.label === "GetChanges"){
+        } else if (edge.label === "GetChanges") {
             let text = `For detailed information on detection of dcsync as well as opsec considerations, see the adsecurity post in the references tab.`;
             formatted = text;
-        }else if (edge.label === "GetChangesAll"){
+        } else if (edge.label === "GetChangesAll") {
             let text = `For detailed information on detection of dcsync as well as opsec considerations, see the adsecurity post in the references tab.`;
             formatted = text;
-        }else if (edge.label === "ReadLAPSPassword"){
+        } else if (edge.label === "ReadLAPSPassword") {
             let text = `Reading properties from LDAP is an extremely low risk operation.`;
             formatted = text;
         } else if (edge.label === "Contains") {
@@ -970,16 +970,16 @@ export default class HelpModal extends Component {
             formatted = `There are no opsec considerations related to this edge.`;
         }
 
-        this.setState({opsecTabContent: {__html: formatted}})
+        this.setState({ opsecTabContent: { __html: formatted } })
     }
 
-    createReferencesTab(edge, source, target){
+    createReferencesTab(edge, source, target) {
         let sourceType = source.type;
         let sourceName = source.label;
         let targetType = target.type;
         let targetName = target.label;
         let formatted;
-        if (edge.label === "AdminTo"){
+        if (edge.label === "AdminTo") {
             let text = `<h4>Lateral movement</h4>
             <a href="https://attack.mitre.org/wiki/Lateral_Movement">https://attack.mitre.org/wiki/Lateral_Movement</a>
 
@@ -1001,11 +1001,11 @@ export default class HelpModal extends Component {
             <h4>Opsec Considerations</h4>
             <a href="https://blog.cobaltstrike.com/2017/06/23/opsec-considerations-for-beacon-commands/">https://blog.cobaltstrike.com/2017/06/23/opsec-considerations-for-beacon-commands/</a>`;
             formatted = text;
-        }else if (edge.label === "MemberOf"){
+        } else if (edge.label === "MemberOf") {
             let text = `<a href="https://adsecurity.org/?tag=ad-delegation">https://adsecurity.org/?tag=ad-delegation</a>
             <a href="https://www.itprotoday.com/management-mobility/view-or-remove-active-directory-delegated-permissions ">https://www.itprotoday.com/management-mobility/view-or-remove-active-directory-delegated-permissions </a>`;
             formatted = text;
-        }else if (edge.label === "HasSession"){
+        } else if (edge.label === "HasSession") {
             let text = `<h4>Gathering Credentials</h4>
             <a href="http://blog.gentilkiwi.com/mimikatz">http://blog.gentilkiwi.com/mimikatz</a>
             <a href="https://github.com/gentilkiwi/mimikatz">https://github.com/gentilkiwi/mimikatz</a>
@@ -1017,68 +1017,68 @@ export default class HelpModal extends Component {
             <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Exfiltration/Invoke-TokenManipulation.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/master/Exfiltration/Invoke-TokenManipulation.ps1</a>
             <a href="https://attack.mitre.org/wiki/Technique/T1134">https://attack.mitre.org/wiki/Technique/T1134</a>`;
             formatted = text;
-        }else if (edge.label === "AllExtendedRights"){
+        } else if (edge.label === "AllExtendedRights") {
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="https://www.youtube.com/watch?v=z8thoG7gPd0">https://www.youtube.com/watch?v=z8thoG7gPd0</a>`;
             formatted = text;
-        }else if (edge.label === "AddMember"){
+        } else if (edge.label === "AddMember") {
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="https://www.youtube.com/watch?v=z8thoG7gPd0">https://www.youtube.com/watch?v=z8thoG7gPd0</a>
             <a href="https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4728">https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4728</a>`;
             formatted = text;
-        }else if (edge.label === "ForceChangePassword"){
+        } else if (edge.label === "ForceChangePassword") {
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="https://www.youtube.com/watch?v=z8thoG7gPd0">https://www.youtube.com/watch?v=z8thoG7gPd0</>
             <a href="https://www.sixdub.net/?p=579">https://www.sixdub.net/?p=579</a>
             <a href="https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4724">https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4724</a>`;
             formatted = text;
-        }else if (edge.label === "GenericAll"){
+        } else if (edge.label === "GenericAll") {
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="https://www.youtube.com/watch?v=z8thoG7gPd0">https://www.youtube.com/watch?v=z8thoG7gPd0</a>
             <a href="https://adsecurity.org/?p=1729">https://adsecurity.org/?p=1729</a>
             <a href="http://www.harmj0y.net/blog/activedirectory/targeted-kerberoasting/">http://www.harmj0y.net/blog/activedirectory/targeted-kerberoasting/</a>
             <a href="https://posts.specterops.io/a-red-teamers-guide-to-gpos-and-ous-f0d03976a31e">https://posts.specterops.io/a-red-teamers-guide-to-gpos-and-ous-f0d03976a31e</a>`;
             formatted = text;
-        }else if (edge.label === "GenericWrite"){
+        } else if (edge.label === "GenericWrite") {
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="https://www.youtube.com/watch?v=z8thoG7gPd0">https://www.youtube.com/watch?v=z8thoG7gPd0</a>
             <a href="http://www.harmj0y.net/blog/activedirectory/targeted-kerberoasting/">http://www.harmj0y.net/blog/activedirectory/targeted-kerberoasting/</a>`;
             formatted = text;
-        }else if (edge.label === "Owns"){
+        } else if (edge.label === "Owns") {
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="https://www.youtube.com/watch?v=z8thoG7gPd0">https://www.youtube.com/watch?v=z8thoG7gPd0</a>
             <a href="http://www.selfadsi.org/deep-inside/ad-security-descriptors.htm">http://www.selfadsi.org/deep-inside/ad-security-descriptors.htm</a>`;
             formatted = text;
-        }else if (edge.label === "WriteDacl"){
+        } else if (edge.label === "WriteDacl") {
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="https://www.youtube.com/watch?v=z8thoG7gPd0">https://www.youtube.com/watch?v=z8thoG7gPd0</a>`;
             formatted = text;
-        }else if (edge.label === "WriteOwner"){
+        } else if (edge.label === "WriteOwner") {
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="http://www.selfadsi.org/deep-inside/ad-security-descriptors.htm">http://www.selfadsi.org/deep-inside/ad-security-descriptors.htm</a>`;
             formatted = text;
-        }else if (edge.label === "CanRDP"){
+        } else if (edge.label === "CanRDP") {
             let text = `<a href="https://michael-eder.net/post/2018/native_rdp_pass_the_hash/">https://michael-eder.net/post/2018/native_rdp_pass_the_hash/</a>
             <a href="https://www.kali.org/penetration-testing/passing-hash-remote-desktop/">https://www.kali.org/penetration-testing/passing-hash-remote-desktop/</a>`;
             formatted = text;
-        }else if (edge.label === "ExecuteDCOM"){
+        } else if (edge.label === "ExecuteDCOM") {
             let text = ``;
             formatted = text;
-        }else if (edge.label === "AllowedToDelegate"){
+        } else if (edge.label === "AllowedToDelegate") {
             let text = `<a href="https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/">https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/</a>
             <a href="http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/">http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/</a>
             <a href="https://twitter.com/gentilkiwi/status/806643377278173185">https://twitter.com/gentilkiwi/status/806643377278173185</a>
             <a href="https://www.coresecurity.com/blog/kerberos-delegation-spns-and-more">https://www.coresecurity.com/blog/kerberos-delegation-spns-and-more</a>`;
             formatted = text;
-        }else if (edge.label === "GetChanges"){
+        } else if (edge.label === "GetChanges") {
             let text = `<a href="https://adsecurity.org/?p=1729">https://adsecurity.org/?p=1729</a>
             <a href="http://www.harmj0y.net/blog/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/">http://www.harmj0y.net/blog/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/</a>`;
             formatted = text;
-        }else if (edge.label === "GetChangesAll"){
+        } else if (edge.label === "GetChangesAll") {
             let text = `<a href="https://adsecurity.org/?p=1729">https://adsecurity.org/?p=1729</a>
             <a href="http://www.harmj0y.net/blog/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/">http://www.harmj0y.net/blog/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/</a>`;
             formatted = text;
-        }else if (edge.label === "ReadLAPSPassword"){
+        } else if (edge.label === "ReadLAPSPassword") {
             let text = `<a href="https://www.specterops.io/assets/resources/an_ace_up_the_sleeve.pdf">https://www.specterops.io/assets/resources/an_ace_up_the_sleeve.pdf</a>
             <a href="https://adsecurity.org/?p=3164">https://adsecurity.org/?p=3164</a>`;
             formatted = text;
@@ -1090,7 +1090,7 @@ export default class HelpModal extends Component {
             <a href="https://blog.cptjesus.com/posts/bloodhound15">https://blog.cptjesus.com/posts/bloodhound15</a>`;
         }
 
-        this.setState({referencesTabContent: {__html: formatted}})
+        this.setState({ referencesTabContent: { __html: formatted } })
     }
 
     openModal(edge, source, target) {
