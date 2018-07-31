@@ -902,7 +902,7 @@ export default class HelpModal extends Component {
             let text = `No opsec considerations apply to this edge.`;
             formatted = text;
         }else if (edge.label === "HasSession"){
-            let text = ``;
+            let text = `An EDR product may detect your attempt to inject into lsass and alert a SOC analyst. There are many more opsec considerations to keep in mind when stealing credentials or tokens. For more information, see the References tab.`;
             formatted = text;
         }else if (edge.label === "AllExtendedRights"){
             let text = `When using the PowerView functions, keep in mind that PowerShell v5 introduced several security mechanisms that make it much easier for defenders to see what's going on with PowerShell in their network, such as script block logging and AMSI. You can bypass those security mechanisms by downgrading to PowerShell v2, which all PowerView functions support.`;
@@ -1006,7 +1006,16 @@ export default class HelpModal extends Component {
             <a href="https://www.itprotoday.com/management-mobility/view-or-remove-active-directory-delegated-permissions ">https://www.itprotoday.com/management-mobility/view-or-remove-active-directory-delegated-permissions </a>`;
             formatted = text;
         }else if (edge.label === "HasSession"){
-            let text = ``;
+            let text = `<h4>Gathering Credentials</h4>
+            <a href="http://blog.gentilkiwi.com/mimikatz">http://blog.gentilkiwi.com/mimikatz</a>
+            <a href="https://github.com/gentilkiwi/mimikatz">https://github.com/gentilkiwi/mimikatz</a>
+            <a href="https://adsecurity.org/?page_id=1821">https://adsecurity.org/?page_id=1821</a>
+            <a href="https://attack.mitre.org/wiki/Credential_Access">https://attack.mitre.org/wiki/Credential_Access</a>
+            
+            <h4>Token Impersonation</h4>
+            <a href="https://labs.mwrinfosecurity.com/assets/BlogFiles/mwri-security-implications-of-windows-access-tokens-2008-04-14.pdf">https://labs.mwrinfosecurity.com/assets/BlogFiles/mwri-security-implications-of-windows-access-tokens-2008-04-14.pdf</>
+            <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Exfiltration/Invoke-TokenManipulation.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/master/Exfiltration/Invoke-TokenManipulation.ps1</a>
+            <a href="https://attack.mitre.org/wiki/Technique/T1134">https://attack.mitre.org/wiki/Technique/T1134</a>`;
             formatted = text;
         }else if (edge.label === "AllExtendedRights"){
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
