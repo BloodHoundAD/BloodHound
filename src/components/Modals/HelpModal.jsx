@@ -119,6 +119,10 @@ export default class HelpModal extends Component {
             let text = `${this.groupSpecialFormat(source)} the ability to read the password set by Local Administrator Password Solution (LAPS) on the computer {}. The local administrator password for a computer managed by LAPS is stored in the confidential LDAP attribute,  “ms-mcs-AdmPwd”. `;
 
             formatted = text;
+        }else if (edge.label === "Contains"){
+            formatted = `The ${sourceType} ${sourceName} contains the ${targetType} ${targetName}. GPOs linked to a container apply to all objects that are contained by the container.`;
+        }else if (edge.label === "GpLink"){
+            formatted = `The GPO ${sourceName} is linked to the ${targetType} ${targetName}. A linked GPO applies its settings to objects in the linked container.`;
         }
 
         this.setState({infoTabContent: {__html: formatted}})
@@ -874,6 +878,10 @@ export default class HelpModal extends Component {
 
             Get-DomainObject windows1 -Credential $Cred -Properties "ms-mcs-AdmPwd",name`;
             formatted = text;
+        } else if (edge.label === "Contains") {
+            formatted = `There is no abuse info related to this edge.`;
+        } else if (edge.label === "GpLink") {
+            formatted = `There is no abuse info related to this edge.`;
         }
 
         this.setState({abuseTabContent: {__html: formatted}})
@@ -956,6 +964,10 @@ export default class HelpModal extends Component {
         }else if (edge.label === "ReadLAPSPassword"){
             let text = `Reading properties from LDAP is an extremely low risk operation.`;
             formatted = text;
+        } else if (edge.label === "Contains") {
+            formatted = `There are no opsec considerations related to this edge.`;
+        } else if (edge.label === "GpLink") {
+            formatted = `There are no opsec considerations related to this edge.`;
         }
 
         this.setState({opsecTabContent: {__html: formatted}})
@@ -1061,6 +1073,12 @@ export default class HelpModal extends Component {
             let text = `<a href="https://www.specterops.io/assets/resources/an_ace_up_the_sleeve.pdf">https://www.specterops.io/assets/resources/an_ace_up_the_sleeve.pdf</a>
             <a href="https://adsecurity.org/?p=3164">https://adsecurity.org/?p=3164</a>`;
             formatted = text;
+        } else if (edge.label === "Contains") {
+            formatted = `<a href="https://wald0.com/?p=179">https://wald0.com/?p=179</a>
+            <a href="https://blog.cptjesus.com/posts/bloodhound15">https://blog.cptjesus.com/posts/bloodhound15</a>`;
+        } else if (edge.label === "GpLink") {
+            formatted = `<a href="https://wald0.com/?p=179">https://wald0.com/?p=179</a>
+            <a href="https://blog.cptjesus.com/posts/bloodhound15">https://blog.cptjesus.com/posts/bloodhound15</a>`;
         }
 
         this.setState({referencesTabContent: {__html: formatted}})
