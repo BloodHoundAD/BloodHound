@@ -168,7 +168,7 @@
                 }
             ]
         },{
-            "name": "Shortest Paths to Domain Admins from Owned Principal",
+            "name": "Shortest Paths to Domain Admins from Owned Principals",
             "queryList": [
                 {
                     "final": false,
