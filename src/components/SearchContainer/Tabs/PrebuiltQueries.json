@@ -192,9 +192,14 @@
             "name": "Shortest Paths to High Value Targets",
             "queryList": [
                 {
+                    "final": false,
+                    "title": "Select a Domain",
+                    "query": "MATCH (n:Domain) RETURN n.name ORDER BY n.name DESC"
+                },
+                {
                     "final": true,
                     "query":
-                        "MATCH (n),(m),p=shortestPath((n)-[r:{}*1..]->(m)) WHERE m.highvalue=true AND NOT m = n RETURN p",
+                        "MATCH (n),(m),p=shortestPath((n)-[r:{}*1..]->(m)) WHERE m.domain={result} AND m.highvalue=true AND NOT m = n RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
                 }
