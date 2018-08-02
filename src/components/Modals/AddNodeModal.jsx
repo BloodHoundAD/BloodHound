@@ -9,6 +9,10 @@ export default class AddNodeModal extends Component {
         };
     }
 
+    componentDidMount() {
+        emitter.on("addNode", this.openModal.bind(this));
+    }
+
     closeModal() {
         this.setState({ open: false });
     }
@@ -71,8 +75,8 @@ export default class AddNodeModal extends Component {
             });
         }else{
             complete.show();
-            emitter.emit("addNodeFinal", name, type)
-            setTimeout(x => {this.closeModal()}, 500);
+            emitter.emit("addNodeFinal", name, type);
+            setTimeout(x => {this.closeModal();}, 500);
         }
         
         //this.closeModal();
@@ -94,10 +98,6 @@ export default class AddNodeModal extends Component {
 
         validate.removeClass("has-error");
         error.hide();
-    }
-
-    componentDidMount() {
-        emitter.on("addNode", this.openModal.bind(this));   
     }
 
     render() {
