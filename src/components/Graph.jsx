@@ -1534,11 +1534,10 @@ export default class GraphContainer extends Component {
 
         var noverlapListener = sigmaInstance.configNoverlap({});
 
-        noverlapListener.bind("stop", function(event) {
+        noverlapListener.bind("stop", event => {
             emitter.emit("updateLoadingText", "Done!");
             this.lockScale();
             sigma.canvas.edges.autoCurve(sigmaInstance);
-            sigmaInstance.settings("scalingMode","fixedScaling");
             setTimeout(function() {
                 emitter.emit("showLoadingIndicator", false);
             }, 1500);
