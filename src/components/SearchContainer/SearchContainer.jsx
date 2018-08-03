@@ -332,6 +332,7 @@ export default class SearchContainer extends Component {
             current.Owns = false;
             current.WriteDacl = false;
             current.WriteOwner = false;
+            current.ReadLAPSPassword = false;
         }else if (section === "special"){
             current.CanRDP = false;
             current.ExecuteDCOM = false;
@@ -361,6 +362,7 @@ export default class SearchContainer extends Component {
             current.Owns = true;
             current.WriteDacl = true;
             current.WriteOwner = true;
+            current.ReadLAPSPassword = true;
         }else if (section === "special"){
             current.CanRDP = true;
             current.ExecuteDCOM = true;
