@@ -650,6 +650,7 @@ export default class GraphContainer extends Component {
     }
 
     doQueryNative(params) {
+        this.clearScale();
         if (appStore.performance.debug) {
             emitter.emit("setRawQuery", params.statement);
         }
@@ -1055,6 +1056,16 @@ export default class GraphContainer extends Component {
         };
     };
 
+    lockScale(){
+        let graph = this.state.sigmaInstance.graph;
+        graph.initScale = graph.currentScale;
+    }
+
+    clearScale(){
+        let graph = this.state.sigmaInstance.graph;
+        graph.initScale = null;
+    }
+
     //Function taken from the DragNodes code https://github.com/jacomyal/sigma.js/blob/master/plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js
     calculateClickPos(clientX, clientY){
         let _s = this.state.sigmaInstance;
@@ -1096,7 +1107,9 @@ export default class GraphContainer extends Component {
             glyphTextColor: "white",
             glyphTextThreshold: 1,
             zoomingRatio: 1.4,
-            scalingMode: "inside"
+            scalingMode: "inside",
+            autoRescale: true,
+            sideMargin: 20
         });
 
         //Monkeypatch the drawIcon function to add font-weight to the canvas drawing for drawIcon
@@ -1124,6 +1137,150 @@ export default class GraphContainer extends Component {
             context.fillText(text, x, y);
             context.restore();
         }
+
+        //Monkeypatch the middleware with a customized patch from here: https://github.com/jacomyal/sigma.js/pull/302/files
+        sigma.middlewares.rescale = function(readPrefix, writePrefix, options) {
+            var _this = this,
+                i,
+                l,
+                a,
+                b,
+                c,
+                d,
+                scale,
+                margin,
+                n = this.graph.nodes(),
+                e = this.graph.edges(),
+                settings = this.settings.embedObjects(options || {}),
+                bounds = settings('bounds') || sigma.utils.getBoundaries(
+                  this.graph,
+                  readPrefix,
+                  true
+                ),
+                minX = bounds.minX,
+                minY = bounds.minY,
+                maxX = bounds.maxX,
+                maxY = bounds.maxY,
+                sizeMax = bounds.sizeMax,
+                weightMax = bounds.weightMax,
+                w = settings('width') || 1,
+                h = settings('height') || 1,
+                rescaleSettings = settings('autoRescale'),
+                validSettings = {
+                  nodePosition: 1,
+                  nodeSize: 1,
+                  edgeSize: 1
+                };
+            /**
+             * What elements should we rescale?
+             */
+            if (!(rescaleSettings instanceof Array))
+              rescaleSettings = ['nodePosition', 'nodeSize', 'edgeSize'];
+        
+            for (i = 0, l = rescaleSettings.length; i < l; i++)
+              if (!validSettings[rescaleSettings[i]])
+                throw new Error(
+                  'The rescale setting "' + rescaleSettings[i] + '" is not recognized.'
+                );
+        
+            var np = ~rescaleSettings.indexOf('nodePosition'),
+                ns = ~rescaleSettings.indexOf('nodeSize'),
+                es = ~rescaleSettings.indexOf('edgeSize');
+        
+            if (np) {
+              /**
+               * First, we compute the scaling ratio, without considering the sizes
+               * of the nodes : Each node will have its center in the canvas, but might
+               * be partially out of it.
+               */
+              scale = settings('scalingMode') === 'outside' ?
+                Math.max(
+                  w / Math.max(maxX - minX, 1),
+                  h / Math.max(maxY - minY, 1)
+                ) :
+                Math.min(
+                  w / Math.max(maxX - minX, 1),
+                  h / Math.max(maxY - minY, 1)
+                );
+
+                _this.graph.currentScale = scale;
+              /**
+               * Then, we correct that scaling ratio considering a margin, which is
+               * basically the size of the biggest node.
+               * This has to be done as a correction since to compare the size of the
+               * biggest node to the X and Y values, we have to first get an
+               * approximation of the scaling ratio.
+               **/
+              margin =
+                (
+                  settings('rescaleIgnoreSize') ?
+                    0 :
+                    (settings('maxNodeSize') || sizeMax) / scale
+                ) +
+                (settings('sideMargin') || 0);
+              maxX += margin;
+              minX -= margin;
+              maxY += margin;
+              minY -= margin;
+        
+              // Fix the scaling with the new extrema:
+              scale = settings('scalingMode') === 'outside' ?
+                Math.max(
+                  w / Math.max(maxX - minX, 1),
+                  h / Math.max(maxY - minY, 1)
+                ) :
+                Math.min(
+                  w / Math.max(maxX - minX, 1),
+                  h / Math.max(maxY - minY, 1)
+                );
+                _this.graph.currentScale = scale;
+            }
+        
+            // Size homothetic parameters:
+            if (!settings('maxNodeSize') && !settings('minNodeSize')) {
+              a = 1;
+              b = 0;
+            } else if (settings('maxNodeSize') === settings('minNodeSize')) {
+              a = 0;
+              b = +settings('maxNodeSize');
+            } else {
+              a = (settings('maxNodeSize') - settings('minNodeSize')) / sizeMax;
+              b = +settings('minNodeSize');
+            }
+        
+            if (!settings('maxEdgeSize') && !settings('minEdgeSize')) {
+              c = 1;
+              d = 0;
+            } else if (settings('maxEdgeSize') === settings('minEdgeSize')) {
+              c = 0;
+              d = +settings('minEdgeSize');
+            } else {
+              c = (settings('maxEdgeSize') - settings('minEdgeSize')) / weightMax;
+              d = +settings('minEdgeSize');
+            }
+        
+            // Rescale the nodes and edges:
+            for (i = 0, l = e.length; i < l; i++)
+              e[i][writePrefix + 'size'] =
+                e[i][readPrefix + 'size'] * (es ? c : 1) + (es ? d : 0);
+        
+            for (i = 0, l = n.length; i < l; i++) {
+              n[i][writePrefix + 'size'] =
+                n[i][readPrefix + 'size'] * (ns ? a : 1) + (ns ? b : 0);
+        
+              if (np) {
+                n[i][writePrefix + 'x'] =
+                  (n[i][readPrefix + 'x'] - (maxX + minX) / 2) * (this.graph.initScale || scale);
+                n[i][writePrefix + 'y'] =
+                  (n[i][readPrefix + 'y'] - (maxY + minY) / 2) * (this.graph.initScale || scale);
+              }
+              else {
+                n[i][writePrefix + 'x'] = n[i][readPrefix + 'x'];
+                n[i][writePrefix + 'y'] = n[i][readPrefix + 'y'];
+              }
+            }
+        };
+        
 
         //Bind sigma events
         sigmaInstance.renderers[0].bind("render", function(e) {
@@ -1342,7 +1499,7 @@ export default class GraphContainer extends Component {
             rankDir: "LR"
         });
 
-        dagreListener.bind("stop", function(event) {
+        dagreListener.bind("stop", event => {
             var needsfix = false;
             sigmaInstance.graph.nodes().forEach(function(node) {
                 if (isNaN(node.x) || isNaN(node.y)) {
@@ -1354,6 +1511,7 @@ export default class GraphContainer extends Component {
             }, this);
             if (!needsfix) {
                 emitter.emit("updateLoadingText", "Done!");
+                this.lockScale();
                 sigma.canvas.edges.autoCurve(sigmaInstance);
                 setTimeout(function() {
                     emitter.emit("showLoadingIndicator", false);
@@ -1378,7 +1536,9 @@ export default class GraphContainer extends Component {
 
         noverlapListener.bind("stop", function(event) {
             emitter.emit("updateLoadingText", "Done!");
+            this.lockScale();
             sigma.canvas.edges.autoCurve(sigmaInstance);
+            sigmaInstance.settings("scalingMode","fixedScaling");
             setTimeout(function() {
                 emitter.emit("showLoadingIndicator", false);
             }, 1500);
