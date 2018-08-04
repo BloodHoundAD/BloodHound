@@ -6,7 +6,6 @@ import Gallery from "react-photo-gallery";
 import SelectedImage from "./SelectedImage";
 import Lightbox from "react-images";
 import { readFileSync, writeFileSync } from "fs";
-import { base64Sync } from "base64-img";
 import sizeOf from "image-size";
 import md5File from "md5-file";
 import { remote } from "electron";

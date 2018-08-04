@@ -52,7 +52,6 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.1.1",
     "async": "^2.6.0",
-    "base64-img": "^1.0.4",
     "bootstrap": "^3.3.7",
     "bootstrap-3-typeahead": "^4.0.2",
     "dagre": "^0.7.4",
