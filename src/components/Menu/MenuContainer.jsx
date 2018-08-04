@@ -168,7 +168,6 @@ export default class MenuContainer extends Component {
         let s = driver.session();
         await s.run("MATCH (n:User) WHERE NOT EXISTS(n.owned) SET n.owned=false");
         await s.run("MATCH (n:Computer) WHERE NOT EXISTS(n.owned) SET n.owned=false");
-        await s.run("MATCH (n) WHERE NOT EXISTS(n.pics) SET n.pics=[]");
         s.close();
     }
 
