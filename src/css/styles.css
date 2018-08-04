@@ -740,6 +740,34 @@ div.tooltip-inner-custom {
     border-radius: 0;
 }
 
+.react-photo-gallery--gallery{
+    width: 99%;
+}
+
+.gallery-img i:first-child{
+    visibility: hidden;
+    position:absolute;
+    top:8px;
+    right: 18px;
+    z-index: 2;
+    font-size: 15px;
+    color: blue;
+}
+
+.gallery-img i:nth-child(2){
+    visibility: hidden;
+    position:absolute;
+    top:8px;
+    right: 2px;
+    z-index: 2;
+    font-size: 15px;
+    color: rgb(244, 65, 104)
+}
+
+.gallery-img:hover i{
+    visibility: visible;
+}
+
 .loadingIndicator {
     position: absolute;
     z-index: 25;
@@ -754,7 +782,7 @@ div.tooltip-inner-custom {
 }
 
 .loadingIndicator img {
-    width: 80px;
+    width: 150px;
     height: auto;
 }
 

@@ -65,7 +65,7 @@ export default class MenuContainer extends Component {
                             },
                             3000
                         );
-                        this.addOwnedProp();
+                        this.addBaseProps();
                         $.each(results, function(_, file) {
                             if (file.delete) {
                                 unlinkSync(file.path);
@@ -150,7 +150,7 @@ export default class MenuContainer extends Component {
                             },
                             3000
                         );
-                        this.addOwnedProp();
+                        this.addBaseProps();
                         $.each(results, (_, file) => {
                             if (file.delete) {
                                 unlinkSync(file.path);
@@ -164,10 +164,11 @@ export default class MenuContainer extends Component {
         );
     }
 
-    async addOwnedProp(){
+    async addBaseProps(){
         let s = driver.session();
         await s.run("MATCH (n:User) WHERE NOT EXISTS(n.owned) SET n.owned=false");
         await s.run("MATCH (n:Computer) WHERE NOT EXISTS(n.owned) SET n.owned=false");
+        await s.run("MATCH (n) WHERE NOT EXISTS(n.pics) SET n.pics=[]");
         s.close();
     }
 
@@ -229,11 +230,17 @@ export default class MenuContainer extends Component {
 
         let size = statSync(file).size;
         createReadStream(file, {encoding: 'utf8', start: size-100, end: size}).on('data', chunk => {
-            type = /type.?:\s?"(\w*)"/g.exec(chunk)[1];
-            count = /count.?:\s?(\d*)/g.exec(chunk)[1];
+            let type;
+            try{
+                type = /type.?:\s?"(\w*)"/g.exec(chunk)[1];
+                count = /count.?:\s?(\d*)/g.exec(chunk)[1];
+            }catch(e){
+                type = null;
+            }
+            
 
             if (!acceptableTypes.includes(type)){
-                emitter.emit("showAlert", "Unrecognized JSON Type");
+                emitter.emit("showAlert", "Unrecognized File");
                 this.setState({
                     uploading: false
                 });

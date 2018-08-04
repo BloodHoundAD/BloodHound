@@ -9,6 +9,8 @@ import DomainNodeData from "./Tabs/DomainNodeData";
 import GpoNodeData from "./Tabs/GpoNodeData";
 import OuNodeData from "./Tabs/OuNodeData";
 import { Tabs, Tab } from "react-bootstrap";
+import { openSync, readSync, closeSync } from "fs";
+import imageType from "image-type";
 
 export default class TabContainer extends Component {
     constructor(props) {
@@ -32,6 +34,24 @@ export default class TabContainer extends Component {
         emitter.on("domainNodeClicked", this._domainNodeClicked.bind(this));
         emitter.on("gpoNodeClicked", this._gpoNodeClicked.bind(this));
         emitter.on("ouNodeClicked", this._ouNodeClicked.bind(this));
+        emitter.on("imageupload", this.uploadImage.bind(this));
+    }
+
+    uploadImage(event){
+        let files = [];
+        $.each(event.dataTransfer.files, (_, f) => {
+            let buf = Buffer.alloc(12);
+            let file = openSync(f.path, 'r')
+            readSync(file,buf, 0, 12, 0);
+            closeSync(file)
+            let type = imageType(buf);
+            if (type !== null && type.mime.includes("image")){
+                files.push({path: f.path, name: f.name})
+            }else{
+                emitter.emit("showAlert", `${f.name} is not an image`);
+            }
+        })
+        emitter.emit("imageUploadFinal", files);
     }
 
     _userNodeClicked() {
@@ -136,9 +156,7 @@ export default class TabContainer extends Component {
                         />
                         <UserNodeData visible={this.state.userVisible} />
                         <GroupNodeData visible={this.state.groupVisible} />
-                        <ComputerNodeData
-                            visible={this.state.computerVisible}
-                        />
+                        <ComputerNodeData visible={this.state.computerVisible} />
                         <DomainNodeData visible={this.state.domainVisible} />
                         <GpoNodeData visible={this.state.gpoVisible} />
                         <OuNodeData visible={this.state.ouVisible} />

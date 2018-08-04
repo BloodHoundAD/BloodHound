@@ -2,6 +2,16 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import NodeCypherLink from "./NodeCypherLink";
 import NodeProps from "./NodeProps";
+import Gallery from "react-photo-gallery";
+import SelectedImage from "./SelectedImage";
+import Lightbox from "react-images";
+import { readFileSync, writeFileSync } from "fs";
+import { base64Sync } from "base64-img";
+import sizeOf from "image-size";
+import md5File from "md5-file";
+import { remote } from "electron";
+const { app } = remote;
+import { join } from "path";
 
 export default class GroupNodeData extends Component {
     constructor() {
@@ -11,23 +21,46 @@ export default class GroupNodeData extends Component {
             label: "",
             driversessions: [],
             propertyMap: {},
-            displayMap: {"description":"Description","admincount":"Admin Count"},
+            displayMap: {
+                description: "Description",
+                admincount: "Admin Count"
+            },
             ServicePrincipalNames: [],
-            notes: null
+            notes: null,
+            pics: [],
+            currentImage: 0,
+            lightboxIsOpen: false
         };
 
         emitter.on("groupNodeClicked", this.getNodeData.bind(this));
+        emitter.on("imageUploadFinal", this.uploadImage.bind(this));
+        emitter.on("clickPhoto", this.openLightbox.bind(this));
+        emitter.on("deletePhoto", this.handleDelete.bind(this));
+    }
+
+    componentDidMount() {
+        jQuery(this.refs.complete).hide();
+        jQuery(this.refs.piccomplete).hide();
     }
 
     getNodeData(payload) {
         jQuery(this.refs.complete).hide();
-        $.each(this.state.driversessions, function(index, record) {
+        $.each(this.state.driversessions, function(_, record) {
             record.close();
         });
 
         this.setState({
             label: payload
         });
+
+        let key = `group_${this.state.label}`;
+        let c = imageconf.get(key);
+        let pics = [];
+        if (typeof c !== "undefined"){
+            this.setState({pics: c})
+        }else{
+            this.setState({pics: pics})
+        }
 
         var propCollection = driver.session();
         propCollection
@@ -36,30 +69,42 @@ export default class GroupNodeData extends Component {
                 function(result) {
                     var properties = result.records[0]._fields[0].properties;
                     let notes;
-                    if (!properties.notes){
+                    if (!properties.notes) {
                         notes = null;
-                    }else{
+                    } else {
                         notes = properties.notes;
                     }
-                    this.setState({ propertyMap: properties, notes: notes });
+
+                    this.setState({
+                        propertyMap: properties,
+                        notes: notes
+                    });
                     propCollection.close();
                 }.bind(this)
             );
     }
 
-    notesChanged(event){
-        this.setState({notes: event.target.value})
+    notesChanged(event) {
+        this.setState({ notes: event.target.value });
     }
 
-    notesBlur(event){
-        let notes = this.state.notes === null || this.state.notes === "" ? null : this.state.notes;
+    notesBlur(event) {
+        let notes =
+            this.state.notes === null || this.state.notes === ""
+                ? null
+                : this.state.notes;
         let q = driver.session();
-        if (notes === null){
-            q.run("MATCH (n:Group {name:{name}}) REMOVE n.notes", {name: this.state.label}).then(x => {
+        if (notes === null) {
+            q.run("MATCH (n:Group {name:{name}}) REMOVE n.notes", {
+                name: this.state.label
+            }).then(x => {
                 q.close();
             });
-        }else{
-            q.run("MATCH (n:Group {name:{name}}) SET n.notes = {notes}", {name: this.state.label, notes: this.state.notes}).then(x =>{
+        } else {
+            q.run("MATCH (n:Group {name:{name}}) SET n.notes = {notes}", {
+                name: this.state.label,
+                notes: this.state.notes
+            }).then(x => {
                 q.close();
             });
         }
@@ -68,7 +113,118 @@ export default class GroupNodeData extends Component {
         check.fadeOut(2000);
     }
 
+    uploadImage(files) {
+        if (!this.props.visible || files.length === 0) {
+            return;
+        }
+        let p = this.state.pics;
+        let oLen = p.length;
+        let key = `group_${this.state.label}`;
+        
+        $.each(files, (_, f) => {
+            let exists = false;
+            let hash = md5File.sync(f.path);
+            $.each(p, (_, p1) => {
+                if (p1.hash === hash){
+                    exists = true;
+                }
+            })
+            if (exists){
+                emitter.emit("showAlert", "Image already exists");
+                return;
+            }
+            let path = join(app.getPath("userData"), "images", hash);
+            let dimensions = sizeOf(f.path);
+            let data = readFileSync(f.path);
+            writeFileSync(path, data);
+            p.push({hash: hash, src: path, width: dimensions.width, height: dimensions.height})
+        });
+
+        if (p.length === oLen){
+            return;
+        }
+        this.setState({pics: p});
+        imageconf.set(key, p)
+        let check = jQuery(this.refs.piccomplete);
+        check.show();
+        check.fadeOut(2000);
+    }
+
+    handleDelete(event) {
+        if (!this.props.visible) {
+            return;
+        }
+        let pics = this.state.pics;
+        let temp = pics[event.index];
+        pics.splice(event.index, 1);
+        this.setState({
+            pics: pics
+        })
+        let key = `group_${this.state.label}`;
+        imageconf.set(key, pics);
+        
+        let check = jQuery(this.refs.piccomplete);
+        check.show();
+        check.fadeOut(2000);
+    }
+
+    openLightbox(event) {
+        if (!this.props.visible) {
+            return;
+        }
+        this.setState({
+            currentImage: event.index,
+            lightboxIsOpen: true
+        });
+    }
+    closeLightbox() {
+        if (!this.props.visible) {
+            return;
+        }
+        this.setState({
+            currentImage: 0,
+            lightboxIsOpen: false
+        });
+    }
+    gotoPrevious() {
+        if (!this.props.visible) {
+            return;
+        }
+        this.setState({
+            currentImage: this.state.currentImage - 1
+        });
+    }
+    gotoNext() {
+        if (!this.props.visible) {
+            return;
+        }
+        this.setState({
+            currentImage: this.state.currentImage + 1
+        });
+    }
+
     render() {
+        let gallery;
+        if (this.state.pics.length === 0){
+            gallery = (<span>Drop pictures on here to upload!</span>)
+        }else{
+            gallery = (
+            <React.Fragment>
+                <Gallery
+                    photos={this.state.pics}
+                    ImageComponent={SelectedImage}
+                    className={"gallerymod"}
+                />
+                <Lightbox
+                    images={this.state.pics}
+                    isOpen={this.state.lightboxIsOpen}
+                    onClose={this.closeLightbox.bind(this)}
+                    onClickPrev={this.gotoPrevious.bind(this)}
+                    onClickNext={this.gotoNext.bind(this)}
+                    currentImage={this.state.currentImage}
+                />
+            </React.Fragment>)
+        }
         return (
             <div className={this.props.visible ? "" : "displaynone"}>
                 <dl className="dl-horizontal">
@@ -253,7 +409,21 @@ export default class GroupNodeData extends Component {
                         className="fa fa-check-circle green-icon-color notes-check-style"
                     />
                 </div>
-                <textarea onBlur={this.notesBlur.bind(this)} onChange={this.notesChanged.bind(this)} value={this.state.notes === null ? "" : this.state.notes} className={"node-notes-textarea"} ref="notes" />
+                <textarea
+                    onBlur={this.notesBlur.bind(this)}
+                    onChange={this.notesChanged.bind(this)}
+                    value={this.state.notes === null ? "" : this.state.notes}
+                    className={"node-notes-textarea"}
+                    ref="notes"
+                />
+                <div>
+                    <h4 className={"inline"}>Pictures</h4>
+                    <i
+                        ref="piccomplete"
+                        className="fa fa-check-circle green-icon-color notes-check-style"
+                    />
+                </div>
+                {gallery}
             </div>
         );
     }

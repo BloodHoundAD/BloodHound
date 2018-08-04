@@ -812,7 +812,7 @@ export default class SearchContainer extends Component {
                     </div>
                 </div>
 
-                <div ref="tabs">
+                <div id="tabcontainer" ref="tabs">
                     <TabContainer />
                 </div>
             </div>

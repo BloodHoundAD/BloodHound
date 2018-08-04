@@ -35,7 +35,7 @@ export default class LoadingContainer extends Component {
         return (
             <div className="loadingIndicator" ref="load">
                 <div>{this.state.text}</div>
-                <img src="src/img/loading.gif" />
+                <img src="src/img/loading_new.gif" />
             </div>
         );
     }

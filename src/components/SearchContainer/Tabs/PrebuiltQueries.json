@@ -100,6 +100,15 @@
             ]
         },
         {
+            "name": "Shortest Paths to Unconstrained Delegation Systems",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (m:Computer) WHERE m.unconstraineddelegation=true MATCH (n) MATCH p=shortestPath((n)-[r:{}*1..]->(m)) WHERE NOT m=n RETURN p"
+                }
+            ]
+        },
+        {
             "name": "Shortest Paths from Kerberoastable Users",
             "queryList": [
                 {

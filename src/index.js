@@ -7,17 +7,19 @@ import Login from "./components/Float/Login";
 
 import { remote, shell } from "electron";
 const { app } = remote;
-import { stat, writeFile } from "fs";
 import { join } from "path";
+import { stat, writeFile, existsSync, mkdirSync } from "fs";
 
 import ConfigStore from "electron-store";
 global.conf = new ConfigStore();
+global.imageconf = new ConfigStore({
+    name: "images"
+})
 import { EventEmitter2 as e } from "eventemitter2";
 global.emitter = new e({});
 global.renderEmit = new e({});
 global.neo4j = require("neo4j-driver").v1;
 global.Mustache = require("mustache");
-
 
 //open links externally by default
 $(document).on('click', 'a[href^="http"]', function(event) {
@@ -291,6 +293,11 @@ stat(custompath, function(err, stats) {
         writeFile(custompath, "{}");
     }
 });
+
+let imagepath = join(app.getPath("userData"), "images");
+if (!existsSync(imagepath)){
+    mkdirSync(imagepath)
+}
 
 renderEmit.on("login", function() {
     emitter.removeAllListeners();

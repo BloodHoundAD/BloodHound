@@ -31,10 +31,15 @@ export default class AppContainer extends Component {
             event.preventDefault();
             return false;
         }, false)
-
+        
         document.addEventListener('drop', function(event){
-            emitter.emit("filedrop", event)
             event.preventDefault();
+            if (jQuery("#tabcontainer").has(jQuery(event.target)).length === 1){
+                emitter.emit("imageupload", event)
+            }else{
+                emitter.emit("filedrop", event)
+            }
+            
             return false;
         }, false)
     }
