@@ -19,12 +19,12 @@ export default class NodeCypherNoNumberLink extends Component {
 
         return (
             <Fragment>
-                <dt>
+                <dt onClick={c}>
                     <a href="#" onClick={c}>
                         {this.props.property}
                     </a>
                 </dt>
-                <dd />
+                <dd onClick={c} style={{"cursor":"pointer"}} />
             </Fragment>
         );
     }
