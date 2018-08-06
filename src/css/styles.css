@@ -37,7 +37,6 @@ body {
     font-family: "Roboto", sans-serif;
     height: 100%;
     overflow: hidden;
-    background-color: lightgray;
     overflow: hidden;
 }
 
@@ -100,7 +99,7 @@ div.tooltip-inner-custom {
 .graph {
     width: 100%;
     height: 100%;
-    background-color: lightgray;
+    background-color: rgb(242, 245, 249);
     overflow: hidden;
 }
 
