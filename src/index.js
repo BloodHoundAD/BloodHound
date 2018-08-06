@@ -141,7 +141,9 @@ global.appStore = {
             CanRDP: "tapered",
             ExecuteDCOM: "tapered",
             ReadLAPSPassword: "tapered",
-            AllowedToDelegate: "tapered"
+            AllowedToDelegate: "tapered",
+            GetChanges: "tapered",
+            GetChangeAll: "tapered"
         }
     },
     lowResPalette: {
@@ -172,7 +174,9 @@ global.appStore = {
             CanRDP: "line",
             ExecuteDCOM: "line",
             ReadLAPSPassword: "line",
-            AllowedToDelegate: "line"
+            AllowedToDelegate: "line",
+            GetChanges: "line",
+            GetChangeAll: "line"
         }
     },
     highResStyle: {
