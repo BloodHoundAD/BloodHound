@@ -96,7 +96,7 @@ export default class HelpModal extends Component {
             Note: This edge does not guarantee privileged execution.`;
             formatted = text.format(sourceType, sourceName, targetName);
         } else if (edge.label === "ExecuteDCOM") {
-            let text = `${this.groupSpecialFormat(source)} membership in the Distributed COM Users local group on the computer {}. This can allow code execution under certain conditions.`;
+            let text = `${this.groupSpecialFormat(source)} membership in the Distributed COM Users local group on the computer {}. This can allow code execution under certain conditions by instantiating a COM object on a remote machine and invoking its methods.`;
             formatted = text.format(sourceType, sourceName, targetName);
         } else if (edge.label === "AllowedToDelegate") {
             let text = `The {} {} has the constrained delegation privilege to the computer {}.
@@ -849,7 +849,22 @@ export default class HelpModal extends Component {
             This will initiate the remote desktop connection, and will fail if Restricted Admin Mode is not enabled.`;
             formatted = text;
         } else if (edge.label === "ExecuteDCOM") {
-            let text = ``;
+            let text = `The PowerShell script Invoke-DCOM implements lateral movement using a variety of different COM objects (ProgIds: MMC20.Application, ShellWindows, ShellBrowserWindow, ShellBrowserWindow, and ExcelDDE).  LethalHTA implements lateral movement using the HTA COM object (ProgId: htafile).  
+
+            One can manually instantiate and manipulate COM objects on a remote machine using the following PowerShell code.  If specifying a COM object by its CLSID:
+            
+            $ComputerName = ${targetName}  # Remote computer
+            $clsid = “{fbae34e8-bf95-4da8-bf98-6c6e580aa348}”      # GUID of the COM object
+            $Type = [Type]::GetTypeFromCLSID($clsid, $ComputerName)
+            $ComObject = [Activator]::CreateInstance($Type)
+            
+            If specifying a COM object by its ProgID:
+            
+            $ComputerName = ${targetName}  # Remote computer
+            $ProgId = “<NAME>”      # GUID of the COM object
+            $Type = [Type]::GetTypeFromProgID($ProgId, $ComputerName)
+            $ComObject = [Activator]::CreateInstance($Type)
+            `;
             formatted = text.format(sourceType, sourceName, targetName);
         } else if (edge.label === "AllowedToDelegate") {
             let text = `Abusing this privilege will require either using Benjamin Delpy’s Kekeo project on a compromised host, or proxying in traffic generated from the Impacket library. See the references tab for more detailed information on exploiting this privilege.`;
@@ -950,7 +965,12 @@ export default class HelpModal extends Component {
             Remote desktop will create Logon and Logoff events with the access type RemoteInteractive.`;
             formatted = text;
         } else if (edge.label === "ExecuteDCOM") {
-            let text = ``;
+            let text = `The artifacts generated when using DCOM vary depending on the specific COM object used.
+
+            DCOM is built on top of the TCP/IP RPC protocol (TCP ports 135 + high ephemeral ports) and may leverage several different RPC interface UUIDs(outlined here). In order to use DCOM, one must be authenticated.  Consequently, logon events and authentication-specific logs(Kerberos, NTLM, etc.) will be generated when using DCOM.  
+            
+            Processes may be spawned as the user authenticating to the remote system, as a user already logged into the system, or may take advantage of an already spawned process.  Many DCOM servers spawn under the process “svchost.exe -k DcomLaunch” and typically have a command line containing the string “ -Embedding” or are executing inside of the DLL hosting process “DllHost.exe /Processid:{<AppId>}“ (where AppId is the AppId the COM object is registered to use).  Certain COM services are implemented as service executables; consequently, service-related event logs may be generated.
+            `;
             formatted = text;
         } else if (edge.label === "AllowedToDelegate") {
             let text = `As mentioned in the abuse info, in order to currently abuse this primitive either the Kekeo binary will need to be dropped to disk on the target or traffic from Impacket will need to be proxied in. See the References for more information.`;
@@ -1062,7 +1082,21 @@ export default class HelpModal extends Component {
             <a href="https://www.kali.org/penetration-testing/passing-hash-remote-desktop/">https://www.kali.org/penetration-testing/passing-hash-remote-desktop/</a>`;
             formatted = text;
         } else if (edge.label === "ExecuteDCOM") {
-            let text = ``;
+            let text = `<a href="https://enigma0x3.net/2017/01/05/lateral-movement-using-the-mmc20-application-com-object/">https://enigma0x3.net/2017/01/05/lateral-movement-using-the-mmc20-application-com-object/</a> 
+            <a href="https://enigma0x3.net/2017/01/23/lateral-movement-via-dcom-round-2/">https://enigma0x3.net/2017/01/23/lateral-movement-via-dcom-round-2/</a>
+            <a href="https://enigma0x3.net/2017/09/11/lateral-movement-using-excel-application-and-dcom/">https://enigma0x3.net/2017/09/11/lateral-movement-using-excel-application-and-dcom/</a>
+            <a href="https://enigma0x3.net/2017/11/16/lateral-movement-using-outlooks-createobject-method-and-dotnettojscript/">https://enigma0x3.net/2017/11/16/lateral-movement-using-outlooks-createobject-method-and-dotnettojscript/</a>
+            <a href="https://www.cybereason.com/blog/leveraging-excel-dde-for-lateral-movement-via-dcom ">https://www.cybereason.com/blog/leveraging-excel-dde-for-lateral-movement-via-dcom </a>
+            <a href="https://www.cybereason.com/blog/dcom-lateral-movement-techniques">https://www.cybereason.com/blog/dcom-lateral-movement-techniques</a>
+            <a href="https://bohops.com/2018/04/28/abusing-dcom-for-yet-another-lateral-movement-technique/">https://bohops.com/2018/04/28/abusing-dcom-for-yet-another-lateral-movement-technique/</a>
+            <a href="https://attack.mitre.org/wiki/Technique/T1175">https://attack.mitre.org/wiki/Technique/T1175</a>
+            
+            <h4>Invoke-DCOM</h4>
+            <a href="https://github.com/rvrsh3ll/Misc-Powershell-Scripts/blob/master/Invoke-DCOM.ps1">https://github.com/rvrsh3ll/Misc-Powershell-Scripts/blob/master/Invoke-DCOM.ps1</a>
+            
+            <h4>LethalHTA</h4>
+            <a href="https://codewhitesec.blogspot.com/2018/07/lethalhta.html">https://codewhitesec.blogspot.com/2018/07/lethalhta.html</>
+            <a href="https://github.com/codewhitesec/LethalHTA/ ">https://github.com/codewhitesec/LethalHTA/ </a>`;
             formatted = text;
         } else if (edge.label === "AllowedToDelegate") {
             let text = `<a href="https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/">https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/</a>
