@@ -7,35 +7,40 @@
     overflow: hidden;
 }
 
-.max{
+.max {
     width: 100%;
     height: 100%;
 }
 
 @font-face {
-    font-family: 'Roboto';
+    font-family: "Roboto";
     font-weight: 400;
     font-style: normal;
-    src: url('../fonts/roboto-v15-latin-regular.eot');
+    src: url("../fonts/roboto-v15-latin-regular.eot");
     /* IE9 Compat Modes */
-    src: local('Roboto'), local('Roboto-Regular'), url('../fonts/roboto-v15-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-    url('../fonts/roboto-v15-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
-    url('../fonts/roboto-v15-latin-regular.woff') format('woff'), /* Modern Browsers */
-    url('../fonts/roboto-v15-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
-    url('../fonts/roboto-v15-latin-regular.svg#Roboto') format('svg');
+    src: local("Roboto"), local("Roboto-Regular"),
+        url("../fonts/roboto-v15-latin-regular.eot?#iefix")
+            format("embedded-opentype"),
+        /* IE6-IE8 */ url("../fonts/roboto-v15-latin-regular.woff2")
+            format("woff2"),
+        /* Super Modern Browsers */
+            url("../fonts/roboto-v15-latin-regular.woff") format("woff"),
+        /* Modern Browsers */ url("../fonts/roboto-v15-latin-regular.ttf")
+            format("truetype"),
+        /* Safari, Android, iOS */
+            url("../fonts/roboto-v15-latin-regular.svg#Roboto") format("svg");
     /* Legacy iOS */
 }
 
 html,
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
     height: 100%;
     overflow: hidden;
-    background-color: lightgray;
     overflow: hidden;
 }
 
-.customQueryGlyph{
+.customQueryGlyph {
     font-size: small;
     vertical-align: middle;
     top: -1px;
@@ -47,7 +52,7 @@ div.tooltip-inner-custom {
     max-width: 250px;
 }
 
-.aboutscroll{
+.aboutscroll {
     width: 100%;
     overflow: auto;
     height: 150px;
@@ -71,6 +76,11 @@ div.tooltip-inner-custom {
     pointer-events: none;
 }
 
+.bottomdiv-dark .slideupbutton{
+    background-color: black;
+    color: white;
+}
+
 .slideupbutton {
     position: relative;
     left: 50%;
@@ -87,20 +97,42 @@ div.tooltip-inner-custom {
     outline: 0;
 }
 
-.query-box{
-    padding: 0 .5em .5em .5em
+.query-box {
+    padding: 0 0.5em 0.5em 0.5em;
 }
 
 .graph {
     width: 100%;
     height: 100%;
-    background-color: lightgray;
     overflow: hidden;
 }
 
-.dropdown-item > i{
-    float:right;
-    margin-top:3px;
+.graph-light{
+    background-color: rgb(242, 245, 249);
+}
+
+.graph-dark{
+    background-color: rgb(79, 71, 61);
+    background-color: rgb(56, 51, 50);
+}
+
+.menu-button-dark{
+    color: white;
+    background-color: black;
+}
+
+.menu-button-dark:hover{
+    color: white;
+}
+
+.menu-button-light{
+    color: black;
+    background-color: white;
+}
+
+.dropdown-item > i {
+    float: right;
+    margin-top: 3px;
     margin-left: 2px;
 }
 
@@ -108,25 +140,162 @@ div.tooltip-inner-custom {
     outline: 0;
 }
 
-.typeaheadfix{
+.typeaheadfix {
     border: 0;
 }
 
-.typeaheadfix .Select-menu-outer{
+.typeaheadfix .Select-menu-outer {
     z-index: 99999;
 }
 
-.typeaheadfix .Select-control{
+.typeaheadfix .Select-control {
     border: 0;
     box-shadow: none !important;
 }
 
-.typeaheadfix .Select-control:focus{
+.typeaheadfix .Select-control:focus {
     border: 0;
 }
 
-.typeaheadfix .Select-arrow-zone{
+.typeaheadfix .Select-arrow-zone {
     display: none;
+}
+
+.edge-filter-heading > h4{
+    display: inline;
+    margin-right: 5px;
+}
+
+.edge-filter-heading > button{
+    height: 20px;
+    width: 30px;
+}
+
+.edgeFilter{
+    position: absolute;
+    left: 100%;
+    display: inline-block;
+    width: auto;
+    background-color: white;
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+    margin-left: 2px;
+}
+
+.edgeFilter > h4{
+    display:inline-block;
+    white-space: nowrap;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.edgeFilter > div > h3{
+    display:inline;
+    white-space: nowrap;
+    margin-right: 8px;
+}
+
+.edgeFilter > div{
+    margin-left: 8px;
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+.edgeFilter > div > input{
+    margin-top: 0;
+    white-space: nowrap;
+}
+
+#help-tab-container > div div{
+    white-space: pre-line;
+    margin-top: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.nodeEditor{
+    position: absolute;
+    z-index: 20;
+    top: 1em;
+    right: 10em;
+    overflow: auto;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+.formButtonFix:focus{
+    border: 1px solid #ccc !important;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075) !important;
+}
+
+.heighthack{
+    height: 1px;
+}
+
+.nodeEditor .panel-heading{
+    cursor: move;
+}
+
+
+.nodeEditTableContainer{
+    overflow: auto;
+    max-height: 20em;
+}
+
+.nodeEditRow *[contenteditable="true"]{
+    background-color: white;
+    border: 1px solid lightgray;
+}
+
+.nodeEditRow > td{
+    padding: 5px !important;
+}
+
+.nodeEditString{
+    resize: none;
+    max-width: 400px;
+}
+
+.nodeEditNumber{
+    resize: none;
+}
+
+.nodeEditArray{
+    resize: none;
+    max-height: 200px;
+    width: 100%;
+    height:100%;
+    max-width: 400px;
+    overflow-y: scroll;
+    white-space: pre-line;
+}
+
+.node-notes-textarea{
+    resize: none;
+    width: 98%;
+    height: 100px;
+}
+
+.add-modal-check-style{
+    position: relative;
+    font-size: 24px;
+    margin-right: 5px;
+    top: 5px;
+}
+
+.notes-check-style{
+    position:relative;
+    font-size: 18px;
+    margin-left: 5px;
+}
+
+.tooltip-ul i{
+    width: 20px;
+    text-align: center;
+}
+
+.glyph-hover-style:hover{
+    background-color: #247BA0;
+    color: white;
 }
 
 @media all and (min-width: 600px) {
@@ -181,14 +350,86 @@ div.tooltip-inner-custom {
     }
 }
 
+.searchdiv-light{
+    background-color: white;
+    color: black;
+}
+
+.searchdiv-light .dbbuttons > button{
+    color: white;
+}
+
+.searchdiv-dark .dbbuttons > button{
+    color: black;
+}
+
+.searchdiv-dark .edgeFilter{
+    background-color: black;
+    color: white;
+}
+
+.searchdiv-dark .edge-filter-heading > button{
+    color: black;
+}
+
+
+.searchdiv-dark{
+    background-color: black;
+    color: white;
+}
+
+.searchdiv-dark #tab-style > ul > li > a{
+    color: white;
+}
+
+.searchdiv-dark #tab-style > ul > li > a:hover{
+    color: black;
+}
+
+.searchdiv-dark .searchbox{
+    background-color: black;
+    color: white;
+}
+
+.searchdiv-dark .spanfix{
+    background-color: black;
+    color: white;
+}
+
+.searchdiv-dark h4{
+    color: white;
+}
+
+.searchdiv-light h4{
+    color: blue;
+}
+.searchdiv-dark .query-box a{
+    color: white;
+}
+
+.searchdiv-dark .dl-horizontal a{
+    color: white;
+}
+
+.searchdiv-dark .dl-horizontal dd:hover{
+    background-color: gray;
+}
+
+.searchdiv-light .dl-horizontal dd:hover{
+    background-color: #ecf0f1;
+}
 
 .mainfade-appear {
-  opacity: 0.01;
+    opacity: 0.01;
+}
+
+.inline{
+    display: inline;
 }
 
 .mainfade-appear.mainfade-appear-active {
-  opacity: 1;
-  transition: opacity 1s ease-in;
+    opacity: 1;
+    transition: opacity 1s ease-in;
 }
 
 .dl-horizontal-fix {
@@ -198,10 +439,9 @@ div.tooltip-inner-custom {
 .dl-horizontal > h4 {
     margin-top: 10px;
     margin-bottom: 5px;
-    color: blue;
 }
 
-.dl-horizontal{
+.dl-horizontal {
     margin-right: 10px;
 }
 
@@ -209,6 +449,11 @@ div.tooltip-inner-custom {
     width: auto;
     padding-right: 1em;
     text-align: left;
+    pointer-events: none;
+}
+
+.dl-horizontal dd:hover {
+    background-color: #ecf0f1;
 }
 
 .dl-horizontal dd {
@@ -223,7 +468,7 @@ div.tooltip-inner-custom {
 
 .nodedatabox {
     overflow: auto;
-    border-top: .5px solid lightgray;
+    border-top: 0.5px solid lightgray;
     background-color: white;
 }
 
@@ -270,7 +515,6 @@ div.tooltip-inner-custom {
     padding-bottom: 10px;
 }
 
-
 .hideme {
     position: absolute;
     top: 0;
@@ -296,7 +540,7 @@ div.tooltip-inner-custom {
 .loginwindow {
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, .7);
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
 @media all and (min-width: 600px) {
@@ -307,10 +551,10 @@ div.tooltip-inner-custom {
         overflow: auto;
         max-width: 70%;
         transform: translate(-50%, -50%);
-        border: 5px solid rgba(0, 0, 0, .5);
+        border: 5px solid rgba(0, 0, 0, 0.5);
         border-radius: 10px;
-        background-color: rgba(255, 255, 255, .9);
-        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+        background-color: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
     }
 }
 
@@ -322,10 +566,10 @@ div.tooltip-inner-custom {
         overflow: auto;
         max-width: 40%;
         transform: translate(-50%, -50%);
-        border: 5px solid rgba(0, 0, 0, .5);
+        border: 5px solid rgba(0, 0, 0, 0.5);
         border-radius: 10px;
-        background-color: rgba(255, 255, 255, .9);
-        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+        background-color: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
     }
 }
 
@@ -337,10 +581,10 @@ div.tooltip-inner-custom {
         overflow: auto;
         max-width: 25%;
         transform: translate(-50%, -50%);
-        border: 5px solid rgba(0, 0, 0, .5);
+        border: 5px solid rgba(0, 0, 0, 0.5);
         border-radius: 10px;
-        background-color: rgba(255, 255, 255, .9);
-        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+        background-color: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
     }
 }
 
@@ -356,8 +600,8 @@ div.tooltip-inner-custom {
 }
 
 .loginwindow .input-group-addon {
-    min-width:115px;
-    text-align:left;
+    min-width: 115px;
+    text-align: left;
 }
 
 .loginwindow > #checkconnectionpanel {
@@ -367,10 +611,10 @@ div.tooltip-inner-custom {
     overflow: auto;
     max-width: 30%;
     transform: translate(-50%, -50%);
-    border: 5px solid rgba(0, 0, 0, .5);
+    border: 5px solid rgba(0, 0, 0, 0.5);
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, .9);
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
 .loginwindow > #checkconnectionpanel span {
@@ -386,10 +630,10 @@ div.tooltip-inner-custom {
     overflow: auto;
     max-width: 30%;
     transform: translate(-50%, -50%);
-    border: 5px solid rgba(0, 0, 0, .5);
+    border: 5px solid rgba(0, 0, 0, 0.5);
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, .9);
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
 .loginwindow > #logoutpanel span {
@@ -399,7 +643,7 @@ div.tooltip-inner-custom {
 }
 
 .loginwindow > #logoutpanel div {
-    margin: .5em 1em .5em 1em;
+    margin: 0.5em 1em 0.5em 1em;
 }
 
 .green-icon-color {
@@ -418,19 +662,19 @@ div.tooltip-inner-custom {
     margin-top: 5px;
 }
 
-.savecontainer{
-    margin-top:10px;
+.savecontainer {
+    margin-top: 10px;
 }
 
 .buttoncontainer {
     width: 50%;
-    display:inline-block;
+    display: inline-block;
     text-align: right;
 }
 
 .logincheck {
     width: 50%;
-    display:inline-block;
+    display: inline-block;
 }
 
 .has-spinner.activate .button-spinner {
@@ -441,50 +685,57 @@ div.tooltip-inner-custom {
 .button-spinner {
     display: inline-block;
     width: 0;
-    -webkit-transition: opacity .25s, width .25s;
-    -moz-transition: opacity .25s, width .25s;
-    -o-transition: opacity .25s, width .25s;
-    transition: opacity .25s, width .25s;
+    -webkit-transition: opacity 0.25s, width 0.25s;
+    -moz-transition: opacity 0.25s, width 0.25s;
+    -o-transition: opacity 0.25s, width 0.25s;
+    transition: opacity 0.25s, width 0.25s;
     opacity: 0;
 }
 
 .spinner > div {
-  width: 12px;
-  height: 12px;
-  background-color: #333;
+    width: 12px;
+    height: 12px;
+    background-color: #333;
 
-  border-radius: 100%;
-  display: inline-block;
-  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+    border-radius: 100%;
+    display: inline-block;
+    -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+    animation: sk-bouncedelay 1.4s infinite ease-in-out both;
 }
 
 .spinner .bounce1 {
-  -webkit-animation-delay: -0.32s;
-  animation-delay: -0.32s;
+    -webkit-animation-delay: -0.32s;
+    animation-delay: -0.32s;
 }
 
 .spinner .bounce2 {
-  -webkit-animation-delay: -0.16s;
-  animation-delay: -0.16s;
+    -webkit-animation-delay: -0.16s;
+    animation-delay: -0.16s;
 }
 
 @-webkit-keyframes sk-bouncedelay {
-  0%, 80%, 100% { -webkit-transform: scale(0) }
-  40% { -webkit-transform: scale(1.0) }
+    0%,
+    80%,
+    100% {
+        -webkit-transform: scale(0);
+    }
+    40% {
+        -webkit-transform: scale(1);
+    }
 }
 
 @keyframes sk-bouncedelay {
-  0%, 80%, 100% { 
-    -webkit-transform: scale(0);
-    transform: scale(0);
-  } 40% { 
-    -webkit-transform: scale(1.0);
-    transform: scale(1.0);
-  }
+    0%,
+    80%,
+    100% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    }
+    40% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
 }
-
-
 
 .modal {
     text-align: center;
@@ -494,7 +745,7 @@ div.tooltip-inner-custom {
     .modal:before {
         display: inline-block;
         height: 100%;
-        content: ' ';
+        content: " ";
         vertical-align: middle;
     }
 }
@@ -527,10 +778,6 @@ div.tooltip-inner-custom {
     float: right;
     clear: right;
     padding-top: 3px;
-}
-
-.zoomBox div button {
-    background-color: white;
 }
 
 .zoomIn {
@@ -583,21 +830,56 @@ div.tooltip-inner-custom {
     border-radius: 0;
 }
 
+.react-photo-gallery--gallery{
+    width: 99%;
+}
+
+.gallery-img i:first-child{
+    visibility: hidden;
+    position:absolute;
+    top:8px;
+    right: 18px;
+    z-index: 2;
+    font-size: 15px;
+    color: blue;
+}
+
+.gallery-img i:nth-child(2){
+    visibility: hidden;
+    position:absolute;
+    top:8px;
+    right: 2px;
+    z-index: 2;
+    font-size: 15px;
+    color: rgb(244, 65, 104)
+}
+
+.gallery-img:hover i{
+    visibility: visible;
+}
+
 .loadingIndicator {
     position: absolute;
     z-index: 25;
-    bottom: .5em;
+    bottom: 0.5em;
     left: 1em;
-    width: 80px;
 }
 
 .loadingIndicator div:first-child {
     text-align: center;
-    font-weight: bold
+    font-weight: bold;
 }
 
-.loadingIndicator img{
-    width: 80px;
+.loading-indicator-light div:first-child{
+    color: black;
+}
+
+.loading-indicator-dark div:first-child{
+    color: white;
+}
+
+.loadingIndicator img {
+    width: 150px;
     height: auto;
 }
 
@@ -608,8 +890,12 @@ div.tooltip-inner-custom {
     right: 10em;
     overflow: auto;
     min-width: 15%;
-    background-color: rgba(255, 255, 255, .9);
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+.settingsDiv .panel-heading{
+    cursor: move;
 }
 
 .sliderinput {
@@ -633,15 +919,15 @@ div.tooltip-inner-custom {
     margin-left: 5px;
 }
 
-.center-align{
+.center-align {
     text-align: center;
 }
 
-#tab-style{
-    border-top: .5px solid lightgray;
+#tab-style {
+    border-top: 0.5px solid lightgray;
 }
 
-#tab-style > ul{
+#tab-style > ul {
     display: table;
     width: 100%;
     border-bottom: 1px solid lightgray;
@@ -655,7 +941,7 @@ div.tooltip-inner-custom {
     display: table-cell;
     width: 33%;
     text-align: center;
-    color: #337AB7;
+    color: #337ab7;
 }
 
 #tab-style > ul > li > a:focus {
@@ -673,33 +959,39 @@ div.tooltip-inner-custom {
     color: black;
 }
 
-#tab-style > ul > li > a[aria-selected='true']{
+#tab-style > ul > li > a[aria-selected="true"] {
     border-right: 1px solid lightgray;
     border-left: 1px solid lightgray;
     color: black;
 }
 
-#tab-style > div{
+#tab-style > div {
     padding: 0 10px 0 10px;
 }
 
-#tab-style h3{
+#tab-style h3 {
     text-align: center;
 }
 
 .dbbuttons {
     padding-bottom: 1em;
+    width: 50%;
 }
 
 .displaynone {
     display: none;
 }
 
-.menubutton{
+.form-override:focus{
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    border: 1px solid rgb(204,204,204);
+}
+
+.menubutton {
     border-radius: 4px;
     background-color: #f4511e;
     border: none;
-    color: #FFFFFF;
+    color: #ffffff;
     text-align: center;
     font-size: 28px;
     padding: 20px;
@@ -717,23 +1009,22 @@ div.tooltip-inner-custom {
     overflow: visible;
 }
 
-.menudiv > div > button{
+.menudiv > div > button {
     overflow: hidden;
     white-space: nowrap;
-    background-color: #fff;
     margin-bottom: 5px;
     float: right;
     clear: right;
 }
 
-.menudiv > div > button > span{
+.menudiv > div > button > span {
     vertical-align: middle;
     top: -1px;
     width: 15px;
     height: 15px;
 }
 
-.fake-hidden{
+.fake-hidden {
     width: 0;
     height: 0;
     overflow: hidden;
@@ -745,8 +1036,8 @@ div.tooltip-inner-custom {
     top: 1em;
     right: 10em;
     overflow: auto;
-    background-color: rgba(255, 255, 255, .9);
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .2);
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
 .queryNodeSelect {
@@ -764,23 +1055,27 @@ div.tooltip-inner-custom {
     max-height: 16em;
 }
 
-.queryNodeSelect img{
+.queryNodeSelect img {
     width: auto;
     height: 100px;
     display: block;
-    margin:auto;
+    margin: auto;
 }
 
-.queryNodeItemPreWrap > p{
+.queryNodeItemPreWrap > p {
     white-space: pre-wrap;
 }
 
-.tab-content > div:last-child > div{
+.tab-content > div:last-child > div {
     max-height: 200px;
     overflow-y: auto;
 }
 
-.tab-content > div:nth-last-child(2) > div{
+.tab-content > div:nth-last-child(2) > div {
     max-height: 600px;
     overflow-y: auto;
+}
+
+.help-modal-width > div{
+    width: 40%;
 }

@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-
 import { Modal } from "react-bootstrap";
 
-export default class CancelUploadModal extends Component {
+export default class DeleteEdgeModal extends Component {
     constructor() {
         super();
         this.state = {
@@ -14,17 +13,18 @@ export default class CancelUploadModal extends Component {
         this.setState({ open: false });
     }
 
-    closeAndCancel() {
-        this.setState({ open: false });
-        emitter.emit("cancelUpload");
+    confirmDelete() {
+        this.closeModal();
+        emitter.emit("deleteEdgeConfirm", this.state.id);
     }
 
-    openModal() {
-        this.setState({ open: true });
+    openModal(id) {
+        appStore.currentTooltip.close();
+        this.setState({ open: true,  id: id });
     }
 
     componentDidMount() {
-        emitter.on("showCancelUpload", this.openModal.bind(this));
+        emitter.on("deleteEdge", this.openModal.bind(this));
     }
 
     render() {
@@ -32,25 +32,23 @@ export default class CancelUploadModal extends Component {
             <Modal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby="CanceulUploadHeader"
+                aria-labelledby="DeleteEdgeModalHeader"
             >
                 <Modal.Header closeButton={true}>
-                    <Modal.Title id="CancelUploadHeader">
-                        Cancel Upload
-                    </Modal.Title>
+                    <Modal.Title id="DeleteEdgeModalHeader">Delete Edge</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
-                    <p>Are you sure you want to cancel the upload?</p>
+                    <p>Are you sure you want to delete this edge?</p>
                 </Modal.Body>
 
                 <Modal.Footer>
                     <button
                         type="button"
                         className="btn btn-danger"
-                        onClick={this.closeAndCancel.bind(this)}
+                        onClick={this.confirmDelete.bind(this)}
                     >
-                        Stop Upload
+                        Confirm
                     </button>
                     <button
                         type="button"

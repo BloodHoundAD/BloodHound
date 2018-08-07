@@ -1,72 +1,73 @@
-import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
-import NodeALink from './NodeALink';
+import React, { Component, Fragment } from "react";
+import PropTypes from "prop-types";
+import NodeALink from "./NodeALink";
 
 export default class NodeCypherLink extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
-    
     componentWillMount() {
         this.setState({
             ready: false,
             value: 0
         });
     }
-    
 
-    componentWillReceiveProps(newProps){
-        if (this.props.target !== newProps.target){
+    componentWillReceiveProps(newProps) {
+        if (this.props.target !== newProps.target) {
             var session = driver.session();
-            if (typeof this.state.session !== 'undefined'){
+            if (typeof this.state.session !== "undefined") {
                 this.state.session.close();
             }
-            
+
             this.setState({
                 session: session,
-                ready:false
+                ready: false
             });
             let query = this.props.baseQuery;
-            if (this.props.distinct){
-                query += ' RETURN COUNT(DISTINCT(n))';
-            }else{
-                query += ' RETURN COUNT(n)';
+            if (this.props.distinct) {
+                query += " RETURN COUNT(DISTINCT(n))";
+            } else {
+                query += " RETURN COUNT(n)";
             }
-            let domain = '@' + newProps.target.split('@').last();
-            this.setState({domain:domain});
-            session.run(query, {name: newProps.target, domain: domain})
-                .then(function(result){
+            let domain = "@" + newProps.target.split("@").last();
+            this.setState({ domain: domain });
+            session.run(query, { name: newProps.target, domain: domain }).then(
+                function(result) {
                     this.setState({
-                        value:result.records[0]._fields[0].low,
-                        ready:true
+                        value: result.records[0]._fields[0].low,
+                        ready: true
                     });
-                }.bind(this));
+                }.bind(this)
+            );
         }
     }
 
-    render(){
+    render() {
         return (
             <Fragment>
-                <dt>
-                    {this.props.property
-                }</dt>
+                <dt>{this.props.property}</dt>
                 <dd>
                     <NodeALink
                         ready={this.state.ready}
                         value={this.state.value}
-                        click={function(){
+                        click={function() {
                             emitter.emit(
-                                'query',
-                                this.props.baseQuery + ' RETURN p',
-                                {name:this.props.target, domain:this.state.domain}, this.props.start, this.props.end
+                                "query",
+                                this.props.baseQuery + " RETURN p",
+                                {
+                                    name: this.props.target,
+                                    domain: this.state.domain
+                                },
+                                this.props.start,
+                                this.props.end
                             );
-                        }.bind(this)} 
+                        }.bind(this)}
                     />
                 </dd>
             </Fragment>
         );
-        
     }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "bloodhound",
-  "version": "1.5.2",
+  "version": "2.0.0",
   "description": "Graph Theory for Active Directory",
   "keywords": [
     "Graph",
@@ -50,22 +50,32 @@
     "webpack-hot-middleware": "^2.21.0"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.1.1",
     "async": "^2.6.0",
     "bootstrap": "^3.3.7",
     "bootstrap-3-typeahead": "^4.0.2",
     "dagre": "^0.7.4",
     "electron-store": "^1.3.0",
     "eventemitter2": "^4.1.0",
-    "fast-csv": "^2.4.1",
+    "fontfaceobserver": "^2.0.13",
+    "image-size": "^0.6.3",
+    "image-type": "^3.0.0",
+    "is-zip-file": "^1.0.2",
     "jquery": "^3.2.1",
     "linkurious": "^1.5.1",
+    "md5-file": "^4.0.0",
     "mustache": "^2.3.0",
-    "neo4j-driver": "^1.5.2",
-    "react": "^16.2.0",
+    "neo4j-driver": "^1.6.2",
+    "prop-types": "^15.6.2",
+    "react": "^16.4.2",
     "react-bootstrap": "^0.32.0",
-    "react-dom": "^16.2.0",
+    "react-dom": "^16.4.2",
     "react-if": "^2.1.0",
+    "react-images": "^0.5.19",
+    "react-photo-gallery": "^6.1.2",
     "react-transition-group": "^2.2.1",
-    "unzipper": "^0.8.9"
+    "stream-json": "^1.1.0",
+    "unzipper": "^0.8.9",
+    "uuid": "^3.3.2"
   }
 }
