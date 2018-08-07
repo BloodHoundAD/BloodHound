@@ -5,8 +5,23 @@ export default class RawQuery extends Component {
         super();
         this.state = {
             val: "",
-            open: false
+            open: false,
+            darkMode: false
         };
+    }
+
+    componentWillMount() {
+        emitter.on("setRawQuery", this._setQueryFromEvent.bind(this));
+        emitter.on("toggleDarkMode", this.toggleDarkMode.bind(this));
+    }
+
+    componentDidMount() {
+        $(this.refs.input).slideToggle(0);
+        this.toggleDarkMode(appStore.performance.darkMode);
+    }
+
+    toggleDarkMode(enabled){
+        this.setState({darkMode: enabled});
     }
 
     _onChange(event) {
@@ -23,14 +38,6 @@ export default class RawQuery extends Component {
         }
     }
 
-    componentWillMount() {
-        emitter.on("setRawQuery", this._setQueryFromEvent.bind(this));
-    }
-
-    componentDidMount() {
-        $(this.refs.input).slideToggle(0);
-    }
-
     _toggle() {
         $(this.refs.input).slideToggle();
         this.setState({
@@ -44,7 +51,7 @@ export default class RawQuery extends Component {
 
     render() {
         return (
-            <div className="bottomdiv">
+            <div className={this.state.darkMode ? "bottomdiv bottomdiv-dark" : "bottomdiv"}>
                 <button
                     onClick={this._toggle.bind(this)}
                     className="slideupbutton"

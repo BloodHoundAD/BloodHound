@@ -13,7 +13,8 @@ export default class SearchContainer extends Component {
             pathfindingIsOpen: false,
             mainValue: "",
             pathfindValue: "",
-            edgeincluded: appStore.edgeincluded
+            edgeincluded: appStore.edgeincluded,
+            darkMode: false
         };
     }
 
@@ -28,12 +29,15 @@ export default class SearchContainer extends Component {
             "fast"
         );
 
+        this.toggleDarkMode(appStore.performance.darkMode);
+
         emitter.on("userNodeClicked", this.openNodeTab.bind(this));
         emitter.on("groupNodeClicked", this.openNodeTab.bind(this));
         emitter.on("computerNodeClicked", this.openNodeTab.bind(this));
         emitter.on("domainNodeClicked", this.openNodeTab.bind(this));
         emitter.on("gpoNodeClicked", this.openNodeTab.bind(this));
         emitter.on("ouNodeClicked", this.openNodeTab.bind(this));
+        emitter.on("toggleDarkMode", this.toggleDarkMode.bind(this));
         emitter.on(
             "setStart",
             function (payload) {
@@ -317,6 +321,10 @@ export default class SearchContainer extends Component {
         });
     }
 
+    toggleDarkMode(enabled){
+        this.setState({darkMode: enabled});
+    }
+
     clearSection(section){
         let current = this.state.edgeincluded;
         if (section === "default"){
@@ -525,7 +533,7 @@ export default class SearchContainer extends Component {
 
     render() {
         return (
-            <div id="searchdiv" className="searchdiv">
+            <div id="searchdiv" className={this.state.darkMode ? "searchdiv searchdiv-dark" : "searchdiv searchdiv-light"}>
                 <div ref="edgeFilter" className="edgeFilter">
                     <div>
                         <h3>Edge Filtering</h3>

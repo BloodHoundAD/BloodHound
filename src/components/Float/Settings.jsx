@@ -7,7 +7,7 @@ export default class Settings extends Component {
 
         this.state = {
             nodeLabelVal: appStore.performance.nodeLabels,
-            edgeLabelVal: appStore.performance.edgeLabels
+            edgeLabelVal: appStore.performance.edgeLabels,
         };
     }
 
@@ -45,6 +45,7 @@ export default class Settings extends Component {
 
         $(this.refs.check).prop("checked", appStore.performance.lowGraphics);
         $(this.refs.debug).prop("checked", appStore.performance.debug);
+        $(this.refs.dark).prop("checked", appStore.performance.darkMode);
 
         $(this.refs.outer).fadeToggle(0);
         $(this.refs.outer).draggable();
@@ -73,6 +74,13 @@ export default class Settings extends Component {
         $(this.refs.debug).prop("checked", event.target.checked);
         appStore.performance.debug = event.target.checked;
         conf.set("performance", appStore.performance);
+    }
+
+    toggleDarkMode(event){
+        $(this.refs.dark).prop("checked", event.target.checked);
+        appStore.performance.darkMode = event.target.checked;
+        conf.set("performance", appStore.performance);
+        emitter.emit("toggleDarkMode", event.target.checked);
     }
 
     closeSettings() {
@@ -242,6 +250,23 @@ export default class Settings extends Component {
                         data-toggle="tooltip"
                         data-placement="right"
                         title="Lower detail of graph to improve performance"
+                        className="glyphicon glyphicon-question-sign"
+                    />
+                    <br />
+                    <div className="checkbox-inline">
+                        <label>
+                            <input
+                                ref="dark"
+                                type="checkbox"
+                                onChange={this.toggleDarkMode.bind(this)}
+                            />{" "}
+                            Dark Mode
+                        </label>
+                    </div>
+                    <i
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="Toggle Dark Mode for the Interface"
                         className="glyphicon glyphicon-question-sign"
                     />
                 </div>

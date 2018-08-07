@@ -5,7 +5,8 @@ export default class LoadingContainer extends Component {
         super();
 
         this.state = {
-            text: "Loading"
+            text: "Loading",
+            darkMode: false
         };
 
         emitter.on(
@@ -29,11 +30,18 @@ export default class LoadingContainer extends Component {
 
     componentDidMount() {
         jQuery(this.refs.load).fadeToggle(0);
+
+        emitter.on("toggleDarkMode", this.toggleDarkMode.bind(this));
+        this.toggleDarkMode(appStore.performance.darkMode);
+    }
+
+    toggleDarkMode(enabled){
+        this.setState({darkMode: enabled});
     }
 
     render() {
         return (
-            <div className="loadingIndicator" ref="load">
+            <div className={this.state.darkMode ? "loadingIndicator loading-indicator-dark" : "loadingIndicator loading-indicator-light"} ref="load">
                 <div>{this.state.text}</div>
                 <img src="src/img/loading_new.gif" />
             </div>

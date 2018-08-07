@@ -25,7 +25,8 @@ export default class GraphContainer extends Component {
             firstDraw: true,
             nodeTemplate: null,
             edgeTemplate: null,
-            session: driver.session()
+            session: driver.session(),
+            darkMode: false
         };
 
         $.ajax({
@@ -108,6 +109,7 @@ export default class GraphContainer extends Component {
         emitter.on("setOwned", this.setOwned.bind(this));
         emitter.on("setHighVal", this.setHighVal.bind(this))
         emitter.on("getHelp", this.getHelpEdge.bind(this))
+        emitter.on("toggleDarkMode", this.toggleDarkMode.bind(this));
     }
 
     componentDidMount() {
@@ -115,6 +117,26 @@ export default class GraphContainer extends Component {
         font.load().then(x => {
             this.inita();
         });
+    }
+
+    toggleDarkMode(enabled){
+        this.setState({darkMode: enabled});
+
+        if (enabled){
+            this.state.sigmaInstance.settings("defaultEdgeColor", "white");
+            this.state.sigmaInstance.settings("defaultLabelColor", "white");
+            this.state.sigmaInstance.settings("defaultEdgeLabelColor", "white");
+            this.state.sigmaInstance.settings("defaultEdgeHoverLabelBGColor", "black");
+            //this.state.sigmaInstance.settings("defaultNodeColor", "white");
+        }else{
+            this.state.sigmaInstance.settings("defaultEdgeColor", "#356");
+            this.state.sigmaInstance.settings("defaultLabelColor", "black");
+            this.state.sigmaInstance.settings("defaultEdgeLabelColor", "black");
+            this.state.sigmaInstance.settings("defaultEdgeHoverLabelBGColor", "white");
+            //this.state.sigmaInstance.settings("defaultNodeColor", "black");
+        }
+
+        this.state.sigmaInstance.refresh({skipIndexation: true});
     }
 
     async setConstraints() {
@@ -131,7 +153,7 @@ export default class GraphContainer extends Component {
 
     inita(){
         this.initializeSigma();
-
+        this.toggleDarkMode(appStore.performance.darkMode);
         this.doQueryNative({
             statement:'MATCH (n:Group) WHERE n.objectsid =~ "(?i)S-1-5.*-512" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
             //statement: 'MATCH (n)-[r:AdminTo]->(m) RETURN n,r,m LIMIT 5',
@@ -583,7 +605,7 @@ export default class GraphContainer extends Component {
     render() {
         return (
             <div className="graph">
-                <div id="graph" className="graph" />
+                <div id="graph" className={this.state.darkMode ? "graph graph-dark" : "graph graph-light"} />
             </div>
         );
     }

@@ -242,10 +242,10 @@ global.appStore = {
 if (typeof conf.get("performance") === "undefined") {
     conf.set("performance", {
         edge: 5,
-        sibling: 10,
         lowGraphics: false,
         nodeLabels: 0,
-        edgeLabels: 0
+        edgeLabels: 0,
+        darkMode: false
     });
 }
 
@@ -287,6 +287,11 @@ appStore.performance = conf.get("performance");
 
 if (typeof appStore.performance.edgeLabels === "undefined") {
     appStore.performance.edgeLabels = 0;
+    conf.set("performance", appStore.performance);
+}
+
+if (typeof appStore.performance.darkMode === "undefined") {
+    appStore.performance.darkMode = false;
     conf.set("performance", appStore.performance);
 }
 
