@@ -84,7 +84,6 @@ export default class GraphContainer extends Component {
 
     componentWillMount() {
         emitter.on("searchQuery", this.doSearchQuery.bind(this));
-        emitter.on("pathQuery", this.doPathQuery.bind(this));
         emitter.on("graphBack", this.goBack.bind(this));
         emitter.on("query", this.doGenericQuery.bind(this));
         emitter.on("spotlightClick", this.spotlightClickHandler.bind(this));
@@ -612,6 +611,7 @@ export default class GraphContainer extends Component {
 
     goBack() {
         if (appStore.queryStack.length > 0) {
+            this.clearScale();
             if (appStore.currentTooltip !== null) {
                 appStore.currentTooltip.close();
             }
@@ -625,6 +625,7 @@ export default class GraphContainer extends Component {
             });
             this.setState({currentQuery: query.params})
             this.applyDesign();
+            this.lockScale();
             appStore.spotlightData = query.spotlight;
             (appStore.startNode = query.startNode),
                 (appStore.endNode = query.endNode);
@@ -999,19 +1000,6 @@ export default class GraphContainer extends Component {
         });
     }
 
-    doPathQuery(start, end) {
-        var statement =
-            "MATCH (n {name:{start}}), (m {name:{end}}), p=allShortestPaths((n)-[*]->(m)) RETURN p";
-        var props = { start: start, end: end };
-        this.doQueryNative({
-            statement: statement,
-            allowCollapse: true,
-            props: props,
-            start: start,
-            end: end
-        });
-    }
-
     doGenericQuery(statement, props, start, end, allowCollapse = true) {
         if (appStore.currentTooltip !== null) {
             appStore.currentTooltip.close();
@@ -1302,7 +1290,6 @@ export default class GraphContainer extends Component {
               }
             }
         };
-        
 
         //Bind sigma events
         sigmaInstance.renderers[0].bind("render", function(e) {

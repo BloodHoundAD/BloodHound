@@ -347,11 +347,14 @@ export default class DomainNodeData extends Component {
                         }
                     />
 
-                    <NodeCypherLink
+                    <NodeCypherLinkComplex
                         property="Foreign Admins"
                         target={this.state.label}
-                        baseQuery={
-                            "MATCH (n) WHERE NOT n.domain={name} WITH n MATCH (b:Computer) WHERE b.domain={name} WITH n,b MATCH p=shortestPath((n)-[r:AdminTo|MemberOf*1..]->(b))"
+                        countQuery={
+                            "OPTIONAL MATCH p = (n:User)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c:Computer) WHERE c.domain = {name} AND NOT n.domain = {name} RETURN count(distinct(n)) UNION ALL OPTIONAL MATCH p = (n:User)-[:AdminTo]->(c:Computer) WHERE c.domain = {name} AND NOT n.domain = {name} RETURN count(distinct(n))"
+                        }
+                        graphQuery = {
+                            "OPTIONAL MATCH p = (n:User)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c:Computer) WHERE c.domain = {name} AND NOT n.domain = {name} RETURN p UNION ALL OPTIONAL MATCH p = (n:User)-[:AdminTo]->(c:Computer) WHERE c.domain = {name} AND NOT n.domain = {name} RETURN p"
                         }
                     />
 
