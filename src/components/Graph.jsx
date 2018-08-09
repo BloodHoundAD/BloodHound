@@ -163,7 +163,9 @@ export default class GraphContainer extends Component {
     }
 
     getHelpEdge(id){
-        appStore.currentTooltip.close();
+        if (appStore.currentTooltip !== null){
+            appStore.currentTooltip.close();
+        }
         let instance = this.state.sigmaInstance.graph;
         let edge = instance.edges(id);
         let source = instance.nodes(edge.source);
@@ -280,7 +282,9 @@ export default class GraphContainer extends Component {
     }
 
     relayout() {
-        appStore.currentTooltip.close();
+        if (appStore.currentTooltip !== null){
+            appStore.currentTooltip.close();
+        }
         sigma.layouts.stopForceLink();
         if (appStore.dagre) {
             sigma.layouts.dagre.start(this.state.sigmaInstance);
