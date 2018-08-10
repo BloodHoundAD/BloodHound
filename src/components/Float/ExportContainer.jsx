@@ -21,9 +21,7 @@ export default class ExportContainer extends Component {
     }
 
     _show() {
-        if (appStore.currentTooltip !== null){
-            appStore.currentTooltip.close();
-        }
+        closeTooltip();
         $(this.refs.outer).fadeToggle(true);
     }
 

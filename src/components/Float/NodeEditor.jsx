@@ -26,7 +26,7 @@ export default class NodeEditor extends Component {
     }
 
     getNodeData(name, type) {
-        appStore.currentTooltip.close();
+        closeTooltip()
         $(this.refs.outer).fadeIn();
         $(this.refs.newAttrName).val("");
         let q = driver.session();

@@ -83,9 +83,7 @@ export default class AddNodeModal extends Component {
     }
 
     openModal() {
-        if (appStore.currentTooltip !== null){
-            appStore.currentTooltip.close();
-        }
+        closeTooltip()
         this.setState( {open: true });
         jQuery(this.refs.name).focus()
         jQuery(this.refs.error).hide()

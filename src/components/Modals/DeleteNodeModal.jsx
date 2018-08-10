@@ -19,9 +19,7 @@ export default class DeleteNodeModal extends Component {
     }
 
     openModal(id) {
-        if (appStore.currentTooltip !== null){
-            appStore.currentTooltip.close();
-        }
+        closeTooltip()
         
         this.setState({ open: true,  id: id });
     }

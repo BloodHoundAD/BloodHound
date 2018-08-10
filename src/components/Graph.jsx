@@ -163,9 +163,7 @@ export default class GraphContainer extends Component {
     }
 
     getHelpEdge(id){
-        if (appStore.currentTooltip !== null){
-            appStore.currentTooltip.close();
-        }
+        closeTooltip();
         let instance = this.state.sigmaInstance.graph;
         let edge = instance.edges(id);
         let source = instance.nodes(edge.source);
@@ -174,9 +172,7 @@ export default class GraphContainer extends Component {
     }
 
     setOwned(id, status){
-        if (appStore.currentTooltip !== null){
-            appStore.currentTooltip.close();
-        }
+        closeTooltip();
         let instance = this.state.sigmaInstance;
         let node = instance.graph.nodes(id);
         if (status){
@@ -212,9 +208,7 @@ export default class GraphContainer extends Component {
     }
 
     setHighVal(id, status){
-        if (appStore.currentTooltip !== null){
-            appStore.currentTooltip.close();
-        }
+        closeTooltip();
         let instance = this.state.sigmaInstance;
         let node = instance.graph.nodes(id);
         node.highvalue = status;
@@ -282,9 +276,7 @@ export default class GraphContainer extends Component {
     }
 
     relayout() {
-        if (appStore.currentTooltip !== null){
-            appStore.currentTooltip.close();
-        }
+        closeTooltip();
         sigma.layouts.stopForceLink();
         if (appStore.dagre) {
             sigma.layouts.dagre.start(this.state.sigmaInstance);
@@ -337,9 +329,7 @@ export default class GraphContainer extends Component {
     }
 
     reload(){
-        if (appStore.currentTooltip !== null){
-            appStore.currentTooltip.close();
-        }
+        closeTooltip();
         this.doQueryNative(this.state.currentQuery);
     }
 
@@ -616,9 +606,7 @@ export default class GraphContainer extends Component {
     goBack() {
         if (appStore.queryStack.length > 0) {
             this.clearScale();
-            if (appStore.currentTooltip !== null) {
-                appStore.currentTooltip.close();
-            }
+            closeTooltip();
             sigma.layouts.stopForceLink();
 
             let query = appStore.queryStack.pop();
@@ -1005,9 +993,7 @@ export default class GraphContainer extends Component {
     }
 
     doGenericQuery(statement, props, start, end, allowCollapse = true) {
-        if (appStore.currentTooltip !== null) {
-            appStore.currentTooltip.close();
-        }
+        closeTooltip()
 
         if (typeof props === "undefined") {
             props = {};
@@ -1367,9 +1353,7 @@ export default class GraphContainer extends Component {
         })
 
         sigmaInstance.bind("clickStage", event => {
-            if (appStore.currentTooltip !== null){
-                appStore.currentTooltip.close()
-            }
+            closeTooltip()
         })
 
         //Some key binds

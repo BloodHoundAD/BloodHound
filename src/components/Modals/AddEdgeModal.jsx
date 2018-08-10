@@ -21,9 +21,7 @@ export default class AddEdgeModal extends Component {
     }
 
     openModal() {
-        if (appStore.currentTooltip !== null){
-            appStore.currentTooltip.close();
-        }
+        closeTooltip()
         this.setState( {open: true });
         jQuery(this.refs.errora).hide();
         jQuery(this.refs.errorb).hide();

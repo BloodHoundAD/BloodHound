@@ -105,9 +105,7 @@ export default class MenuContainer extends Component {
     }
 
     _importClick() {
-        if (appStore.currentTooltip !== null){
-            appStore.currentTooltip.close();
-        }
+        closeTooltip()
         var fname = dialog.showOpenDialog({
             properties: ["openFile"]
         });

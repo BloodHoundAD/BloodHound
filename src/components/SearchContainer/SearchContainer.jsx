@@ -41,7 +41,7 @@ export default class SearchContainer extends Component {
         emitter.on(
             "setStart",
             function (payload) {
-                appStore.currentTooltip.close()
+                closeTooltip()
                 jQuery(this.refs.searchbar).val(payload);
             }.bind(this)
         );
@@ -49,7 +49,7 @@ export default class SearchContainer extends Component {
         emitter.on(
             "setEnd",
             function (payload) {
-                appStore.currentTooltip.close()
+                closeTooltip()
                 jQuery(this.refs.pathbar).val(payload);
                 var e = jQuery(this.refs.pathfinding);
                 if (!e.is(":visible")) {
