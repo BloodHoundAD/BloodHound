@@ -312,6 +312,7 @@ if (!existsSync(imagepath)){
 global.closeTooltip = function(){
     if (appStore.currentTooltip !== null){
         appStore.currentTooltip.close();
+        appStore.currentTooltip = null;
     }
 }
 
