@@ -143,15 +143,15 @@ export default class MenuContainer extends Component {
                         );
                         this.getFileMeta(file.path, callback);
                     },
-                    function done() {
+                    () => {
                         setTimeout(
-                            _ => {
+                            () => {
                                 this.setState({ uploading: false });
                             },
                             3000
                         );
                         this.addBaseProps();
-                        $.each(results, (_, file) => {
+                        $.each(results, function(_, file) {
                             if (file.delete) {
                                 unlinkSync(file.path);
                             }
