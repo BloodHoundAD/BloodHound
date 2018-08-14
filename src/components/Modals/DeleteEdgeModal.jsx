@@ -19,7 +19,7 @@ export default class DeleteEdgeModal extends Component {
     }
 
     openModal(id) {
-        appStore.currentTooltip.close();
+        closeTooltip()
         this.setState({ open: true,  id: id });
     }
 

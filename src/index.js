@@ -309,6 +309,12 @@ if (!existsSync(imagepath)){
     mkdirSync(imagepath)
 }
 
+global.closeTooltip = function(){
+    if (appStore.currentTooltip !== null){
+        appStore.currentTooltip.close();
+    }
+}
+
 renderEmit.on("login", function() {
     emitter.removeAllListeners();
     ReactDOM.unmountComponentAtNode(document.getElementById("root"));
