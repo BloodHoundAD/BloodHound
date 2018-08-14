@@ -67,7 +67,6 @@ NodeCypherLinkComplex.propTypes = {
     property: PropTypes.string.isRequired,
     countQuery: PropTypes.string.isRequired,
     graphQuery: PropTypes.string.isRequired,
-    distinct: PropTypes.bool,
     start: PropTypes.string,
     end: PropTypes.string
 };
