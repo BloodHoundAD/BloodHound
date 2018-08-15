@@ -2,10 +2,10 @@
 # DO NOT RUN THIS SCRIPT, THIS IS A SCRIPT FOR TRAVIS TO DO STUFF
 response="$(curl -s --user "${GH_USER}" https://api.github.com/repos/BloodHoundAD/BloodHound/releases/4033842/assets)"
 
-iad32id="$(echo "$response" | grep -B 1 \"BloodHound-linux-ia32 | head -n1 | cut -d ":" -f 2 | cut -c 2- | sed 's/.$//')"
-x64id="$(echo "$response" | grep -B 1 \"BloodHound-linux-x64 | head -n1 | cut -d ":" -f 2 | cut -c 2- | sed 's/.$//')"
-armv7lid="$(echo "$response" | grep -B 1 \"BloodHound-linux-armv7l | head -n1 | cut -d ":" -f 2 | cut -c 2- | sed 's/.$//')"
-macid="$(echo "$response" | grep -B 1 \"BloodHound-darwin-x64 | head -n1 | cut -d ":" -f 2 | cut -c 2- | sed 's/.$//')"
+iad32id="$(echo "$response" | grep -B 2 \"BloodHound-linux-ia32 | head -n1 | cut -d ":" -f 2 | cut -c 2- | sed 's/.$//')"
+x64id="$(echo "$response" | grep -B 2 \"BloodHound-linux-x64 | head -n1 | cut -d ":" -f 2 | cut -c 2- | sed 's/.$//')"
+armv7lid="$(echo "$response" | grep -B 2 \"BloodHound-linux-armv7l | head -n1 | cut -d ":" -f 2 | cut -c 2- | sed 's/.$//')"
+macid="$(echo "$response" | grep -B 2 \"BloodHound-darwin-x64 | head -n1 | cut -d ":" -f 2 | cut -c 2- | sed 's/.$//')"
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 	if [[ ! $iad32id == "" ]]; then
