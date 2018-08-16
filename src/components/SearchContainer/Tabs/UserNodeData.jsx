@@ -91,7 +91,6 @@ export default class UserNodeData extends Component {
             return;
         }
         let pics = this.state.pics;
-        let temp = pics[event.index];
         pics.splice(event.index, 1);
         this.setState({
             pics: pics
@@ -279,6 +278,15 @@ export default class UserNodeData extends Component {
                         }
                     />
 
+                    <NodeCypherLink
+                        property="Reachable High Value Targets"
+                        target={this.state.label}
+                        baseQuery={
+                            'MATCH (m:User {name:{name}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll")'
+                        }
+                        start={this.state.label}
+                    />
+
                     <NodeCypherLinkComplex
                         property="Effective Inbound GPOs"
                         target={this.state.label}
@@ -353,6 +361,57 @@ export default class UserNodeData extends Component {
                         target={this.state.label}
                         baseQuery={
                             "MATCH p=shortestPath((m:User {name:{name}})-[r:HasSession|AdminTo|MemberOf*1..]->(n:Computer))"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <h4>Execution Privileges</h4>
+                    <NodeCypherLink
+                        property="First Degree RDP Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:User {name:{name}})-[r:CanRDP]->(n:Computer)"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="Group Delegated RDP Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:User {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:CanRDP]->(n:Computer)"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="First Degree DCOM Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:User {name:{name}})-[r:ExecuteDCOM]->(n:Computer)"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="Group Delegated DCOM Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:User {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:ExecuteDCOM]->(n:Computer)"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="Constrained Delegation Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:User {name:{name}})-[r:AllowedToDelegate]->(n:Computer)"
                         }
                         start={this.state.label}
                         distinct

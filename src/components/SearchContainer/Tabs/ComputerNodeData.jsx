@@ -262,6 +262,15 @@ export default class ComputerNodeData extends Component {
                         distinct
                     />
 
+                    <NodeCypherLink
+                        property="Reachable High Value Targets"
+                        target={this.state.label}
+                        baseQuery={
+                            'MATCH (m:Computer {name:{name}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll")'
+                        }
+                        start={this.state.label}
+                    />
+
                     <NodeCypherLinkComplex
                         property="Sibling Objects in the Same OU"
                         target={this.state.label}
@@ -315,6 +324,47 @@ export default class ComputerNodeData extends Component {
                         target={this.state.label}
                         baseQuery={
                             "MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((n)-[r:AdminTo|MemberOf|HasSession*1..]->(m:Computer {name:{name}}))"
+                        }
+                        end={this.state.label}
+                        distinct
+                    />
+
+                    <h4>Inbound Execution Privileges</h4>
+                    <NodeCypherLink
+                        property="First Degree RDP Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(n)-[r:CanRDP]->(m:Computer {name:{name}})"
+                        }
+                        end={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="Group Delegated RDP Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(n)-[r1:MemberOf*1..]->(g:Group)-[r:CanRDP]->(m:Computer {name:{name}})"
+                        }
+                        end={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="First Degree DCOM Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(n)-[r:ExecuteDCOM]->(m:Computer {name:{name}})"
+                        }
+                        end={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="Group Delegated DCOM Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(n)-[r1:MemberOf*1..]->(g:Group)-[r:ExecuteDCOM]->(m:Computer {name:{name}})"
                         }
                         end={this.state.label}
                         distinct
@@ -376,6 +426,57 @@ export default class ComputerNodeData extends Component {
                         target={this.state.label}
                         baseQuery={
                             "MATCH (m:Computer {name:{name}}), (n:Computer) WHERE NOT n.name={name} MATCH p=shortestPath((m)-[r:AdminTo|MemberOf*1..]->(n))"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <h4>Outbound Execution Privileges</h4>
+                    <NodeCypherLink
+                        property="First Degree RDP Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:Computer {name:{name}})-[r:CanRDP]->(n:Computer)"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="Group Delegated RDP Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:Computer {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:CanRDP]->(n:Computer)"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="First Degree DCOM Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:Computer {name:{name}})-[r:ExecuteDCOM]->(n:Computer)"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="Group Delegated DCOM Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:Computer {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:ExecuteDCOM]->(n:Computer)"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="Constrained Delegation Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:User {name:{name}})-[r:AllowedToDelegate]->(n:Computer)"
                         }
                         start={this.state.label}
                         distinct

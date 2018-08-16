@@ -244,6 +244,15 @@ export default class GroupNodeData extends Component {
                         end={this.state.label}
                     />
 
+                    <NodeCypherLink
+                        property="Reachable High Value Targets"
+                        target={this.state.label}
+                        baseQuery={
+                            'MATCH (m:Group {name:{name}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll")'
+                        }
+                        start={this.state.label}
+                    />
+
                     {/* <NodeCypherLink property="Sibling Objects in the Same OU" target={this.state.label} baseQuery={"MATCH (o1:OU)-[r1:Contains]->(g1:Group {name:{name}}) WITH o1 MATCH p= (d: Domain)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)"} /> */}
 
                     <h4>Group Members</h4>
@@ -332,6 +341,47 @@ export default class GroupNodeData extends Component {
                         target={this.state.label}
                         baseQuery={
                             "MATCH p = shortestPath((g:Group {name:{name}})-[r:MemberOf|AdminTo|HasSession*1..]->(n:Computer))"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <h4>Execution Privileges</h4>
+                    <NodeCypherLink
+                        property="First Degree RDP Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:Group {name:{name}})-[r:CanRDP]->(n:Computer)"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="Group Delegated RDP Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:Group {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:CanRDP]->(n:Computer)"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="First Degree DCOM Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:Group {name:{name}})-[r:ExecuteDCOM]->(n:Computer)"
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="Group Delegated DCOM Privileges"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(m:Group {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:ExecuteDCOM]->(n:Computer)"
                         }
                         start={this.state.label}
                         distinct

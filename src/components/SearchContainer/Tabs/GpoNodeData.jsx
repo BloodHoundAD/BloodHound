@@ -222,6 +222,15 @@ export default class GpoNodeData extends Component {
                         displayMap={this.state.displayMap}
                         ServicePrincipalNames={[]}
                     />
+
+                    <NodeCypherLink
+                        property="Reachable High Value Targets"
+                        target={this.state.label}
+                        baseQuery={
+                            'MATCH (m:GPO {name:{name}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll")'
+                        }
+                        start={this.state.label}
+                    />
                     <br />
                     <h4>Affected Objects</h4>
                     <NodeCypherLink
