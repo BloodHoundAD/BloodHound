@@ -266,7 +266,7 @@ export default class ComputerNodeData extends Component {
                         property="Reachable High Value Targets"
                         target={this.state.label}
                         baseQuery={
-                            'MATCH (m:Computer {name:{name}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll")'
+                            'MATCH (m:Computer {name:{name}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
                         }
                         start={this.state.label}
                     />
@@ -331,7 +331,7 @@ export default class ComputerNodeData extends Component {
 
                     <h4>Inbound Execution Privileges</h4>
                     <NodeCypherLink
-                        property="First Degree RDP Privileges"
+                        property="First Degree Remote Desktop Users"
                         target={this.state.label}
                         baseQuery={
                             "MATCH p=(n)-[r:CanRDP]->(m:Computer {name:{name}})"
@@ -341,7 +341,7 @@ export default class ComputerNodeData extends Component {
                     />
 
                     <NodeCypherLink
-                        property="Group Delegated RDP Privileges"
+                        property="Group Delegated Remote Desktop Users"
                         target={this.state.label}
                         baseQuery={
                             "MATCH p=(n)-[r1:MemberOf*1..]->(g:Group)-[r:CanRDP]->(m:Computer {name:{name}})"
@@ -351,7 +351,7 @@ export default class ComputerNodeData extends Component {
                     />
 
                     <NodeCypherLink
-                        property="First Degree DCOM Privileges"
+                        property="First Degree Distributed COM Users"
                         target={this.state.label}
                         baseQuery={
                             "MATCH p=(n)-[r:ExecuteDCOM]->(m:Computer {name:{name}})"
@@ -361,7 +361,7 @@ export default class ComputerNodeData extends Component {
                     />
 
                     <NodeCypherLink
-                        property="Group Delegated DCOM Privileges"
+                        property="Group Delegated Distributed COM Users"
                         target={this.state.label}
                         baseQuery={
                             "MATCH p=(n)-[r1:MemberOf*1..]->(g:Group)-[r:ExecuteDCOM]->(m:Computer {name:{name}})"

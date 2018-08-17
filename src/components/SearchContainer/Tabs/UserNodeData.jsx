@@ -282,7 +282,7 @@ export default class UserNodeData extends Component {
                         property="Reachable High Value Targets"
                         target={this.state.label}
                         baseQuery={
-                            'MATCH (m:User {name:{name}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll")'
+                            'MATCH (m:User {name:{name}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
                         }
                         start={this.state.label}
                     />

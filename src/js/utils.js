@@ -564,14 +564,49 @@ export function buildGpoAdminJson(chunk) {
     let queries = {};
 
     let baseQuery =
-        "UNWIND {props} AS prop MERGE (n:{} {name:prop.admin}) MERGE (m:Computer {name:prop.comp}) MERGE (n)-[r:AdminTo {isacl:false}]->(m)";
+        "UNWIND {props} AS prop MERGE (n:{} {name:prop.member}) MERGE (m:Computer {name:prop.comp}) MERGE (n)-[r:{} {isacl:false}]->(m)";
     $.each(chunk, function(_, gpoadmin) {
-        let comp = gpoadmin.Computer;
-        let admin = gpoadmin.Name;
-        let type = gpoadmin.Type;
+        let computers = gpoadmin.AffectedComputers;
+        let localadmins = gpoadmin.LocalAdmins;
+        let rdpers = gpoadmin.RemoteDesktopUsers;
+        let dcom = gpoadmin.DcomUsers;
 
-        let query = baseQuery.format(type.toTitleCase());
-        insert(queries, type, query, { admin: admin, comp: comp });
+        $.each(computers, function(_, comp){
+            let p = {comp: comp};
+
+            $.each(localadmins, function(_, admin){
+                let member = admin.Name;
+                let type = admin.Type;
+                let rel = "AdminTo";
+                let hash = rel+type;
+                p.member = member;
+                let statement = baseQuery.format(type, rel);
+
+                insert(queries, hash, statement, p);
+            })
+
+            $.each(rdpers, function(_, admin){
+                let member = admin.Name;
+                let type = admin.Type;
+                let rel = "CanRDP";
+                let hash = rel+type;
+                p.member = member;
+                let statement = baseQuery.format(type, rel);
+
+                insert(queries, hash, statement, p);
+            })
+
+            $.each(dcom, function(_, admin){
+                let member = admin.Name;
+                let type = admin.Type;
+                let rel = "ExecuteDCOM";
+                let hash = rel+type;
+                p.member = member;
+                let statement = baseQuery.format(type, rel);
+
+                insert(queries, hash, statement, p);
+            })
+        });
     });
 
     return queries;

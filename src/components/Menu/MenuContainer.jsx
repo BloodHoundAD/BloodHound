@@ -210,16 +210,14 @@ export default class MenuContainer extends Component {
             "sessions",
             "ous",
             "groups",
-            "gpoadmins",
+            "gpomembers",
             "gpos",
             "computers",
             "users",
             "domains"
         ];
         let count;
-        let type;
         
-
         this.setState({
             uploading: true,
             progress: 0
@@ -249,51 +247,6 @@ export default class MenuContainer extends Component {
         });
     }
 
-    getFileMetaOld(file, callback) {
-        let acceptableTypes = [
-            "sessions",
-            "ous",
-            "groups",
-            "gpoadmins",
-            "gpos",
-            "computers",
-            "users",
-            "domains"
-        ];
-        let count;
-        let type;
-
-        console.log(file);
-        this.setState({
-            uploading: true,
-            progress: 0
-        });
-
-        let pipeline = chain([
-            createReadStream(file, { encoding: "utf8" }),
-            withParser({ filter: "meta" })
-        ]);
-
-        let asm = connectTo(pipeline);
-        asm.on(
-            "done",
-            function(asm) {
-                let data = asm.current;
-                count = data.count;
-                type = data.type;
-
-                if (!acceptableTypes.includes(type)) {
-                    emitter.emit("showAlert", "Unrecognized JSON Type");
-                    this.setState({
-                        uploading: false
-                    });
-                    callback();
-                }
-
-                this.processJson(file, callback, count, type);
-            }.bind(this)
-        );
-    }
 
     processJson(file, callback, count, type) {
         let pipeline = chain([
@@ -360,10 +313,9 @@ export default class MenuContainer extends Component {
             groups: buildGroupJson,
             ous: buildOuJson,
             sessions: buildSessionJson,
-            gpoadmins: buildGpoAdminJson
+            gpomembers: buildGpoAdminJson
         };
         let data = funcMap[type](chunk);
-
         for (let key in data) {
             if (data[key].props.length === 0){
                 continue;
