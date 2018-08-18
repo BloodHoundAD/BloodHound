@@ -131,7 +131,7 @@ function deleteSessions() {
         .then(function(results) {
             session.close();
             emitter.emit("refreshDBData");
-            var count = results.records[0]._fields[0].low;
+            var count = results.records[0]._fields[0];
             if (count === 0) {
                 emitter.emit("hideDBClearModal");
             } else {
@@ -152,7 +152,7 @@ function deleteEdges() {
         .then(function(results) {
             emitter.emit("refreshDBData");
             session.close();
-            var count = results.records[0]._fields[0].low;
+            var count = results.records[0]._fields[0];
             if (count === 0) {
                 deleteNodes();
             } else {
@@ -168,7 +168,7 @@ function deleteNodes() {
         .then(function(results) {
             emitter.emit("refreshDBData");
             session.close();
-            var count = results.records[0]._fields[0].low;
+            var count = results.records[0]._fields[0];
             if (count === 0) {
                 grabConstraints();
             } else {

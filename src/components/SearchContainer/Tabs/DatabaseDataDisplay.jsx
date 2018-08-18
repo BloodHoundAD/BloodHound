@@ -67,14 +67,14 @@ export default class DatabaseDataDisplay extends Component {
             "MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)"
         ).then(
             result => {
-                this.setState({ num_users: result.records[0]._fields[0].low });
+                this.setState({ num_users: result.records[0]._fields[0] });
                 s1.close();
             }
         );
 
         s2.run("MATCH (n:Group) RETURN count(n)").then(
             result => {
-                this.setState({ num_groups: result.records[0]._fields[0].low });
+                this.setState({ num_groups: result.records[0]._fields[0] });
                 s2.close();
             }
         );
@@ -82,7 +82,7 @@ export default class DatabaseDataDisplay extends Component {
         s3.run("MATCH (n:Computer) RETURN count(n)").then(
             result => {
                 this.setState({
-                    num_computers: result.records[0]._fields[0].low
+                    num_computers: result.records[0]._fields[0]
                 });
                 s3.close();
             }
@@ -91,7 +91,7 @@ export default class DatabaseDataDisplay extends Component {
         s4.run("MATCH ()-[r:HasSession]->() RETURN count(r)").then(
             result => {
                 this.setState({
-                    num_sessions: result.records[0]._fields[0].low
+                    num_sessions: result.records[0]._fields[0]
                 });
                 s4.close();
             }
@@ -99,7 +99,7 @@ export default class DatabaseDataDisplay extends Component {
 
         s6.run("MATCH ()-[r {isacl: true}]->() RETURN count(r)").then(
             result => {
-                this.setState({ num_acls: result.records[0]._fields[0].low });
+                this.setState({ num_acls: result.records[0]._fields[0] });
                 s6.close();
             }
         );
@@ -107,7 +107,7 @@ export default class DatabaseDataDisplay extends Component {
         s5.run("MATCH ()-[r]->() RETURN count(r)").then(
             result => {
                 this.setState({
-                    num_relationships: result.records[0]._fields[0].low
+                    num_relationships: result.records[0]._fields[0]
                 });
                 s5.close();
             }

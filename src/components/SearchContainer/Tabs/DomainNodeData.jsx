@@ -100,7 +100,7 @@ export default class DomainNodeData extends Component {
             name: payload
         }).then(
             function(result) {
-                this.setState({ users: result.records[0]._fields[0].low });
+                this.setState({ users: result.records[0]._fields[0] });
                 s1.close();
             }.bind(this)
         );
@@ -109,7 +109,7 @@ export default class DomainNodeData extends Component {
             name: payload
         }).then(
             function(result) {
-                this.setState({ groups: result.records[0]._fields[0].low });
+                this.setState({ groups: result.records[0]._fields[0] });
                 s2.close();
             }.bind(this)
         );
@@ -118,7 +118,7 @@ export default class DomainNodeData extends Component {
             name: payload
         }).then(
             function(result) {
-                this.setState({ computers: result.records[0]._fields[0].low });
+                this.setState({ computers: result.records[0]._fields[0] });
                 s3.close();
             }.bind(this)
         );
@@ -127,7 +127,7 @@ export default class DomainNodeData extends Component {
             name: payload
         }).then(
             function(result) {
-                this.setState({ ous: result.records[0]._fields[0].low });
+                this.setState({ ous: result.records[0]._fields[0] });
                 s4.close();
             }.bind(this)
         );
@@ -136,7 +136,7 @@ export default class DomainNodeData extends Component {
             name: payload
         }).then(
             function(result) {
-                this.setState({ gpos: result.records[0]._fields[0].low });
+                this.setState({ gpos: result.records[0]._fields[0] });
                 s5.close();
             }.bind(this)
         );

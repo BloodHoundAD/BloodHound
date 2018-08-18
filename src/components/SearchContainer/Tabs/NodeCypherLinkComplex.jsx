@@ -30,7 +30,7 @@ export default class NodeCypherLinkComplex extends Component {
             session.run(query, { name: newProps.target, domain: domain }).then(
                 function(result) {
                     this.setState({
-                        value: result.records[0]._fields[0].low,
+                        value: result.records[0]._fields[0],
                         ready: true
                     });
                 }.bind(this)

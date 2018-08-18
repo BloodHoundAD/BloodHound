@@ -252,7 +252,8 @@ export default class Login extends Component {
                 driver.close();
                 global.driver = neo4j.driver(
                     this.state.url,
-                    neo4j.auth.basic(this.state.user, this.state.password)
+                    neo4j.auth.basic(this.state.user, this.state.password),
+                    {disableLosslessIntegers: true}
                 );
             }
         });

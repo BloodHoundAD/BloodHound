@@ -744,7 +744,7 @@ export default class GraphContainer extends Component {
                                         field,
                                         function(_, value) {
                                             if (value !== null) {
-                                                let id = value.identity.low;
+                                                let id = value.identity;
                                                 if (value.end && !edges.id) {
                                                     edges[
                                                         id
@@ -763,7 +763,7 @@ export default class GraphContainer extends Component {
                                         }.bind(this)
                                     );
                                 } else {
-                                    let id = field.identity.low;
+                                    let id = field.identity;
                                     if (field.end && !edges.id) {
                                         edges[id] = this.createEdgeFromRow(
                                             field
@@ -813,10 +813,10 @@ export default class GraphContainer extends Component {
     }
 
     createEdgeFromRow(data) {
-        var id = data.identity.low;
+        var id = data.identity;
         var type = data.type;
-        var source = data.start.low;
-        var target = data.end.low;
+        var source = data.start;
+        var target = data.end;
 
         var edge = {
             id: id,
@@ -837,12 +837,12 @@ export default class GraphContainer extends Component {
     }
 
     createNodeFromRow(data, params) {
-        var id = data.identity.low;
+        var id = data.identity;
         var type = data.labels[0];
         var label = data.properties.name;
         var guid = data.properties.guid;
 
-        if (label == null) {
+        if (label === null) {
             label = guid;
         }
 
