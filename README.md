@@ -13,6 +13,8 @@ BloodHound uses graph theory to reveal the hidden and often unintended relations
 
 BloodHound is developed by [@_wald0](https://www.twitter.com/_wald0), [@CptJesus](https://twitter.com/CptJesus), and [@harmj0y](https://twitter.com/harmj0y).
 
+A sample database generator can be found [here](https://github.com/BloodHoundAD/BloodHound-Tools/tree/master/DBCreator)
+
 # License
 
 BloodHound uses graph theory to reveal hidden relationships and
