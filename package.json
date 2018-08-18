@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-loader": "^7.1.2",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
@@ -68,7 +68,7 @@
     "neo4j-driver": "^1.6.2",
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
-    "react-bootstrap": "^0.32.0",
+    "react-bootstrap": "0.32.0",
     "react-dom": "^16.4.2",
     "react-if": "^2.1.0",
     "react-images": "^0.5.19",
