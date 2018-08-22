@@ -572,17 +572,14 @@ export function buildGpoAdminJson(chunk) {
         let dcom = gpoadmin.DcomUsers;
 
         $.each(computers, function(_, comp){
-            let p = {comp: comp};
-
             $.each(localadmins, function(_, admin){
                 let member = admin.Name;
                 let type = admin.Type;
                 let rel = "AdminTo";
                 let hash = rel+type;
-                p.member = member;
                 let statement = baseQuery.format(type, rel);
 
-                insert(queries, hash, statement, p);
+                insert(queries, hash, statement, {comp: comp, member: member});
             })
 
             $.each(rdpers, function(_, admin){
@@ -590,10 +587,9 @@ export function buildGpoAdminJson(chunk) {
                 let type = admin.Type;
                 let rel = "CanRDP";
                 let hash = rel+type;
-                p.member = member;
                 let statement = baseQuery.format(type, rel);
 
-                insert(queries, hash, statement, p);
+                insert(queries, hash, statement, {comp: comp, member: member});
             })
 
             $.each(dcom, function(_, admin){
@@ -601,14 +597,13 @@ export function buildGpoAdminJson(chunk) {
                 let type = admin.Type;
                 let rel = "ExecuteDCOM";
                 let hash = rel+type;
-                p.member = member;
                 let statement = baseQuery.format(type, rel);
 
-                insert(queries, hash, statement, p);
+                insert(queries, hash, statement, {comp: comp, member: member});
             })
         });
     });
-
+    console.log(queries)
     return queries;
 }
 
