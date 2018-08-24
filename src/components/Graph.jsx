@@ -252,6 +252,10 @@ export default class GraphContainer extends Component {
         let typevar = `type_${type.toLowerCase()}`;
 
         let statement = `MERGE (n:${type} {${key}:{name}})`
+        if (key === "Computer" || key === "User"){
+            statement = `${statement} SET n.owned=false`
+        }
+
         q.run(statement, {name:varn}).then(x => {
             let instance = this.state.sigmaInstance;
             let id = generateUniqueId(instance, true);
