@@ -273,6 +273,7 @@ div.tooltip-inner-custom {
     resize: none;
     width: 98%;
     height: 100px;
+    color:black;
 }
 
 .add-modal-check-style{
