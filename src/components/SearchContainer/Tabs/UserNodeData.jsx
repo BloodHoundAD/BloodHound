@@ -35,7 +35,8 @@ export default class UserNodeData extends Component {
                 description: "Description",
                 userpassword: "User Password",
                 admincount: "AdminCount",
-                owned: "Compromised"
+                owned: "Compromised",
+                sensitive: "Cannot Be Delegated"
             },
             notes: null,
             pics: [],
