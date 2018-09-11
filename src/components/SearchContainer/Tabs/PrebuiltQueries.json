@@ -121,7 +121,7 @@
                     "final": false,
                     "title": "Select a user",
                     "query":
-                        "MATCH (n:User) WHERE n.domain={result} AND n.hasspn=true RETURN n.name, n.PwdLastSet ORDER BY n.PwdLastSet ASC"
+                        "MATCH (n:User) WHERE n.domain={result} AND n.hasspn=true RETURN n.name, n.pwdlastset ORDER BY n.pwdlastset ASC"
                 },
                 {
                     "final": true,
