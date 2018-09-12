@@ -476,6 +476,7 @@ export default class HelpModal extends Component {
             }
             formatted = text;
         } else if (edge.label === "WriteDacl") {
+            let text;
             if (targetType === "Group") {
                 text = `To abuse WriteDacl to a user object, you may grant yourself the AddMember privilege. This can be accomplished using the Add-DomainObjectAcl function in PowerView.
                 
