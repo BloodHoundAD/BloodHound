@@ -166,6 +166,8 @@ export default class MenuContainer extends Component {
         let s = driver.session();
         await s.run("MATCH (n:User) WHERE NOT EXISTS(n.owned) SET n.owned=false");
         await s.run("MATCH (n:Computer) WHERE NOT EXISTS(n.owned) SET n.owned=false");
+        await s.run("MATCH (n:Group) WHERE n.name =~ 'EVERYONE@.*' SET n.objectsid='S-1-1-0'")
+        await s.run("MATCH (n:Group) WHERE n.name =~ 'AUTHENTICATED USERS@.*' SET n.objectsid='S-1-5-11'")
         s.close();
     }
 
@@ -274,7 +276,7 @@ export default class MenuContainer extends Component {
                     chunk.push(data.value);
                     localcount++;
 
-                    if (localcount % 100 === 0) {
+                    if (localcount % 1 === 0) {
                         pipeline.pause();
                         await this.uploadData(chunk, type);
                         sent += chunk.length;
