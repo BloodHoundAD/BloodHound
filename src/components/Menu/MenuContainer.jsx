@@ -347,14 +347,14 @@ export default class MenuContainer extends Component {
                     <MenuButton
                         click={this._exportClick.bind(this)}
                         hoverVal="Export Graph"
-                        glyphicon="fa fa-download"
+                        glyphicon="fa fa-upload"
                     />
                 </div>
                 <div>
                     <MenuButton
                         click={this._importClick.bind(this)}
                         hoverVal="Import Graph"
-                        glyphicon="fa fa-upload"
+                        glyphicon="fa fa-download"
                     />
                 </div>
                 <div>
