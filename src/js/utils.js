@@ -53,7 +53,7 @@ export function buildSearchQuery(searchterm){
 
 export function buildSelectQuery(start, end){
     let startTerm, endTerm, apart, bpart;
-    
+
     if (start.includes(':')){
         let [type, search] = start.split(':')
         startTerm = search;
@@ -727,6 +727,9 @@ export function buildComputerJson(chunk) {
             let p = { name: name, target: aName };
             insert(queries, hash, statement, p);
         });
+
+        let aces = comp.Aces;
+        processAceArray(aces, name, "Computer", queries);
 
         let allowedToDelegate = comp.AllowedToDelegate;
         $.each(allowedToDelegate, (_, comp) =>{
