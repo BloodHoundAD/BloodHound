@@ -59,7 +59,7 @@ export default class HelpModal extends Component {
             Any user that is an administrator to the system has the capability to retrieve the credential material from memory if it still exists.
             
             Note: A session does not guarantee credential material is present, only possible.`;
-            formatted = text.format(sourceType, targetName, sourceName);
+            formatted = text.format(targetType, targetName, sourceName);
         } else if (edge.label === "AllExtendedRights") {
             let text = `${this.groupSpecialFormat(source)} the AllExtendedRights privilege to the {} {}. Extended rights are special rights granted on objects which allow reading of privileged attributes, as well as performing special actions. `;
             formatted = text.format(sourceType, sourceName, targetType, targetName);
