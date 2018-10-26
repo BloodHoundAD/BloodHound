@@ -55,6 +55,18 @@ Array.prototype.allEdgesSameType = function() {
     return true;
 };
 
+Array.prototype.chunk = function() {
+    let i = 0;
+    let len = this.length
+    let temp = []
+
+    for (i = 0;i < len; i+= 500){
+        temp.push(this.slice(i, i+500))
+    }
+
+    return temp;
+}
+
 if (!Array.prototype.last) {
     Array.prototype.last = function() {
         return this[this.length - 1];

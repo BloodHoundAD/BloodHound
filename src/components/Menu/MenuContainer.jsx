@@ -322,12 +322,16 @@ export default class MenuContainer extends Component {
             if (data[key].props.length === 0){
                 continue;
             }
-            await session
-                .run(data[key].statement, { props: data[key].props })
+            let arr = data[key].props.chunk()
+            let statement = data[key].statement;
+            for (let i = 0; i < arr.length; i++){
+                await session
+                .run(statement, { props: arr[i] })
                 .catch(function(error) {
                     console.log(data[key].props)
                     console.log(error);
                 });
+            }            
         }
 
         session.close();
