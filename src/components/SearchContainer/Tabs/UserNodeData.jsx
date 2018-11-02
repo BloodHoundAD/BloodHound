@@ -36,7 +36,8 @@ export default class UserNodeData extends Component {
                 userpassword: "User Password",
                 admincount: "AdminCount",
                 owned: "Compromised",
-                sensitive: "Cannot Be Delegated"
+                sensitive: "Cannot Be Delegated",
+                dontreqpreauth: "ASREP Roastable"
             },
             notes: null,
             pics: [],
