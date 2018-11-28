@@ -500,6 +500,12 @@ export function buildOuJson(chunk) {
         props: []
     };
 
+    queries.links = {
+        statement:
+            "UNWIND {props} as prop MERGE (n:OU {guid:prop.guid}) MERGE (m:GPO {name:prop.gpo}) MERGE (m)-[r:GpLink {enforced:prop.enforced, isacl:false}]->(n)",
+        props: []
+    };
+
     queries.childous = {
         statement:
             "UNWIND {props} AS prop MERGE (n:OU {guid:prop.parent}) MERGE (m:OU {guid:prop.child}) MERGE (n)-[r:Contains {isacl:false}]->(m)",
@@ -521,6 +527,18 @@ export function buildOuJson(chunk) {
     $.each(chunk, function(_, ou) {
         let guid = ou.Guid;
         let properties = ou.Properties;
+        
+        let links = ou.Links;
+        $.each(links, function (_, link) {
+            let enforced = link.IsEnforced;
+            let target = link.Name;
+
+            queries.links.props.push({
+                guid: guid,
+                gpo: target,
+                enforced: enforced
+            });
+        });
 
         queries.properties.props.push({ guid: guid, map: properties });
 
