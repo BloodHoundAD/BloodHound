@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Modal } from "react-bootstrap";
 import { buildSearchQuery } from 'utils';
 
+const SEPARATOR = "#BLOODHOUNDSEPARATOR#";
+
 export default class AddEdgeModal extends Component {
     constructor() {
         super();
@@ -49,7 +51,7 @@ export default class AddEdgeModal extends Component {
                             type: record._fields[0].labels[0]
                         });
                         map[index] = props;
-                        data.push(`${props.name}#${index}`);
+                        data.push(`${props.name}${SEPARATOR}${index}`);
                     })
 
                     this.map = map;
@@ -58,11 +60,11 @@ export default class AddEdgeModal extends Component {
                 })
             },
             updater: function(item){
-                let [_, index] = item.split('#');
+                let [_, index] = item.split(SEPARATOR);
                 return this.map[index];
             },
             matcher: function(item){
-                let [name,index] = item.split('#');
+                let [name,index] = item.split(SEPARATOR);
                 let obj = this.map[index];
                 let searchTerm = this.query.includes(':') ? this.query.split(':')[1] : this.query;
 
@@ -75,7 +77,7 @@ export default class AddEdgeModal extends Component {
                 }
             },
             highlighter: function(item){
-                let [name,index] = item.split('#');
+                let [name,index] = item.split(SEPARATOR);
                 let obj = this.map[index];
                 let searchTerm = this.query.includes(':') ? this.query.split(':')[1] : this.query;
                 let type = obj.type;

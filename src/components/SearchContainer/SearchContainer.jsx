@@ -4,6 +4,8 @@ import Icon from "../Icon";
 import TabContainer from "./TabContainer";
 import { buildSearchQuery, buildSelectQuery } from "utils";
 
+const SEPARATOR = "#BLOODHOUNDSEPARATOR#";
+
 export default class SearchContainer extends Component {
     constructor(props) {
         super(props);
@@ -73,7 +75,7 @@ export default class SearchContainer extends Component {
                             type: record._fields[0].labels[0]
                         });
                         map[index] = props;
-                        data.push(`${props.name}#${index}`);
+                        data.push(`${props.name}${SEPARATOR}${index}`);
                     })
 
                     this.map = map;
@@ -113,13 +115,13 @@ export default class SearchContainer extends Component {
             }.bind(this),
             autoSelect: false,
             updater: function (item) {
-                let spl = item.split("#");
+                let spl = item.split(SEPARATOR);
                 let index = spl[1];
                 let obj = this.map[index];
                 return obj;
             },
             matcher: function (item) {
-                let spl = item.split("#");
+                let spl = item.split(SEPARATOR);
                 let name = spl[0];
                 let index = spl[1];
                 let obj = this.map[index];
@@ -144,7 +146,7 @@ export default class SearchContainer extends Component {
                 }
             },
             highlighter: function (item) {
-                let spl = item.split("#");
+                let spl = item.split(SEPARATOR);
                 let name = spl[0];
                 let index = spl[1];
                 let obj = this.map[index];
@@ -210,7 +212,7 @@ export default class SearchContainer extends Component {
                             type: record._fields[0].labels[0]
                         });
                         map[index] = props;
-                        data.push(`${props.name}#${index}`);
+                        data.push(`${props.name}${SEPARATOR}${index}`);
                         index++;
                     })
 
@@ -237,13 +239,13 @@ export default class SearchContainer extends Component {
             }.bind(this),
             autoSelect: false,
             updater: function (item) {
-                let spl = item.split("#");
+                let spl = item.split(SEPARATOR);
                 let index = spl[1];
                 let obj = this.map[index];
                 return obj;
             },
             matcher: function (item) {
-                let spl = item.split("#");
+                let spl = item.split(SEPARATOR);
                 let name = spl[0];
                 let index = spl[1];
                 let obj = this.map[index];
@@ -268,7 +270,7 @@ export default class SearchContainer extends Component {
                 }
             },
             highlighter: function (item) {
-                let spl = item.split("#");
+                let spl = item.split(SEPARATOR);
                 let name = spl[0];
                 let index = spl[1];
                 let obj = this.map[index];
