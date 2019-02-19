@@ -19,7 +19,7 @@ A sample database generator can be found [here](https://github.com/BloodHoundAD/
 
 BloodHound uses graph theory to reveal hidden relationships and
 attack paths in an Active Directory environment.
-Copyright (C) 2016 Andrew Robbins, Rohan Vazarkar, Will Schroeder
+Copyright (C) 2016-2019 Andrew Robbins, Rohan Vazarkar, Will Schroeder
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
