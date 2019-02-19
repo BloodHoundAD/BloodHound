@@ -256,6 +256,7 @@ export default class MenuContainer extends Component {
             withParser({ filter: type }),
             streamArray()
         ]);
+        
 
         let localcount = 0;
         let sent = 0;
@@ -267,16 +268,16 @@ export default class MenuContainer extends Component {
             progress: 0
         });
 
+        console.log(`Processing ${file}`);
         console.time("IngestTime");
-
         pipeline
             .on(
                 "data",
                 async function(data) {
                     chunk.push(data.value);
                     localcount++;
-
-                    if (localcount % 1 === 0) {
+                    
+                    if (localcount % 1000 === 0 || type === "gpomembers" || type === "ous" || type === "domains") {
                         pipeline.pause();
                         await this.uploadData(chunk, type);
                         sent += chunk.length;
@@ -325,6 +326,7 @@ export default class MenuContainer extends Component {
             let arr = data[key].props.chunk()
             let statement = data[key].statement;
             for (let i = 0; i < arr.length; i++){
+                //console.log(arr[i]);
                 await session
                 .run(statement, { props: arr[i] })
                 .catch(function(error) {

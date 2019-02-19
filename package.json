@@ -74,7 +74,7 @@
     "react-images": "^0.5.19",
     "react-photo-gallery": "^6.1.2",
     "react-transition-group": "^2.2.1",
-    "stream-json": "^1.1.0",
+    "stream-json": "^1.1.4",
     "unzipper": "^0.8.9",
     "uuid": "^3.3.2"
   }
