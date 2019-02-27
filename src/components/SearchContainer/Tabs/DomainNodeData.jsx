@@ -351,10 +351,10 @@ export default class DomainNodeData extends Component {
                         property="Foreign Admins"
                         target={this.state.label}
                         countQuery={
-                            "OPTIONAL MATCH p = (n:User)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c:Computer) WHERE c.domain = {name} AND NOT n.domain = {name} RETURN count(distinct(n)) UNION ALL OPTIONAL MATCH p = (n:User)-[:AdminTo]->(c:Computer) WHERE c.domain = {name} AND NOT n.domain = {name} RETURN count(distinct(n))"
+                            "MATCH (u:User) WHERE NOT u.domain = {name} OPTIONAL MATCH (u)-[:AdminTo]->(c {domain:{name}}) OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:{name}}) RETURN COUNT(DISTINCT(u))"
                         }
                         graphQuery = {
-                            "OPTIONAL MATCH p = (n:User)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c:Computer) WHERE c.domain = {name} AND NOT n.domain = {name} RETURN p UNION ALL OPTIONAL MATCH p = (n:User)-[:AdminTo]->(c:Computer) WHERE c.domain = {name} AND NOT n.domain = {name} RETURN p"
+                            "MATCH (u:User) WHERE NOT u.domain = {name} OPTIONAL MATCH p1 = (u)-[:AdminTo]->(c {domain:{name}}) OPTIONAL MATCH p2 = (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:{name}}) RETURN p1,p2"
                         }
                     />
 
