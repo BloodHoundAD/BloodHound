@@ -319,6 +319,17 @@ export default class ComputerNodeData extends Component {
                         end={this.state.label}
                         distinct
                     />
+                    
+                    <NodeCypherLinkComplex
+                        property="Foreign Admins"
+                        target={this.state.label}
+                        countQuery={
+                            "MATCH (c:Computer {name:{name}}) OPTIONAL MATCH (u1)-[:AdminTo]->(c) WHERE NOT u1.domain = c.domain WITH u1,c OPTIONAL MATCH (u2)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c) WHERE NOT u2.domain = c.domain WITH COLLECT(u1) + COLLECT(u2) as tempVar,c UNWIND tempVar as principals RETURN c.name,COUNT(DISTINCT(principals))"
+                        }
+                        graphQuery={
+                            "MATCH (c:Computer {name:{name}}) OPTIONAL MATCH p1 = (u1)-[:AdminTo]->(c) WHERE NOT u1.domain = c.domain WITH p1,c OPTIONAL MATCH p2 = (u2)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c) WHERE NOT u2.domain = c.domain RETURN p1,p2"
+                        }
+                    />
 
                     <NodeCypherLink
                         property="Derivative Local Admins"
@@ -389,6 +400,7 @@ export default class ComputerNodeData extends Component {
                             "MATCH p=(c:Computer {name:{name}})-[r:MemberOf*1..]->(n:Group)"
                         }
                         start={this.state.label}
+                        distinct
                     />
 
                     <NodeCypherLink
@@ -398,6 +410,7 @@ export default class ComputerNodeData extends Component {
                             "MATCH p=(c:Computer {name:{name}})-[r:MemberOf*1..]->(n:Group) WHERE NOT n.domain = c.domain"
                         }
                         start={this.state.label}
+                        distinct
                     />
 
                     <h4>Local Admin Rights</h4>
