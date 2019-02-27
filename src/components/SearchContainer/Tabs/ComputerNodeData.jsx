@@ -388,6 +388,7 @@ export default class ComputerNodeData extends Component {
                             "MATCH p=(c:Computer {name:{name}})-[r:MemberOf*1..]->(n:Group)"
                         }
                         start={this.state.label}
+                        distinct
                     />
 
                     <NodeCypherLink
@@ -397,6 +398,7 @@ export default class ComputerNodeData extends Component {
                             "MATCH p=(c:Computer {name:{name}})-[r:MemberOf*1..]->(n:Group) WHERE NOT n.domain = c.domain"
                         }
                         start={this.state.label}
+                        distinct
                     />
 
                     <h4>Local Admin Rights</h4>
