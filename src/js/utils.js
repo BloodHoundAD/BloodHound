@@ -273,6 +273,8 @@ function processAceArray(array, objname, objtype, output) {
             rights.push("ForceChangePassword");
         } else if (acetype === "Member") {
             rights.push("AddMember");
+        }else if (acetype === "AllowedToAct"){
+            rights.push("AddAllowedToAct");
         } else if (right === "ExtendedRight") {
             rights.push(acetype);
         }

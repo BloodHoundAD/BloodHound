@@ -736,6 +736,16 @@ export default class SearchContainer extends Component {
                         />
                         <label onClick={this.handleChange.bind(this)} name="AllowedToDelegate"> AllowedToDelegate</label>
                     </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="AddAllowedToAct"
+                            checked={this.state.edgeincluded.AddAllowedToAct}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="AddAllowedToAct"> AddAllowedToAct</label>
+                    </div>
                 </div>
                 <div className="input-group input-group-unstyled searchSelectorS">
                     <GlyphiconSpan

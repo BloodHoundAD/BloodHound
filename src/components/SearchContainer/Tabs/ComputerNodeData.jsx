@@ -27,7 +27,8 @@ export default class ComputerNodeData extends Component {
                 operatingsystem: "OS",
                 enabled: "Enabled",
                 unconstraineddelegation: "Allows Unconstrained Delegation",
-                owned: "Compromised"
+                owned: "Compromised",
+                haslaps: "LAPS Enabled"
             },
             notes: null,
             pics: [],

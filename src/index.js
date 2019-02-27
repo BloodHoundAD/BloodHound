@@ -156,6 +156,7 @@ global.appStore = {
             ExecuteDCOM: "tapered",
             ReadLAPSPassword: "tapered",
             AllowedToDelegate: "tapered",
+            AddAllowedToAct: "tapered",
             GetChanges: "tapered",
             GetChangeAll: "tapered"
         }
@@ -189,6 +190,7 @@ global.appStore = {
             ExecuteDCOM: "line",
             ReadLAPSPassword: "line",
             AllowedToDelegate: "line",
+            AddAllowedToAct: "line",
             GetChanges: "line",
             GetChangeAll: "line"
         }
@@ -287,10 +289,10 @@ if (typeof conf.get("edgeincluded") === "undefined"){
 
 appStore.edgeincluded = conf.get("edgeincluded");
 //Code to add new edges to filter
-// if (!appStore.edgeincluded.hasOwnProperty("AllowedToDelegate")){
-//     appStore.edgeincluded.AllowedToDelegate = true;
-//     conf.set("edgeincluded", appStore.edgeincluded)
-// }
+if (!appStore.edgeincluded.hasOwnProperty("AddAllowedToAct")){
+    appStore.edgeincluded.AddAllowedToAct = true;
+    conf.set("edgeincluded", appStore.edgeincluded)
+}
 
 // if (!appStore.edgeincluded.hasOwnProperty("ReadLAPSPassword")) {
 //     appStore.edgeincluded.ReadLAPSPassword = true;
