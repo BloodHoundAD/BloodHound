@@ -360,10 +360,10 @@ export default class DomainNodeData extends Component {
                         property="Foreign Admins"
                         target={this.state.label}
                         countQuery={
-                            "OPTIONAL MATCH p = (n:User)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c:Computer) WHERE c.domain = {name} AND NOT n.domain = {name} RETURN count(distinct(n)) UNION ALL OPTIONAL MATCH p = (n:User)-[:AdminTo]->(c:Computer) WHERE c.domain = {name} AND NOT n.domain = {name} RETURN count(distinct(n))"
+                            "MATCH (u:User) WHERE NOT u.domain = {name} OPTIONAL MATCH (u)-[:AdminTo]->(c {domain:{name}}) OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:{name}}) RETURN COUNT(DISTINCT(u))"
                         }
                         graphQuery = {
-                            "OPTIONAL MATCH p = (n:User)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c:Computer) WHERE c.domain = {name} AND NOT n.domain = {name} RETURN p UNION ALL OPTIONAL MATCH p = (n:User)-[:AdminTo]->(c:Computer) WHERE c.domain = {name} AND NOT n.domain = {name} RETURN p"
+                            "MATCH (u:User) WHERE NOT u.domain = {name} OPTIONAL MATCH p1 = (u)-[:AdminTo]->(c {domain:{name}}) OPTIONAL MATCH p2 = (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:{name}}) RETURN p1,p2"
                         }
                     />
 
@@ -442,10 +442,10 @@ export default class DomainNodeData extends Component {
                         property="Calculated Principals with DCSync Privileges"
                         target={this.state.label}
                         countQuery={
-                            "MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH n1 MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u:Domain {name: {name}}) WITH n1 MATCH (n2)-[:MemberOf|GenericAll|AllExtendedRights*1..]->(u:Domain {name: {name}}) WITH collect(distinct(n1))+collect(distinct(n2)) as results UNWIND results as x WITH x WHERE x:User OR x:Computer RETURN count(distinct(x))"
+                            "MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN COUNT(DISTINCT(n1))"
                         }
                         graphQuery={
-                            "MATCH p=(n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH p,n1 MATCH p2=(n1)-[:MemberOf|GetChangesAll*1..]->(u:Domain {name: {name}}) WITH p,p2 MATCH p3=(n2)-[:MemberOf|GenericAll|AllExtendedRights*1..]->(u:Domain {name: {name}}) RETURN p,p2,p3"
+                            "MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN p"
                         }
                     />
                 </dl>
