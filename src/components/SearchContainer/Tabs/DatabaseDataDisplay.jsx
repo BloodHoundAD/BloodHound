@@ -55,6 +55,10 @@ export default class DatabaseDataDisplay extends Component {
         emitter.emit("openSessionClearModal");
     }
 
+    toggleWarmupModal(){
+        emitter.emit("openWarmupModal");
+    }
+
     refreshDBData() {
         var s1 = driver.session();
         var s2 = driver.session();
@@ -150,10 +154,10 @@ export default class DatabaseDataDisplay extends Component {
                         </button>
                         <button
                             type="button"
-                            className="btn btn-warning"
-                            onClick={this.toggleLogoutModal}
+                            className="btn btn-success"
+                            onClick={this.toggleWarmupModal}
                         >
-                            Log Out/Switch DB
+                            Warm Up Database
                         </button>
                     </div>
                     <div className="btn-group-vertical btn-group-sm dbbuttons">
@@ -170,6 +174,15 @@ export default class DatabaseDataDisplay extends Component {
                             onClick={this.toggleDBWarnModal}
                         >
                             Clear Database
+                        </button>
+                    </div>
+                    <div className="btn-group-vertical btn-group-sm dbbuttonslast">
+                    <button
+                            type="button"
+                            className="btn btn-warning"
+                            onClick={this.toggleLogoutModal}
+                        >
+                            Log Out/Switch DB
                         </button>
                     </div>
                 </div>

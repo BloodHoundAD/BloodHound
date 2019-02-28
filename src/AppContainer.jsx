@@ -23,6 +23,7 @@ import SessionClearModal from "./components/Modals/SessionClearModal";
 import About from "./components/Modals/About.jsx";
 import HelpModal from "./components/Modals/HelpModal.jsx";
 import NodeEditor from "./components/Float/NodeEditor";
+import WarmupModal from "./components/Modals/WarmupModal.jsx";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 export default class AppContainer extends Component {
@@ -65,6 +66,7 @@ export default class AppContainer extends Component {
                         <ClearingModal />
                         <CancelUploadModal />
                         <SessionClearModal />
+                        <WarmupModal />
                         <RawQuery />
                         <MenuContainer />
                         <Settings />

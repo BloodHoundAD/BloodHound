@@ -975,8 +975,12 @@ div.tooltip-inner-custom {
 }
 
 .dbbuttons {
-    padding-bottom: 1em;
     width: 50%;
+}
+
+.dbbuttonslast{
+    padding-bottom: 1em;
+    width: 100%;
 }
 
 .displaynone {
