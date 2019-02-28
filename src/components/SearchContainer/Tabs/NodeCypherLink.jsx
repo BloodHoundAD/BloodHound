@@ -14,11 +14,21 @@ export default class NodeCypherLink extends Component {
         });
     }
 
+    cancelQuery(){
+        if (typeof this.state.session !== "undefined") {
+            this.state.session.close();
+        }
+    }
+
     componentWillReceiveProps(newProps) {
         if (this.props.target !== newProps.target) {
             var session = driver.session();
             if (typeof this.state.session !== "undefined") {
                 this.state.session.close();
+            }
+
+            if (newProps.target === ""){
+                return
             }
 
             this.setState({
@@ -40,7 +50,11 @@ export default class NodeCypherLink extends Component {
                         ready: true
                     });
                 }.bind(this)
-            );
+            ).catch(function(error){
+                if (!error.message.includes("The transaction has been terminated")){
+                    console.log(error)
+                }
+            });
         }
     }
 

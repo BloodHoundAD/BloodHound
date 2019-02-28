@@ -17,7 +17,7 @@ global.imageconf = new ConfigStore({
 })
 import { EventEmitter2 as e } from "eventemitter2";
 global.emitter = new e({});
-emitter.setMaxListeners(15);
+emitter.setMaxListeners(0);
 global.renderEmit = new e({});
 global.neo4j = require("neo4j-driver").v1;
 global.Mustache = require("mustache");

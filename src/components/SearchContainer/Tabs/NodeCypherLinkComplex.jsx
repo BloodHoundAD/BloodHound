@@ -21,6 +21,10 @@ export default class NodeCypherLinkComplex extends Component {
                 this.state.session.close();
             }
 
+            if (newProps.target === ""){
+                return
+            }
+
             this.setState({
                 session: session,
                 ready: false
@@ -34,7 +38,11 @@ export default class NodeCypherLinkComplex extends Component {
                         ready: true
                     });
                 }.bind(this)
-            );
+            ).catch(function(error){
+                if (!error.message.includes("The transaction has been terminated")){
+                    console.log(error)
+                }
+            });
         }
     }
 

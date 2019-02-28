@@ -46,9 +46,18 @@ export default class UserNodeData extends Component {
         };
 
         emitter.on("userNodeClicked", this.getNodeData.bind(this));
+        emitter.on("computerNodeClicked", this.nullTarget.bind(this));
+        emitter.on("groupNodeClicked", this.nullTarget.bind(this));
+        emitter.on("domainNodeClicked", this.nullTarget.bind(this));
+        emitter.on("gpoNodeClicked", this.nullTarget.bind(this));
+        emitter.on("ouNodeClicked", this.nullTarget.bind(this))
         emitter.on("imageUploadFinal", this.uploadImage.bind(this));
         emitter.on("clickPhoto", this.openLightbox.bind(this));
         emitter.on("deletePhoto", this.handleDelete.bind(this));
+    }
+
+    nullTarget(){
+        this.state.label = "";
     }
 
     uploadImage(files) {
