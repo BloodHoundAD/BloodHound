@@ -869,6 +869,10 @@ export default class GraphContainer extends Component {
                 node.blocksinheritance = data.properties.blocksinheritance;
             }
 
+            if (data.properties.hasOwnProperty("haslaps")) {
+                node.haslaps = data.properties.haslaps;
+            }
+
             if (data.properties.hasOwnProperty("guid")) {
                 node.guid = data.properties.guid;
             }

