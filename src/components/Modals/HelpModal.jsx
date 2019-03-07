@@ -118,19 +118,21 @@ export default class HelpModal extends Component {
         } else if (edge.label === "ReadLAPSPassword") {
             let text = `${this.groupSpecialFormat(source)} the ability to read the password set by Local Administrator Password Solution (LAPS) on the computer {}. The local administrator password for a computer managed by LAPS is stored in the confidential LDAP attribute,  “ms-mcs-AdmPwd”. `;
 
-            formatted = text;
+            formatted = text.format(sourceType, sourceName, targetType, targetName);
         } else if (edge.label === "Contains") {
             formatted = `The ${sourceType} ${sourceName} contains the ${targetType} ${targetName}. GPOs linked to a container apply to all objects that are contained by the container.`;
         } else if (edge.label === "GpLink") {
             formatted = `The GPO ${sourceName} is linked to the ${targetType} ${targetName}. A linked GPO applies its settings to objects in the linked container.`;
         } else if (edge.label === "AddAllowedToAct") {
-            formatted = `${this.groupSpecialFormat(source)} can modify the msds-AllowedToActOnBehalfOfOtherIdentity attribute on the computer ${targetName}.
+            let text = `${this.groupSpecialFormat(source)} can modify the msds-AllowedToActOnBehalfOfOtherIdentity attribute on the computer ${targetName}.
             
             The ability to modify the msDS-AllowedToActOnBehalfOfOtherIdentity property allows an attacker to abuse resource-based constrained delegation to compromise the remote computer system. This property is a binary DACL that controls what security principals can pretend to be any domain user to the particular computer object.
             
             If the msDS-AllowedToActOnBehalfOfOtherIdentity DACL is set to allow an attack-controller account, the attacker can use said account to execute a modified S4U2self/S4U2proxy abuse chain to impersonate any domain user to the target computer system and receive a valid service ticket "as" this user.
             
             One is that impersonated users can not be in the "Protected Users" security group or otherwise have delegation privileges revoked. Another caveat is that the principal added to the msDS-AllowedToActOnBehalfOfOtherIdentity DACL *must* have a service pricipal name (SPN) set in order to successfully abuse the S4U2self/S4U2proxy process. If an attacker does not currently control an account with a SPN set, an attacker can abuse the default domain MachineAccountQuota settings to add a computer account that the attacker controls via the Powermad project.`;
+
+            formatted = text.format(sourceType, sourceName, targetType, targetName);
         }
 
         this.setState({ infoTabContent: { __html: formatted } })
