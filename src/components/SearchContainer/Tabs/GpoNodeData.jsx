@@ -42,13 +42,15 @@ export default class GpoNodeData extends Component {
         emitter.on("deletePhoto", this.handleDelete.bind(this));
     }
 
-    nullTarget(){
-        this.state.label = "";
-    }
-
     componentDidMount() {
         jQuery(this.refs.complete).hide();
         jQuery(this.refs.piccomplete).hide();
+    }
+
+    nullTarget(){
+        this.setState({
+            label: ""
+        });
     }
 
     getNodeData(payload, guid) {

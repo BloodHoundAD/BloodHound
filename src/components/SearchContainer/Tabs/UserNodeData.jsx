@@ -57,7 +57,9 @@ export default class UserNodeData extends Component {
     }
 
     nullTarget(){
-        this.state.label = "";
+        this.setState({
+            label: ""
+        });
     }
 
     uploadImage(files) {
@@ -91,7 +93,7 @@ export default class UserNodeData extends Component {
             return;
         }
         this.setState({pics: p});
-        imageconf.set(key, p)
+        imageconf.set(key, p);
         let check = jQuery(this.refs.piccomplete);
         check.show();
         check.fadeOut(2000);
