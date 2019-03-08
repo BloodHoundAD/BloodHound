@@ -690,7 +690,7 @@ export default class GraphContainer extends Component {
             if (stat[key]){
                 edgearr.push(key);
             }
-        })
+        });
 
         if (edgearr.length === 0){
             emitter.emit("showAlert", "Must specify at least one edge type!");
@@ -705,7 +705,14 @@ export default class GraphContainer extends Component {
         let statement = params.statement.format(finaledges);
 
         if (appStore.performance.debug) {
-            emitter.emit("setRawQuery", statement);
+            let temp = statement;
+            $.each(Object.keys(params.props), function(_, key){
+                let replace = `{${key}}`;
+                let props = `"${params.props[key]}"`;
+                
+                temp = temp.replace(replace, props);
+            });
+            emitter.emit("setRawQuery", temp);
         }
         let promises = [];
         session.run(statement, params.props).subscribe({
