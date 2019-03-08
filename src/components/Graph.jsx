@@ -672,9 +672,6 @@ export default class GraphContainer extends Component {
 
     doQueryNative(params) {
         this.clearScale();
-        if (appStore.performance.debug) {
-            emitter.emit("setRawQuery", params.statement);
-        }
         let nodes = {};
         let edges = {};
         let session = driver.session();
@@ -705,7 +702,11 @@ export default class GraphContainer extends Component {
         }
 
         let finaledges = edgearr.join('|');
-        let statement = params.statement.format(finaledges)
+        let statement = params.statement.format(finaledges);
+
+        if (appStore.performance.debug) {
+            emitter.emit("setRawQuery", statement);
+        }
         let promises = [];
         session.run(statement, params.props).subscribe({
             onNext: async function(result) {

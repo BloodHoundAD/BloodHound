@@ -30,6 +30,10 @@ export default class About extends Component {
         };
     }
 
+    componentDidMount() {
+        emitter.on("showAbout", this.openModal.bind(this));
+    }
+
     closeModal() {
         this.setState({ open: false });
     }
@@ -37,11 +41,7 @@ export default class About extends Component {
     openModal() {
         this.setState({ open: true });
     }
-
-    componentDidMount() {
-        emitter.on("showAbout", this.openModal.bind(this));
-    }
-
+    
     render() {
         return (
             <Modal
