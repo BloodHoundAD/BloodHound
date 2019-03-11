@@ -76,7 +76,7 @@ export default class SearchContainer extends Component {
                         });
                         map[index] = props;
                         data.push(`${props.name}${SEPARATOR}${index}`);
-                    })
+                    });
 
                     this.map = map;
                     session.close();
@@ -745,6 +745,16 @@ export default class SearchContainer extends Component {
                             onChange={this.handleChange.bind(this)}
                         />
                         <label onClick={this.handleChange.bind(this)} name="AddAllowedToAct"> AddAllowedToAct</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="AllowedToAct"
+                            checked={this.state.edgeincluded.AllowedToAct}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="AllowedToAct"> AllowedToAct</label>
                     </div>
                 </div>
                 <div className="input-group input-group-unstyled searchSelectorS">

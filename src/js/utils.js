@@ -689,6 +689,7 @@ export function buildComputerJson(chunk) {
         let localadmins = comp.LocalAdmins;
         let rdpers = comp.RemoteDesktopUsers;
         let primarygroup = comp.PrimaryGroup;
+        let allowedtoact = comp.AllowedToAct;
         let dcom = comp.DcomUsers;
 
         if (!queries.properties) {
@@ -740,6 +741,18 @@ export function buildComputerJson(chunk) {
             let aType = dcomu.Type;
             let aName = dcomu.Name;
             let rel = "ExecuteDCOM";
+
+            let hash = rel + aType;
+
+            let statement = baseQuery.format(aType, rel);
+            let p = { name: name, target: aName };
+            insert(queries, hash, statement, p);
+        });
+
+        $.each(allowedtoact, function (_, atau) {
+            let aType = atau.Type;
+            let aName = atau.Name;
+            let rel = "AllowedToAct";
 
             let hash = rel + aType;
 
