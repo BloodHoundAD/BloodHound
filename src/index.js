@@ -285,7 +285,9 @@ if (typeof conf.get("edgeincluded") === "undefined"){
         AllowedToDelegate: true,
         ReadLAPSPassword: true,
         Contains: true,
-        GpLink: true
+        GpLink: true,
+        AddAllowedToAct: true,
+        AllowedToAct: true
     });
 }
 
