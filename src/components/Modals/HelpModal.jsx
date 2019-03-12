@@ -133,6 +133,14 @@ export default class HelpModal extends Component {
             One caveat is that impersonated users can not be in the "Protected Users" security group or otherwise have delegation privileges revoked. Another caveat is that the principal added to the msDS-AllowedToActOnBehalfOfOtherIdentity DACL *must* have a service pricipal name (SPN) set in order to successfully abuse the S4U2self/S4U2proxy process. If an attacker does not currently control an account with a SPN set, an attacker can abuse the default domain MachineAccountQuota settings to add a computer account that the attacker controls via the Powermad project.`;
 
             formatted = text.format(sourceType, sourceName, targetType, targetName);
+        } else if (edge.label === "AllowedToAct"){
+            let text = `${this.groupSpecialFormat(source)} is added to the msds-AllowedToActOnBehalfOfOtherIdentity attribute on the computer ${targetName}.
+            
+            An attacker can use this account to execute a modified S4U2self/S4U2proxy abuse chain to impersonate any domain user to the target computer system and receive a valid service ticket "as" this user.
+            
+            One caveat is that impersonated users can not be in the "Protected Users" security group or otherwise have delegation privileges revoked. Another caveat is that the principal added to the msDS-AllowedToActOnBehalfOfOtherIdentity DACL *must* have a service pricipal name (SPN) set in order to successfully abuse the S4U2self/S4U2proxy process. If an attacker does not currently control an account with a SPN set, an attacker can abuse the default domain MachineAccountQuota settings to add a computer account that the attacker controls via the Powermad project.`;
+
+            formatted = text.format(sourceType, sourceName, targetType, targetName);
         }
 
         this.setState({ infoTabContent: { __html: formatted } })
@@ -1287,6 +1295,18 @@ export default class HelpModal extends Component {
             And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
             
             <code>Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>`;
+        }else if (edge.label === "AllowedToAct"){
+            formatted = `Abusing this primitive is currently only possible through the Rubeus project.
+            
+            To use this attack, the controlled account MUST have a service principal name set, along with access to either the plaintext or the RC4_HMAC hash of the account.
+
+            If the plaintext password is available, you can hash it to the RC4_HMAC version using Rubeus:
+
+            <code>Rubeus.exe hash /password:Summer2018!</code>            
+            
+            Use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
+            
+            <code>Rubeus.exe s4u /user:${sourceName}$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>`;
         }
 
         this.setState({ abuseTabContent: { __html: formatted } })
@@ -1381,6 +1401,8 @@ export default class HelpModal extends Component {
             formatted = `There are no opsec considerations related to this edge.`;
         }else if (edge.label === "AddAllowedToAct"){
             formatted = `To execute this attack, the Rubeus C# assembly needs to be executed on some system with the ability to send/receive traffic in the domain. Modification of the *msDS-AllowedToActOnBehalfOfOtherIdentity* property against the target also must occur, whether through PowerShell or another method. The property should be cleared (or reset to its original value) after attack execution in order to prevent easy detection.`;
+        } else if (edge.label === "AllowedToAct") {
+            formatted = `To execute this attack, the Rubeus C# assembly needs to be executed on some system with the ability to send/receive traffic in the domain.`;
         }
 
         this.setState({ opsecTabContent: { __html: formatted } })
@@ -1555,6 +1577,13 @@ export default class HelpModal extends Component {
             <a href="http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/">http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/</a>
             <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="https://github.com/Kevin-Robertson/Powermad#new-machineaccount">https://github.com/Kevin-Robertson/Powermad#new-machineaccount</a>`;
+        } else if (edge.label === "AllowedToAct") {
+            formatted = `<a href="https://eladshamir.com/2019/01/28/Wagging-the-Dog.html">https://eladshamir.com/2019/01/28/Wagging-the-Dog.html</a>
+            <a href="https://github.com/GhostPack/Rubeus#s4u">https://github.com/GhostPack/Rubeus#s4u</a>
+            <a href="https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff">https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff</a>
+            <a href="http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/">http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/</a>
+            <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
+            <a href="https://github.com/Kevin-Robertson/Powermad#new-machineaccount">https://github.com/Kevin-Robertson/Powermad#new-machineaccount</a>`;
         }
 
         this.setState({ referencesTabContent: { __html: formatted } })
@@ -1576,7 +1605,7 @@ export default class HelpModal extends Component {
                 aria-labelledby="HelpHeader"
                 className="help-modal-width"
             >
-                <Modal.Header closeButton={true}>
+                <Modal.Header closeButton>
                     <Modal.Title id="HelpHeader">Help: {this.state.edgeType}</Modal.Title>
                 </Modal.Header>
 
