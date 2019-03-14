@@ -347,6 +347,8 @@ export default class SearchContainer extends Component {
             current.CanRDP = false;
             current.ExecuteDCOM = false;
             current.AllowedToDelegate = false;
+            current.AddAllowedToAct = false;
+            current.AllowedToAct = false;
         }else{
             current.Contains = false;
             current.GpLink = false;
