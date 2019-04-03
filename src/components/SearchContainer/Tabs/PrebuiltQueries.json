@@ -29,7 +29,7 @@
                 {
                     "final": true,
                     "query":
-                        "MATCH (n:User),(m:Group {name:{result}}),p=shortestPath((n)-[r:{}*1..]->(m)) RETURN p",
+                        "MATCH (n),(m:Group {name:{result}}),p=shortestPath((n)-[r:{}*1..]->(m)) WHERE (n:User) OR (n:Computer) RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
                 }
