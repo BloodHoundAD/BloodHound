@@ -1,53 +1,35 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Alert } from "react-bootstrap";
 
+export default function GenericAlert() {
+  const [visible, setVisible] = useState(false);
+  const [text, setText] = useState("No data returned from query");
+  const [timer, setTimer] = useState(null);
 
-export default class GenericAlert extends Component {
-    constructor() {
-        super();
-        this.state = {
-            visible: false,
-            text: "No data returned from query",
-            timeout: null
-        };
+  const handleDismiss = () => {
+    setVisible(false);
+  };
 
-        emitter.on("showAlert", this._show.bind(this));
-        emitter.on("hideAlert", this._dismiss.bind(this));
-    }
+  const handleShow = text => {
+    clearTimeout(timer);
 
-    _dismiss() {
-        this.setState({ visible: false });
-    }
+    const time = setTimeout(() => {
+      handleDismiss();
+    }, 2500);
 
-    _show(val) {
-        clearTimeout(this.state.timeout);
-        var t = setTimeout(
-            _ => {
-                this._dismiss();
-            },
-            2500
-        );
+    setVisible(true);
+    setText(text);
+    setTimer(time);
+  };
 
-        this.setState({
-            visible: true,
-            text: val,
-            timeout: t
-        });
-    }
+  emitter.on("showAlert", msg => handleShow(msg));
+  emitter.on("hideAlert", () => handleDismiss());
 
-    render() {
-        if (this.state.visible) {
-            return (
-                <Alert
-                    className="alertdiv"
-                    bsStyle="danger"
-                    onDismiss={x => this._dismiss}
-                >
-                    {this.state.text}
-                </Alert>
-            );
-        } else {
-            return null;
-        }
-    }
+  return (
+    visible && (
+      <Alert className="alertdiv" bsStyle="info" onDismiss={handleDismiss}>
+        {text}
+      </Alert>
+    )
+  );
 }
