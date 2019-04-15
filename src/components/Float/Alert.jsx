@@ -1,53 +1,45 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Alert } from "react-bootstrap";
 
+export default function GenericAlert() {
+    const DEFAULT_TEXT = "No data returned from query";
+    const DEFAULT_TYPE = "danger";
+    const DEFAULT_TIMEOUT = 2500;
 
-export default class GenericAlert extends Component {
-    constructor() {
-        super();
-        this.state = {
-            visible: false,
-            text: "No data returned from query",
-            timeout: null
-        };
+    const [visible, setVisible] = useState(false);
+    const [text, setText] = useState(DEFAULT_TEXT);
+    const [type, setType] = useState(DEFAULT_TYPE);
+    const [timer, setTimer] = useState(null);
 
-        emitter.on("showAlert", this._show.bind(this));
-        emitter.on("hideAlert", this._dismiss.bind(this));
-    }
+    const handleDismiss = () => {
+        setVisible(false);
+    };
 
-    _dismiss() {
-        this.setState({ visible: false });
-    }
+    const handleShow = ({
+        text = DEFAULT_TEXT,
+        timeout = DEFAULT_TIMEOUT,
+        type = DEFAULT_TYPE
+    }) => {
+        clearTimeout(timer);
 
-    _show(val) {
-        clearTimeout(this.state.timeout);
-        var t = setTimeout(
-            _ => {
-                this._dismiss();
-            },
-            2500
-        );
+        const time = setTimeout(() => {
+            handleDismiss();
+        }, timeout);
 
-        this.setState({
-            visible: true,
-            text: val,
-            timeout: t
-        });
-    }
+        setVisible(true);
+        setText(text);
+        setType(type);
+        setTimer(time);
+    };
 
-    render() {
-        if (this.state.visible) {
-            return (
-                <Alert
-                    className="alertdiv"
-                    bsStyle="danger"
-                    onDismiss={x => this._dismiss}
-                >
-                    {this.state.text}
-                </Alert>
-            );
-        } else {
-            return null;
-        }
-    }
+    emitter.on("showAlert", props => handleShow(props));
+    emitter.on("hideAlert", () => handleDismiss());
+
+    return (
+        visible && (
+            <Alert className="alertdiv" bsStyle={type} onDismiss={handleDismiss}>
+                {text}
+            </Alert>
+        )
+    );
 }

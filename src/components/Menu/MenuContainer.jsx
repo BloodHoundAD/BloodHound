@@ -54,7 +54,7 @@ export default class MenuContainer extends Component {
                     (file, callback) => {
                         emitter.emit(
                             "showAlert",
-                            "Processing file {}".format(file.name)
+                          { text:`Processing file ${file.name}`, type: "info"}
                         );
                         this.getFileMeta(file.path, callback);
                     },

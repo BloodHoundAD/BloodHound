@@ -294,7 +294,7 @@ export default class GraphContainer extends Component {
     changeLayout(){
         appStore.dagre = !appStore.dagre;
         var type = appStore.dagre ? "Hierarchical" : "Directed";
-        emitter.emit("showAlert", "Changed Layout to " + type);
+        emitter.emit("showAlert", {text:`Changed Layout to ${type}`, type:"success"});
         this.relayout();
     }
 
@@ -402,7 +402,7 @@ export default class GraphContainer extends Component {
 
     loadFromChildProcess(graph) {
         if (graph.nodes.length === 0) {
-            emitter.emit("showAlert", "No data returned from query");
+            emitter.emit("showAlert", {text:"No data returned from query",type:"info"});
             emitter.emit("updateLoadingText", "Done!");
             setTimeout(function() {
                 emitter.emit("showLoadingIndicator", false);
@@ -462,12 +462,12 @@ export default class GraphContainer extends Component {
                 try {
                     graph = JSON.parse(data);
                 } catch (err) {
-                    emitter.emit("showAlert", "Bad JSON File");
+                    emitter.emit("showAlert", {text:"Bad JSON File"});
                     return;
                 }
 
                 if (graph.nodes.length === 0) {
-                    emitter.emit("showAlert", "No data returned from query");
+                    emitter.emit("showAlert", {text:"No data returned from query", type:"info"});
                 } else {
                     $.each(graph.nodes, function(i, node) {
                         node.glyphs = $.map(node.glyphs, function(
@@ -693,7 +693,7 @@ export default class GraphContainer extends Component {
         });
 
         if (edgearr.length === 0){
-            emitter.emit("showAlert", "Must specify at least one edge type!");
+            emitter.emit("showAlert", {text:"Must specify at least one edge type!"});
             emitter.emit("updateLoadingText", "Done!");
             setTimeout(function() {
                 emitter.emit("showLoadingIndicator", false);
@@ -1392,16 +1392,16 @@ export default class GraphContainer extends Component {
 
                     if (mode === 2) {
                         sigmaInstance.settings("labelThreshold", 500);
-                        emitter.emit("showAlert", "Hiding Node Labels");
+                        emitter.emit("showAlert", { text:"Hiding Node Labels", type:"info"});
                     } else if (mode === 0) {
                         sigmaInstance.settings("labelThreshold", 15);
                         emitter.emit(
                             "showAlert",
-                            "Default Node Label Threshold"
+                          {text:"Default Node Label Threshold", type:"info"}
                         );
                     } else {
                         sigmaInstance.settings("labelThreshold", 1);
-                        emitter.emit("showAlert", "Always Showing Node Labels");
+                        emitter.emit("showAlert", {text:"Always Showing Node Labels", type:"info"});
                     }
 
                     sigmaInstance.refresh({ skipIndexation: true });

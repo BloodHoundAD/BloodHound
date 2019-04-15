@@ -84,7 +84,7 @@ export default class NodeEditor extends Component {
 
         if (Object.keys(this.state.properties).includes(val)){
             input.css("border", "3px solid red")
-            emitter.emit("showAlert", "Node property already exists");
+            emitter.emit("showAlert", {text:"Node property already exists"});
             return;
         }
 

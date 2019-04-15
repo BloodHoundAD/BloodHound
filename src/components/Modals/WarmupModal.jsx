@@ -20,7 +20,7 @@ export default class WarmupModal extends Component {
         session.run("MATCH (n) OPTIONAL MATCH (n)-[r]->() RETURN count(n.name) + count(r.isacl)")
             .then(function(){
                 session.close()
-                emitter.emit("showAlert", "Database Warmup Complete!")
+                emitter.emit("showAlert", { text:"Database Warmup Complete!", type:"success"})
             })
     }
 
