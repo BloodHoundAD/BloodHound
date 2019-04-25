@@ -159,7 +159,8 @@ global.appStore = {
             AddAllowedToAct: "tapered",
             AllowedToAct: "tapered",
             GetChanges: "tapered",
-            GetChangeAll: "tapered"
+            GetChangeAll: "tapered",
+            SQLAdmin: "tapered"
         }
     },
     lowResPalette: {
@@ -194,7 +195,8 @@ global.appStore = {
             AddAllowedToAct: "line",
             AllowedToAct: "line",
             GetChanges: "line",
-            GetChangeAll: "line"
+            GetChangeAll: "line",
+            SQLAdmin: "line"
         }
     },
     highResStyle: {
@@ -287,7 +289,8 @@ if (typeof conf.get("edgeincluded") === "undefined"){
         Contains: true,
         GpLink: true,
         AddAllowedToAct: true,
-        AllowedToAct: true
+        AllowedToAct: true,
+        SQLAdmin: true
     });
 }
 
@@ -300,6 +303,11 @@ if (!appStore.edgeincluded.hasOwnProperty("AddAllowedToAct")){
 
 if (!appStore.edgeincluded.hasOwnProperty("AllowedToAct")) {
     appStore.edgeincluded.AllowedToAct = true;
+    conf.set("edgeincluded", appStore.edgeincluded);
+}
+
+if (!appStore.edgeincluded.hasOwnProperty("SQLAdmin")) {
+    appStore.edgeincluded.SQLAdmin = true;
     conf.set("edgeincluded", appStore.edgeincluded);
 }
 

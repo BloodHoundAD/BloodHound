@@ -507,6 +507,37 @@ export default class ComputerNodeData extends Component {
                         distinct
                     />
 
+                    <h4>Inbound Object Control</h4> 
+                    <NodeCypherLink
+                        property="Explicit Object Controllers"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(n)-[r]->(u1:Computer {name: {name}}) WHERE r.isacl=true"
+                        }
+                        end={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="Unrolled Object Controllers"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1:AddMember|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(u:Computer {name: {name}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = u.name) AND NOT n.name = u.name"
+                        }
+                        end={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property="Transitive Object Controllers"
+                        target={this.state.label}
+                        baseQuery={
+                            "MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((n)-[r1:MemberOf|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(u1:Computer {name: {name}}))"
+                        }
+                        end={this.state.label}
+                        distinct
+                    />
+
                     <h4>Outbound Object Control</h4>
                     <NodeCypherLink
                         property="First Degree Object Control"

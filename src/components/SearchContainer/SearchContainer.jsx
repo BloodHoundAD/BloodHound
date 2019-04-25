@@ -349,6 +349,7 @@ export default class SearchContainer extends Component {
             current.AllowedToDelegate = false;
             current.AddAllowedToAct = false;
             current.AllowedToAct = false;
+            current.SQLAdmin = false;
         }else{
             current.Contains = false;
             current.GpLink = false;
@@ -379,6 +380,9 @@ export default class SearchContainer extends Component {
             current.CanRDP = true;
             current.ExecuteDCOM = true;
             current.AllowedToDelegate = true;
+            current.AddAllowedToAct = true;
+            current.AllowedToAct = true;
+            current.SQLAdmin = true;
         }else{
             current.Contains = true;
             current.GpLink = true;
@@ -757,6 +761,16 @@ export default class SearchContainer extends Component {
                             onChange={this.handleChange.bind(this)}
                         />
                         <label onClick={this.handleChange.bind(this)} name="AllowedToAct"> AllowedToAct</label>
+                    </div>
+                    <div>
+                        <input
+                            className="checkbox-inline"
+                            type="checkbox"
+                            name="SQLAdmin"
+                            checked={this.state.edgeincluded.SQLAdmin}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label onClick={this.handleChange.bind(this)} name="SQLAdmin"> SQLAdmin</label>
                     </div>
                 </div>
                 <div className="input-group input-group-unstyled searchSelectorS">

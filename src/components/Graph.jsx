@@ -838,6 +838,17 @@ export default class GraphContainer extends Component {
             label: type
         };
 
+        if (data.hasOwnProperty("properties")){
+            if (data.properties.hasOwnProperty("enforced")){
+                edge.enforced = data.properties.enforced;
+            }
+            
+            if (data.properties.hasOwnProperty("port")){
+                let port = data.properties.port;
+                edge.label = `${type} (${port})`
+            }
+        }
+
         if (
             data.hasOwnProperty("properties") &&
             data.properties.hasOwnProperty("enforced")

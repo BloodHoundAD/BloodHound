@@ -319,6 +319,25 @@ function processAceArray(array, objname, objtype, output) {
     });
 }
 
+function processSPNTargetArray(array, username, output) {
+    let baseSpnQuery =
+        "UNWIND {props} AS prop MERGE (a:User {name:prop.principal}) MERGE (b:Computer {name: prop.obj}) MERGE (a)-[r:{} {isacl:false, port: prop.port}]->(b)";
+
+    $.each(array, function(_, spn) {
+        let target = spn.ComputerName;
+        let service  = spn.Service;
+        let port = spn.Port;
+
+        let hash = target + port + service;
+        let formatted = baseSpnQuery.format(service);
+        insert(output, hash, formatted, {
+            obj: target,
+            principal: username,
+            port: port
+        })
+    });
+}
+
 export function buildDomainJson(chunk) {
     let queries = {};
     queries.properties = {
@@ -669,6 +688,9 @@ export function buildUserJson(chunk) {
         $.each(allowedToDelegate, (_, comp) =>{
             queries.delegate.props.push({name: name, comp: comp});
         });
+
+        let spnTargets = user.SPNTargets;
+        processSPNTargetArray(spnTargets, name, queries);
     });
     return queries;
 }
