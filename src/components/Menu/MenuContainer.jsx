@@ -277,7 +277,7 @@ export default class MenuContainer extends Component {
                     chunk.push(data.value);
                     localcount++;
                     
-                    if (localcount % 1000 === 0 || type === "gpomembers" || type === "ous" || type === "domains") {
+                    if (localcount % 1000 === 0) {
                         pipeline.pause();
                         await this.uploadData(chunk, type);
                         sent += chunk.length;
