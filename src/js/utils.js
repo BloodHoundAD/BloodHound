@@ -642,7 +642,6 @@ export function buildGpoAdminJson(chunk) {
             })
         });
     });
-    console.log(queries)
     return queries;
 }
 
