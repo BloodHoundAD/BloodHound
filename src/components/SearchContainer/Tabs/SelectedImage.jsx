@@ -32,7 +32,10 @@ export default class SelectedImage extends Component {
         };
 
         return (<div style={style} className="gallery-img">
-            <i className="fa fa-copy" onClick={x => {emitter.emit("showAlert", "Copied file path to clipboard");clipboard.writeText(this.props.photo.src)}} />
+          <i className="fa fa-copy" onClick={x => {
+            emitter.emit("showAlert", {text:"Copied file path to clipboard", type:"success"});
+            clipboard.writeText(this.props.photo.src)}
+          } />
             <i className="fa fa-trash-alt" onClick={e => this.click(e, true)} />
             <img className={"gallery-img"} onClick={e => this.click(e, false)} {...this.props.photo} style={style} />
         </div>);

@@ -104,7 +104,7 @@ export default class GpoNodeData extends Component {
                 }
             })
             if (exists){
-                emitter.emit("showAlert", "Image already exists");
+                emitter.emit("showAlert", {text:"Image already exists"});
                 return;
             }
             let path = join(app.getPath("userData"), "images", hash);

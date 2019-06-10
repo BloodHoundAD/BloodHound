@@ -103,7 +103,7 @@ export default class QueryNodeSelect extends Component {
                     if (y.length === 0) {
                         emitter.emit(
                             "showAlert",
-                            "No data returned from query"
+                          { text:"No data returned from query", type: "info"}
                         );
                         appStore.prebuiltQuery = [];
                         this._dismiss();
