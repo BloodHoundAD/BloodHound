@@ -22,9 +22,9 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development electron .",
     "dev": "concurrently -k \"babel-node server.js\" \"npm start\"",
-    "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --ignore=node_modules/\\.bin --icon=src/img/icon.ico",
-    "macbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=darwin --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --ignore=node_modules/\\.bin --icon=src/img/icon.icns",
-    "linuxbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=linux --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --ignore=node_modules/\\.bin"
+    "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --ignore=Ingestors --ignore=node_modules/\\.bin --icon=src/img/icon.ico",
+    "macbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=darwin --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --ignore=Ingestors --ignore=node_modules/\\.bin --icon=src/img/icon.icns",
+    "linuxbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=linux --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --ignore=Ingestors --ignore=node_modules/\\.bin"
   },
   "babel": {
     "presets": [
@@ -43,7 +43,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "concurrently": "^3.5.1",
     "cross-env": "^5.1.3",
-    "electron": "^1.7.10",
+    "electron": "^5.0.3",
     "express": "^4.16.2",
     "webpack": "^3.10.0",
     "webpack-dev-middleware": "^2.0.4",
