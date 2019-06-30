@@ -48,7 +48,7 @@ export default class TabContainer extends Component {
             if (type !== null && type.mime.includes('image')) {
                 files.push({ path: f.path, name: f.name });
             } else {
-                emitter.emit('showAlert', `${f.name} is not an image`);
+                emitter.emit('showAlert', "{} is not an image".format(f.name));
             }
         });
         emitter.emit('imageUploadFinal', files);

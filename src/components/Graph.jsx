@@ -294,7 +294,7 @@ export default class GraphContainer extends Component {
     changeLayout(){
         appStore.dagre = !appStore.dagre;
         var type = appStore.dagre ? "Hierarchical" : "Directed";
-        emitter.emit("showAlert", {text:`Changed Layout to ${type}`, type:"success"});
+        emitter.emit("showAlert", {text:"Changed Layout to {}".format(type), type:"success"});
         this.relayout();
     }
 

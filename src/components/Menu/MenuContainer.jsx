@@ -54,7 +54,7 @@ export default class MenuContainer extends Component {
                     (file, callback) => {
                         emitter.emit(
                             "showAlert",
-                          { text:`Processing file ${file.name}`, type: "info"}
+                          { text:"Processing file {}".format(file.name), type: "info"}
                         );
                         this.getFileMeta(file.path, callback);
                     },
@@ -191,7 +191,7 @@ export default class MenuContainer extends Component {
                             delete: true
                         });
                     }).on("error", function(error){
-                        emitter.emit('showAlert', `${name} is corrupted or password protected`);
+                        emitter.emit('showAlert', "{} is corrupted or password protected".format(name));
                     })
                     .promise();
             } else {
