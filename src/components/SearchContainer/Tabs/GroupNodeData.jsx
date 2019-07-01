@@ -1,45 +1,46 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import NodeCypherLink from "./NodeCypherLink";
-import NodeProps from "./NodeProps";
-import Gallery from "react-photo-gallery";
-import SelectedImage from "./SelectedImage";
-import Lightbox from "react-images";
-import { readFileSync, writeFileSync } from "fs";
-import sizeOf from "image-size";
-import md5File from "md5-file";
-import { remote } from "electron";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import NodeCypherLink from './NodeCypherLink';
+import NodeProps from './NodeProps';
+import Gallery from 'react-photo-gallery';
+import SelectedImage from './SelectedImage';
+import Lightbox from 'react-images';
+import { readFileSync, writeFileSync } from 'fs';
+import sizeOf from 'image-size';
+import md5File from 'md5-file';
+import { remote } from 'electron';
 const { app } = remote;
-import { join } from "path";
+import { join } from 'path';
+import {withAlert} from 'react-alert';
 
-export default class GroupNodeData extends Component {
+class GroupNodeData extends Component {
     constructor() {
         super();
 
         this.state = {
-            label: "",
+            label: '',
             driversessions: [],
             propertyMap: {},
             displayMap: {
-                description: "Description",
-                admincount: "Admin Count"
+                description: 'Description',
+                admincount: 'Admin Count',
             },
             ServicePrincipalNames: [],
             notes: null,
             pics: [],
             currentImage: 0,
-            lightboxIsOpen: false
+            lightboxIsOpen: false,
         };
 
-        emitter.on("groupNodeClicked", this.getNodeData.bind(this));
-        emitter.on("computerNodeClicked", this.nullTarget.bind(this));
-        emitter.on("userNodeClicked", this.nullTarget.bind(this));
-        emitter.on("domainNodeClicked", this.nullTarget.bind(this));
-        emitter.on("gpoNodeClicked", this.nullTarget.bind(this));
-        emitter.on("ouNodeClicked", this.nullTarget.bind(this))
-        emitter.on("imageUploadFinal", this.uploadImage.bind(this));
-        emitter.on("clickPhoto", this.openLightbox.bind(this));
-        emitter.on("deletePhoto", this.handleDelete.bind(this));
+        emitter.on('groupNodeClicked', this.getNodeData.bind(this));
+        emitter.on('computerNodeClicked', this.nullTarget.bind(this));
+        emitter.on('userNodeClicked', this.nullTarget.bind(this));
+        emitter.on('domainNodeClicked', this.nullTarget.bind(this));
+        emitter.on('gpoNodeClicked', this.nullTarget.bind(this));
+        emitter.on('ouNodeClicked', this.nullTarget.bind(this));
+        emitter.on('imageUploadFinal', this.uploadImage.bind(this));
+        emitter.on('clickPhoto', this.openLightbox.bind(this));
+        emitter.on('deletePhoto', this.handleDelete.bind(this));
     }
 
     componentDidMount() {
@@ -49,7 +50,7 @@ export default class GroupNodeData extends Component {
 
     nullTarget() {
         this.setState({
-            label: ""
+            label: '',
         });
     }
 
@@ -60,21 +61,21 @@ export default class GroupNodeData extends Component {
         });
 
         this.setState({
-            label: payload
+            label: payload,
         });
 
         let key = `group_${this.state.label}`;
         let c = imageconf.get(key);
         let pics = [];
-        if (typeof c !== "undefined"){
-            this.setState({pics: c})
-        }else{
-            this.setState({pics: pics})
+        if (typeof c !== 'undefined') {
+            this.setState({ pics: c });
+        } else {
+            this.setState({ pics: pics });
         }
 
         var propCollection = driver.session();
         propCollection
-            .run("MATCH (c:Group {name:{name}}) RETURN c", { name: payload })
+            .run('MATCH (c:Group {name:{name}}) RETURN c', { name: payload })
             .then(
                 function(result) {
                     var properties = result.records[0]._fields[0].properties;
@@ -87,7 +88,7 @@ export default class GroupNodeData extends Component {
 
                     this.setState({
                         propertyMap: properties,
-                        notes: notes
+                        notes: notes,
                     });
                     propCollection.close();
                 }.bind(this)
@@ -100,20 +101,20 @@ export default class GroupNodeData extends Component {
 
     notesBlur(event) {
         let notes =
-            this.state.notes === null || this.state.notes === ""
+            this.state.notes === null || this.state.notes === ''
                 ? null
                 : this.state.notes;
         let q = driver.session();
         if (notes === null) {
-            q.run("MATCH (n:Group {name:{name}}) REMOVE n.notes", {
-                name: this.state.label
+            q.run('MATCH (n:Group {name:{name}}) REMOVE n.notes', {
+                name: this.state.label,
             }).then(x => {
                 q.close();
             });
         } else {
-            q.run("MATCH (n:Group {name:{name}}) SET n.notes = {notes}", {
+            q.run('MATCH (n:Group {name:{name}}) SET n.notes = {notes}', {
                 name: this.state.label,
-                notes: this.state.notes
+                notes: this.state.notes,
             }).then(x => {
                 q.close();
             });
@@ -130,31 +131,36 @@ export default class GroupNodeData extends Component {
         let p = this.state.pics;
         let oLen = p.length;
         let key = `group_${this.state.label}`;
-        
+
         $.each(files, (_, f) => {
             let exists = false;
             let hash = md5File.sync(f.path);
             $.each(p, (_, p1) => {
-                if (p1.hash === hash){
+                if (p1.hash === hash) {
                     exists = true;
                 }
-            })
-            if (exists){
-                emitter.emit("showAlert", {text:"Image already exists"});
+            });
+            if (exists) {
+                this.props.alert.error('Image already exists');
                 return;
             }
-            let path = join(app.getPath("userData"), "images", hash);
+            let path = join(app.getPath('userData'), 'images', hash);
             let dimensions = sizeOf(f.path);
             let data = readFileSync(f.path);
             writeFileSync(path, data);
-            p.push({hash: hash, src: path, width: dimensions.width, height: dimensions.height})
+            p.push({
+                hash: hash,
+                src: path,
+                width: dimensions.width,
+                height: dimensions.height,
+            });
         });
 
-        if (p.length === oLen){
+        if (p.length === oLen) {
             return;
         }
-        this.setState({pics: p});
-        imageconf.set(key, p)
+        this.setState({ pics: p });
+        imageconf.set(key, p);
         let check = jQuery(this.refs.piccomplete);
         check.show();
         check.fadeOut(2000);
@@ -168,11 +174,11 @@ export default class GroupNodeData extends Component {
         let temp = pics[event.index];
         pics.splice(event.index, 1);
         this.setState({
-            pics: pics
-        })
+            pics: pics,
+        });
         let key = `group_${this.state.label}`;
         imageconf.set(key, pics);
-        
+
         let check = jQuery(this.refs.piccomplete);
         check.show();
         check.fadeOut(2000);
@@ -184,7 +190,7 @@ export default class GroupNodeData extends Component {
         }
         this.setState({
             currentImage: event.index,
-            lightboxIsOpen: true
+            lightboxIsOpen: true,
         });
     }
     closeLightbox() {
@@ -193,7 +199,7 @@ export default class GroupNodeData extends Component {
         }
         this.setState({
             currentImage: 0,
-            lightboxIsOpen: false
+            lightboxIsOpen: false,
         });
     }
     gotoPrevious() {
@@ -201,7 +207,7 @@ export default class GroupNodeData extends Component {
             return;
         }
         this.setState({
-            currentImage: this.state.currentImage - 1
+            currentImage: this.state.currentImage - 1,
         });
     }
     gotoNext() {
@@ -209,35 +215,36 @@ export default class GroupNodeData extends Component {
             return;
         }
         this.setState({
-            currentImage: this.state.currentImage + 1
+            currentImage: this.state.currentImage + 1,
         });
     }
 
     render() {
         let gallery;
-        if (this.state.pics.length === 0){
-            gallery = (<span>Drop pictures on here to upload!</span>)
-        }else{
+        if (this.state.pics.length === 0) {
+            gallery = <span>Drop pictures on here to upload!</span>;
+        } else {
             gallery = (
-            <React.Fragment>
-                <Gallery
-                    photos={this.state.pics}
-                    ImageComponent={SelectedImage}
-                    className={"gallerymod"}
-                />
-                <Lightbox
-                    images={this.state.pics}
-                    isOpen={this.state.lightboxIsOpen}
-                    onClose={this.closeLightbox.bind(this)}
-                    onClickPrev={this.gotoPrevious.bind(this)}
-                    onClickNext={this.gotoNext.bind(this)}
-                    currentImage={this.state.currentImage}
-                />
-            </React.Fragment>)
+                <React.Fragment>
+                    <Gallery
+                        photos={this.state.pics}
+                        ImageComponent={SelectedImage}
+                        className={'gallerymod'}
+                    />
+                    <Lightbox
+                        images={this.state.pics}
+                        isOpen={this.state.lightboxIsOpen}
+                        onClose={this.closeLightbox.bind(this)}
+                        onClickPrev={this.gotoPrevious.bind(this)}
+                        onClickNext={this.gotoNext.bind(this)}
+                        currentImage={this.state.currentImage}
+                    />
+                </React.Fragment>
+            );
         }
         return (
-            <div className={this.props.visible ? "" : "displaynone"}>
-                <dl className="dl-horizontal">
+            <div className={this.props.visible ? '' : 'displaynone'}>
+                <dl className='dl-horizontal'>
                     <h4>Node Info</h4>
                     <dt>Name</dt>
                     <dd>{this.state.label}</dd>
@@ -247,16 +254,16 @@ export default class GroupNodeData extends Component {
                         ServicePrincipalNames={this.state.ServicePrincipalNames}
                     />
                     <NodeCypherLink
-                        property="Sessions"
+                        property='Sessions'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = (c:Computer)-[n:HasSession]->(u:User)-[r2:MemberOf*1..]->(g:Group {name: {name}})"
+                            'MATCH p = (c:Computer)-[n:HasSession]->(u:User)-[r2:MemberOf*1..]->(g:Group {name: {name}})'
                         }
                         end={this.state.label}
                     />
 
                     <NodeCypherLink
-                        property="Reachable High Value Targets"
+                        property='Reachable High Value Targets'
                         target={this.state.label}
                         baseQuery={
                             'MATCH (m:Group {name:{name}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
@@ -268,28 +275,28 @@ export default class GroupNodeData extends Component {
 
                     <h4>Group Members</h4>
                     <NodeCypherLink
-                        property="Direct Members"
+                        property='Direct Members'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=(n)-[b:MemberOf]->(c:Group {name: {name}})"
+                            'MATCH p=(n)-[b:MemberOf]->(c:Group {name: {name}})'
                         }
                         end={this.state.label}
                     />
 
                     <NodeCypherLink
-                        property="Unrolled Members"
+                        property='Unrolled Members'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p =(n)-[r:MemberOf*1..]->(g:Group {name:{name}})"
+                            'MATCH p =(n)-[r:MemberOf*1..]->(g:Group {name:{name}})'
                         }
                         end={this.state.label}
                     />
 
                     <NodeCypherLink
-                        property="Foreign Members"
+                        property='Foreign Members'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = (n)-[r:MemberOf*1..]->(g:Group {name:{name}}) WHERE NOT g.domain = n.domain"
+                            'MATCH p = (n)-[r:MemberOf*1..]->(g:Group {name:{name}}) WHERE NOT g.domain = n.domain'
                         }
                         end={this.state.label}
                         distinct
@@ -297,30 +304,30 @@ export default class GroupNodeData extends Component {
 
                     <h4>Group Membership</h4>
                     <NodeCypherLink
-                        property="First Degree Group Membership"
+                        property='First Degree Group Membership'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=(g1:Group {name:{name}})-[r:MemberOf]->(n:Group)"
+                            'MATCH p=(g1:Group {name:{name}})-[r:MemberOf]->(n:Group)'
                         }
                         start={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Unrolled Member Of"
+                        property='Unrolled Member Of'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = (g1:Group {name:{name}})-[r:MemberOf*1..]->(n:Group)"
+                            'MATCH p = (g1:Group {name:{name}})-[r:MemberOf*1..]->(n:Group)'
                         }
                         start={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Foreign Group Membership"
+                        property='Foreign Group Membership'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=(m:Group {name:{name}})-[r:MemberOf]->(n) WHERE NOT m.domain=n.domain"
+                            'MATCH p=(m:Group {name:{name}})-[r:MemberOf]->(n) WHERE NOT m.domain=n.domain'
                         }
                         start={this.state.label}
                     />
@@ -328,30 +335,30 @@ export default class GroupNodeData extends Component {
                     <h4>Local Admin Rights</h4>
 
                     <NodeCypherLink
-                        property="First Degree Local Admin"
+                        property='First Degree Local Admin'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=(m:Group {name: {name}})-[r:AdminTo]->(n:Computer)"
+                            'MATCH p=(m:Group {name: {name}})-[r:AdminTo]->(n:Computer)'
                         }
                         start={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Group Delegated Local Admin Rights"
+                        property='Group Delegated Local Admin Rights'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = (g1:Group {name:{name}})-[r1:MemberOf*1..]->(g2:Group)-[r2:AdminTo]->(n:Computer)"
+                            'MATCH p = (g1:Group {name:{name}})-[r1:MemberOf*1..]->(g2:Group)-[r2:AdminTo]->(n:Computer)'
                         }
                         start={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Derivative Local Admin Rights"
+                        property='Derivative Local Admin Rights'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = shortestPath((g:Group {name:{name}})-[r:MemberOf|AdminTo|HasSession*1..]->(n:Computer))"
+                            'MATCH p = shortestPath((g:Group {name:{name}})-[r:MemberOf|AdminTo|HasSession*1..]->(n:Computer))'
                         }
                         start={this.state.label}
                         distinct
@@ -359,40 +366,40 @@ export default class GroupNodeData extends Component {
 
                     <h4>Execution Privileges</h4>
                     <NodeCypherLink
-                        property="First Degree RDP Privileges"
+                        property='First Degree RDP Privileges'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=(m:Group {name:{name}})-[r:CanRDP]->(n:Computer)"
+                            'MATCH p=(m:Group {name:{name}})-[r:CanRDP]->(n:Computer)'
                         }
                         start={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Group Delegated RDP Privileges"
+                        property='Group Delegated RDP Privileges'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=(m:Group {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:CanRDP]->(n:Computer)"
+                            'MATCH p=(m:Group {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:CanRDP]->(n:Computer)'
                         }
                         start={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="First Degree DCOM Privileges"
+                        property='First Degree DCOM Privileges'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=(m:Group {name:{name}})-[r:ExecuteDCOM]->(n:Computer)"
+                            'MATCH p=(m:Group {name:{name}})-[r:ExecuteDCOM]->(n:Computer)'
                         }
                         start={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Group Delegated DCOM Privileges"
+                        property='Group Delegated DCOM Privileges'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=(m:Group {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:ExecuteDCOM]->(n:Computer)"
+                            'MATCH p=(m:Group {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:ExecuteDCOM]->(n:Computer)'
                         }
                         start={this.state.label}
                         distinct
@@ -401,30 +408,30 @@ export default class GroupNodeData extends Component {
                     <h4>Outbound Object Control</h4>
 
                     <NodeCypherLink
-                        property="First Degree Object Control"
+                        property='First Degree Object Control'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = (g:Group {name:{name}})-[r]->(n) WHERE r.isacl=true"
+                            'MATCH p = (g:Group {name:{name}})-[r]->(n) WHERE r.isacl=true'
                         }
                         start={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Group Delegated Object Control"
+                        property='Group Delegated Object Control'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = (g1:Group {name:{name}})-[r1:MemberOf*1..]->(g2:Group)-[r2]->(n) WHERE r2.isacl=true"
+                            'MATCH p = (g1:Group {name:{name}})-[r1:MemberOf*1..]->(g2:Group)-[r2]->(n) WHERE r2.isacl=true'
                         }
                         start={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Transitive Object Control"
+                        property='Transitive Object Control'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((g:Group {name:{name}})-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))"
+                            'MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((g:Group {name:{name}})-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))'
                         }
                         start={this.state.label}
                         distinct
@@ -433,54 +440,54 @@ export default class GroupNodeData extends Component {
                     <h4>Inbound Object Control</h4>
 
                     <NodeCypherLink
-                        property="Explicit Object Controllers"
+                        property='Explicit Object Controllers'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:Group {name:{name}})"
+                            'MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:Group {name:{name}})'
                         }
                         end={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Unrolled Object Controllers"
+                        property='Unrolled Object Controllers'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:Group {name: {name}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = g2.name) AND NOT n.name = g2.name AND r1.isacl=true"
+                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:Group {name: {name}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = g2.name) AND NOT n.name = g2.name AND r1.isacl=true'
                         }
                         end={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Transitive Object Controllers"
+                        property='Transitive Object Controllers'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:Group {name:{name}}))"
+                            'MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:Group {name:{name}}))'
                         }
                         end={this.state.label}
                         distinct
                     />
                 </dl>
                 <div>
-                    <h4 className={"inline"}>Notes</h4>
+                    <h4 className={'inline'}>Notes</h4>
                     <i
-                        ref="complete"
-                        className="fa fa-check-circle green-icon-color notes-check-style"
+                        ref='complete'
+                        className='fa fa-check-circle green-icon-color notes-check-style'
                     />
                 </div>
                 <textarea
                     onBlur={this.notesBlur.bind(this)}
                     onChange={this.notesChanged.bind(this)}
-                    value={this.state.notes === null ? "" : this.state.notes}
-                    className={"node-notes-textarea"}
-                    ref="notes"
+                    value={this.state.notes === null ? '' : this.state.notes}
+                    className={'node-notes-textarea'}
+                    ref='notes'
                 />
                 <div>
-                    <h4 className={"inline"}>Pictures</h4>
+                    <h4 className={'inline'}>Pictures</h4>
                     <i
-                        ref="piccomplete"
-                        className="fa fa-check-circle green-icon-color notes-check-style"
+                        ref='piccomplete'
+                        className='fa fa-check-circle green-icon-color notes-check-style'
                     />
                 </div>
                 {gallery}
@@ -490,5 +497,7 @@ export default class GroupNodeData extends Component {
 }
 
 GroupNodeData.propTypes = {
-    visible: PropTypes.bool.isRequired
+    visible: PropTypes.bool.isRequired,
 };
+
+export default withAlert()(GroupNodeData);

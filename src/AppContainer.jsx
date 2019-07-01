@@ -12,7 +12,6 @@ import ClearWarnModal from "./components/Modals/ClearWarnModal";
 import ClearConfirmModal from "./components/Modals/ClearConfirmModal";
 import ClearingModal from "./components/Modals/ClearingModal";
 import LoadingContainer from "./components/Float/LoadingContainer";
-import GenericAlert from "./components/Float/Alert";
 import RawQuery from "./components/RawQuery";
 import MenuContainer from "./components/Menu/MenuContainer";
 import ExportContainer from "./components/Float/ExportContainer";
@@ -50,7 +49,6 @@ export default class AppContainer extends Component {
             <TransitionGroup className="max">
                 <CSSTransition classNames="mainfade" appear timeout={1000}>
                     <div className="max">
-                        <GenericAlert />
                         <ExportContainer />
                         <LoadingContainer />
                         <SpotlightContainer />

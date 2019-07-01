@@ -1,45 +1,46 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import NodeCypherLink from "./NodeCypherLink.jsx";
-import NodeCypherLinkComplex from "./NodeCypherLinkComplex.jsx";
-import NodeProps from "./NodeProps";
-import Gallery from "react-photo-gallery";
-import SelectedImage from "./SelectedImage";
-import Lightbox from "react-images";
-import { readFileSync, writeFileSync } from "fs";
-import sizeOf from "image-size";
-import md5File from "md5-file";
-import { remote } from "electron";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import NodeCypherLink from './NodeCypherLink.jsx';
+import NodeCypherLinkComplex from './NodeCypherLinkComplex.jsx';
+import NodeProps from './NodeProps';
+import Gallery from 'react-photo-gallery';
+import SelectedImage from './SelectedImage';
+import Lightbox from 'react-images';
+import { readFileSync, writeFileSync } from 'fs';
+import sizeOf from 'image-size';
+import md5File from 'md5-file';
+import { remote } from 'electron';
 const { app } = remote;
-import { join } from "path";
+import { join } from 'path';
+import {withAlert} from 'react-alert';
 
-export default class GpoNodeData extends Component {
+class GpoNodeData extends Component {
     constructor() {
         super();
 
         this.state = {
-            label: "",
-            guid: "",
+            label: '',
+            guid: '',
             propertyMap: {},
             displayMap: {
-                "description":"Description",
-                "gpcpath":"GPO File Path"
+                description: 'Description',
+                gpcpath: 'GPO File Path',
             },
-            notes:null,
+            notes: null,
             pics: [],
             currentImage: 0,
-            lightboxIsOpen: false
+            lightboxIsOpen: false,
         };
 
-        emitter.on("gpoNodeClicked", this.getNodeData.bind(this));
-        emitter.on("computerNodeClicked", this.nullTarget.bind(this));
-        emitter.on("groupNodeClicked", this.nullTarget.bind(this));
-        emitter.on("domainNodeClicked", this.nullTarget.bind(this));
-        emitter.on("userNodeClicked", this.nullTarget.bind(this));
-        emitter.on("ouNodeClicked", this.nullTarget.bind(this))
-        emitter.on("imageUploadFinal", this.uploadImage.bind(this));
-        emitter.on("clickPhoto", this.openLightbox.bind(this));
-        emitter.on("deletePhoto", this.handleDelete.bind(this));
+        emitter.on('gpoNodeClicked', this.getNodeData.bind(this));
+        emitter.on('computerNodeClicked', this.nullTarget.bind(this));
+        emitter.on('groupNodeClicked', this.nullTarget.bind(this));
+        emitter.on('domainNodeClicked', this.nullTarget.bind(this));
+        emitter.on('userNodeClicked', this.nullTarget.bind(this));
+        emitter.on('ouNodeClicked', this.nullTarget.bind(this));
+        emitter.on('imageUploadFinal', this.uploadImage.bind(this));
+        emitter.on('clickPhoto', this.openLightbox.bind(this));
+        emitter.on('deletePhoto', this.handleDelete.bind(this));
     }
 
     componentDidMount() {
@@ -47,9 +48,9 @@ export default class GpoNodeData extends Component {
         jQuery(this.refs.piccomplete).hide();
     }
 
-    nullTarget(){
+    nullTarget() {
         this.setState({
-            label: ""
+            label: '',
         });
     }
 
@@ -57,28 +58,28 @@ export default class GpoNodeData extends Component {
         jQuery(this.refs.complete).hide();
         this.setState({
             label: payload,
-            guid: guid
+            guid: guid,
         });
-        
+
         let key = `gpo_${this.state.label}`;
         let c = imageconf.get(key);
         let pics = [];
-        if (typeof c !== "undefined"){
-            this.setState({pics: c})
-        }else{
-            this.setState({pics: pics})
+        if (typeof c !== 'undefined') {
+            this.setState({ pics: c });
+        } else {
+            this.setState({ pics: pics });
         }
 
         let props = driver.session();
         props
-            .run("MATCH (n:GPO {name:{name}}) RETURN n", { name: payload })
+            .run('MATCH (n:GPO {name:{name}}) RETURN n', { name: payload })
             .then(
                 function(result) {
                     var properties = result.records[0]._fields[0].properties;
                     let notes;
-                    if (!properties.notes){
+                    if (!properties.notes) {
                         notes = null;
-                    }else{
+                    } else {
                         notes = properties.notes;
                     }
                     this.setState({ propertyMap: properties, notes: notes });
@@ -94,31 +95,36 @@ export default class GpoNodeData extends Component {
         let p = this.state.pics;
         let oLen = p.length;
         let key = `gpo_${this.state.label}`;
-        
+
         $.each(files, (_, f) => {
             let exists = false;
             let hash = md5File.sync(f.path);
             $.each(p, (_, p1) => {
-                if (p1.hash === hash){
+                if (p1.hash === hash) {
                     exists = true;
                 }
-            })
-            if (exists){
-                emitter.emit("showAlert", {text:"Image already exists"});
+            });
+            if (exists) {
+                this.props.alert.error('Image already exists');
                 return;
             }
-            let path = join(app.getPath("userData"), "images", hash);
+            let path = join(app.getPath('userData'), 'images', hash);
             let dimensions = sizeOf(f.path);
             let data = readFileSync(f.path);
             writeFileSync(path, data);
-            p.push({hash: hash, src: path, width: dimensions.width, height: dimensions.height})
+            p.push({
+                hash: hash,
+                src: path,
+                width: dimensions.width,
+                height: dimensions.height,
+            });
         });
 
-        if (p.length === oLen){
+        if (p.length === oLen) {
             return;
         }
-        this.setState({pics: p});
-        imageconf.set(key, p)
+        this.setState({ pics: p });
+        imageconf.set(key, p);
         let check = jQuery(this.refs.piccomplete);
         check.show();
         check.fadeOut(2000);
@@ -132,11 +138,11 @@ export default class GpoNodeData extends Component {
         let temp = pics[event.index];
         pics.splice(event.index, 1);
         this.setState({
-            pics: pics
-        })
+            pics: pics,
+        });
         let key = `gpo_${this.state.label}`;
         imageconf.set(key, pics);
-        
+
         let check = jQuery(this.refs.piccomplete);
         check.show();
         check.fadeOut(2000);
@@ -148,7 +154,7 @@ export default class GpoNodeData extends Component {
         }
         this.setState({
             currentImage: event.index,
-            lightboxIsOpen: true
+            lightboxIsOpen: true,
         });
     }
     closeLightbox() {
@@ -157,7 +163,7 @@ export default class GpoNodeData extends Component {
         }
         this.setState({
             currentImage: 0,
-            lightboxIsOpen: false
+            lightboxIsOpen: false,
         });
     }
     gotoPrevious() {
@@ -165,7 +171,7 @@ export default class GpoNodeData extends Component {
             return;
         }
         this.setState({
-            currentImage: this.state.currentImage - 1
+            currentImage: this.state.currentImage - 1,
         });
     }
     gotoNext() {
@@ -173,23 +179,31 @@ export default class GpoNodeData extends Component {
             return;
         }
         this.setState({
-            currentImage: this.state.currentImage + 1
+            currentImage: this.state.currentImage + 1,
         });
     }
 
-    notesChanged(event){
-        this.setState({notes: event.target.value})
+    notesChanged(event) {
+        this.setState({ notes: event.target.value });
     }
 
-    notesBlur(){
-        let notes = this.state.notes === null || this.state.notes === "" ? null : this.state.notes;
+    notesBlur() {
+        let notes =
+            this.state.notes === null || this.state.notes === ''
+                ? null
+                : this.state.notes;
         let q = driver.session();
-        if (notes === null){
-            q.run("MATCH (n:GPO {name:{name}}) REMOVE n.notes", {name: this.state.label}).then(x => {
+        if (notes === null) {
+            q.run('MATCH (n:GPO {name:{name}}) REMOVE n.notes', {
+                name: this.state.label,
+            }).then(x => {
                 q.close();
             });
-        }else{
-            q.run("MATCH (n:GPO {name:{name}}) SET n.notes = {notes}", {name: this.state.label, notes: this.state.notes}).then(x =>{
+        } else {
+            q.run('MATCH (n:GPO {name:{name}}) SET n.notes = {notes}', {
+                name: this.state.label,
+                notes: this.state.notes,
+            }).then(x => {
                 q.close();
             });
         }
@@ -200,30 +214,31 @@ export default class GpoNodeData extends Component {
 
     render() {
         let gallery;
-        if (this.state.pics.length === 0){
-            gallery = (<span>Drop pictures on here to upload!</span>)
-        }else{
+        if (this.state.pics.length === 0) {
+            gallery = <span>Drop pictures on here to upload!</span>;
+        } else {
             gallery = (
-            <React.Fragment>
-                <Gallery
-                    photos={this.state.pics}
-                    ImageComponent={SelectedImage}
-                    className={"gallerymod"}
-                />
-                <Lightbox
-                    images={this.state.pics}
-                    isOpen={this.state.lightboxIsOpen}
-                    onClose={this.closeLightbox.bind(this)}
-                    onClickPrev={this.gotoPrevious.bind(this)}
-                    onClickNext={this.gotoNext.bind(this)}
-                    currentImage={this.state.currentImage}
-                />
-            </React.Fragment>)
+                <React.Fragment>
+                    <Gallery
+                        photos={this.state.pics}
+                        ImageComponent={SelectedImage}
+                        className={'gallerymod'}
+                    />
+                    <Lightbox
+                        images={this.state.pics}
+                        isOpen={this.state.lightboxIsOpen}
+                        onClose={this.closeLightbox.bind(this)}
+                        onClickPrev={this.gotoPrevious.bind(this)}
+                        onClickNext={this.gotoNext.bind(this)}
+                        currentImage={this.state.currentImage}
+                    />
+                </React.Fragment>
+            );
         }
 
         return (
-            <div className={this.props.visible ? "" : "displaynone"}>
-                <dl className="dl-horizontal">
+            <div className={this.props.visible ? '' : 'displaynone'}>
+                <dl className='dl-horizontal'>
                     <dt>Domain</dt>
                     <dd>{this.state.label}</dd>
                     <dt>GUID</dt>
@@ -235,7 +250,7 @@ export default class GpoNodeData extends Component {
                     />
 
                     <NodeCypherLink
-                        property="Reachable High Value Targets"
+                        property='Reachable High Value Targets'
                         target={this.state.label}
                         baseQuery={
                             'MATCH (m:GPO {name:{name}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
@@ -245,25 +260,25 @@ export default class GpoNodeData extends Component {
                     <br />
                     <h4>Affected Objects</h4>
                     <NodeCypherLink
-                        property="Directly Affected OUs"
+                        property='Directly Affected OUs'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = (m:GPO {name:{name}})-[r:GpLink]->(n)"
+                            'MATCH p = (m:GPO {name:{name}})-[r:GpLink]->(n)'
                         }
                         start={this.state.label}
                     />
 
                     <NodeCypherLink
-                        property="Affected OUs"
+                        property='Affected OUs'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = (m:GPO {name:{name}})-[r:GpLink|Contains*1..]->(n) WHERE n:OU OR n:Domain"
+                            'MATCH p = (m:GPO {name:{name}})-[r:GpLink|Contains*1..]->(n) WHERE n:OU OR n:Domain'
                         }
                         start={this.state.label}
                     />
 
                     <NodeCypherLinkComplex
-                        property="Computer Objects"
+                        property='Computer Objects'
                         target={this.state.label}
                         countQuery={
                             "MATCH (g:GPO {name:{name}}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:Computer) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:Computer) RETURN count(n1) + count(n2)"
@@ -274,7 +289,7 @@ export default class GpoNodeData extends Component {
                     />
 
                     <NodeCypherLinkComplex
-                        property="User Objects"
+                        property='User Objects'
                         target={this.state.label}
                         countQuery={
                             "MATCH (g:GPO {name:{name}}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:User) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:User) RETURN count(n1) + count(n2)"
@@ -287,48 +302,54 @@ export default class GpoNodeData extends Component {
                     <h4>Inbound Object Control</h4>
 
                     <NodeCypherLink
-                        property="Explicit Object Controllers"
+                        property='Explicit Object Controllers'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:GPO {name:{name}})"
+                            'MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:GPO {name:{name}})'
                         }
                         end={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Unrolled Object Controllers"
+                        property='Unrolled Object Controllers'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:GPO {name: {name}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = g2.name) AND NOT n.name = g2.name AND r1.isacl=true"
+                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:GPO {name: {name}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = g2.name) AND NOT n.name = g2.name AND r1.isacl=true'
                         }
                         end={this.state.label}
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Transitive Object Controllers"
+                        property='Transitive Object Controllers'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:GPO {name:{name}}))"
+                            'MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:GPO {name:{name}}))'
                         }
                         end={this.state.label}
                         distinct
                     />
                 </dl>
                 <div>
-                    <h4 className={"inline"}>Notes</h4>
+                    <h4 className={'inline'}>Notes</h4>
                     <i
-                        ref="complete"
-                        className="fa fa-check-circle green-icon-color notes-check-style"
+                        ref='complete'
+                        className='fa fa-check-circle green-icon-color notes-check-style'
                     />
                 </div>
-                <textarea onBlur={this.notesBlur.bind(this)} onChange={this.notesChanged.bind(this)} value={this.state.notes === null ? "" : this.state.notes} className={"node-notes-textarea"} ref="notes" />
+                <textarea
+                    onBlur={this.notesBlur.bind(this)}
+                    onChange={this.notesChanged.bind(this)}
+                    value={this.state.notes === null ? '' : this.state.notes}
+                    className={'node-notes-textarea'}
+                    ref='notes'
+                />
                 <div>
-                    <h4 className={"inline"}>Pictures</h4>
+                    <h4 className={'inline'}>Pictures</h4>
                     <i
-                        ref="piccomplete"
-                        className="fa fa-check-circle green-icon-color notes-check-style"
+                        ref='piccomplete'
+                        className='fa fa-check-circle green-icon-color notes-check-style'
                     />
                 </div>
                 {gallery}
@@ -338,5 +359,7 @@ export default class GpoNodeData extends Component {
 }
 
 GpoNodeData.propTypes = {
-    visible: PropTypes.bool.isRequired
+    visible: PropTypes.bool.isRequired,
 };
+
+export default withAlert()(GpoNodeData);

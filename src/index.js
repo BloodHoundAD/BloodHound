@@ -4,6 +4,8 @@ import ReactDOM from 'react-dom';
 
 import AppContainer from './AppContainer';
 import Login from './components/Float/Login';
+import {transitions, positions, Provider as AlertProvider} from 'react-alert';
+import AlertTemplate from 'react-alert-template-basic';
 
 import { remote, shell } from 'electron';
 const { app } = remote;
@@ -294,6 +296,13 @@ if (typeof conf.get('edgeincluded') === 'undefined') {
     });
 }
 
+const alertOptions = {
+    position: positions.TOP_CENTER,
+    timeout: 5000,
+    offset: '30px',
+    transitions: transitions.FADE
+}
+
 appStore.edgeincluded = conf.get('edgeincluded');
 //Code to add new edges to filter
 if (!appStore.edgeincluded.hasOwnProperty('AddAllowedToAct')) {
@@ -351,7 +360,12 @@ global.closeTooltip = function() {
 renderEmit.on('login', function() {
     emitter.removeAllListeners();
     ReactDOM.unmountComponentAtNode(document.getElementById('root'));
-    ReactDOM.render(<AppContainer />, document.getElementById('root'));
+    let Root = () => (
+        <AlertProvider template={AlertTemplate} {...alertOptions}>
+            <AppContainer />
+        </AlertProvider>
+    )
+    ReactDOM.render(<Root />, document.getElementById('root'));
 });
 
 renderEmit.on('logout', function() {

@@ -13,8 +13,9 @@ import md5File from "md5-file";
 import { remote } from "electron";
 const { app } = remote;
 import { join } from "path";
+import {withAlert} from 'react-alert';
 
-export default class ComputerNodeData extends Component {
+class ComputerNodeData extends Component {
     constructor() {
         super();
 
@@ -134,7 +135,9 @@ export default class ComputerNodeData extends Component {
                 }
             })
             if (exists){
-                emitter.emit("showAlert", {text:"Image already exists"});
+                this.props.alert.error(
+                    'Image already exists'
+                );
                 return;
             }
             let path = join(app.getPath("userData"), "images", hash);
@@ -593,3 +596,5 @@ export default class ComputerNodeData extends Component {
 ComputerNodeData.propTypes = {
     visible: PropTypes.bool.isRequired
 };
+
+export default withAlert()(ComputerNodeData);

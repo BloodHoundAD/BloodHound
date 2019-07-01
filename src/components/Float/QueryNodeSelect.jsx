@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import { ListGroup, Panel } from "react-bootstrap";
 import { If, Then, Else } from "react-if";
 import QueryNodeSelectItem from "./QueryNodeSelectItem";
+import {withAlert} from 'react-alert';
 
-export default class QueryNodeSelect extends Component {
+class QueryNodeSelect extends Component {
     constructor() {
         super();
 
@@ -101,9 +102,8 @@ export default class QueryNodeSelect extends Component {
                         return b;
                     });
                     if (y.length === 0) {
-                        emitter.emit(
-                            "showAlert",
-                          { text:"No data returned from query", type: "info"}
+                        this.props.alert.info(
+                            'No data returned from query'
                         );
                         appStore.prebuiltQuery = [];
                         this._dismiss();
@@ -168,3 +168,5 @@ export default class QueryNodeSelect extends Component {
         );
     }
 }
+
+export default withAlert()(QueryNodeSelect);

@@ -1,26 +1,27 @@
-import React, { Component } from "react";
-import LoadLabel from "./LoadLabel.jsx";
-import PropTypes from "prop-types";
-import NodeCypherLink from "./NodeCypherLink.jsx";
-import NodeCypherNoNumberLink from "./NodeCypherNoNumberLink";
-import NodeCypherLinkComplex from "./NodeCypherLinkComplex";
-import NodeProps from "./NodeProps";
-import Gallery from "react-photo-gallery";
-import SelectedImage from "./SelectedImage";
-import Lightbox from "react-images";
-import { readFileSync, writeFileSync } from "fs";
-import sizeOf from "image-size";
-import md5File from "md5-file";
-import { remote } from "electron";
+import React, { Component } from 'react';
+import LoadLabel from './LoadLabel.jsx';
+import PropTypes from 'prop-types';
+import NodeCypherLink from './NodeCypherLink.jsx';
+import NodeCypherNoNumberLink from './NodeCypherNoNumberLink';
+import NodeCypherLinkComplex from './NodeCypherLinkComplex';
+import NodeProps from './NodeProps';
+import Gallery from 'react-photo-gallery';
+import SelectedImage from './SelectedImage';
+import Lightbox from 'react-images';
+import { readFileSync, writeFileSync } from 'fs';
+import sizeOf from 'image-size';
+import md5File from 'md5-file';
+import { remote } from 'electron';
 const { app } = remote;
-import { join } from "path";
+import { join } from 'path';
+import {withAlert} from 'react-alert';
 
-export default class DomainNodeData extends Component {
+class DomainNodeData extends Component {
     constructor() {
         super();
 
         this.state = {
-            label: "",
+            label: '',
             users: -1,
             groups: -1,
             computers: -1,
@@ -29,34 +30,34 @@ export default class DomainNodeData extends Component {
             driversessions: [],
             propertyMap: {},
             displayMap: {
-                "description":"Description",
-                "functionallevel":"Domain Functional Level"
+                description: 'Description',
+                functionallevel: 'Domain Functional Level',
             },
             notes: null,
             pics: [],
             currentImage: 0,
-            lightboxIsOpen: false
+            lightboxIsOpen: false,
         };
 
-        emitter.on("domainNodeClicked", this.getNodeData.bind(this));
-        emitter.on("computerNodeClicked", this.nullTarget.bind(this));
-        emitter.on("groupNodeClicked", this.nullTarget.bind(this));
-        emitter.on("userNodeClicked", this.nullTarget.bind(this));
-        emitter.on("gpoNodeClicked", this.nullTarget.bind(this));
-        emitter.on("ouNodeClicked", this.nullTarget.bind(this))
-        emitter.on("imageUploadFinal", this.uploadImage.bind(this));
-        emitter.on("clickPhoto", this.openLightbox.bind(this));
-        emitter.on("deletePhoto", this.handleDelete.bind(this));
+        emitter.on('domainNodeClicked', this.getNodeData.bind(this));
+        emitter.on('computerNodeClicked', this.nullTarget.bind(this));
+        emitter.on('groupNodeClicked', this.nullTarget.bind(this));
+        emitter.on('userNodeClicked', this.nullTarget.bind(this));
+        emitter.on('gpoNodeClicked', this.nullTarget.bind(this));
+        emitter.on('ouNodeClicked', this.nullTarget.bind(this));
+        emitter.on('imageUploadFinal', this.uploadImage.bind(this));
+        emitter.on('clickPhoto', this.openLightbox.bind(this));
+        emitter.on('deletePhoto', this.handleDelete.bind(this));
     }
 
     componentDidMount() {
         jQuery(this.refs.complete).hide();
         jQuery(this.refs.piccomplete).hide();
     }
-    
-    nullTarget(){
+
+    nullTarget() {
         this.setState({
-            label: ""
+            label: '',
         });
     }
 
@@ -72,28 +73,28 @@ export default class DomainNodeData extends Component {
             groups: -1,
             computers: -1,
             ous: -1,
-            gpos: -1
+            gpos: -1,
         });
 
         let key = `domain_${this.state.label}`;
         let c = imageconf.get(key);
         let pics = [];
-        if (typeof c !== "undefined"){
-            this.setState({pics: c})
-        }else{
-            this.setState({pics: pics})
+        if (typeof c !== 'undefined') {
+            this.setState({ pics: c });
+        } else {
+            this.setState({ pics: pics });
         }
 
         let props = driver.session();
         props
-            .run("MATCH (n:Domain {name:{name}}) RETURN n", { name: payload })
+            .run('MATCH (n:Domain {name:{name}}) RETURN n', { name: payload })
             .then(
                 function(result) {
                     var properties = result.records[0]._fields[0].properties;
                     let notes;
-                    if (!properties.notes){
+                    if (!properties.notes) {
                         notes = null;
-                    }else{
+                    } else {
                         notes = properties.notes;
                     }
                     this.setState({ propertyMap: properties, notes: notes });
@@ -107,8 +108,8 @@ export default class DomainNodeData extends Component {
         let s4 = driver.session();
         let s5 = driver.session();
 
-        s1.run("MATCH (a:User) WHERE a.domain={name} RETURN COUNT(a)", {
-            name: payload
+        s1.run('MATCH (a:User) WHERE a.domain={name} RETURN COUNT(a)', {
+            name: payload,
         }).then(
             function(result) {
                 this.setState({ users: result.records[0]._fields[0] });
@@ -116,8 +117,8 @@ export default class DomainNodeData extends Component {
             }.bind(this)
         );
 
-        s2.run("MATCH (a:Group) WHERE a.domain={name} RETURN COUNT(a)", {
-            name: payload
+        s2.run('MATCH (a:Group) WHERE a.domain={name} RETURN COUNT(a)', {
+            name: payload,
         }).then(
             function(result) {
                 this.setState({ groups: result.records[0]._fields[0] });
@@ -125,8 +126,8 @@ export default class DomainNodeData extends Component {
             }.bind(this)
         );
 
-        s3.run("MATCH (n:Computer) WHERE n.domain={name} RETURN count(n)", {
-            name: payload
+        s3.run('MATCH (n:Computer) WHERE n.domain={name} RETURN count(n)', {
+            name: payload,
         }).then(
             function(result) {
                 this.setState({ computers: result.records[0]._fields[0] });
@@ -134,8 +135,8 @@ export default class DomainNodeData extends Component {
             }.bind(this)
         );
 
-        s4.run("MATCH (n:OU {domain:{name}}) RETURN COUNT(n)", {
-            name: payload
+        s4.run('MATCH (n:OU {domain:{name}}) RETURN COUNT(n)', {
+            name: payload,
         }).then(
             function(result) {
                 this.setState({ ous: result.records[0]._fields[0] });
@@ -143,8 +144,8 @@ export default class DomainNodeData extends Component {
             }.bind(this)
         );
 
-        s5.run("MATCH (n:GPO {domain:{name}}) RETURN COUNT(n)", {
-            name: payload
+        s5.run('MATCH (n:GPO {domain:{name}}) RETURN COUNT(n)', {
+            name: payload,
         }).then(
             function(result) {
                 this.setState({ gpos: result.records[0]._fields[0] });
@@ -155,19 +156,27 @@ export default class DomainNodeData extends Component {
         this.setState({ driversessions: [s1, s2, s3] });
     }
 
-    notesChanged(event){
-        this.setState({notes: event.target.value})
+    notesChanged(event) {
+        this.setState({ notes: event.target.value });
     }
 
-    notesBlur(event){
-        let notes = this.state.notes === null || this.state.notes === "" ? null : this.state.notes;
+    notesBlur(event) {
+        let notes =
+            this.state.notes === null || this.state.notes === ''
+                ? null
+                : this.state.notes;
         let q = driver.session();
-        if (notes === null){
-            q.run("MATCH (n:Domain {name:{name}}) REMOVE n.notes", {name: this.state.label}).then(x => {
+        if (notes === null) {
+            q.run('MATCH (n:Domain {name:{name}}) REMOVE n.notes', {
+                name: this.state.label,
+            }).then(x => {
                 q.close();
             });
-        }else{
-            q.run("MATCH (n:Domain {name:{name}}) SET n.notes = {notes}", {name: this.state.label, notes: this.state.notes}).then(x =>{
+        } else {
+            q.run('MATCH (n:Domain {name:{name}}) SET n.notes = {notes}', {
+                name: this.state.label,
+                notes: this.state.notes,
+            }).then(x => {
                 q.close();
             });
         }
@@ -183,31 +192,36 @@ export default class DomainNodeData extends Component {
         let p = this.state.pics;
         let oLen = p.length;
         let key = `domain_${this.state.label}`;
-        
+
         $.each(files, (_, f) => {
             let exists = false;
             let hash = md5File.sync(f.path);
             $.each(p, (_, p1) => {
-                if (p1.hash === hash){
+                if (p1.hash === hash) {
                     exists = true;
                 }
-            })
-            if (exists){
-                emitter.emit("showAlert", {text:"Image already exists"});
+            });
+            if (exists) {
+                this.props.alert.error('Image already exists');
                 return;
             }
-            let path = join(app.getPath("userData"), "images", hash);
+            let path = join(app.getPath('userData'), 'images', hash);
             let dimensions = sizeOf(f.path);
             let data = readFileSync(f.path);
             writeFileSync(path, data);
-            p.push({hash: hash, src: path, width: dimensions.width, height: dimensions.height})
+            p.push({
+                hash: hash,
+                src: path,
+                width: dimensions.width,
+                height: dimensions.height,
+            });
         });
 
-        if (p.length === oLen){
+        if (p.length === oLen) {
             return;
         }
-        this.setState({pics: p});
-        imageconf.set(key, p)
+        this.setState({ pics: p });
+        imageconf.set(key, p);
         let check = jQuery(this.refs.piccomplete);
         check.show();
         check.fadeOut(2000);
@@ -221,11 +235,11 @@ export default class DomainNodeData extends Component {
         let temp = pics[event.index];
         pics.splice(event.index, 1);
         this.setState({
-            pics: pics
-        })
+            pics: pics,
+        });
         let key = `domain_${this.state.label}`;
         imageconf.set(key, pics);
-        
+
         let check = jQuery(this.refs.piccomplete);
         check.show();
         check.fadeOut(2000);
@@ -237,7 +251,7 @@ export default class DomainNodeData extends Component {
         }
         this.setState({
             currentImage: event.index,
-            lightboxIsOpen: true
+            lightboxIsOpen: true,
         });
     }
     closeLightbox() {
@@ -246,7 +260,7 @@ export default class DomainNodeData extends Component {
         }
         this.setState({
             currentImage: 0,
-            lightboxIsOpen: false
+            lightboxIsOpen: false,
         });
     }
     gotoPrevious() {
@@ -254,7 +268,7 @@ export default class DomainNodeData extends Component {
             return;
         }
         this.setState({
-            currentImage: this.state.currentImage - 1
+            currentImage: this.state.currentImage - 1,
         });
     }
     gotoNext() {
@@ -262,36 +276,37 @@ export default class DomainNodeData extends Component {
             return;
         }
         this.setState({
-            currentImage: this.state.currentImage + 1
+            currentImage: this.state.currentImage + 1,
         });
     }
 
     render() {
         let gallery;
-        if (this.state.pics.length === 0){
-            gallery = (<span>Drop pictures on here to upload!</span>)
-        }else{
+        if (this.state.pics.length === 0) {
+            gallery = <span>Drop pictures on here to upload!</span>;
+        } else {
             gallery = (
-            <React.Fragment>
-                <Gallery
-                    photos={this.state.pics}
-                    ImageComponent={SelectedImage}
-                    className={"gallerymod"}
-                />
-                <Lightbox
-                    images={this.state.pics}
-                    isOpen={this.state.lightboxIsOpen}
-                    onClose={this.closeLightbox.bind(this)}
-                    onClickPrev={this.gotoPrevious.bind(this)}
-                    onClickNext={this.gotoNext.bind(this)}
-                    currentImage={this.state.currentImage}
-                />
-            </React.Fragment>)
+                <React.Fragment>
+                    <Gallery
+                        photos={this.state.pics}
+                        ImageComponent={SelectedImage}
+                        className={'gallerymod'}
+                    />
+                    <Lightbox
+                        images={this.state.pics}
+                        isOpen={this.state.lightboxIsOpen}
+                        onClose={this.closeLightbox.bind(this)}
+                        onClickPrev={this.gotoPrevious.bind(this)}
+                        onClickNext={this.gotoNext.bind(this)}
+                        currentImage={this.state.currentImage}
+                    />
+                </React.Fragment>
+            );
         }
 
         return (
-            <div className={this.props.visible ? "" : "displaynone"}>
-                <dl className="dl-horizontal">
+            <div className={this.props.visible ? '' : 'displaynone'}>
+                <dl className='dl-horizontal'>
                     <dt>Domain</dt>
                     <dd>{this.state.label}</dd>
                     <NodeProps
@@ -336,134 +351,140 @@ export default class DomainNodeData extends Component {
                     </dd>
                     <NodeCypherNoNumberLink
                         target={this.state.label}
-                        property="Map OU Structure"
-                        query="MATCH p = (d:Domain {name:{name}})-[r:Contains*1..]->(n) RETURN p"
+                        property='Map OU Structure'
+                        query='MATCH p = (d:Domain {name:{name}})-[r:Contains*1..]->(n) RETURN p'
                     />
                     <br />
                     <h4>Foreign Members</h4>
 
                     <NodeCypherLink
-                        property="Foreign Users"
+                        property='Foreign Users'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH (n:User) WHERE NOT n.domain={name} WITH n MATCH (b:Group) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r:MemberOf]->(b)"
+                            'MATCH (n:User) WHERE NOT n.domain={name} WITH n MATCH (b:Group) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r:MemberOf]->(b)'
                         }
                     />
 
                     <NodeCypherLink
-                        property="Foreign Groups"
+                        property='Foreign Groups'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH (n:Group) WHERE NOT n.domain={name} WITH n MATCH (b:Group) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r:MemberOf]->(b)"
+                            'MATCH (n:Group) WHERE NOT n.domain={name} WITH n MATCH (b:Group) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r:MemberOf]->(b)'
                         }
                     />
 
                     <NodeCypherLinkComplex
-                        property="Foreign Admins"
+                        property='Foreign Admins'
                         target={this.state.label}
                         countQuery={
-                            "MATCH (u:User) WHERE NOT u.domain = {name} OPTIONAL MATCH (u)-[:AdminTo]->(c {domain:{name}}) OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:{name}}) RETURN COUNT(DISTINCT(u))"
+                            'MATCH (u:User) WHERE NOT u.domain = {name} OPTIONAL MATCH (u)-[:AdminTo]->(c {domain:{name}}) OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:{name}}) RETURN COUNT(DISTINCT(u))'
                         }
-                        graphQuery = {
-                            "MATCH (u:User) WHERE NOT u.domain = {name} OPTIONAL MATCH p1 = (u)-[:AdminTo]->(c {domain:{name}}) OPTIONAL MATCH p2 = (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:{name}}) RETURN p1,p2"
+                        graphQuery={
+                            'MATCH (u:User) WHERE NOT u.domain = {name} OPTIONAL MATCH p1 = (u)-[:AdminTo]->(c {domain:{name}}) OPTIONAL MATCH p2 = (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:{name}}) RETURN p1,p2'
                         }
                     />
 
                     <NodeCypherLink
-                        property="Foreign GPO Controllers"
+                        property='Foreign GPO Controllers'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH (n) WHERE NOT n.domain={name} WITH n MATCH (b:GPO) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r]->(b) WHERE r.isacl=true"
+                            'MATCH (n) WHERE NOT n.domain={name} WITH n MATCH (b:GPO) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r]->(b) WHERE r.isacl=true'
                         }
                     />
 
                     <h4>Inbound Trusts</h4>
                     <NodeCypherLink
-                        property="First Degree Trusts"
+                        property='First Degree Trusts'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=(a:Domain {name:{name}})<-[r:TrustedBy]-(n:Domain)"
+                            'MATCH p=(a:Domain {name:{name}})<-[r:TrustedBy]-(n:Domain)'
                         }
                     />
 
                     <NodeCypherLink
-                        property="Effective Inbound Trusts"
+                        property='Effective Inbound Trusts'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH (n:Domain) WHERE NOT n.name={name} WITH n MATCH p=shortestPath((a:Domain {name:{name}})<-[r:TrustedBy*1..]-(n))"
+                            'MATCH (n:Domain) WHERE NOT n.name={name} WITH n MATCH p=shortestPath((a:Domain {name:{name}})<-[r:TrustedBy*1..]-(n))'
                         }
                     />
 
                     <h4>Outbound Trusts</h4>
                     <NodeCypherLink
-                        property="First Degree Trusts"
+                        property='First Degree Trusts'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=(a:Domain {name:{name}})-[r:TrustedBy]->(n:Domain)"
+                            'MATCH p=(a:Domain {name:{name}})-[r:TrustedBy]->(n:Domain)'
                         }
                     />
 
                     <NodeCypherLink
-                        property="Effective Outbound Trusts"
+                        property='Effective Outbound Trusts'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH (n:Domain) WHERE NOT n.name={name} MATCH p=shortestPath((a:Domain {name:{name}})-[r:TrustedBy*1..]->(n))"
+                            'MATCH (n:Domain) WHERE NOT n.name={name} MATCH p=shortestPath((a:Domain {name:{name}})-[r:TrustedBy*1..]->(n))'
                         }
                     />
 
                     <h4>Inbound Controllers</h4>
 
                     <NodeCypherLink
-                        property="First Degree Controllers"
+                        property='First Degree Controllers'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=(n)-[r]->(u:Domain {name: {name}}) WHERE r.isacl=true"
+                            'MATCH p=(n)-[r]->(u:Domain {name: {name}}) WHERE r.isacl=true'
                         }
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Unrolled Controllers"
+                        property='Unrolled Controllers'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1]->(u:Domain {name: {name}}) WHERE r1.isacl=true"
+                            'MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1]->(u:Domain {name: {name}}) WHERE r1.isacl=true'
                         }
                         distinct
                     />
 
                     <NodeCypherLink
-                        property="Transitive Controllers"
+                        property='Transitive Controllers'
                         target={this.state.label}
                         baseQuery={
-                            "MATCH p=shortestPath((n)-[r1:MemberOf|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(u:Domain {name: {name}})) WHERE NOT n.name={name}"
+                            'MATCH p=shortestPath((n)-[r1:MemberOf|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(u:Domain {name: {name}})) WHERE NOT n.name={name}'
                         }
                         distinct
                     />
 
                     <NodeCypherLinkComplex
-                        property="Calculated Principals with DCSync Privileges"
+                        property='Calculated Principals with DCSync Privileges'
                         target={this.state.label}
                         countQuery={
-                            "MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN COUNT(DISTINCT(n1))"
+                            'MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN COUNT(DISTINCT(n1))'
                         }
                         graphQuery={
-                            "MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN p"
+                            'MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN p'
                         }
                     />
                 </dl>
                 <div>
-                    <h4 className={"inline"}>Notes</h4>
+                    <h4 className={'inline'}>Notes</h4>
                     <i
-                        ref="complete"
-                        className="fa fa-check-circle green-icon-color notes-check-style"
+                        ref='complete'
+                        className='fa fa-check-circle green-icon-color notes-check-style'
                     />
                 </div>
-                <textarea onBlur={this.notesBlur.bind(this)} onChange={this.notesChanged.bind(this)} value={this.state.notes === null ? "" : this.state.notes} className={"node-notes-textarea"} ref="notes" />
+                <textarea
+                    onBlur={this.notesBlur.bind(this)}
+                    onChange={this.notesChanged.bind(this)}
+                    value={this.state.notes === null ? '' : this.state.notes}
+                    className={'node-notes-textarea'}
+                    ref='notes'
+                />
                 <div>
-                    <h4 className={"inline"}>Pictures</h4>
+                    <h4 className={'inline'}>Pictures</h4>
                     <i
-                        ref="piccomplete"
-                        className="fa fa-check-circle green-icon-color notes-check-style"
+                        ref='piccomplete'
+                        className='fa fa-check-circle green-icon-color notes-check-style'
                     />
                 </div>
                 {gallery}
@@ -473,5 +494,7 @@ export default class DomainNodeData extends Component {
 }
 
 DomainNodeData.propTypes = {
-    visible: PropTypes.bool.isRequired
+    visible: PropTypes.bool.isRequired,
 };
+
+export default withAlert()(DomainNodeData);

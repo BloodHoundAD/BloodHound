@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import NodeEditorRow from "./NodeEditorRow.jsx";
+import {withAlert} from 'react-alert';
 
-export default class NodeEditor extends Component {
+class NodeEditor extends Component {
     constructor() {
         super();
 
@@ -84,7 +85,7 @@ export default class NodeEditor extends Component {
 
         if (Object.keys(this.state.properties).includes(val)){
             input.css("border", "3px solid red")
-            emitter.emit("showAlert", {text:"Node property already exists"});
+            this.props.alert.error('No data returned from query');
             return;
         }
 
@@ -240,3 +241,5 @@ export default class NodeEditor extends Component {
         );
     }
 }
+
+export default withAlert()(NodeEditor);

@@ -11,8 +11,9 @@ import OuNodeData from './Tabs/OuNodeData';
 import { Tabs, Tab } from 'react-bootstrap';
 import { openSync, readSync, closeSync } from 'fs';
 import imageType from 'image-type';
+import {withAlert} from 'react-alert';
 
-export default class TabContainer extends Component {
+class TabContainer extends Component {
     constructor(props) {
         super(props);
 
@@ -48,7 +49,7 @@ export default class TabContainer extends Component {
             if (type !== null && type.mime.includes('image')) {
                 files.push({ path: f.path, name: f.name });
             } else {
-                emitter.emit('showAlert', "{} is not an image".format(f.name));
+                this.props.alert.info('{} is not an image'.format(f.name));
             }
         });
         emitter.emit('imageUploadFinal', files);
@@ -172,3 +173,5 @@ export default class TabContainer extends Component {
         );
     }
 }
+
+export default withAlert()(TabContainer);
