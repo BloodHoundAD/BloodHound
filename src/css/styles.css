@@ -1082,3 +1082,7 @@ div.tooltip-inner-custom {
 .help-modal-width > div {
     width: 40%;
 }
+
+#alertContainer > div > div{
+    width: unset !important;
+}

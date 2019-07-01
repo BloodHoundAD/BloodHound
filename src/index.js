@@ -298,9 +298,13 @@ if (typeof conf.get('edgeincluded') === 'undefined') {
 
 const alertOptions = {
     position: positions.TOP_CENTER,
-    timeout: 5000,
+    timeout: 50000,
     offset: '30px',
     transitions: transitions.FADE,
+    containerStyle: {
+        zIndex: 100,
+        width: '25%'
+    }
 };
 
 appStore.edgeincluded = conf.get('edgeincluded');
@@ -361,7 +365,7 @@ renderEmit.on('login', function() {
     emitter.removeAllListeners();
     ReactDOM.unmountComponentAtNode(document.getElementById('root'));
     let Root = () => (
-        <AlertProvider template={AlertTemplate} {...alertOptions}>
+        <AlertProvider id='alertContainer' template={AlertTemplate} {...alertOptions}>
             <AppContainer />
         </AlertProvider>
     );
