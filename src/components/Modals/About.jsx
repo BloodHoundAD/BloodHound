@@ -1,9 +1,9 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
-import { Modal } from "react-bootstrap";
-import { join } from "path";
-import { readFileSync, readFile } from "fs";
-import { remote } from "electron";
+import { Modal } from 'react-bootstrap';
+import { join } from 'path';
+import { readFileSync, readFile } from 'fs';
+import { remote } from 'electron';
 const { app, shell } = remote;
 
 export default class About extends Component {
@@ -11,27 +11,27 @@ export default class About extends Component {
         super();
 
         var json = JSON.parse(
-            readFileSync(join(app.getAppPath(), "package.json"))
+            readFileSync(join(app.getAppPath(), 'package.json'))
         );
 
         readFile(
-            join(app.getAppPath(), "LICENSE.md"),
-            "utf8",
+            join(app.getAppPath(), 'LICENSE.md'),
+            'utf8',
             function(err, data) {
                 this.setState({
-                    license: data
+                    license: data,
                 });
             }.bind(this)
         );
 
         this.state = {
             open: false,
-            version: json.version
+            version: json.version,
         };
     }
 
     componentDidMount() {
-        emitter.on("showAbout", this.openModal.bind(this));
+        emitter.on('showAbout', this.openModal.bind(this));
     }
 
     closeModal() {
@@ -41,16 +41,16 @@ export default class About extends Component {
     openModal() {
         this.setState({ open: true });
     }
-    
+
     render() {
         return (
             <Modal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby="AboutHeader"
+                aria-labelledby='AboutHeader'
             >
-                <Modal.Header closeButton={true}>
-                    <Modal.Title id="AboutHeader">About BloodHound</Modal.Title>
+                <Modal.Header closeButton>
+                    <Modal.Title id='AboutHeader'>About BloodHound</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
@@ -58,12 +58,12 @@ export default class About extends Component {
                         <b>Version:</b> {this.state.version}
                     </h5>
                     <h5>
-                        <b>GitHub:</b>{" "}
+                        <b>GitHub:</b>{' '}
                         <a
-                            href="#"
+                            href='#'
                             onClick={function() {
                                 shell.openExternal(
-                                    "https://www.github.com/BloodHoundAD/BloodHound"
+                                    'https://www.github.com/BloodHoundAD/BloodHound'
                                 );
                             }}
                         >
@@ -71,12 +71,12 @@ export default class About extends Component {
                         </a>
                     </h5>
                     <h5>
-                        <b>BloodHound Slack:</b>{" "}
+                        <b>BloodHound Slack:</b>{' '}
                         <a
-                            href="#"
+                            href='#'
                             onClick={function() {
                                 shell.openExternal(
-                                    "https://bloodhoundgang.herokuapp.com/"
+                                    'https://bloodhoundgang.herokuapp.com/'
                                 );
                             }}
                         >
@@ -84,32 +84,34 @@ export default class About extends Component {
                         </a>
                     </h5>
                     <h5>
-                        <b>Authors:</b>{" "}
+                        <b>Authors:</b>{' '}
                         <a
-                            href="#"
+                            href='#'
                             onClick={function() {
                                 shell.openExternal(
-                                    "https://www.twitter.com/harmj0y"
+                                    'https://www.twitter.com/harmj0y'
                                 );
                             }}
                         >
                             @harmj0y
-                        </a>,{" "}
+                        </a>
+                        ,{' '}
                         <a
-                            href="#"
+                            href='#'
                             onClick={function() {
                                 shell.openExternal(
-                                    "https://www.twitter.com/_wald0"
+                                    'https://www.twitter.com/_wald0'
                                 );
                             }}
                         >
                             @_wald0
-                        </a>,{" "}
+                        </a>
+                        ,{' '}
                         <a
-                            href="#"
+                            href='#'
                             onClick={function() {
                                 shell.openExternal(
-                                    "https://www.twitter.com/cptjesus"
+                                    'https://www.twitter.com/cptjesus'
                                 );
                             }}
                         >
@@ -120,13 +122,13 @@ export default class About extends Component {
                     <h5>
                         <b>License</b>
                     </h5>
-                    <div className="aboutscroll">{this.state.license}</div>
+                    <div className='aboutscroll'>{this.state.license}</div>
                 </Modal.Body>
 
                 <Modal.Footer>
                     <button
-                        type="button"
-                        className="btn btn-primary"
+                        type='button'
+                        className='btn btn-primary'
                         onClick={this.closeModal.bind(this)}
                     >
                         Close

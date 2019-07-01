@@ -23,7 +23,7 @@ import { withParser } from 'stream-json/filters/Pick';
 import { streamArray } from 'stream-json/streamers/StreamArray';
 import { chain } from 'stream-chain';
 import { isZipSync } from 'is-zip-file';
-import {withAlert} from 'react-alert';
+import { withAlert } from 'react-alert';
 
 class MenuContainer extends Component {
     constructor() {

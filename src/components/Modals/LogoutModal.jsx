@@ -1,13 +1,17 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
-import { Modal } from "react-bootstrap";
+import { Modal } from 'react-bootstrap';
 
 export default class LogoutModal extends Component {
     constructor() {
         super();
         this.state = {
-            open: false
+            open: false,
         };
+    }
+
+    componentDidMount() {
+        emitter.on('showLogout', this.openModal.bind(this));
     }
 
     closeModal() {
@@ -15,20 +19,16 @@ export default class LogoutModal extends Component {
     }
 
     closeAndLogout() {
-        conf.delete("databaseInfo");
+        conf.delete('databaseInfo');
         appStore.databaseInfo = null;
         this.setState({ open: false });
-        emitter.emit("doLogout");
+        emitter.emit('doLogout');
         driver.close();
-        renderEmit.emit("logout");
+        renderEmit.emit('logout');
     }
 
     openModal() {
         this.setState({ open: true });
-    }
-
-    componentDidMount() {
-        emitter.on("showLogout", this.openModal.bind(this));
     }
 
     render() {
@@ -36,10 +36,10 @@ export default class LogoutModal extends Component {
             <Modal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby="LogoutModalHeader"
+                aria-labelledby='LogoutModalHeader'
             >
-                <Modal.Header closeButton={true}>
-                    <Modal.Title id="LogoutModalHeader">Logout</Modal.Title>
+                <Modal.Header closeButton>
+                    <Modal.Title id='LogoutModalHeader'>Logout</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
@@ -48,15 +48,15 @@ export default class LogoutModal extends Component {
 
                 <Modal.Footer>
                     <button
-                        type="button"
-                        className="btn btn-danger"
+                        type='button'
+                        className='btn btn-danger'
                         onClick={this.closeAndLogout.bind(this)}
                     >
                         Logout
                     </button>
                     <button
-                        type="button"
-                        className="btn btn-primary"
+                        type='button'
+                        className='btn btn-primary'
                         onClick={this.closeModal.bind(this)}
                     >
                         Cancel

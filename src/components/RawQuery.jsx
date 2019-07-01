@@ -1,18 +1,18 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
 export default class RawQuery extends Component {
     constructor() {
         super();
         this.state = {
-            val: "",
+            val: '',
             open: false,
-            darkMode: false
+            darkMode: false,
         };
     }
 
     componentWillMount() {
-        emitter.on("setRawQuery", this._setQueryFromEvent.bind(this));
-        emitter.on("toggleDarkMode", this.toggleDarkMode.bind(this));
+        emitter.on('setRawQuery', this._setQueryFromEvent.bind(this));
+        emitter.on('toggleDarkMode', this.toggleDarkMode.bind(this));
     }
 
     componentDidMount() {
@@ -20,13 +20,13 @@ export default class RawQuery extends Component {
         this.toggleDarkMode(appStore.performance.darkMode);
     }
 
-    toggleDarkMode(enabled){
-        this.setState({darkMode: enabled});
+    toggleDarkMode(enabled) {
+        this.setState({ darkMode: enabled });
     }
 
     _onChange(event) {
         this.setState({
-            val: event.target.value
+            val: event.target.value,
         });
     }
 
@@ -34,14 +34,14 @@ export default class RawQuery extends Component {
         var key = e.keyCode ? e.keyCode : e.which;
 
         if (key === 13) {
-            emitter.emit("query", this.state.val);
+            emitter.emit('query', this.state.val);
         }
     }
 
     _toggle() {
         $(this.refs.input).slideToggle();
         this.setState({
-            open: !this.state.open
+            open: !this.state.open,
         });
     }
 
@@ -51,36 +51,42 @@ export default class RawQuery extends Component {
 
     render() {
         return (
-            <div className={this.state.darkMode ? "bottomdiv bottomdiv-dark" : "bottomdiv"}>
+            <div
+                className={
+                    this.state.darkMode
+                        ? 'bottomdiv bottomdiv-dark'
+                        : 'bottomdiv'
+                }
+            >
                 <button
                     onClick={this._toggle.bind(this)}
-                    className="slideupbutton"
+                    className='slideupbutton'
                 >
                     <span
                         className={
                             this.state.open
-                                ? "glyphicon glyphicon-chevron-down"
-                                : "glyphicon glyphicon-chevron-up"
+                                ? 'glyphicon glyphicon-chevron-down'
+                                : 'glyphicon glyphicon-chevron-up'
                         }
                     />
                     Raw Query
                     <span
                         className={
                             this.state.open
-                                ? "glyphicon glyphicon-chevron-down"
-                                : "glyphicon glyphicon-chevron-up"
+                                ? 'glyphicon glyphicon-chevron-down'
+                                : 'glyphicon glyphicon-chevron-up'
                         }
                     />
                 </button>
                 <input
-                    ref="input"
-                    type="text"
+                    ref='input'
+                    type='text'
                     onChange={this._onChange.bind(this)}
                     value={this.state.val}
                     onKeyUp={this._onKeyUp.bind(this)}
-                    className="form-control queryInput"
-                    autoComplete="off"
-                    placeholder="Enter a raw query..."
+                    className='form-control queryInput'
+                    autoComplete='off'
+                    placeholder='Enter a raw query...'
                 />
             </div>
         );

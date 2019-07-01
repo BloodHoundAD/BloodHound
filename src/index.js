@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 
 import AppContainer from './AppContainer';
 import Login from './components/Float/Login';
-import {transitions, positions, Provider as AlertProvider} from 'react-alert';
+import { transitions, positions, Provider as AlertProvider } from 'react-alert';
 import AlertTemplate from 'react-alert-template-basic';
 
 import { remote, shell } from 'electron';
@@ -300,8 +300,8 @@ const alertOptions = {
     position: positions.TOP_CENTER,
     timeout: 5000,
     offset: '30px',
-    transitions: transitions.FADE
-}
+    transitions: transitions.FADE,
+};
 
 appStore.edgeincluded = conf.get('edgeincluded');
 //Code to add new edges to filter
@@ -364,7 +364,7 @@ renderEmit.on('login', function() {
         <AlertProvider template={AlertTemplate} {...alertOptions}>
             <AppContainer />
         </AlertProvider>
-    )
+    );
     ReactDOM.render(<Root />, document.getElementById('root'));
 });
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { Modal } from 'react-bootstrap';
-import {withAlert} from 'react-alert';
+import { withAlert } from 'react-alert';
 
 class WarmupModal extends Component {
     constructor() {
@@ -26,7 +26,7 @@ class WarmupModal extends Component {
             .run(
                 'MATCH (n) OPTIONAL MATCH (n)-[r]->() RETURN count(n.name) + count(r.isacl)'
             )
-            .then(() =>  {
+            .then(() => {
                 session.close();
                 this.props.alert.success('Database Warmup Complete!');
             });

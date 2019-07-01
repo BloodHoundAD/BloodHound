@@ -1,8 +1,8 @@
-import React, { Component } from "react";
-import { Modal } from "react-bootstrap";
+import React, { Component } from 'react';
+import { Modal } from 'react-bootstrap';
 import { buildSearchQuery } from 'utils';
 
-const SEPARATOR = "#BLOODHOUNDSEPARATOR#";
+const SEPARATOR = '#BLOODHOUNDSEPARATOR#';
 
 export default class AddEdgeModal extends Component {
     constructor() {
@@ -10,12 +10,12 @@ export default class AddEdgeModal extends Component {
         this.state = {
             open: false,
             source: null,
-            target: null
+            target: null,
         };
     }
 
     componentDidMount() {
-        emitter.on("addEdge", this.openModal.bind(this));
+        emitter.on('addEdge', this.openModal.bind(this));
     }
 
     closeModal() {
@@ -23,287 +23,327 @@ export default class AddEdgeModal extends Component {
     }
 
     openModal() {
-        closeTooltip()
-        this.setState( {open: true });
+        closeTooltip();
+        this.setState({ open: true });
         jQuery(this.refs.errora).hide();
         jQuery(this.refs.errorb).hide();
         jQuery(this.refs.edgeError).hide();
         jQuery(this.refs.complete).hide();
 
-        this.bindSearchBars(jQuery(this.refs.source), "source");
-        this.bindSearchBars(jQuery(this.refs.target), "target");
-        
+        this.bindSearchBars(jQuery(this.refs.source), 'source');
+        this.bindSearchBars(jQuery(this.refs.target), 'target');
     }
 
-    bindSearchBars(element,which){
+    bindSearchBars(element, which) {
         element.typeahead({
             autoSelect: false,
             source: function(query, process) {
                 let session = driver.session();
                 let [statement, searchterm] = buildSearchQuery(query);
 
-                session.run(statement, {name: searchterm}).then(x => {
+                session.run(statement, { name: searchterm }).then(x => {
                     let data = [];
                     let map = {};
                     $.each(x.records, (index, record) => {
                         let props = record._fields[0].properties;
                         Object.assign(props, {
-                            type: record._fields[0].labels[0]
+                            type: record._fields[0].labels[0],
                         });
                         map[index] = props;
                         data.push(`${props.name}${SEPARATOR}${index}`);
-                    })
+                    });
 
                     this.map = map;
                     session.close();
                     return process(data);
-                })
+                });
             },
-            updater: function(item){
+            updater: function(item) {
                 let [_, index] = item.split(SEPARATOR);
                 return this.map[index];
             },
-            matcher: function(item){
-                let [name,index] = item.split(SEPARATOR);
+            matcher: function(item) {
+                let [name, index] = item.split(SEPARATOR);
                 let obj = this.map[index];
-                let searchTerm = this.query.includes(':') ? this.query.split(':')[1] : this.query;
+                let searchTerm = this.query.includes(':')
+                    ? this.query.split(':')[1]
+                    : this.query;
 
-                if (name.toLowerCase().indexOf(searchTerm.toLowerCase() !== -1)){
+                if (
+                    name.toLowerCase().indexOf(searchTerm.toLowerCase() !== -1)
+                ) {
                     return true;
-                }else if (obj.guid && obj.guid.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1){
+                } else if (
+                    obj.guid &&
+                    obj.guid.toLowerCase().indexOf(searchTerm.toLowerCase()) !==
+                        -1
+                ) {
                     return true;
-                }else{
+                } else {
                     return false;
                 }
             },
-            highlighter: function(item){
-                let [name,index] = item.split(SEPARATOR);
+            highlighter: function(item) {
+                let [name, index] = item.split(SEPARATOR);
                 let obj = this.map[index];
-                let searchTerm = this.query.includes(':') ? this.query.split(':')[1] : this.query;
+                let searchTerm = this.query.includes(':')
+                    ? this.query.split(':')[1]
+                    : this.query;
                 let type = obj.type;
                 let icon;
 
                 switch (type) {
-                    case "Group":
+                    case 'Group':
                         icon =
                             '<i style="float:right" class="fa fa-users"></i>';
                         break;
-                    case "User":
+                    case 'User':
                         icon = '<i style="float:right" class="fa fa-user"></i>';
                         break;
-                    case "Computer":
+                    case 'Computer':
                         icon =
                             '<i style="float:right" class="fa fa-desktop"></i>';
                         break;
-                    case "Domain":
+                    case 'Domain':
                         icon =
                             '<i style="float:right" class="fa fa-globe"></i>';
                         break;
-                    case "GPO":
+                    case 'GPO':
                         icon = '<i style="float:right" class="fa fa-list"></i>';
                         break;
-                    case "OU":
+                    case 'OU':
                         icon =
                             '<i style="float:right" class="fa fa-sitemap"></i>';
                         break;
                 }
 
-                let html = "<div>{}".format(name);
+                let html = '<div>{}'.format(name);
 
-                if (searchTerm !== "") {
-                    let reQuery = new RegExp("(" + searchTerm + ")", "gi");
+                if (searchTerm !== '') {
+                    let reQuery = new RegExp('(' + searchTerm + ')', 'gi');
 
-                    html = html.replace(reQuery, "<strong>$1</strong>");
+                    html = html.replace(reQuery, '<strong>$1</strong>');
                 }
-                html += icon + "</div>";
+                html += icon + '</div>';
                 let jElem = $(html);
 
                 return jElem.html();
             },
-            afterSelect: item =>{
+            afterSelect: item => {
                 let p = {};
                 p[which] = item;
                 this.setState(p);
-                if (which === "source"){
+                if (which === 'source') {
                     this.sourceFocus();
                     this.sourceBlur();
-                }else{
+                } else {
                     this.targetFocus();
                     this.targetBlur();
-                }     
-            }
+                }
+            },
         });
     }
 
-    validate(){
+    validate() {
         let source = this.state.source;
         let target = this.state.target;
         let edge = jQuery(this.refs.type).val();
         let edgeError = jQuery(this.refs.edgeError);
-        let edgeValid = jQuery(this.refs.validateedge)
+        let edgeValid = jQuery(this.refs.validateedge);
         let sourceValid = jQuery(this.refs.validatea);
         let targetValid = jQuery(this.refs.validateb);
         let sourceError = jQuery(this.refs.errora);
         let targetError = jQuery(this.refs.errorb);
         let complete = jQuery(this.refs.complete);
 
-        edgeValid.removeClass("has-error");
+        edgeValid.removeClass('has-error');
         edgeError.hide();
 
-        if (source === null){
-            sourceValid.addClass("has-error");
-            sourceError.html("Source node not validated!");
+        if (source === null) {
+            sourceValid.addClass('has-error');
+            sourceError.html('Source node not validated!');
             sourceError.show();
             return;
         }
 
-        if (target === null){
-            targetValid.addClass("has-error");
-            targetError.html("Target node not validated!");
+        if (target === null) {
+            targetValid.addClass('has-error');
+            targetError.html('Target node not validated!');
             targetError.show();
             return;
         }
 
-        if (source.name === target.name){
-            targetValid.addClass("has-error");
-            targetError.html("Source and target cannot be identical!");
+        if (source.name === target.name) {
+            targetValid.addClass('has-error');
+            targetError.html('Source and target cannot be identical!');
             targetError.show();
-            sourceValid.addClass("has-error");
-            sourceError.html("Source and target cannot be identical");
+            sourceValid.addClass('has-error');
+            sourceError.html('Source and target cannot be identical');
             sourceError.show();
             return;
         }
 
         let q = driver.session();
-        let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${target.type} {name:{target}}) MATCH (n)-[r:${edge}]->(m) RETURN r`
-        q.run(statement, {source: source.name, target: target.name}).then(x => {
-            q.close();
-            if (x.records.length > 0){
-                edgeValid.addClass("has-error");
-                edgeError.html("Edge already exists");
-                edgeError.show();
-            }else{
-                let edgepart;
-                if (edge === "GenericAll" || edge === "GenericWrite" || edge === "AllExtendedRights" || edge === "AddMember" || edge === "ForceChangePassword" || edge === "Owns" || edge === "WriteDacl" || edge === "WriteOwner" || edge === "ReadLAPSPassword"){
-                    edgepart = `[r:${edge} {isacl:true}]`;
-                }else{
-                    edgepart = `[r:${edge} {isacl:false}]`;
+        let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${
+            target.type
+        } {name:{target}}) MATCH (n)-[r:${edge}]->(m) RETURN r`;
+        q.run(statement, { source: source.name, target: target.name }).then(
+            x => {
+                q.close();
+                if (x.records.length > 0) {
+                    edgeValid.addClass('has-error');
+                    edgeError.html('Edge already exists');
+                    edgeError.show();
+                } else {
+                    let edgepart;
+                    if (
+                        edge === 'GenericAll' ||
+                        edge === 'GenericWrite' ||
+                        edge === 'AllExtendedRights' ||
+                        edge === 'AddMember' ||
+                        edge === 'ForceChangePassword' ||
+                        edge === 'Owns' ||
+                        edge === 'WriteDacl' ||
+                        edge === 'WriteOwner' ||
+                        edge === 'ReadLAPSPassword'
+                    ) {
+                        edgepart = `[r:${edge} {isacl:true}]`;
+                    } else {
+                        edgepart = `[r:${edge} {isacl:false}]`;
+                    }
+                    let s = driver.session();
+                    let statement = `MATCH (n:${
+                        source.type
+                    } {name: {source}}) MATCH (m:${
+                        target.type
+                    } {name:{target}}) MERGE (n)-${edgepart}->(m) RETURN r`;
+                    s.run(statement, {
+                        source: source.name,
+                        target: target.name,
+                    }).then(x => {
+                        s.close();
+                        complete.show();
+                        setTimeout(x => {
+                            this.closeModal();
+                        }, 500);
+                    });
                 }
-                let s = driver.session();
-                let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${target.type} {name:{target}}) MERGE (n)-${edgepart}->(m) RETURN r`
-                s.run(statement, {source: source.name, target: target.name}).then(x =>{
-                    s.close();
-                    complete.show();
-                    setTimeout(x => {this.closeModal()}, 500);
-                })
             }
-        });
+        );
     }
 
-    clearFocus(){
+    clearFocus() {
         let validate = jQuery(this.refs.validate);
         let error = jQuery(this.refs.error);
 
-        validate.removeClass("has-error");
+        validate.removeClass('has-error');
         error.hide();
     }
 
-    targetBlur(){
-        if (this.state.target === null){
+    targetBlur() {
+        if (this.state.target === null) {
             let source = jQuery(this.refs.source).val();
             let q = driver.session();
-            q.run("MATCH (n) WHERE n.name = {name} RETURN n", {name: source}).then(x => {
-                if (x.records.length === 0){
+            q.run('MATCH (n) WHERE n.name = {name} RETURN n', {
+                name: source,
+            }).then(x => {
+                if (x.records.length === 0) {
                     let validate = jQuery(this.refs.validateb);
                     let error = jQuery(this.refs.errorb);
-                    validate.addClass("has-error");
-                    error.html("Node not found");
+                    validate.addClass('has-error');
+                    error.html('Node not found');
                     error.show();
-                }else if (x.records.length > 1){
+                } else if (x.records.length > 1) {
                     let validate = jQuery(this.refs.validateb);
                     let error = jQuery(this.refs.errorb);
-                    validate.addClass("has-error");
-                    error.html("Multiple possible nodes found. Click on item from dropdown to set type");
+                    validate.addClass('has-error');
+                    error.html(
+                        'Multiple possible nodes found. Click on item from dropdown to set type'
+                    );
                     error.show();
-                }else{
+                } else {
                     let props = x._fields[0].properties;
                     Object.assign(props, {
-                        type: x._fields[0].labels[0]
+                        type: x._fields[0].labels[0],
                     });
-                    this.setState({source: props})
-                }          
+                    this.setState({ source: props });
+                }
                 q.close();
-            })
+            });
         }
     }
 
-    targetChanged(){
+    targetChanged() {
         let target = jQuery(this.refs.target).val();
-        if (this.state.target && target !== this.state.target.name){
-            this.setState({target: null})
+        if (this.state.target && target !== this.state.target.name) {
+            this.setState({ target: null });
         }
     }
 
-    targetFocus(){
+    targetFocus() {
         let validate = jQuery(this.refs.validateb);
         let error = jQuery(this.refs.errorb);
-        validate.removeClass("has-error");
-        error.hide()
+        validate.removeClass('has-error');
+        error.hide();
 
-        if (this.state.source !== null){
+        if (this.state.source !== null) {
             validate = jQuery(this.refs.validatea);
             error = jQuery(this.refs.errora);
-            validate.removeClass("has-error");
+            validate.removeClass('has-error');
             error.hide();
         }
     }
 
-    sourceBlur(){
-        if (this.state.source === null){
+    sourceBlur() {
+        if (this.state.source === null) {
             let source = jQuery(this.refs.source).val();
             let q = driver.session();
-            q.run("MATCH (n) WHERE n.name = {name} RETURN n", {name: source}).then(x => {
-                if (x.records.length === 0){
+            q.run('MATCH (n) WHERE n.name = {name} RETURN n', {
+                name: source,
+            }).then(x => {
+                if (x.records.length === 0) {
                     let validate = jQuery(this.refs.validatea);
                     let error = jQuery(this.refs.errora);
-                    validate.addClass("has-error");
-                    error.html("Node not found");
+                    validate.addClass('has-error');
+                    error.html('Node not found');
                     error.show();
-                }else if (x.records.length > 1){
+                } else if (x.records.length > 1) {
                     let validate = jQuery(this.refs.validatea);
                     let error = jQuery(this.refs.errora);
-                    validate.addClass("has-error");
-                    error.html("Multiple possible nodes found. Click on item from dropdown to set type");
+                    validate.addClass('has-error');
+                    error.html(
+                        'Multiple possible nodes found. Click on item from dropdown to set type'
+                    );
                     error.show();
-                }else{
+                } else {
                     let props = x._fields[0].properties;
                     Object.assign(props, {
-                        type: x._fields[0].labels[0]
+                        type: x._fields[0].labels[0],
                     });
-                    this.setState({source: props})
-                }          
+                    this.setState({ source: props });
+                }
                 q.close();
-            })
+            });
         }
     }
 
-    sourceChanged(){
+    sourceChanged() {
         let source = jQuery(this.refs.source).val();
-        if (this.state.source && source !== this.state.source.name){
-            this.setState({source: null})
+        if (this.state.source && source !== this.state.source.name) {
+            this.setState({ source: null });
         }
     }
 
-    sourceFocus(){
+    sourceFocus() {
         let validate = jQuery(this.refs.validatea);
         let error = jQuery(this.refs.errora);
-        validate.removeClass("has-error");
-        error.hide()
+        validate.removeClass('has-error');
+        error.hide();
 
-        if (this.state.target !== null){
+        if (this.state.target !== null) {
             validate = jQuery(this.refs.validateb);
             error = jQuery(this.refs.errorb);
-            validate.removeClass("has-error");
+            validate.removeClass('has-error');
             error.hide();
         }
     }
@@ -313,24 +353,47 @@ export default class AddEdgeModal extends Component {
             <Modal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby="AddEdgeModalHeader"
+                aria-labelledby='AddEdgeModalHeader'
             >
-                <Modal.Header closeButton={true}>
-                    <Modal.Title id="AddEdgeModalHeader">Add Edge</Modal.Title>
+                <Modal.Header closeButton>
+                    <Modal.Title id='AddEdgeModalHeader'>Add Edge</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
-                    <form onSubmit={x => {x.preventDefault(); this.validate()}} className="needs-validation" noValidate>
-                        <div ref="validatea" className={"form-group"}>
-                            <label htmlFor="sourceNode" required>Source Node</label>
-                            <input onFocus={this.sourceFocus.bind(this)} onInput={this.sourceChanged.bind(this)} onBlur={this.sourceBlur.bind(this)} type="search" autoComplete="off" placeholder="Source Node" ref="source" className={"form-control"} id="sourceNode" />
-                            <span className="help-block" ref="errora">
+                    <form
+                        onSubmit={x => {
+                            x.preventDefault();
+                            this.validate();
+                        }}
+                        className='needs-validation'
+                        noValidate
+                    >
+                        <div ref='validatea' className={'form-group'}>
+                            <label htmlFor='sourceNode' required>
+                                Source Node
+                            </label>
+                            <input
+                                onFocus={this.sourceFocus.bind(this)}
+                                onInput={this.sourceChanged.bind(this)}
+                                onBlur={this.sourceBlur.bind(this)}
+                                type='search'
+                                autoComplete='off'
+                                placeholder='Source Node'
+                                ref='source'
+                                className={'form-control'}
+                                id='sourceNode'
+                            />
+                            <span className='help-block' ref='errora'>
                                 Looks good!
                             </span>
                         </div>
-                        <div className={"form-group"} ref="validateedge">
-                            <label htmlFor="addEdgeType">Edge Type</label>
-                            <select ref="type" className={"form-control"} id="addEdgeType">
+                        <div className={'form-group'} ref='validateedge'>
+                            <label htmlFor='addEdgeType'>Edge Type</label>
+                            <select
+                                ref='type'
+                                className={'form-control'}
+                                id='addEdgeType'
+                            >
                                 <option>MemberOf</option>
                                 <option>HasSession</option>
                                 <option>AdminTo</option>
@@ -349,14 +412,26 @@ export default class AddEdgeModal extends Component {
                                 <option>ExecuteDCOM</option>
                                 <option>AllowedToDelegate</option>
                             </select>
-                            <span className="help-block" ref="edgeError">
+                            <span className='help-block' ref='edgeError'>
                                 Looks good!
                             </span>
                         </div>
-                        <div ref="validateb" className={"form-group"}>
-                            <label htmlFor="targetNode" required>Target Node</label>
-                            <input onFocus={this.targetFocus.bind(this)} onInput={this.targetChanged.bind(this)} onBlur={this.targetBlur.bind(this)} type="search" autoComplete="off" placeholder="Target Node" ref="target" className={"form-control"} id="targetNode" />
-                            <span className="help-block" ref="errorb">
+                        <div ref='validateb' className={'form-group'}>
+                            <label htmlFor='targetNode' required>
+                                Target Node
+                            </label>
+                            <input
+                                onFocus={this.targetFocus.bind(this)}
+                                onInput={this.targetChanged.bind(this)}
+                                onBlur={this.targetBlur.bind(this)}
+                                type='search'
+                                autoComplete='off'
+                                placeholder='Target Node'
+                                ref='target'
+                                className={'form-control'}
+                                id='targetNode'
+                            />
+                            <span className='help-block' ref='errorb'>
                                 Looks good!
                             </span>
                         </div>
@@ -365,19 +440,19 @@ export default class AddEdgeModal extends Component {
 
                 <Modal.Footer>
                     <i
-                        ref="complete"
-                        className="fa fa-check-circle green-icon-color add-modal-check-style"
+                        ref='complete'
+                        className='fa fa-check-circle green-icon-color add-modal-check-style'
                     />
                     <button
-                        type="button"
-                        className="btn btn-primary"
+                        type='button'
+                        className='btn btn-primary'
                         onClick={this.validate.bind(this)}
                     >
                         Confirm
                     </button>
                     <button
-                        type="button"
-                        className="btn btn-danger"
+                        type='button'
+                        className='btn btn-danger'
                         onClick={this.closeModal.bind(this)}
                     >
                         Cancel

@@ -1,12 +1,17 @@
-import React, { Component } from "react";
-import { Modal } from "react-bootstrap";
+import React, { Component } from 'react';
+import { Modal } from 'react-bootstrap';
 
 export default class ClearingModal extends Component {
     constructor() {
         super();
         this.state = {
-            open: false
+            open: false,
         };
+    }
+
+    componentDidMount() {
+        emitter.on('openClearingModal', this.openModal.bind(this));
+        emitter.on('hideDBClearModal', this.closeModal.bind(this));
     }
 
     openModal() {
@@ -17,19 +22,15 @@ export default class ClearingModal extends Component {
         this.setState({ open: false });
     }
 
-    componentDidMount() {
-        emitter.on("openClearingModal", this.openModal.bind(this));
-        emitter.on("hideDBClearModal", this.closeModal.bind(this));
-    }
     render() {
         return (
             <Modal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby="ClearingModalHeader"
+                aria-labelledby='ClearingModalHeader'
             >
-                <Modal.Header closeButton={true}>
-                    <Modal.Title id="ClearingModalHeader">
+                <Modal.Header closeButton>
+                    <Modal.Title id='ClearingModalHeader'>
                         Clearing Data
                     </Modal.Title>
                 </Modal.Header>

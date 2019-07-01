@@ -102,15 +102,15 @@
         <i class="fa fa-trash"> </i> Delete Node
     </li>
     {{#expand}}
-    <li onclick="emitter.emit('unfoldNode', {{id}});">
+    <li onclick="emitter.emit('unfoldNode', '{{id}}')">
         <i class="fa fa-object-ungroup"> </i> Expand
     </li>
     {{/expand}} {{#collapse}}
-    <li onclick="emitter.emit('collapseNode', {{id}});">
+    <li onclick="emitter.emit('collapseNode', '{{id}}')">
         <i class="fa fa-object-group"> </i> Collapse
     </li>
     {{/collapse}} {{#groupedNode}}
-    <li onclick="emitter.emit('ungroupNode', {{id}});">
+    <li onclick="emitter.emit('ungroupNode', '{{id}}')">
         <i class="fa fa-object-ungroup"> </i> Expand
     </li>
     {{/groupedNode}}

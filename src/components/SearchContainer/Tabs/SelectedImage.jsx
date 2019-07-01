@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 const { clipboard } = require('electron');
-import {withAlert} from 'react-alert';
+import { withAlert } from 'react-alert';
 
 class SelectedImage extends Component {
     constructor() {

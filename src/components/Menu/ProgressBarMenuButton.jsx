@@ -1,19 +1,19 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 export default class ProgressBarMenuButton extends Component {
     constructor() {
         super();
 
         this.state = {
-            expanded: false
+            expanded: false,
         };
     }
 
     componentDidMount() {
-        $(this.refs.btn).html("{}%".format(this.props.progress));
-        $(this.refs.btn).css("padding", "6px 0px 6px 0px");
-        $(this.refs.btn).css("width", "41px");
+        $(this.refs.btn).html('{}%'.format(this.props.progress));
+        $(this.refs.btn).css('padding', '6px 0px 6px 0px');
+        $(this.refs.btn).css('width', '41px');
     }
 
     componentWillReceiveProps(nextProps) {
@@ -27,7 +27,7 @@ export default class ProgressBarMenuButton extends Component {
             </div>`.formatAll(nextProps.progress);
             $(this.refs.btn).html(template);
         } else {
-            $(this.refs.btn).html("{}%".format(nextProps.progress));
+            $(this.refs.btn).html('{}%'.format(nextProps.progress));
         }
 
         this.forceUpdate();
@@ -40,10 +40,10 @@ export default class ProgressBarMenuButton extends Component {
     _leave(e) {
         this.setState({ expanded: false });
         var target = $(e.target);
-        target.html("{}%".format(this.props.progress));
+        target.html('{}%'.format(this.props.progress));
         target.animate(
             {
-                width: "41px"
+                width: '41px',
             },
             100
         );
@@ -65,7 +65,7 @@ export default class ProgressBarMenuButton extends Component {
         target.html(template);
         target.animate(
             {
-                width: "150px"
+                width: '150px',
             },
             100
         );
@@ -74,11 +74,11 @@ export default class ProgressBarMenuButton extends Component {
     render() {
         return (
             <button
-                ref="btn"
+                ref='btn'
                 onClick={this.props.click}
                 onMouseLeave={this._leave.bind(this)}
                 onMouseEnter={this._enter.bind(this)}
-                className="btn"
+                className='btn'
             />
         );
     }
@@ -86,5 +86,5 @@ export default class ProgressBarMenuButton extends Component {
 
 ProgressBarMenuButton.propTypes = {
     progress: PropTypes.number.isRequired,
-    click: PropTypes.func.isRequired
+    click: PropTypes.func.isRequired,
 };

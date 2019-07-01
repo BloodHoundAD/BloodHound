@@ -1,13 +1,18 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
-import { Modal } from "react-bootstrap";
+import { Modal } from 'react-bootstrap';
 
 export default class CancelUploadModal extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
+        
         this.state = {
-            open: false
+            open: false,
         };
+    }
+
+    componentDidMount() {
+        emitter.on('showCancelUpload', this.openModal.bind(this));
     }
 
     closeModal() {
@@ -16,15 +21,11 @@ export default class CancelUploadModal extends Component {
 
     closeAndCancel() {
         this.setState({ open: false });
-        emitter.emit("cancelUpload");
+        emitter.emit('cancelUpload');
     }
 
     openModal() {
         this.setState({ open: true });
-    }
-
-    componentDidMount() {
-        emitter.on("showCancelUpload", this.openModal.bind(this));
     }
 
     render() {
@@ -32,10 +33,10 @@ export default class CancelUploadModal extends Component {
             <Modal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby="CanceulUploadHeader"
+                aria-labelledby='CanceulUploadHeader'
             >
-                <Modal.Header closeButton={true}>
-                    <Modal.Title id="CancelUploadHeader">
+                <Modal.Header closeButton>
+                    <Modal.Title id='CancelUploadHeader'>
                         Cancel Upload
                     </Modal.Title>
                 </Modal.Header>
@@ -46,15 +47,15 @@ export default class CancelUploadModal extends Component {
 
                 <Modal.Footer>
                     <button
-                        type="button"
-                        className="btn btn-danger"
+                        type='button'
+                        className='btn btn-danger'
                         onClick={this.closeAndCancel.bind(this)}
                     >
                         Stop Upload
                     </button>
                     <button
-                        type="button"
-                        className="btn btn-primary"
+                        type='button'
+                        className='btn btn-primary'
                         onClick={this.closeModal.bind(this)}
                     >
                         Cancel

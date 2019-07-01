@@ -1,5 +1,5 @@
-import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
+import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 export default class NodeCypherNoNumberLink extends Component {
     constructor(props) {
@@ -9,7 +9,7 @@ export default class NodeCypherNoNumberLink extends Component {
     render() {
         let c = function() {
             emitter.emit(
-                "query",
+                'query',
                 this.props.query,
                 { name: this.props.target },
                 this.props.start,
@@ -20,11 +20,11 @@ export default class NodeCypherNoNumberLink extends Component {
         return (
             <Fragment>
                 <dt onClick={c}>
-                    <a href="#" onClick={c}>
+                    <a href='#' onClick={c}>
                         {this.props.property}
                     </a>
                 </dt>
-                <dd onClick={c} style={{"cursor":"pointer"}} />
+                <dd onClick={c} style={{ cursor: 'pointer' }} />
             </Fragment>
         );
     }
@@ -35,5 +35,5 @@ NodeCypherNoNumberLink.propTypes = {
     property: PropTypes.string.isRequired,
     query: PropTypes.string.isRequired,
     start: PropTypes.string,
-    end: PropTypes.string
+    end: PropTypes.string,
 };

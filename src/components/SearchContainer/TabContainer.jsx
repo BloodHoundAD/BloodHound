@@ -11,7 +11,7 @@ import OuNodeData from './Tabs/OuNodeData';
 import { Tabs, Tab } from 'react-bootstrap';
 import { openSync, readSync, closeSync } from 'fs';
 import imageType from 'image-type';
-import {withAlert} from 'react-alert';
+import { withAlert } from 'react-alert';
 
 class TabContainer extends Component {
     constructor(props) {

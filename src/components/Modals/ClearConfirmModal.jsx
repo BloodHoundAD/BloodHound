@@ -1,14 +1,18 @@
-import React, { Component } from "react";
-import { clearDatabase } from "utils";
+import React, { Component } from 'react';
+import { clearDatabase } from 'utils';
 
-import { Modal } from "react-bootstrap";
+import { Modal } from 'react-bootstrap';
 
 export default class ClearConfirmModal extends Component {
     constructor() {
         super();
         this.state = {
-            open: false
+            open: false,
         };
+    }
+
+    componentDidMount() {
+        emitter.on('openDBConfirm', this.openModal.bind(this));
     }
 
     openModal() {
@@ -21,12 +25,8 @@ export default class ClearConfirmModal extends Component {
 
     closeModalAndClearDB() {
         this.setState({ open: false });
-        emitter.emit("clearDB");
+        emitter.emit('clearDB');
         clearDatabase();
-    }
-
-    componentDidMount() {
-        emitter.on("openDBConfirm", this.openModal.bind(this));
     }
 
     render() {
@@ -34,10 +34,10 @@ export default class ClearConfirmModal extends Component {
             <Modal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby="ConfirmModalHeader"
+                aria-labelledby='ConfirmModalHeader'
             >
-                <Modal.Header closeButton={true}>
-                    <Modal.Title id="ConfirmModalHeader">
+                <Modal.Header closeButton>
+                    <Modal.Title id='ConfirmModalHeader'>
                         Clear Database
                     </Modal.Title>
                 </Modal.Header>
@@ -51,15 +51,15 @@ export default class ClearConfirmModal extends Component {
                 <Modal.Footer>
                     <button
                         onClick={this.closeModal.bind(this)}
-                        type="button"
-                        className="btn btn-primary"
+                        type='button'
+                        className='btn btn-primary'
                     >
                         Cancel
                     </button>
                     <button
                         onClick={this.closeModalAndClearDB.bind(this)}
-                        type="button"
-                        className="btn btn-danger"
+                        type='button'
+                        className='btn btn-danger'
                     >
                         Clear Database
                     </button>

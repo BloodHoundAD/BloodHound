@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
 export default class ExportContainer extends Component {
     constructor() {
@@ -6,14 +6,14 @@ export default class ExportContainer extends Component {
 
         this.state = {
             jsonActive: true,
-            imageActive: false
+            imageActive: false,
         };
     }
-    
+
     componentDidMount() {
         $(this.refs.outer).fadeToggle(0);
         $(this.refs.outer).draggable();
-        emitter.on("showExport", this._show.bind(this));
+        emitter.on('showExport', this._show.bind(this));
     }
 
     _dismiss() {
@@ -34,67 +34,67 @@ export default class ExportContainer extends Component {
     }
 
     _buttonClick() {
-        emitter.emit("export", this.state.jsonActive ? "json" : "image");
+        emitter.emit('export', this.state.jsonActive ? 'json' : 'image');
     }
 
     render() {
         return (
-            <div className="floating-div" ref="outer">
-                <div className="panel-heading">
+            <div className='floating-div' ref='outer'>
+                <div className='panel-heading'>
                     Export Graph
                     <button
-                        type="button"
-                        className="close"
+                        type='button'
+                        className='close'
                         onClick={this._dismiss.bind(this)}
-                        aria-label="Close"
+                        aria-label='Close'
                     >
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden='true'>&times;</span>
                     </button>
                 </div>
 
-                <div className="panel-body">
-                    <div className="list-group">
+                <div className='panel-body'>
+                    <div className='list-group'>
                         <a
-                            href="#"
+                            href='#'
                             onClick={this._jsonClick.bind(this)}
                             className={
                                 this.state.jsonActive
-                                    ? "list-group-item active"
-                                    : "list-group-item"
+                                    ? 'list-group-item active'
+                                    : 'list-group-item'
                             }
                         >
-                            <h4 className="list-group-item-heading">
+                            <h4 className='list-group-item-heading'>
                                 Export to JSON
                             </h4>
-                            <p className="list-group-item-text">
+                            <p className='list-group-item-text'>
                                 Use this format to export data and re-import it
                                 later
                             </p>
                         </a>
 
                         <a
-                            href="#"
+                            href='#'
                             onClick={this._imageClick.bind(this)}
                             className={
                                 this.state.imageActive
-                                    ? "list-group-item active"
-                                    : "list-group-item"
+                                    ? 'list-group-item active'
+                                    : 'list-group-item'
                             }
                         >
-                            <h4 className="list-group-item-heading">
+                            <h4 className='list-group-item-heading'>
                                 Export to Image
                             </h4>
-                            <p className="list-group-item-text">
+                            <p className='list-group-item-text'>
                                 Use this format to export data and view it as an
                                 image
                             </p>
                         </a>
                     </div>
 
-                    <div style={{ textAlign: "center" }}>
+                    <div style={{ textAlign: 'center' }}>
                         <button
                             onClick={this._buttonClick.bind(this)}
-                            className="btn btn-lg"
+                            className='btn btn-lg'
                         >
                             Export Data
                         </button>

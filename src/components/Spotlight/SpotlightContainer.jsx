@@ -1,7 +1,7 @@
-import React, { Component } from "react";
-import GlyphiconSpan from "../GlyphiconSpan";
-import Icon from "../Icon";
-import SpotlightRow from "./SpotlightRow";
+import React, { Component } from 'react';
+import GlyphiconSpan from '../GlyphiconSpan';
+import Icon from '../Icon';
+import SpotlightRow from './SpotlightRow';
 
 export default class SpotlightContainer extends Component {
     constructor(props) {
@@ -9,30 +9,30 @@ export default class SpotlightContainer extends Component {
 
         this.state = {
             data: appStore.spotlightData,
-            searchVal: "",
-            rex: new RegExp("", "i")
+            searchVal: '',
+            rex: new RegExp('', 'i'),
         };
 
         emitter.on(
-            "spotlightUpdate",
+            'spotlightUpdate',
             function() {
                 this.setState({ data: appStore.spotlightData });
             }.bind(this)
         );
 
         emitter.on(
-            "spotlightClick",
+            'spotlightClick',
             function() {
                 $(this.refs.spotlight).fadeToggle(false);
             }.bind(this)
         );
 
         emitter.on(
-            "resetSpotlight",
+            'resetSpotlight',
             function() {
                 this.setState({
-                    searchVal: "",
-                    rex: new RegExp("", "i")
+                    searchVal: '',
+                    rex: new RegExp('', 'i'),
                 });
             }.bind(this)
         );
@@ -41,40 +41,40 @@ export default class SpotlightContainer extends Component {
     _searchChanged(event) {
         this.setState({
             searchVal: event.target.value,
-            rex: new RegExp(event.target.value, "i")
+            rex: new RegExp(event.target.value, 'i'),
         });
     }
 
     render() {
         return (
-            <div ref="spotlight" className="spotlight">
-                <div className="input-group input-group-unstyled no-border-radius">
+            <div ref='spotlight' className='spotlight'>
+                <div className='input-group input-group-unstyled no-border-radius'>
                     <GlyphiconSpan
                         tooltip={false}
-                        classes="input-group-addon spanfix"
+                        classes='input-group-addon spanfix'
                     >
-                        <Icon glyph="search" />
+                        <Icon glyph='search' />
                     </GlyphiconSpan>
                     <input
                         onChange={this._searchChanged.bind(this)}
                         value={this.state.searchVal}
-                        type="search"
-                        className="form-control searchbox"
-                        autoComplete="off"
-                        placeholder="Explore Nodes"
-                        data-type="search"
+                        type='search'
+                        className='form-control searchbox'
+                        autoComplete='off'
+                        placeholder='Explore Nodes'
+                        data-type='search'
                     />
                 </div>
 
-                <div className="spotlight-nodelist">
-                    <table data-role="table" className="table table-striped">
+                <div className='spotlight-nodelist'>
+                    <table data-role='table' className='table table-striped'>
                         <thead>
                             <tr>
                                 <td>Node Label</td>
                                 <td>Collapsed Into</td>
                             </tr>
                         </thead>
-                        <tbody ref="spotlight-tbody" className="searchable">
+                        <tbody ref='spotlight-tbody' className='searchable'>
                             {Object.keys(this.state.data).map(
                                 function(key) {
                                     var d = this.state.data[key];
@@ -104,7 +104,7 @@ export default class SpotlightContainer extends Component {
         jQuery(this.refs.spotlight).fadeToggle(0);
 
         $(window).on(
-            "keyup",
+            'keyup',
             function(e) {
                 var key = e.keyCode ? e.keyCode : e.which;
 

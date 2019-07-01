@@ -12,7 +12,7 @@ import md5File from 'md5-file';
 import { remote } from 'electron';
 const { app } = remote;
 import { join } from 'path';
-import {withAlert} from 'react-alert';
+import { withAlert } from 'react-alert';
 
 class GpoNodeData extends Component {
     constructor() {

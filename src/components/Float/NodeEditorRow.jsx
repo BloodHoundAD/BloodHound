@@ -1,34 +1,36 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
 export default class NodeEditorRow extends Component {
-    constructor() {
-        super();
-    }
+    constructor(props) {
+        super(props);
 
-    componentDidMount() {
         let type = typeof this.props.val;
-        if (type === "object") {
-            type = "array";
+        if (type === 'object') {
+            type = 'array';
         }
-        this.setState({
+
+        this.state = {
             editing: false,
             val: this.props.val,
             deleting: false,
-            valtype: type
-        });
+            valtype: type,
+        };
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.val !== this.props.val && nextProps.val !== this.state.val) {
+        if (
+            nextProps.val !== this.props.val &&
+            nextProps.val !== this.state.val
+        ) {
             let type = typeof nextProps.val;
-            if (type === "object") {
-                type = "array";
+            if (type === 'object') {
+                type = 'array';
             }
             this.setState({
                 val: nextProps.val,
                 editing: false,
                 deleting: false,
-                valtype: type
+                valtype: type,
             });
         }
     }
@@ -56,15 +58,15 @@ export default class NodeEditorRow extends Component {
         let input = jQuery(this.refs.input);
         let val = this.props.val;
 
-        if (input.is("div")) {
+        if (input.is('div')) {
             input.html(val);
-            input.removeAttr("contenteditable");
-        } else if (input.is("textarea")){
-            let tempval = val.join("\n");
-            input.attr("disabled", "");
-            input.val(tempval); 
-        }else {
-            input.attr("disabled", "");
+            input.removeAttr('contenteditable');
+        } else if (input.is('textarea')) {
+            let tempval = val.join('\n');
+            input.attr('disabled', '');
+            input.val(tempval);
+        } else {
+            input.attr('disabled', '');
         }
         this.setState({ editing: false, val: val });
     }
@@ -72,31 +74,31 @@ export default class NodeEditorRow extends Component {
     saveEdit() {
         let input = jQuery(this.refs.input);
         let val;
-        if (input.is("div")) {
+        if (input.is('div')) {
             val = input.html();
-            input.removeAttr("contenteditable");
-        } else if (input.is("textarea")){
+            input.removeAttr('contenteditable');
+        } else if (input.is('textarea')) {
             let tempval = input.val();
-            val = tempval.split("\n");
-            input.attr("disabled", "");
+            val = tempval.split('\n');
+            input.attr('disabled', '');
         } else {
             val = this.state.val;
-            input.attr("disabled", "");
+            input.attr('disabled', '');
         }
-        if (this.state.valtype === "number"){
+        if (this.state.valtype === 'number') {
             val = parseInt(val);
         }
-        this.setState({editing: false});
-        this.props.updateHandler(this.props.attributeName, val)
+        this.setState({ editing: false });
+        this.props.updateHandler(this.props.attributeName, val);
     }
 
     enableEdit() {
         let input = jQuery(this.refs.input);
 
-        if (input.is("div")) {
-            input.attr("contenteditable", true);
+        if (input.is('div')) {
+            input.attr('contenteditable', true);
         } else {
-            input.removeAttr("disabled");
+            input.removeAttr('disabled');
         }
 
         this.setState({ editing: true });
@@ -106,43 +108,50 @@ export default class NodeEditorRow extends Component {
         let type = this.state ? this.state.valtype : typeof this.props.val;
         let valcolumn;
 
-        if (type === "boolean") {
+        if (type === 'boolean') {
             valcolumn = (
                 <input
-                    ref="input"
-                    className="checkbox"
-                    type="checkbox"
+                    ref='input'
+                    className='checkbox'
+                    type='checkbox'
                     checked={!this.state ? false : this.state.val}
                     disabled
                     onChange={this.changeVal.bind(this)}
                 />
             );
-        } else if (type === "string") {
+        } else if (type === 'string') {
             valcolumn = (
-                <div className={"nodeEditString"} ref="input">
+                <div className={'nodeEditString'} ref='input'>
                     {!this.state ? this.props.val : this.state.val}
                 </div>
             );
-        } else if (type === "number") {
+        } else if (type === 'number') {
             valcolumn = (
-                <div className={"nodeEditNumber"} ref="input">
+                <div className={'nodeEditNumber'} ref='input'>
                     {!this.state ? this.props.val : this.state.val}
                 </div>
             );
-        } else if (type === "object" || type === "array") {
+        } else if (type === 'object' || type === 'array') {
             valcolumn = (
-                <textarea disabled className={"nodeEditArray"} ref="input" defaultValue={!this.state
-                    ? this.props.val.join("\n")
-                    : this.state.val.join("\n")} />
+                <textarea
+                    disabled
+                    className={'nodeEditArray'}
+                    ref='input'
+                    defaultValue={
+                        !this.state
+                            ? this.props.val.join('\n')
+                            : this.state.val.join('\n')
+                    }
+                />
             );
         }
 
         let deletecolumn;
         if (!this.state || this.state.deleting === false) {
             deletecolumn = (
-                <button type="button">
+                <button type='button'>
                     <span
-                        className="fa fa-trash"
+                        className='fa fa-trash'
                         onClick={this.enableDelete.bind(this)}
                     />
                 </button>
@@ -150,15 +159,15 @@ export default class NodeEditorRow extends Component {
         } else if (this.state.deleting) {
             deletecolumn = (
                 <div>
-                    <button type="button">
+                    <button type='button'>
                         <span
-                            className="fa fa-check"
+                            className='fa fa-check'
                             onClick={this.saveDelete.bind(this)}
                         />
                     </button>
-                    <button type="button">
+                    <button type='button'>
                         <span
-                            className="fa fa-close"
+                            className='fa fa-close'
                             onClick={this.cancelDelete.bind(this)}
                         />
                     </button>
@@ -169,9 +178,9 @@ export default class NodeEditorRow extends Component {
         let editcolumn;
         if (!this.state || this.state.editing === false) {
             editcolumn = (
-                <button type="button">
+                <button type='button'>
                     <span
-                        className="fa fa-edit"
+                        className='fa fa-edit'
                         onClick={this.enableEdit.bind(this)}
                     />
                 </button>
@@ -179,15 +188,15 @@ export default class NodeEditorRow extends Component {
         } else if (this.state.editing) {
             editcolumn = (
                 <div>
-                    <button type="button">
+                    <button type='button'>
                         <span
-                            className="fa fa-check"
+                            className='fa fa-check'
                             onClick={this.saveEdit.bind(this)}
                         />
                     </button>
-                    <button type="button">
+                    <button type='button'>
                         <span
-                            className="fa fa-close"
+                            className='fa fa-close'
                             onClick={this.cancelEdit.bind(this)}
                         />
                     </button>
@@ -196,11 +205,11 @@ export default class NodeEditorRow extends Component {
         }
 
         return (
-            <tr className="nodeEditRow">
-                <td align="center">{deletecolumn}</td>
-                <td align="center">{editcolumn}</td>
-                <td align="center">{this.props.attributeName}</td>
-                <td align="center">{valcolumn}</td>
+            <tr className='nodeEditRow'>
+                <td align='center'>{deletecolumn}</td>
+                <td align='center'>{editcolumn}</td>
+                <td align='center'>{this.props.attributeName}</td>
+                <td align='center'>{valcolumn}</td>
             </tr>
         );
     }

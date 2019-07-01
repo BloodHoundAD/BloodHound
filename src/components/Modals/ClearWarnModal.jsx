@@ -1,13 +1,17 @@
-import React, { Component } from "react";
-import { Modal } from "react-bootstrap";
+import React, { Component } from 'react';
+import { Modal } from 'react-bootstrap';
 
 export default class ClearWarnModal extends Component {
     constructor() {
         super();
 
         this.state = {
-            open: false
+            open: false,
         };
+    }
+
+    componentDidMount() {
+        emitter.on('openDBWarnModal', this.openModal.bind(this));
     }
 
     closeModal() {
@@ -20,11 +24,7 @@ export default class ClearWarnModal extends Component {
 
     closeAndOpenStep() {
         this.setState({ open: false });
-        emitter.emit("openDBConfirm");
-    }
-
-    componentDidMount() {
-        emitter.on("openDBWarnModal", this.openModal.bind(this));
+        emitter.emit('openDBConfirm');
     }
 
     render() {
@@ -32,10 +32,10 @@ export default class ClearWarnModal extends Component {
             <Modal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby="WarnModalHeader"
+                aria-labelledby='WarnModalHeader'
             >
-                <Modal.Header closeButton={true}>
-                    <Modal.Title id="WarnModalHeader">
+                <Modal.Header closeButton>
+                    <Modal.Title id='WarnModalHeader'>
                         Clear Database
                     </Modal.Title>
                 </Modal.Header>
@@ -50,15 +50,15 @@ export default class ClearWarnModal extends Component {
                 <Modal.Footer>
                     <button
                         onClick={this.closeAndOpenStep.bind(this)}
-                        type="button"
-                        className="btn btn-danger"
+                        type='button'
+                        className='btn btn-danger'
                     >
                         Clear Database
                     </button>
                     <button
                         onClick={this.closeModal.bind(this)}
-                        type="button"
-                        className="btn btn-primary"
+                        type='button'
+                        className='btn btn-primary'
                     >
                         Cancel
                     </button>
