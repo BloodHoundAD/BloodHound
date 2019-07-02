@@ -298,7 +298,7 @@ if (typeof conf.get('edgeincluded') === 'undefined') {
 
 const alertOptions = {
     position: positions.TOP_CENTER,
-    timeout: 50000,
+    timeout: 5000,
     offset: '30px',
     transitions: transitions.FADE,
     containerStyle: {
