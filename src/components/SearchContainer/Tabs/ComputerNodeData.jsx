@@ -469,6 +469,17 @@ class ComputerNodeData extends Component {
                         distinct
                     />
 
+                    <h4>Inbound Execution Privileges</h4>
+                    <NodeCypherLink
+                        property='SQL Admins'
+                        target={this.state.label}
+                        baseQuery={
+                            'MATCH p=(n:User)-[r:SQLAdmin]->(m:Computer {name:{name}})'
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
                     <h4>Outbound Execution Privileges</h4>
                     <NodeCypherLink
                         property='First Degree RDP Privileges'

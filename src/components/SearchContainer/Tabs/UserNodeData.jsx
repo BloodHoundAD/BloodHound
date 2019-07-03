@@ -434,6 +434,16 @@ class UserNodeData extends Component {
                     />
 
                     <NodeCypherLink
+                        property='SQL Admin Rights'
+                        target={this.state.label}
+                        baseQuery={
+                            'MATCH p=(m:User {name:{name}})-[r:SQLAdmin]->(n:Computer)'
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
                         property='Constrained Delegation Privileges'
                         target={this.state.label}
                         baseQuery={
