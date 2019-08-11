@@ -608,6 +608,7 @@ export function buildGpoAdminJson(chunk) {
         let computers = gpoadmin.AffectedComputers;
         let localadmins = gpoadmin.LocalAdmins;
         let rdpers = gpoadmin.RemoteDesktopUsers;
+        let psremoters = gpoadmin.RemoteManagementUsers;
         let dcom = gpoadmin.DcomUsers;
 
         $.each(computers, function(_, comp){
@@ -625,6 +626,16 @@ export function buildGpoAdminJson(chunk) {
                 let member = admin.Name;
                 let type = admin.Type;
                 let rel = "CanRDP";
+                let hash = rel+type;
+                let statement = baseQuery.format(type, rel);
+
+                insert(queries, hash, statement, {comp: comp, member: member});
+            })
+
+            $.each(psremoters, function(_, admin){
+                let member = admin.Name;
+                let type = admin.Type;
+                let rel = "CanPSRemote";
                 let hash = rel+type;
                 let statement = baseQuery.format(type, rel);
 
@@ -709,6 +720,7 @@ export function buildComputerJson(chunk) {
         let properties = comp.Properties;
         let localadmins = comp.LocalAdmins;
         let rdpers = comp.RemoteDesktopUsers;
+        let psremoters = comp.RemoteManagementUsers;
         let primarygroup = comp.PrimaryGroup;
         let allowedtoact = comp.AllowedToAct;
         let dcom = comp.DcomUsers;
@@ -750,6 +762,18 @@ export function buildComputerJson(chunk) {
             let aType = rdp.Type;
             let aName = rdp.Name;
             let rel = "CanRDP";
+
+            let hash = rel + aType;
+
+            let statement = baseQuery.format(aType, rel);
+            let p = { name: name, target: aName };
+            insert(queries, hash, statement, p);
+        });
+
+        $.each(psremoters, function(_, psremote) {
+            let aType = psremote.Type;
+            let aName = psremote.Name;
+            let rel = "CanPSRemote";
 
             let hash = rel + aType;
 

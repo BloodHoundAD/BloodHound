@@ -904,6 +904,22 @@ export default class SearchContainer extends Component {
                         <input
                             className='checkbox-inline'
                             type='checkbox'
+                            name='CanPSRemote'
+                            checked={this.state.edgeincluded.CanPSRemote}
+                            onChange={this.handleChange.bind(this)}
+                        />
+                        <label
+                            onClick={this.handleChange.bind(this)}
+                            name='CanPSRemote'
+                        >
+                            {' '}
+                            CanPSRemote
+                        </label>
+                    </div>
+                    <div>
+                        <input
+                            className='checkbox-inline'
+                            type='checkbox'
                             name='ExecuteDCOM'
                             checked={this.state.edgeincluded.ExecuteDCOM}
                             onChange={this.handleChange.bind(this)}

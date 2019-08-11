@@ -377,10 +377,30 @@ class ComputerNodeData extends Component {
                     />
 
                     <NodeCypherLink
+                        property='First Degree PSRemoting Users'
+                        target={this.state.label}
+                        baseQuery={
+                            'MATCH p=(n)-[r:CanPSRemote]->(m:Computer {name:{name}})'
+                        }
+                        end={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
                         property='Group Delegated Remote Desktop Users'
                         target={this.state.label}
                         baseQuery={
                             'MATCH p=(n)-[r1:MemberOf*1..]->(g:Group)-[r:CanRDP]->(m:Computer {name:{name}})'
+                        }
+                        end={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
+                        property='Group Delegated PSRemoting Users'
+                        target={this.state.label}
+                        baseQuery={
+                            'MATCH p=(n)-[r1:MemberOf*1..]->(g:Group)-[r:CanPSRemote]->(m:Computer {name:{name}})'
                         }
                         end={this.state.label}
                         distinct

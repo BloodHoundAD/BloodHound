@@ -409,6 +409,7 @@ export default class AddEdgeModal extends Component {
                                 <option>Contains</option>
                                 <option>GpLink</option>
                                 <option>CanRDP</option>
+                                <option>CanPSRemote</option>
                                 <option>ExecuteDCOM</option>
                                 <option>AllowedToDelegate</option>
                             </select>

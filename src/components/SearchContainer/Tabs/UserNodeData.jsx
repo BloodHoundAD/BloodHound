@@ -404,6 +404,16 @@ class UserNodeData extends Component {
                     />
 
                     <NodeCypherLink
+                        property='First Degree PSRemoting Privileges'
+                        target={this.state.label}
+                        baseQuery={
+                            'MATCH p=(m:User {name:{name}})-[r:CanPSRemote]->(n:Computer)'
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
+                    <NodeCypherLink
                         property='Group Delegated RDP Privileges'
                         target={this.state.label}
                         baseQuery={
@@ -412,6 +422,17 @@ class UserNodeData extends Component {
                         start={this.state.label}
                         distinct
                     />
+
+                    <NodeCypherLink
+                        property='Group Delegated PSRemoting Privileges'
+                        target={this.state.label}
+                        baseQuery={
+                            'MATCH p=(m:User {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:CanPSRemote]->(n:Computer)'
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
 
                     <NodeCypherLink
                         property='First Degree DCOM Privileges'
