@@ -389,14 +389,15 @@ class GraphContainer extends Component {
             json = JSON.parse(json);
             json.spotlight = appStore.spotlightData;
 
-            dialog.showSaveDialog(
+            let r = dialog.showSaveDialog(
                 {
                     defaultPath: 'graph.json',
-                },
-                function(loc) {
-                    writeFile(loc, JSON.stringify(json, null, 2));
                 }
             );
+
+            if (r !== undefined){
+                writeFile(r, JSON.stringify(json, null, 2));
+            }
         }
     }
 
@@ -778,13 +779,13 @@ class GraphContainer extends Component {
                                         function(_, value) {
                                             if (value !== null) {
                                                 let id = value.identity;
-                                                if (value.end && !edges.id) {
+                                                if ('end' in value && !edges.id) {
                                                     edges[
                                                         id
                                                     ] = this.createEdgeFromRow(
                                                         value
                                                     );
-                                                } else if (!nodes.id) {
+                                                } else if (!nodes.id && !'end' in value) {
                                                     nodes[
                                                         id
                                                     ] = this.createNodeFromRow(
@@ -797,11 +798,11 @@ class GraphContainer extends Component {
                                     );
                                 } else {
                                     let id = field.identity;
-                                    if (field.end && !edges.id) {
+                                    if (Object.hasOwnProperty(field, 'end') && !edges.id) {
                                         edges[id] = this.createEdgeFromRow(
                                             field
                                         );
-                                    } else if (!nodes.id) {
+                                    } else if (!nodes.id && !Object.hasOwnProperty(field, 'end')) {
                                         nodes[id] = this.createNodeFromRow(
                                             field,
                                             params
