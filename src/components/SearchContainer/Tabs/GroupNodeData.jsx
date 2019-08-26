@@ -290,6 +290,7 @@ class GroupNodeData extends Component {
                             'MATCH p =(n)-[r:MemberOf*1..]->(g:Group {name:{name}})'
                         }
                         end={this.state.label}
+                        distinct
                     />
 
                     <NodeCypherLink

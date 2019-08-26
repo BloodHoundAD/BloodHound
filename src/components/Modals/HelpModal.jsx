@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import { Modal, Tabs, Tab } from 'react-bootstrap';
+import DOMPurify from 'dompurify';
 
 export default class HelpModal extends Component {
     constructor() {
@@ -33,9 +34,9 @@ export default class HelpModal extends Component {
 
     createGeneralInfoTab(edge, source, target) {
         let sourceType = source.type.toLowerCase();
-        let sourceName = source.label;
+        let sourceName = DOMPurify.sanitize(source.label);
         let targetType = target.type.toLowerCase();
-        let targetName = target.label;
+        let targetName = DOMPurify.sanitize(target.label);
         let formatted;
         if (edge.label === 'AdminTo') {
             let text = `${this.groupSpecialFormat(
@@ -225,7 +226,7 @@ export default class HelpModal extends Component {
                 targetType,
                 targetName
             );
-        } else if (edge.label === 'SQLAdmin'){
+        } else if (edge.label === 'SQLAdmin') {
             formatted = `The user ${sourceName} is a SQL admin on the computer ${targetName}.
 
             There is at least one MSSQL instance running on ${targetName} where the user ${sourceName} is the account configured to run the SQL Server instance. The typical configuration for MSSQL is to have the local Windows account or Active Directory domain account that is configured to run the SQL Server service (the primary database engine for SQL Server) have sysadmin privileges in the SQL Server application. As a result, the SQL Server service account can be used to log into the SQL Server instance remotely, read all of the databases (including those protected with transparent encryption), and run operating systems command through SQL Server (as the service account) using a variety of techniques.
@@ -233,7 +234,6 @@ export default class HelpModal extends Component {
             For Windows systems that have been joined to an Active Directory domain, the SQL Server instances and the associated service account can be identified by executing a LDAP query for a list of "MSSQLSvc" Service Principal Names (SPN) as a domain user. In short, when the Database Engine service starts, it attempts to register the SPN, and the SPN is then used to help facilitate Kerberos authentication.
             
             Author: Scott Sutherland`;
-
         }
 
         this.setState({ infoTabContent: { __html: formatted } });
@@ -241,9 +241,9 @@ export default class HelpModal extends Component {
 
     createAbuseInfoTab(edge, source, target) {
         let sourceType = source.type;
-        let sourceName = source.label;
+        let sourceName = DOMPurify.sanitize(source.label);
         let targetType = target.type;
-        let targetName = target.label;
+        let targetName = DOMPurify.sanitize(target.label);
         let formatted;
         if (edge.label === 'AdminTo') {
             let text = `<h4>Lateral movement</h4>
@@ -1569,8 +1569,8 @@ export default class HelpModal extends Component {
             Use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
             
             <code>Rubeus.exe s4u /user:${sourceName}$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>`;
-        } else if (edge.label === 'SQLAdmin'){
-                formatted = `Scott Sutherland (<a href="https://twitter.com/_nullbind">@nullbind</a>) from NetSPI has authored PowerUpSQL, a PowerShell Toolkit for Attacking SQL Server. Major contributors include Antti Rantasaari, Eric Gruber (<a href="https://twitter.com/egru">@egru</a>), and Thomas Elling (<a href="https://github.com/thomaselling">@thomaselling</a>). Before executing any of the below commands, download PowerUpSQL and laod it into your PowerShell instance. Get PowerUpSQL here: <a href="https://github.com/NetSPI/PowerUpSQL">https://github.com/NetSPI/PowerUpSQL</a>.
+        } else if (edge.label === 'SQLAdmin') {
+            formatted = `Scott Sutherland (<a href="https://twitter.com/_nullbind">@nullbind</a>) from NetSPI has authored PowerUpSQL, a PowerShell Toolkit for Attacking SQL Server. Major contributors include Antti Rantasaari, Eric Gruber (<a href="https://twitter.com/egru">@egru</a>), and Thomas Elling (<a href="https://github.com/thomaselling">@thomaselling</a>). Before executing any of the below commands, download PowerUpSQL and laod it into your PowerShell instance. Get PowerUpSQL here: <a href="https://github.com/NetSPI/PowerUpSQL">https://github.com/NetSPI/PowerUpSQL</a>.
 
                 <h4>Finding Data</h4>
                 Get a list of databases, sizes, and encryption status:
@@ -1631,9 +1631,9 @@ export default class HelpModal extends Component {
 
     createOpsecTab(edge, source, target) {
         let sourceType = source.type;
-        let sourceName = source.label;
+        let sourceName = DOMPurify.sanitize(source.label);
         let targetType = target.type;
-        let targetName = target.label;
+        let targetName = DOMPurify.sanitize(target.label);
         let formatted;
         if (edge.label === 'AdminTo') {
             let text = `There are several forensic artifacts generated by the techniques described above. For instance, lateral movement via PsExec will generate 4697 events on the target system. If the target organization is collecting and analyzing those events, they may very easily detect lateral movement via PsExec. 
@@ -1720,7 +1720,7 @@ export default class HelpModal extends Component {
             formatted = `To execute this attack, the Rubeus C# assembly needs to be executed on some system with the ability to send/receive traffic in the domain. Modification of the *msDS-AllowedToActOnBehalfOfOtherIdentity* property against the target also must occur, whether through PowerShell or another method. The property should be cleared (or reset to its original value) after attack execution in order to prevent easy detection.`;
         } else if (edge.label === 'AllowedToAct') {
             formatted = `To execute this attack, the Rubeus C# assembly needs to be executed on some system with the ability to send/receive traffic in the domain.`;
-        } else if (edge.label === 'SQLAdmin'){
+        } else if (edge.label === 'SQLAdmin') {
             formatted = `Prior to executing operating system commands through SQL Server, review the audit configuration and choose a command execution method that is not being monitored.
             
             View audits:
@@ -1778,9 +1778,9 @@ export default class HelpModal extends Component {
 
     createReferencesTab(edge, source, target) {
         let sourceType = source.type;
-        let sourceName = source.label;
+        let sourceName = DOMPurify.sanitize(source.label);
         let targetType = target.type;
-        let targetName = target.label;
+        let targetName = DOMPurify.sanitize(target.label);
         let formatted;
         if (edge.label === 'AdminTo') {
             let text = `<h4>Lateral movement</h4>
@@ -1952,7 +1952,7 @@ export default class HelpModal extends Component {
             <a href="http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/">http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/</a>
             <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1</a>
             <a href="https://github.com/Kevin-Robertson/Powermad#new-machineaccount">https://github.com/Kevin-Robertson/Powermad#new-machineaccount</a>`;
-        } else if (edge.label === 'SQLAdmin'){
+        } else if (edge.label === 'SQLAdmin') {
             formatted = `<a href="https://github.com/NetSPI/PowerUpSQL/wiki">https://github.com/NetSPI/PowerUpSQL/wiki</a>
             <a href="https://www.slideshare.net/nullbind/powerupsql-2018-blackhat-usa-arsenal-presentation">https://www.slideshare.net/nullbind/powerupsql-2018-blackhat-usa-arsenal-presentation</a>
             <a href="https://sqlwiki.netspi.com/attackQueries/executingOSCommands/#sqlserver">https://sqlwiki.netspi.com/attackQueries/executingOSCommands/#sqlserver</a>
