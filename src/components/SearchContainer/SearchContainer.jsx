@@ -171,46 +171,6 @@ export default class SearchContainer extends Component {
                 return ReactDOMServer.renderToString(
                     <SearchRow key={index} item={obj} search={searchTerm} />
                 );
-
-                // let type = obj.type;
-                // let icon = '';
-
-                // switch (type) {
-                //     case 'Group':
-                //         icon =
-                //             '<i style="float:right" class="fa fa-users"></i>';
-                //         break;
-                //     case 'User':
-                //         icon = '<i style="float:right" class="fa fa-user"></i>';
-                //         break;
-                //     case 'Computer':
-                //         icon =
-                //             '<i style="float:right" class="fa fa-desktop"></i>';
-                //         break;
-                //     case 'Domain':
-                //         icon =
-                //             '<i style="float:right" class="fa fa-globe"></i>';
-                //         break;
-                //     case 'GPO':
-                //         icon = '<i style="float:right" class="fa fa-list"></i>';
-                //         break;
-                //     case 'OU':
-                //         icon =
-                //             '<i style="float:right" class="fa fa-sitemap"></i>';
-                //         break;
-                // }
-
-                // let html = '<div>{}'.format(name);
-
-                // if (searchTerm !== '') {
-                //     let reQuery = new RegExp('(' + searchTerm + ')', 'gi');
-
-                //     html = html.replace(reQuery, '<strong>$1</strong>');
-                // }
-                // html += icon + '</div>';
-                // let jElem = $(html);
-
-                // return jElem.html();
             },
         });
 
