@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Modal } from 'react-bootstrap';
 import { buildSearchQuery } from 'utils';
+import SearchRow from '../SearchContainer/SearchRow';
+import ReactDOMServer from 'react-dom/server';
 
 const SEPARATOR = '#BLOODHOUNDSEPARATOR#';
 
@@ -24,14 +26,16 @@ export default class AddEdgeModal extends Component {
 
     openModal() {
         closeTooltip();
-        this.setState({ open: true });
+        this.setState({ open: true }, () => {
+            setTimeout(() => {
+                this.bindSearchBars(jQuery(this.refs.source), 'source');
+                this.bindSearchBars(jQuery(this.refs.target), 'target');
+            }, 500);
+        });
         jQuery(this.refs.errora).hide();
         jQuery(this.refs.errorb).hide();
         jQuery(this.refs.edgeError).hide();
         jQuery(this.refs.complete).hide();
-
-        this.bindSearchBars(jQuery(this.refs.source), 'source');
-        this.bindSearchBars(jQuery(this.refs.target), 'target');
     }
 
     bindSearchBars(element, which) {
@@ -89,45 +93,10 @@ export default class AddEdgeModal extends Component {
                 let searchTerm = this.query.includes(':')
                     ? this.query.split(':')[1]
                     : this.query;
-                let type = obj.type;
-                let icon;
 
-                switch (type) {
-                    case 'Group':
-                        icon =
-                            '<i style="float:right" class="fa fa-users"></i>';
-                        break;
-                    case 'User':
-                        icon = '<i style="float:right" class="fa fa-user"></i>';
-                        break;
-                    case 'Computer':
-                        icon =
-                            '<i style="float:right" class="fa fa-desktop"></i>';
-                        break;
-                    case 'Domain':
-                        icon =
-                            '<i style="float:right" class="fa fa-globe"></i>';
-                        break;
-                    case 'GPO':
-                        icon = '<i style="float:right" class="fa fa-list"></i>';
-                        break;
-                    case 'OU':
-                        icon =
-                            '<i style="float:right" class="fa fa-sitemap"></i>';
-                        break;
-                }
-
-                let html = '<div>{}'.format(name);
-
-                if (searchTerm !== '') {
-                    let reQuery = new RegExp('(' + searchTerm + ')', 'gi');
-
-                    html = html.replace(reQuery, '<strong>$1</strong>');
-                }
-                html += icon + '</div>';
-                let jElem = $(html);
-
-                return jElem.html();
+                return ReactDOMServer.renderToString(
+                    <SearchRow key={index} item={obj} search={searchTerm} />
+                );
             },
             afterSelect: item => {
                 let p = {};
@@ -184,9 +153,7 @@ export default class AddEdgeModal extends Component {
         }
 
         let q = driver.session();
-        let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${
-            target.type
-        } {name:{target}}) MATCH (n)-[r:${edge}]->(m) RETURN r`;
+        let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${target.type} {name:{target}}) MATCH (n)-[r:${edge}]->(m) RETURN r`;
         q.run(statement, { source: source.name, target: target.name }).then(
             x => {
                 q.close();
@@ -212,11 +179,7 @@ export default class AddEdgeModal extends Component {
                         edgepart = `[r:${edge} {isacl:false}]`;
                     }
                     let s = driver.session();
-                    let statement = `MATCH (n:${
-                        source.type
-                    } {name: {source}}) MATCH (m:${
-                        target.type
-                    } {name:{target}}) MERGE (n)-${edgepart}->(m) RETURN r`;
+                    let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${target.type} {name:{target}}) MERGE (n)-${edgepart}->(m) RETURN r`;
                     s.run(statement, {
                         source: source.name,
                         target: target.name,
@@ -262,9 +225,9 @@ export default class AddEdgeModal extends Component {
                     );
                     error.show();
                 } else {
-                    let props = x._fields[0].properties;
+                    let props = x.records[0]._fields[0].properties;
                     Object.assign(props, {
-                        type: x._fields[0].labels[0],
+                        type: x.records[0]._fields[0].labels[0],
                     });
                     this.setState({ source: props });
                 }
@@ -316,9 +279,9 @@ export default class AddEdgeModal extends Component {
                     );
                     error.show();
                 } else {
-                    let props = x._fields[0].properties;
+                    let props = x.records[0]._fields[0].properties;
                     Object.assign(props, {
-                        type: x._fields[0].labels[0],
+                        type: x.records[0]._fields[0].labels[0],
                     });
                     this.setState({ source: props });
                 }

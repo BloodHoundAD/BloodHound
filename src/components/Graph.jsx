@@ -9,6 +9,9 @@ const { dialog } = remote;
 const uuidv4 = require('uuid/v4');
 var observer = require('fontfaceobserver');
 import { withAlert } from 'react-alert';
+import NodeTooltip from './Tooltips/NodeTooltip';
+import StageTooltip from './Tooltips/StageTooltip';
+import EdgeTooltip from './Tooltips/EdgeTooltip';
 
 class GraphContainer extends Component {
     constructor(props) {
@@ -23,35 +26,26 @@ class GraphContainer extends Component {
             design: null,
             dragged: false,
             firstDraw: true,
-            nodeTemplate: null,
-            edgeTemplate: null,
             session: driver.session(),
             darkMode: false,
+            nodeTooltip: {
+                visible: false,
+                node: null,
+                x: null,
+                y: null,
+            },
+            stageTooltip: {
+                visible: false,
+                x: null,
+                y: null,
+            },
+            edgeTooltip: {
+                visible: false,
+                x: null,
+                y: null,
+                edge: null,
+            },
         };
-
-        $.ajax({
-            url: 'src/components/nodeTooltip.html',
-            type: 'GET',
-            success: function(response) {
-                this.setState({ nodeTemplate: response });
-            }.bind(this),
-        });
-
-        $.ajax({
-            url: 'src/components/edgeTooltip.html',
-            type: 'GET',
-            success: function(response) {
-                this.setState({ edgeTemplate: response });
-            }.bind(this),
-        });
-
-        $.ajax({
-            url: 'src/components/stageTooltip.html',
-            type: 'GET',
-            success: function(response) {
-                this.setState({ stageTemplate: response });
-            }.bind(this),
-        });
 
         child.stdout.on('data', data => {
             console.log(`stdout: ${data}`);
@@ -109,12 +103,21 @@ class GraphContainer extends Component {
         emitter.on('setHighVal', this.setHighVal.bind(this));
         emitter.on('getHelp', this.getHelpEdge.bind(this));
         emitter.on('toggleDarkMode', this.toggleDarkMode.bind(this));
+        emitter.on('closeTooltip', this.hideTooltip.bind(this));
     }
 
     componentDidMount() {
         var font = new observer('Font Awesome 5 Free');
         font.load().then(x => {
             this.inita();
+        });
+    }
+
+    hideTooltip() {
+        this.setState({
+            nodeTooltip: { visible: false },
+            edgeTooltip: { visible: false },
+            stageTooltip: { visible: false },
         });
     }
 
@@ -162,10 +165,11 @@ class GraphContainer extends Component {
         this.initializeSigma();
         this.toggleDarkMode(appStore.performance.darkMode);
         this.doQueryNative({
-            statement:
-                'MATCH (n:Group) WHERE n.objectsid =~ "(?i)S-1-5.*-512" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
+            // statement:
+            //     'MATCH (n:Group) WHERE n.objectsid =~ "(?i)S-1-5.*-512" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
             //statement: 'MATCH (n)-[r:AdminTo]->(m) RETURN n,r,m LIMIT 5',
             //statement: 'MATCH p=(n:Domain)-[r]-(m:Domain) RETURN p',
+            statement: 'MATCH (n) RETURN n',
             allowCollapse: false,
             props: {},
         });
@@ -278,8 +282,8 @@ class GraphContainer extends Component {
                 id: id,
                 label: varn,
                 type: type,
-                x: this.state.tooltipPos.x,
-                y: this.state.tooltipPos.y,
+                x: this.state.stageTooltip.x,
+                y: this.state.stageTooltip.y,
                 folded: {
                     nodes: [],
                     edges: [],
@@ -389,13 +393,11 @@ class GraphContainer extends Component {
             json = JSON.parse(json);
             json.spotlight = appStore.spotlightData;
 
-            let r = dialog.showSaveDialog(
-                {
-                    defaultPath: 'graph.json',
-                }
-            );
+            let r = dialog.showSaveDialog({
+                defaultPath: 'graph.json',
+            });
 
-            if (r !== undefined){
+            if (r !== undefined) {
                 writeFile(r, JSON.stringify(json, null, 2));
             }
         }
@@ -779,13 +781,19 @@ class GraphContainer extends Component {
                                         function(_, value) {
                                             if (value !== null) {
                                                 let id = value.identity;
-                                                if ('end' in value && !edges.id) {
+                                                if (
+                                                    'end' in value &&
+                                                    !edges.id
+                                                ) {
                                                     edges[
                                                         id
                                                     ] = this.createEdgeFromRow(
                                                         value
                                                     );
-                                                } else if (!nodes.id && !'end' in value) {
+                                                } else if (
+                                                    !nodes.id &&
+                                                    !('end' in value)
+                                                ) {
                                                     nodes[
                                                         id
                                                     ] = this.createNodeFromRow(
@@ -798,11 +806,17 @@ class GraphContainer extends Component {
                                     );
                                 } else {
                                     let id = field.identity;
-                                    if (Object.hasOwnProperty(field, 'end') && !edges.id) {
+                                    if (
+                                        Object.hasOwnProperty(field, 'end') &&
+                                        !edges.id
+                                    ) {
                                         edges[id] = this.createEdgeFromRow(
                                             field
                                         );
-                                    } else if (!nodes.id && !Object.hasOwnProperty(field, 'end')) {
+                                    } else if (
+                                        !nodes.id &&
+                                        !Object.hasOwnProperty(field, 'end')
+                                    ) {
                                         nodes[id] = this.createNodeFromRow(
                                             field,
                                             params
@@ -1413,13 +1427,39 @@ class GraphContainer extends Component {
             let x = event.data.captor.clientX;
             let y = event.data.captor.clientY;
 
-            let newPos = this.calculateClickPos(x, y);
+            this.setState({
+                stageTooltip: {
+                    x: x,
+                    y: y,
+                    visible: true,
+                },
+            });
+        });
 
-            this.setState({ tooltipPos: { x: newPos.x, y: newPos.y } });
+        sigmaInstance.bind('rightClickEdge', event => {
+            this.setState({
+                edgeTooltip: {
+                    edge: event.data.edge,
+                    x: event.data.captor.clientX,
+                    y: event.data.captor.clientY,
+                    visible: true,
+                },
+            });
         });
 
         sigmaInstance.bind('clickStage', event => {
             closeTooltip();
+        });
+
+        sigmaInstance.bind('rightClickNode', event => {
+            this.setState({
+                nodeTooltip: {
+                    node: event.data.node,
+                    x: event.data.captor.clientX,
+                    y: event.data.captor.clientY,
+                    visible: true,
+                },
+            });
         });
 
         //Some key binds
@@ -1461,70 +1501,6 @@ class GraphContainer extends Component {
         );
 
         dragListener.bind('drag', this._nodeDragged.bind(this));
-
-        var tooltips = sigma.plugins.tooltips(
-            sigmaInstance,
-            sigmaInstance.renderers[0],
-            {
-                node: [
-                    {
-                        show: 'rightClickNode',
-                        cssClass: 'new-tooltip',
-                        autoadjust: true,
-                        renderer: function(node) {
-                            var template = this.state.nodeTemplate;
-                            node.expand = false;
-                            node.collapse = false;
-                            if (
-                                node.folded.nodes.length > 0 &&
-                                !node.groupedNode
-                            ) {
-                                if (
-                                    typeof this.state.sigmaInstance.graph.nodes(
-                                        node.folded.nodes[0].id
-                                    ) === 'undefined'
-                                ) {
-                                    node.expand = true;
-                                } else {
-                                    node.collapse = true;
-                                }
-                            }
-                            return Mustache.render(template, node);
-                        }.bind(this),
-                    },
-                ],
-                edge: [
-                    {
-                        show: 'rightClickEdge',
-                        cssClass: 'new-tooltip',
-                        autoadjust: true,
-                        renderer: function(edge) {
-                            var template = this.state.edgeTemplate;
-                            return Mustache.render(template, edge);
-                        }.bind(this),
-                    },
-                ],
-                stage: [
-                    {
-                        show: 'rightClickStage',
-                        cssClass: 'new-tooltip',
-                        autoadjust: true,
-                        renderer: function() {
-                            var template = this.state.stageTemplate;
-                            return Mustache.render(template);
-                        }.bind(this),
-                    },
-                ],
-            }
-        );
-
-        tooltips.bind('shown', function(event) {
-            appStore.currentTooltip = event.target;
-        });
-
-        tooltips.bind('hidden', function(event) {
-            appStore.currentTooltip = null;
-        });
 
         //Layout Plugins
         var forcelinkListener = sigma.layouts.configForceLink(sigmaInstance, {
@@ -1645,6 +1621,15 @@ class GraphContainer extends Component {
                             : 'graph graph-light'
                     }
                 />
+                {this.state.nodeTooltip.visible && (
+                    <NodeTooltip {...this.state.nodeTooltip} />
+                )}
+                {this.state.stageTooltip.visible && (
+                    <StageTooltip {...this.state.stageTooltip} />
+                )}
+                {this.state.edgeTooltip.visible && (
+                    <EdgeTooltip {...this.state.edgeTooltip} />
+                )}
             </div>
         );
     }

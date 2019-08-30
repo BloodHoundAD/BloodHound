@@ -303,8 +303,8 @@ const alertOptions = {
     transitions: transitions.FADE,
     containerStyle: {
         zIndex: 100,
-        width: '25%'
-    }
+        width: '25%',
+    },
 };
 
 appStore.edgeincluded = conf.get('edgeincluded');
@@ -355,17 +355,18 @@ if (!existsSync(imagepath)) {
 }
 
 global.closeTooltip = function() {
-    if (appStore.currentTooltip !== null) {
-        appStore.currentTooltip.close();
-        appStore.currentTooltip = null;
-    }
+    emitter.emit('closeTooltip');
 };
 
 renderEmit.on('login', function() {
     emitter.removeAllListeners();
     ReactDOM.unmountComponentAtNode(document.getElementById('root'));
     let Root = () => (
-        <AlertProvider id='alertContainer' template={AlertTemplate} {...alertOptions}>
+        <AlertProvider
+            id='alertContainer'
+            template={AlertTemplate}
+            {...alertOptions}
+        >
             <AppContainer />
         </AlertProvider>
     );
