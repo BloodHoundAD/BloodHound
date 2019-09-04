@@ -165,11 +165,11 @@ class GraphContainer extends Component {
         this.initializeSigma();
         this.toggleDarkMode(appStore.performance.darkMode);
         this.doQueryNative({
-            // statement:
-            //     'MATCH (n:Group) WHERE n.objectsid =~ "(?i)S-1-5.*-512" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
+            statement:
+                'MATCH (n:Group) WHERE n.objectsid =~ "(?i)S-1-5.*-512" WITH n MATCH (n)<-[r:MemberOf*1..]-(m) RETURN n,r,m',
             //statement: 'MATCH (n)-[r:AdminTo]->(m) RETURN n,r,m LIMIT 5',
             //statement: 'MATCH p=(n:Domain)-[r]-(m:Domain) RETURN p',
-            statement: 'MATCH (n) RETURN n',
+            //statement: 'MATCH p=(n)-[r]->(m) RETURN p',
             allowCollapse: false,
             props: {},
         });
