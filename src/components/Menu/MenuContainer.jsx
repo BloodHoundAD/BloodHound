@@ -24,6 +24,7 @@ import { streamArray } from 'stream-json/streamers/StreamArray';
 import { chain } from 'stream-chain';
 import { isZipSync } from 'is-zip-file';
 import { withAlert } from 'react-alert';
+import sanitize from 'sanitize-filename';
 
 class MenuContainer extends Component {
     constructor() {
@@ -175,11 +176,12 @@ class MenuContainer extends Component {
                 await createReadStream(path)
                     .pipe(Parse())
                     .on('entry', function(entry) {
-                        var output = join(tempPath, entry.path);
+                        let sanitized = sanitize(entry.path);
+                        var output = join(tempPath, sanitized);
                         entry.pipe(createWriteStream(output));
                         processed.push({
                             path: output,
-                            name: entry.path,
+                            name: sanitized,
                             delete: true,
                         });
                     })

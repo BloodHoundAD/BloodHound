@@ -86,6 +86,7 @@
         "react-images": "^1.0.0",
         "react-photo-gallery": "^8.0.0",
         "react-transition-group": "^4.2.0",
+        "sanitize-filename": "^1.6.3",
         "stream-json": "^1.1.4",
         "unzipper": "^0.8.9",
         "uuid": "^3.3.2"
