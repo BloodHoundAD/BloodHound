@@ -28,7 +28,7 @@ class UserNodeData extends Component {
             displayMap: {
                 displayname: 'Display Name',
                 pwdlastset: 'Password Last Changed',
-                lastlogon: 'Last Logon',
+                lastlogontimestamp: 'Last Logon',
                 enabled: 'Enabled',
                 email: 'Email',
                 title: 'Title',
