@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { findGraphPath, generateUniqueId } from 'utils';
-import { writeFile, readFile } from 'fs';
+import { writeFileSync, readFile } from 'fs';
 import { fork } from 'child_process';
 var child;
 import { join } from 'path';
@@ -398,7 +398,7 @@ class GraphContainer extends Component {
             });
 
             if (r !== undefined) {
-                writeFile(r, JSON.stringify(json, null, 2));
+                writeFileSync(r, JSON.stringify(json, null, 2));
             }
         }
     }
