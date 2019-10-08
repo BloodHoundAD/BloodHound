@@ -398,7 +398,10 @@ class GraphContainer extends Component {
             });
 
             if (r !== undefined) {
-                writeFile(r, JSON.stringify(json, null, 2));
+                writeFile(r, JSON.stringify(json, null, 2), err => {
+                    if (err) console.log(err);
+                    console.log('Saved ' + r + ' successfully');
+                });
             }
         }
     }
