@@ -81,9 +81,7 @@ export default class Login extends Component {
         icon.removeClass();
         icon.addClass('fa fa-spinner fa-spin form-control-feedback');
         icon.toggle(true);
-        var driver = neo4j.driver(url, neo4j.auth.basic('', ''), {
-            encrypted: 'ENCRYPTION_ON',
-        });
+        var driver = neo4j.driver(url, neo4j.auth.basic('', ''));
         var session = driver.session();
 
         driver.onCompleted = function() {
@@ -129,8 +127,7 @@ export default class Login extends Component {
 
         var driver = neo4j.driver(
             this.state.url,
-            neo4j.auth.basic(this.state.user, this.state.password),
-            { encrypted: 'ENCRYPTION_ON' }
+            neo4j.auth.basic(this.state.user, this.state.password)
         );
         driver.onError = error => {
             console.log(error);

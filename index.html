@@ -1,43 +1,81 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <link type="text/css" rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css">
-    <link type="text/css" rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link type="text/css" rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css">
-    <link type="text/css" rel="stylesheet" href="src/css/styles.css">
-    <link type="text/css" rel="stylesheet" href="src/css/tooltip.css">
-    <title>BloodHound</title>
-    <link rel="icon" href="src/img/favicon.ico">
-    <script>window.$ = window.jQuery = require('jquery');</script>
-    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
-    <script src="src/js/jquery-ui.min.js" type="text/javascript"></script>
-    <script>window.sigma = require('linkurious');</script>
-    <script src="node_modules/linkurious/dist/plugins.js" type="text/javascript"></script>
-    <script src="node_modules/dagre/dist/dagre.min.js" type="text/javascript"></script>
-    <script src="node_modules/bootstrap-3-typeahead/bootstrap3-typeahead.min.js" type="text/javascript"></script>
-    <script src="src/js/simple-slider.min.js" type="text/javascript"></script>
-    <link type="text/css" rel="stylesheet" href="src/css/simple-slider.css">
-    <link type="text/css" rel="stylesheet" href="src/css/simple-slider-volume.css">
-  </head>
-  <body>
-    <div id="root">
-    </div>
-    <script>
-      (function() {
-        const script = document.createElement('script');
-        if (process.env.NODE_ENV === 'development'){
-          script.src = 'http://localhost:9000/dist/bundle.js';
-        }else{
-          script.src = './dist/bundle.js';
-        }
-        document.write(script.outerHTML);
-      }());
-    </script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="node_modules/@fortawesome/fontawesome-free/css/all.min.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="node_modules/bootstrap/dist/css/bootstrap.min.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css"
+        />
+        <link type="text/css" rel="stylesheet" href="src/css/styles.css" />
+        <link type="text/css" rel="stylesheet" href="src/css/tooltip.css" />
+        <title>BloodHound</title>
+        <link rel="icon" href="src/img/favicon.ico" />
+        <script>
+            window.$ = window.jQuery = require('jquery');
+        </script>
+        <script
+            src="node_modules/bootstrap/dist/js/bootstrap.min.js"
+            type="text/javascript"
+        ></script>
+        <script src="src/js/jquery-ui.min.js" type="text/javascript"></script>
+        <script>
+            window.sigma = require('linkurious');
+        </script>
+        <script
+            src="node_modules/linkurious/dist/plugins.js"
+            type="text/javascript"
+        ></script>
+        <script
+            src="node_modules/dagre/dist/dagre.min.js"
+            type="text/javascript"
+        ></script>
+        <script
+            src="node_modules/bootstrap-3-typeahead/bootstrap3-typeahead.min.js"
+            type="text/javascript"
+        ></script>
+        <script
+            src="src/js/simple-slider.min.js"
+            type="text/javascript"
+        ></script>
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="src/css/simple-slider.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="src/css/simple-slider-volume.css"
+        />
+    </head>
+    <body>
+        <div id="root"></div>
+        <script>
+            (function() {
+                const script = document.createElement('script');
+                if (process.env.NODE_ENV === 'development') {
+                    script.src = 'http://localhost:9000/dist/bundle.js';
+                } else {
+                    script.src = './dist/bundle.js';
+                }
+                document.write(script.outerHTML);
+            })();
+        </script>
+    </body>
 
-  <script>
-    // You can also require other files to run in this process
-    require('./renderer.js')
-  </script>
+    <script>
+        // You can also require other files to run in this process
+        require('./renderer.js');
+    </script>
 </html>

@@ -1,4 +1,4 @@
-import 'babel-polyfill'; // generators
+import '@babel/polyfill'; // generators
 import React from 'react';
 import ReactDOM from 'react-dom';
 
