@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { If, Then, Else } from 'react-if';
 
 const NodeTooltip = ({ node, x, y }) => {
@@ -10,8 +10,35 @@ const NodeTooltip = ({ node, x, y }) => {
     let targetSpec = type === 'OU' ? '{guid:{guid}}' : '{name:{name}}';
     let target = type === 'OU' ? { guid: guid } : { name: label };
     let targetProp = type === 'OU' ? guid : label;
+
+    const [realX, setRealX] = useState(0);
+    const [realY, setRealY] = useState(0);
+
+    const tooltipDiv = useRef(null);
+
+    useEffect(() => {
+        let rect = tooltipDiv.current.getBoundingClientRect();
+        if (x + rect.width > window.innerWidth) {
+            x = window.innerWidth - rect.width - 10;
+        }
+
+        if (y + rect.height > window.innerHeight) {
+            y = window.innerHeight - rect.height - 10;
+        }
+
+        setRealX(x);
+        setRealY(y);
+    }, [x, y]);
+
     return (
-        <div className={'new-tooltip'} style={{ left: x, top: y }}>
+        <div
+            ref={tooltipDiv}
+            className={'new-tooltip'}
+            style={{
+                left: realX === 0 ? x : realX,
+                top: realY === 0 ? y : realY,
+            }}
+        >
             <div className='header'>{label}</div>
             <ul className='tooltip-ul'>
                 <If condition={type === 'OU'}>

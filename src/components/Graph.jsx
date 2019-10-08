@@ -393,10 +393,9 @@ class GraphContainer extends Component {
             json = JSON.parse(json);
             json.spotlight = appStore.spotlightData;
 
-            let r = dialog.showSaveDialog({
+            let r = dialog.showSaveDialogSync({
                 defaultPath: 'graph.json',
             });
-
             if (r !== undefined) {
                 writeFile(r, JSON.stringify(json, null, 2), err => {
                     if (err) console.log(err);
@@ -1436,6 +1435,12 @@ class GraphContainer extends Component {
                     y: y,
                     visible: true,
                 },
+                edgeTooltip: {
+                    visible: false,
+                },
+                nodeTooltip: {
+                    visible: false,
+                },
             });
         });
 
@@ -1446,6 +1451,12 @@ class GraphContainer extends Component {
                     x: event.data.captor.clientX,
                     y: event.data.captor.clientY,
                     visible: true,
+                },
+                stageTooltip: {
+                    visible: false,
+                },
+                nodeTooltip: {
+                    visible: false,
                 },
             });
         });
@@ -1461,6 +1472,12 @@ class GraphContainer extends Component {
                     x: event.data.captor.clientX,
                     y: event.data.captor.clientY,
                     visible: true,
+                },
+                edgeTooltip: {
+                    visible: false,
+                },
+                stageTooltip: {
+                    visible: false,
                 },
             });
         });
