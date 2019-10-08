@@ -10,7 +10,7 @@ import AlertTemplate from 'react-alert-template-basic';
 import { remote, shell } from 'electron';
 const { app } = remote;
 import { join } from 'path';
-import { stat, writeFile, existsSync, mkdirSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
 
 import ConfigStore from 'electron-store';
 global.conf = new ConfigStore();
@@ -342,12 +342,9 @@ if (typeof appStore.performance.darkMode === 'undefined') {
 }
 
 var custompath = join(app.getPath('userData'), 'customqueries.json');
-
-stat(custompath, function(err, stats) {
-    if (err) {
-        writeFile(custompath, '{}');
-    }
-});
+if (!existsSync(custompath)) {
+    writeFileSync(custompath, '{queries: []}');
+}
 
 let imagepath = join(app.getPath('userData'), 'images');
 if (!existsSync(imagepath)) {
