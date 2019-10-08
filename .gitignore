@@ -4,3 +4,4 @@ dist/
 npm-debug.log
 *.bin
 *.csv
+graph.json
