@@ -10,7 +10,7 @@ import AlertTemplate from 'react-alert-template-basic';
 import { remote, shell } from 'electron';
 const { app } = remote;
 import { join } from 'path';
-import { stat, writeFile, existsSync, mkdirSync } from 'fs';
+import { stat, writeFileSync, existsSync, mkdirSync } from 'fs';
 
 import ConfigStore from 'electron-store';
 global.conf = new ConfigStore();
@@ -345,7 +345,7 @@ var custompath = join(app.getPath('userData'), 'customqueries.json');
 
 stat(custompath, function(err, stats) {
     if (err) {
-        writeFile(custompath, '{}');
+        writeFileSync(custompath, '{}');
     }
 });
 
