@@ -375,13 +375,14 @@ class GraphContainer extends Component {
     export(payload) {
         if (payload === 'image') {
             let size = $('#graph').outerWidth();
+            let bgColor = this.state.darkMode ? '#383332' : '#f2f5f9';
             sigma.plugins.image(
                 this.state.sigmaInstance,
                 this.state.sigmaInstance.renderers[0],
                 {
                     download: true,
                     size: size,
-                    background: 'lightgray',
+                    background: bgColor,
                     clip: true,
                 }
             );
