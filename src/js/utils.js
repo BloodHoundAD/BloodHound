@@ -22,9 +22,9 @@ export function generateUniqueId(sigmaInstance, isNode) {
     return i;
 }
 
-function getRealLabel(label){
+function getRealLabel(label) {
     let ret = null;
-    $.each(labels, (_, l) =>  {
+    $.each(labels, (_, l) => {
         if (l.toLowerCase() === label.toLowerCase()) {
             ret = l;
         }
@@ -33,9 +33,9 @@ function getRealLabel(label){
     return ret;
 }
 
-export function buildSearchQuery(searchterm){
+export function buildSearchQuery(searchterm) {
     if (searchterm.includes(":")) {
-        let [type,term] = searchterm.split(":");
+        let [type, term] = searchterm.split(":");
         term = escapeRegExp(term);
         let t = "(?i).*" + term + ".*";
         type = getRealLabel(type);
@@ -43,43 +43,43 @@ export function buildSearchQuery(searchterm){
         let statement = `MATCH (n:${type}) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10`;
 
         return [statement, t];
-    }else{
+    } else {
         let q = escapeRegExp(searchterm);
         let t = "(?i).*" + q + ".*";
 
-        return ["MATCH (n) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10",t];
+        return ["MATCH (n) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10", t];
     }
 }
 
-export function buildSelectQuery(start, end){
+export function buildSelectQuery(start, end) {
     let startTerm, endTerm, apart, bpart;
 
-    if (start.includes(':')){
+    if (start.includes(':')) {
         let [type, search] = start.split(':')
         startTerm = search;
         type = getRealLabel(type);
 
-        if (type === "OU" || type === "GPO"){
+        if (type === "OU" || type === "GPO") {
             apart = `MATCH (n:${type}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}`;
-        }else{
+        } else {
             apart = `MATCH (n:${type}) WHERE n.name =~ {aprop}`;
         }
-    }else{
+    } else {
         startTerm = start;
         apart = "MATCH (n) WHERE n.name =~ {aprop}"
     }
 
-    if (end.includes(':')){
+    if (end.includes(':')) {
         let [type, search] = end.split(':')
         endTerm = search;
         type = getRealLabel(type);
 
-        if (type === "OU" || type === "GPO"){
+        if (type === "OU" || type === "GPO") {
             bpart = `MATCH (m:${type}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}`;
-        }else{
+        } else {
             bpart = `MATCH (m:${type}) WHERE m.name =~ {bprop}`;
         }
-    }else{
+    } else {
         endTerm = end;
         bpart = "MATCH (m) WHERE m.name =~ {bprop}"
     }
@@ -99,8 +99,8 @@ export function findGraphPath(sigmaInstance, reverse, nodeid, traversed) {
             ? sigmaInstance.graph.inboundNodes(nodeid)
             : sigmaInstance.graph.outboundNodes(nodeid);
         //Loop over the nodes near us and the edges connecting to those nodes
-        $.each(nodes, function(index, node) {
-            $.each(edges, function(index, edge) {
+        $.each(nodes, function (index, node) {
+            $.each(edges, function (index, edge) {
                 var check = reverse ? edge.source : edge.target;
                 //If an edge is pointing in the right direction, set its color
                 //Push the edge into our store and then
@@ -128,7 +128,7 @@ function deleteSessions() {
         .run(
             "MATCH ()-[r:HasSession]-() WITH r LIMIT 100000 DELETE r RETURN count(r)"
         )
-        .then(function(results) {
+        .then(function (results) {
             session.close();
             emitter.emit("refreshDBData");
             var count = results.records[0]._fields[0];
@@ -149,7 +149,7 @@ function deleteEdges() {
     var session = driver.session();
     session
         .run("MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)")
-        .then(function(results) {
+        .then(function (results) {
             emitter.emit("refreshDBData");
             session.close();
             var count = results.records[0]._fields[0];
@@ -165,7 +165,7 @@ function deleteNodes() {
     var session = driver.session();
     session
         .run("MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)")
-        .then(function(results) {
+        .then(function (results) {
             emitter.emit("refreshDBData");
             session.close();
             var count = results.records[0]._fields[0];
@@ -180,8 +180,8 @@ function deleteNodes() {
 function grabConstraints() {
     var session = driver.session();
     let constraints = [];
-    session.run("CALL db.constraints").then(function(results) {
-        $.each(results.records, function(index, container) {
+    session.run("CALL db.constraints").then(function (results) {
+        $.each(results.records, function (index, container) {
             let constraint = container._fields[0];
             let query = "DROP " + constraint;
             constraints.push(query);
@@ -197,7 +197,7 @@ function dropConstraints(constraints) {
     if (constraints.length > 0) {
         let constraint = constraints.shift();
         let session = driver.session();
-        session.run(constraint).then(function() {
+        session.run(constraint).then(function () {
             dropConstraints(constraints);
             session.close();
         });
@@ -210,8 +210,8 @@ function grabIndexes() {
     var session = driver.session();
     let constraints = [];
 
-    session.run("CALL db.indexes").then(function(results) {
-        $.each(results.records, function(index, container) {
+    session.run("CALL db.indexes").then(function (results) {
+        $.each(results.records, function (index, container) {
             let constraint = container._fields[0];
             let query = "DROP " + constraint;
             constraints.push(query);
@@ -227,7 +227,7 @@ function dropIndexes(indexes) {
     if (indexes.length > 0) {
         let constraint = indexes.shift();
         let session = driver.session();
-        session.run(constraint).then(function() {
+        session.run(constraint).then(function () {
             dropConstraints(indexes);
             session.close();
         });
@@ -238,12 +238,14 @@ function dropIndexes(indexes) {
 
 async function addConstraints() {
     let session = driver.session();
-    await session.run("CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE");
-    await session.run("CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE")
-    await session.run("CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE")
-    await session.run("CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE")
-    await session.run("CREATE CONSTRAINT ON (c:OU) ASSERT c.guid IS UNIQUE")
-    await session.run("CREATE CONSTRAINT ON (c:GPO) ASSERT c.name IS UNIQUE")
+    await session.run('CREATE CONSTRAINT ON (c:User) ASSERT c.objectid IS UNIQUE');
+    await session.run('CREATE CONSTRAINT ON (c:Group) ASSERT c.objectid IS UNIQUE');
+    await session.run(
+        'CREATE CONSTRAINT ON (c:Computer) ASSERT c.objectid IS UNIQUE'
+    );
+    await session.run('CREATE CONSTRAINT ON (c:GPO) ASSERT c.objectid IS UNIQUE');
+    await session.run('CREATE CONSTRAINT ON (c:Domain) ASSERT c.objectid IS UNIQUE');
+    await session.run('CREATE CONSTRAINT ON (c:OU) ASSERT c.objectid IS UNIQUE');
 
     session.close()
 
@@ -254,7 +256,7 @@ function processAceArrayNew(array, objid, objtype, output) {
     let baseAceQuery =
         "UNWIND {props} AS prop MERGE (a:{} {objectid:prop.principal}) MERGE (b:{} {objectid: prop.obj}) MERGE (a)-[r:{} {isacl:true}]->(b)";
 
-    $.each(array, function(_, ace) {
+    $.each(array, function (_, ace) {
         let principal = ace.PrincipalSID;
         let principaltype = ace.PrincipalType;
         let right = ace.RightName;
@@ -273,7 +275,7 @@ function processAceArrayNew(array, objid, objtype, output) {
             rights.push("ForceChangePassword");
         } else if (acetype === "AddMember") {
             rights.push("AddMember");
-        }else if (acetype === "AllowedToAct"){
+        } else if (acetype === "AllowedToAct") {
             rights.push("AddAllowedToAct");
         } else if (right === "ExtendedRight") {
             rights.push(acetype);
@@ -299,11 +301,11 @@ function processAceArrayNew(array, objid, objtype, output) {
             rights.push("Owns");
         }
 
-        if (right === "ReadLAPSPassword"){
+        if (right === "ReadLAPSPassword") {
             rights.push("ReadLAPSPassword");
         }
 
-        $.each(rights, function(_, right) {
+        $.each(rights, function (_, right) {
             let hash = right + principaltype;
             let formatted = baseAceQuery.format(
                 principaltype.toTitleCase(),
@@ -323,7 +325,7 @@ function processAceArray(array, objname, objtype, output) {
     let baseAceQuery =
         "UNWIND {props} AS prop MERGE (a:{} {name:prop.principal}) MERGE (b:{} {name: prop.obj}) MERGE (a)-[r:{} {isacl:true}]->(b)";
 
-    $.each(array, function(_, ace) {
+    $.each(array, function (_, ace) {
         let principal = ace.PrincipalName;
         let principaltype = ace.PrincipalType;
         let right = ace.RightName;
@@ -342,7 +344,7 @@ function processAceArray(array, objname, objtype, output) {
             rights.push("ForceChangePassword");
         } else if (acetype === "AddMember") {
             rights.push("AddMember");
-        }else if (acetype === "AllowedToAct"){
+        } else if (acetype === "AllowedToAct") {
             rights.push("AddAllowedToAct");
         } else if (right === "ExtendedRight") {
             rights.push(acetype);
@@ -368,11 +370,11 @@ function processAceArray(array, objname, objtype, output) {
             rights.push("Owns");
         }
 
-        if (right === "ReadLAPSPassword"){
+        if (right === "ReadLAPSPassword") {
             rights.push("ReadLAPSPassword");
         }
 
-        $.each(rights, function(_, right) {
+        $.each(rights, function (_, right) {
             let hash = right + principaltype;
             let formatted = baseAceQuery.format(
                 principaltype.toTitleCase(),
@@ -392,9 +394,9 @@ function processSPNTargetArray(array, username, output) {
     let baseSpnQuery =
         "UNWIND {props} AS prop MERGE (a:User {name:prop.principal}) MERGE (b:Computer {name: prop.obj}) MERGE (a)-[r:{} {isacl:false, port: prop.port}]->(b)";
 
-    $.each(array, function(_, spn) {
+    $.each(array, function (_, spn) {
         let target = spn.ComputerName;
-        let service  = spn.Service;
+        let service = spn.Service;
         let port = spn.Port;
 
         let hash = target + port + service;
@@ -445,14 +447,14 @@ export function buildDomainJson(chunk) {
         props: []
     };
 
-    $.each(chunk, function(_, domain) {
+    $.each(chunk, function (_, domain) {
         let name = domain.Name;
         let properties = domain.Properties;
 
         queries.properties.props.push({ map: properties, name: name });
 
         let links = domain.Links;
-        $.each(links, function(_, link) {
+        $.each(links, function (_, link) {
             let enforced = link.IsEnforced;
             let target = link.Name;
 
@@ -464,7 +466,7 @@ export function buildDomainJson(chunk) {
         });
 
         let trusts = domain.Trusts;
-        $.each(trusts, function(_, trust) {
+        $.each(trusts, function (_, trust) {
             let target = trust.TargetName;
             let transitive = trust.IsTransitive;
             let direction = trust.TrustDirection;
@@ -509,17 +511,17 @@ export function buildDomainJson(chunk) {
 
         let childous = domain.ChildOus;
 
-        $.each(childous, function(_, ou) {
+        $.each(childous, function (_, ou) {
             queries.childous.props.push({ domain: name, guid: ou });
         });
 
         let comps = domain.Computers;
-        $.each(comps, function(_, computer) {
+        $.each(comps, function (_, computer) {
             queries.computers.props.push({ domain: name, comp: computer });
         });
 
         let users = domain.Users;
-        $.each(users, function(_, user) {
+        $.each(users, function (_, user) {
             queries.users.props.push({ domain: name, user: user });
         });
     });
@@ -535,11 +537,11 @@ export function buildGpoJson(chunk) {
         props: []
     };
 
-    $.each(chunk, function(_, gpo) {
+    $.each(chunk, function (_, gpo) {
         let name = gpo.Name;
         let guid = gpo.Guid;
         let properties = gpo.Properties;
-        queries.properties.props.push({ name: name, guid: guid, map:properties });
+        queries.properties.props.push({ name: name, guid: guid, map: properties });
 
         let aces = gpo.Aces;
         processAceArray(aces, name, "GPO", queries);
@@ -548,22 +550,22 @@ export function buildGpoJson(chunk) {
     return queries;
 }
 
-export function buildGroupJsonNew(chunk){
+export function buildGroupJsonNew(chunk) {
     let queries = {};
     let baseStatement =
         "UNWIND {props} AS prop MERGE (n:Group {name: prop.name}) MERGE (m:{0} {name:prop.member}) MERGE (m)-[r:MemberOf {isacl:false}]->(n)";
-    
-    for (let group of chunk){
+
+    for (let group of chunk) {
         let properties = group.Properties;
         let objectId = group.ObjectIdentifier;
         let aces = group.Aces;
         let members = group.Members;
 
-        insert(queries, "Group", "UNWIND {props} AS prop MERGE (n:Group {objectid: prop.sourceid}) SET n += prop.map", {sourceid: objectId, map: properties})
+        insert(queries, "Group", "UNWIND {props} AS prop MERGE (n:Group {objectid: prop.sourceid}) SET n += prop.map", { sourceid: objectId, map: properties })
 
         processAceArrayNew(aces, objectId, "Group", queries);
 
-        for (let member of members || []){
+        for (let member of members || []) {
             let memberType = member.MemberType;
 
             insert(queries, `member-${memberType}`, baseStatement.formatn(memberType), queries);
@@ -582,7 +584,7 @@ export function buildGroupJson(chunk) {
     let baseStatement =
         "UNWIND {props} AS prop MERGE (n:Group {name: prop.name}) MERGE (m:{} {name:prop.member}) MERGE (m)-[r:MemberOf {isacl:false}]->(n)";
 
-    $.each(chunk, function(_, group) {
+    $.each(chunk, function (_, group) {
         let name = group.Name;
         let properties = group.Properties;
 
@@ -592,7 +594,7 @@ export function buildGroupJson(chunk) {
         processAceArray(aces, name, "Group", queries);
 
         let members = group.Members;
-        $.each(members, function(_, member) {
+        $.each(members, function (_, member) {
             let mname = member.MemberName;
             let mtype = member.MemberType;
 
@@ -637,10 +639,10 @@ export function buildOuJson(chunk) {
         props: []
     };
 
-    $.each(chunk, function(_, ou) {
+    $.each(chunk, function (_, ou) {
         let guid = ou.Guid;
         let properties = ou.Properties;
-        
+
         let links = ou.Links;
         $.each(links, function (_, link) {
             let enforced = link.IsEnforced;
@@ -656,17 +658,17 @@ export function buildOuJson(chunk) {
         queries.properties.props.push({ guid: guid, map: properties });
 
         let childous = ou.ChildOus;
-        $.each(childous, function(_, cou) {
+        $.each(childous, function (_, cou) {
             queries.childous.props.push({ parent: guid, child: cou });
         });
 
         let computers = ou.Computers;
-        $.each(computers, function(_, computer) {
+        $.each(computers, function (_, computer) {
             queries.computers.props.push({ ou: guid, comp: computer });
         });
 
         let users = ou.Users;
-        $.each(users, function(_, user) {
+        $.each(users, function (_, user) {
             queries.users.props.push({ ou: guid, user: user });
         });
     });
@@ -682,11 +684,11 @@ export function buildSessionJson(chunk) {
         props: []
     };
 
-    $.each(chunk, function(_, session) {
+    $.each(chunk, function (_, session) {
         let name = session.UserName;
         let comp = session.ComputerName;
 
-        queries.sessions.props.push({ user: name, comp: comp});
+        queries.sessions.props.push({ user: name, comp: comp });
     });
     return queries;
 }
@@ -696,51 +698,51 @@ export function buildGpoAdminJson(chunk) {
 
     let baseQuery =
         "UNWIND {props} AS prop MERGE (n:{} {name:prop.member}) MERGE (m:Computer {name:prop.comp}) MERGE (n)-[r:{} {isacl:false}]->(m)";
-    $.each(chunk, function(_, gpoadmin) {
+    $.each(chunk, function (_, gpoadmin) {
         let computers = gpoadmin.AffectedComputers;
         let localadmins = gpoadmin.LocalAdmins;
         let rdpers = gpoadmin.RemoteDesktopUsers;
         let dcom = gpoadmin.DcomUsers;
 
-        $.each(computers, function(_, comp){
-            $.each(localadmins, function(_, admin){
+        $.each(computers, function (_, comp) {
+            $.each(localadmins, function (_, admin) {
                 let member = admin.Name;
                 let type = admin.Type;
                 let rel = "AdminTo";
-                let hash = rel+type;
+                let hash = rel + type;
                 let statement = baseQuery.format(type, rel);
 
-                insert(queries, hash, statement, {comp: comp, member: member});
+                insert(queries, hash, statement, { comp: comp, member: member });
             })
 
-            $.each(rdpers, function(_, admin){
+            $.each(rdpers, function (_, admin) {
                 let member = admin.Name;
                 let type = admin.Type;
                 let rel = "CanRDP";
-                let hash = rel+type;
+                let hash = rel + type;
                 let statement = baseQuery.format(type, rel);
 
-                insert(queries, hash, statement, {comp: comp, member: member});
+                insert(queries, hash, statement, { comp: comp, member: member });
             })
 
-            $.each(dcom, function(_, admin){
+            $.each(dcom, function (_, admin) {
                 let member = admin.Name;
                 let type = admin.Type;
                 let rel = "ExecuteDCOM";
-                let hash = rel+type;
+                let hash = rel + type;
                 let statement = baseQuery.format(type, rel);
 
-                insert(queries, hash, statement, {comp: comp, member: member});
+                insert(queries, hash, statement, { comp: comp, member: member });
             })
         });
     });
     return queries;
 }
 
-export function buildUserJsonNew(chunk){
+export function buildUserJsonNew(chunk) {
     let queries = {};
 
-    for (let user of chunk){
+    for (let user of chunk) {
         let properties = user.Properties;
         let objectId = user.ObjectIdentifier;
         let primaryGroup = user.PrimaryGroup;
@@ -748,18 +750,18 @@ export function buildUserJsonNew(chunk){
         let spnTargets = user.SPNTargets;
         let aces = user.Aces;
 
-        insert(queries, "properties", "UNWIND {props} AS prop MERGE (n:User {objectid: prop.sourceid}) SET n += prop.map", {sourceid: objectId, map: properties});
-        if (primaryGroup !== null){
+        insert(queries, "properties", "UNWIND {props} AS prop MERGE (n:User {objectid: prop.sourceid}) SET n += prop.map", { sourceid: objectId, map: properties });
+        if (primaryGroup !== null) {
             let statement = "UNWIND {props} AS prop MERGE (n:User {objectid:prop.sourceid}) MERGE (m:Group {objectid:prop.targetid}) MERGE (n)-[r:MemberOf {isacl: false}]->(m)"
-            insert(queries, "primarygroup", statement, {sourceid: objectid, targetid: primaryGroup});
+            insert(queries, "primarygroup", statement, { sourceid: objectid, targetid: primaryGroup });
         }
 
-        
+
         processAceArrayNew(aces, objectId, "User", queries);
 
-        for (let target of allowedToDelegate){
+        for (let target of allowedToDelegate) {
             let statement = "UNWIND {props} AS prop MERGE (n:User {name: prop.sourceid}) MERGE (m:Computer {name: prop.targetid}) MERGE (n)-[r:AllowedToDelegate {isacl: false}]->(m)"
-            insert(queries, "delegate", statement, {sourceid: objectId, targetid: target})
+            insert(queries, "delegate", statement, { sourceid: objectId, targetid: target })
         }
     }
 }
@@ -772,7 +774,7 @@ export function buildUserJson(chunk) {
         props: []
     }
 
-    $.each(chunk, function(_, user) {
+    $.each(chunk, function (_, user) {
         let name = user.Name;
         let properties = user.Properties;
         let primarygroup = user.PrimaryGroup;
@@ -803,8 +805,8 @@ export function buildUserJson(chunk) {
         processAceArray(aces, name, "User", queries);
 
         let allowedToDelegate = user.AllowedToDelegate;
-        $.each(allowedToDelegate, (_, comp) =>{
-            queries.delegate.props.push({name: name, comp: comp});
+        $.each(allowedToDelegate, (_, comp) => {
+            queries.delegate.props.push({ name: name, comp: comp });
         });
 
         let spnTargets = user.SPNTargets;
@@ -813,11 +815,11 @@ export function buildUserJson(chunk) {
     return queries;
 }
 
-export function buildComputerJsonNew(chunk){
+export function buildComputerJsonNew(chunk) {
     let queries = {}
     let baseQuery = "UNWIND {props} AS prop MERGE (n:Computer {name:objectid:prop.sourceid}) MERGE (m:{0} {name:prop.targetid}) MERGE (m)-[r:{1} {isacl: false}]->(n)";
 
-    for (let computer of chunk){
+    for (let computer of chunk) {
         let objectId = computer.ObjectIdentifier;
         let properties = computer.Properties;
         let localAdmins = computer.LocalAdmins;
@@ -831,61 +833,61 @@ export function buildComputerJsonNew(chunk){
         let aces = computer.Aces;
 
         let statement = "UNWIND {props} AS prop MERGE (n:Computer {objectid:prop.sourceid}) SET n += prop.map";
-        insert(queries, "properties", statement, {sourceid: objectId, map: properties})
-        
-        if (primaryGroup !== null){
+        insert(queries, "properties", statement, { sourceid: objectId, map: properties })
+
+        if (primaryGroup !== null) {
             let statement = "UNWIND {props} AS prop MERGE (n:Computer {objectid:prop.sourceid}) MERGE (m:Group {objectid:prop.targetid}) MERGE (n)-[r:MemberOf {isacl: false}]->(m)"
-            insert(queries, "primarygroup", statement, {sourceid: objectId, targetid: primaryGroup});
+            insert(queries, "primarygroup", statement, { sourceid: objectId, targetid: primaryGroup });
         }
 
-        for (let member of allowedToDelegate || []){
+        for (let member of allowedToDelegate || []) {
             let statement = "UNWIND {props} AS prop MERGE (n:Computer {objectid: prop.sourceid}) MERGE (m:Computer {objectid: prop.targetid}) MERGE (n)-[r:AllowedToDelegate {isacl: false}]->(m)";
-            insert(queries, "allowedtodelegate", statement, {sourceid: objectId, targetid: member})
+            insert(queries, "allowedtodelegate", statement, { sourceid: objectId, targetid: member })
         }
 
-        for (let member of localAdmins || []){
+        for (let member of localAdmins || []) {
             let targetid = member.MemberId;
             let targetType = member.MemberType;
 
             let statement = baseQuery.formatn(targetType, "AdminTo");
-            insert(queries, `${targetType}-AdminTo`, statement, {sourceid: objectId, targetid: targetid})
+            insert(queries, `${targetType}-AdminTo`, statement, { sourceid: objectId, targetid: targetid })
         }
 
-        for (let member of rdp || []){
+        for (let member of rdp || []) {
             let targetid = member.MemberId;
             let targetType = member.MemberType;
-        
+
             let statement = baseQuery.formatn(targetType, "CanRDP");
-            insert(queries, `${targetType}-CanRDP`, statement, {sourceid: objectId, targetid: targetid})
+            insert(queries, `${targetType}-CanRDP`, statement, { sourceid: objectId, targetid: targetid })
         }
 
-        for (let member of dcom || []){
+        for (let member of dcom || []) {
             let targetid = member.MemberId;
             let targetType = member.MemberType;
-        
+
             let statement = baseQuery.formatn(targetType, "ExecuteDCOM");
-            insert(queries, `${targetType}-ExecuteDCOM`, statement, {sourceid: objectId, targetid: targetid})
+            insert(queries, `${targetType}-ExecuteDCOM`, statement, { sourceid: objectId, targetid: targetid })
         }
 
-        for (let member of psremote || []){
+        for (let member of psremote || []) {
             let targetid = member.MemberId;
             let targetType = member.MemberType;
-        
+
             let statement = baseQuery.formatn(targetType, "CanPSRemote");
-            insert(queries, `${targetType}-CanPSRemote`, statement, {sourceid: objectId, targetid: targetid})
+            insert(queries, `${targetType}-CanPSRemote`, statement, { sourceid: objectId, targetid: targetid })
         }
 
-        for (let target of allowedToAct || []){
+        for (let target of allowedToAct || []) {
             let targetType = target.Type;
             let targetId = target.MemberId;
 
             let statement = baseQuery.formatn(targetType, "AllowedToAct");
-            insert(queries, `${targetType}-AllowedToAct`, statement, {sourceid: objectId, targetid: targetId});
+            insert(queries, `${targetType}-AllowedToAct`, statement, { sourceid: objectId, targetid: targetId });
         }
 
-        for (let session of sessions || []){
+        for (let session of sessions || []) {
             let statement = "UNWIND {props} AS prop MERGE (n:Computer {objectid: prop.sourceid}) MERGE (m:User {objectid: prop.targetid}) MERGE (n)-[r:HasSession {isacl:false}]->(m)";
-            insert(queries, "sessions", statement, {sourceid: session.ComputerId, targetid: session.UserId})
+            insert(queries, "sessions", statement, { sourceid: session.ComputerId, targetid: session.UserId })
         }
 
         processAceArrayNew(aces, objectId, "Computer", queries);
@@ -904,7 +906,7 @@ export function buildComputerJson(chunk) {
         props: []
     }
 
-    $.each(chunk, function(_, comp) {
+    $.each(chunk, function (_, comp) {
         let name = comp.Name;
         let properties = comp.Properties;
         let localadmins = comp.LocalAdmins;
@@ -935,7 +937,7 @@ export function buildComputerJson(chunk) {
             name: name,
             pg: primarygroup
         });
-        $.each(localadmins, function(_, admin) {
+        $.each(localadmins, function (_, admin) {
             let aType = admin.Type;
             let aName = admin.Name;
             let rel = "AdminTo";
@@ -947,7 +949,7 @@ export function buildComputerJson(chunk) {
             insert(queries, hash, statement, p);
         });
 
-        $.each(psremote, function(_, psr) {
+        $.each(psremote, function (_, psr) {
             let aType = psr.Type;
             let aName = psr.Name;
             let rel = "CanPSRemote";
@@ -959,7 +961,7 @@ export function buildComputerJson(chunk) {
             insert(queries, hash, statement, p);
         });
 
-        $.each(rdpers, function(_, rdp) {
+        $.each(rdpers, function (_, rdp) {
             let aType = rdp.Type;
             let aName = rdp.Name;
             let rel = "CanRDP";
@@ -971,7 +973,7 @@ export function buildComputerJson(chunk) {
             insert(queries, hash, statement, p);
         });
 
-        $.each(dcom, function(_, dcomu) {
+        $.each(dcom, function (_, dcomu) {
             let aType = dcomu.Type;
             let aName = dcomu.Name;
             let rel = "ExecuteDCOM";
@@ -999,8 +1001,8 @@ export function buildComputerJson(chunk) {
         processAceArray(aces, name, "Computer", queries);
 
         let allowedToDelegate = comp.AllowedToDelegate;
-        $.each(allowedToDelegate, (_, comp) =>{
-            queries.delegate.props.push({name: name, comp: comp});
+        $.each(allowedToDelegate, (_, comp) => {
+            queries.delegate.props.push({ name: name, comp: comp });
         });
     });
     return queries;
