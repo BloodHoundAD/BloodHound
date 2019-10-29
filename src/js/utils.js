@@ -817,7 +817,7 @@ export function buildUserJson(chunk) {
 
 export function buildComputerJsonNew(chunk) {
     let queries = {}
-    let baseQuery = "UNWIND {props} AS prop MERGE (n:Computer {name:objectid:prop.sourceid}) MERGE (m:{0} {name:prop.targetid}) MERGE (m)-[r:{1} {isacl: false}]->(n)";
+    let baseQuery = "UNWIND {props} AS prop MERGE (n:Computer {objectid: prop.sourceid}) MERGE (m:{0} {objectid :prop.targetid}) MERGE (m)-[r:{1} {isacl: false}]->(n)";
 
     for (let computer of chunk) {
         let objectId = computer.ObjectIdentifier;
