@@ -149,14 +149,14 @@ class GraphContainer extends Component {
 
     async setConstraints() {
         let s = driver.session();
-        await s.run('CREATE CONSTRAINT ON (c:User) ASSERT c.name IS UNIQUE');
-        await s.run('CREATE CONSTRAINT ON (c:Group) ASSERT c.name IS UNIQUE');
+        await s.run('CREATE CONSTRAINT ON (c:User) ASSERT c.objectid IS UNIQUE');
+        await s.run('CREATE CONSTRAINT ON (c:Group) ASSERT c.objectid IS UNIQUE');
         await s.run(
-            'CREATE CONSTRAINT ON (c:Computer) ASSERT c.name IS UNIQUE'
+            'CREATE CONSTRAINT ON (c:Computer) ASSERT c.objectid IS UNIQUE'
         );
-        await s.run('CREATE CONSTRAINT ON (c:GPO) ASSERT c.name IS UNIQUE');
-        await s.run('CREATE CONSTRAINT ON (c:Domain) ASSERT c.name IS UNIQUE');
-        await s.run('CREATE CONSTRAINT ON (c:OU) ASSERT c.guid IS UNIQUE');
+        await s.run('CREATE CONSTRAINT ON (c:GPO) ASSERT c.objectid IS UNIQUE');
+        await s.run('CREATE CONSTRAINT ON (c:Domain) ASSERT c.objectid IS UNIQUE');
+        await s.run('CREATE CONSTRAINT ON (c:OU) ASSERT c.objectid IS UNIQUE');
 
         s.close();
     }
