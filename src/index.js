@@ -43,6 +43,15 @@ String.prototype.formatAll = function() {
     return this.replace(/{}/g, args[0]);
 };
 
+String.prototype.formatn = function() {
+    var formatted = this;
+    for (var i = 0; i < arguments.length; i++) {
+        var regexp = new RegExp('\\{'+i+'\\}', 'gi');
+        formatted = formatted.replace(regexp, arguments[i]);
+    }
+    return formatted;
+};
+
 String.prototype.toTitleCase = function() {
     return this.replace(/\w\S*/g, function(txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();

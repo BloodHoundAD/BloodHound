@@ -10,6 +10,7 @@ import {
     buildGpoJson,
     buildGroupJson,
     buildOuJson,
+    buildComputerJsonNew
 } from 'utils';
 import { If, Then, Else } from 'react-if';
 import { remote } from 'electron';
@@ -225,16 +226,23 @@ class MenuContainer extends Component {
         let size = statSync(file).size;
         createReadStream(file, {
             encoding: 'utf8',
-            start: size - 100,
+            start: size - 200,
             end: size,
         }).on('data', chunk => {
-            let type;
+            let type, version;
+            console.log(chunk)
             try {
                 type = /type.?:\s?"(\w*)"/g.exec(chunk)[1];
                 count = /count.?:\s?(\d*)/g.exec(chunk)[1];
             } catch (e) {
                 type = null;
             }
+            try{
+                version = /version.?:\s?(\d*)/g.exec(chunk)[1];
+            }catch (e){
+                version = null;
+            }
+            
 
             if (!acceptableTypes.includes(type)) {
                 this.props.alert.error('Unrecognized File');
@@ -245,11 +253,11 @@ class MenuContainer extends Component {
                 return;
             }
 
-            this.processJson(file, callback, parseInt(count), type);
+            this.processJson(file, callback, parseInt(count), type, version);
         });
     }
 
-    processJson(file, callback, count, type) {
+    processJson(file, callback, count, type, version = null) {
         let pipeline = chain([
             createReadStream(file, { encoding: 'utf8' }),
             withParser({ filter: type }),
@@ -277,7 +285,7 @@ class MenuContainer extends Component {
 
                     if (localcount % 1000 === 0) {
                         pipeline.pause();
-                        await this.uploadData(chunk, type);
+                        await this.uploadData(chunk, type, version);
                         sent += chunk.length;
                         this.setState({
                             progress: Math.floor((sent / count) * 100),
@@ -290,7 +298,7 @@ class MenuContainer extends Component {
             .on(
                 'end',
                 async function() {
-                    await this.uploadData(chunk, type);
+                    await this.uploadData(chunk, type, version);
                     this.setState({ progress: 100 });
                     emitter.emit('refreshDBData');
                     console.timeEnd('IngestTime');
@@ -304,18 +312,26 @@ class MenuContainer extends Component {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    async uploadData(chunk, type) {
+    async uploadData(chunk, type, version) {
         let session = driver.session();
-        let funcMap = {
-            computers: buildComputerJson,
-            domains: buildDomainJson,
-            gpos: buildGpoJson,
-            users: buildUserJson,
-            groups: buildGroupJson,
-            ous: buildOuJson,
-            sessions: buildSessionJson,
-            gpomembers: buildGpoAdminJson,
-        };
+        let funcMap;
+        if (version == null){
+            funcMap = {
+                computers: buildComputerJson,
+                domains: buildDomainJson,
+                gpos: buildGpoJson,
+                users: buildUserJson,
+                groups: buildGroupJson,
+                ous: buildOuJson,
+                sessions: buildSessionJson,
+                gpomembers: buildGpoAdminJson,
+            };
+        }else{
+            funcMap = {
+                computers: buildComputerJsonNew,
+            };
+        }
+        
         let data = funcMap[type](chunk);
         for (let key in data) {
             if (data[key].props.length === 0) {
@@ -325,6 +341,7 @@ class MenuContainer extends Component {
             let statement = data[key].statement;
             for (let i = 0; i < arr.length; i++) {
                 //console.log(arr[i]);
+                console.log(statement)
                 await session
                     .run(statement, { props: arr[i] })
                     .catch(function(error) {

@@ -900,7 +900,7 @@ class GraphContainer extends Component {
     createNodeFromRow(data, params) {
         var id = data.identity;
         var type = data.labels[0];
-        var label = data.properties.name;
+        var label = data.properties.name || data.properties.objectid;
         var guid = data.properties.guid;
 
         if (label === null) {
@@ -920,6 +920,8 @@ class GraphContainer extends Component {
             x: Math.random(),
             y: Math.random(),
         };
+
+        console.log(node)
 
         if (data.hasOwnProperty('properties')) {
             if (data.properties.hasOwnProperty('blocksinheritance')) {
