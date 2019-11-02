@@ -352,7 +352,7 @@ if (typeof appStore.performance.darkMode === 'undefined') {
 
 var custompath = join(app.getPath('userData'), 'customqueries.json');
 if (!existsSync(custompath)) {
-    writeFileSync(custompath, '{queries: []}');
+    writeFileSync(custompath, '{"queries": []}');
 }
 
 let imagepath = join(app.getPath('userData'), 'images');
