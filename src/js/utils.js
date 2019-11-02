@@ -1,3 +1,5 @@
+import {groupBy} from 'lodash/collection'
+
 var labels = [
     "OU",
     "GPO",
@@ -252,74 +254,6 @@ async function addConstraints() {
     emitter.emit("hideDBClearModal");
 }
 
-function processAceArrayNew(array, objid, objtype, output) {
-    let baseAceQuery =
-        "UNWIND {props} AS prop MERGE (a:{} {objectid:prop.principal}) MERGE (b:{} {objectid: prop.obj}) MERGE (a)-[r:{} {isacl:true}]->(b)";
-
-    $.each(array, function (_, ace) {
-        let principal = ace.PrincipalSID;
-        let principaltype = ace.PrincipalType;
-        let right = ace.RightName;
-        let acetype = ace.AceType;
-
-        if (objname === principal) {
-            return;
-        }
-
-        let rights = [];
-
-        //Process the right/type to figure out the ACEs we need to add
-        if (acetype === "All") {
-            rights.push("AllExtendedRights");
-        } else if (acetype === "User-Force-Change-Password") {
-            rights.push("ForceChangePassword");
-        } else if (acetype === "AddMember") {
-            rights.push("AddMember");
-        } else if (acetype === "AllowedToAct") {
-            rights.push("AddAllowedToAct");
-        } else if (right === "ExtendedRight") {
-            rights.push(acetype);
-        }
-
-        if (right === "GenericAll") {
-            rights.push("GenericAll");
-        }
-
-        if (right === "WriteDacl") {
-            rights.push("WriteDacl");
-        }
-
-        if (right === "WriteOwner") {
-            rights.push("WriteOwner");
-        }
-
-        if (right === "GenericWrite") {
-            rights.push("GenericWrite");
-        }
-
-        if (right === "Owner") {
-            rights.push("Owns");
-        }
-
-        if (right === "ReadLAPSPassword") {
-            rights.push("ReadLAPSPassword");
-        }
-
-        $.each(rights, function (_, right) {
-            let hash = right + principaltype;
-            let formatted = baseAceQuery.format(
-                principaltype.toTitleCase(),
-                objtype,
-                right
-            );
-
-            insert(output, hash, formatted, {
-                principal: principal,
-                obj: objid
-            });
-        });
-    });
-}
 
 function processAceArray(array, objname, objtype, output) {
     let baseAceQuery =
@@ -550,28 +484,7 @@ export function buildGpoJson(chunk) {
     return queries;
 }
 
-export function buildGroupJsonNew(chunk) {
-    let queries = {};
-    let baseStatement =
-        "UNWIND {props} AS prop MERGE (n:Group {name: prop.name}) MERGE (m:{0} {name:prop.member}) MERGE (m)-[r:MemberOf {isacl:false}]->(n)";
 
-    for (let group of chunk) {
-        let properties = group.Properties;
-        let objectId = group.ObjectIdentifier;
-        let aces = group.Aces;
-        let members = group.Members;
-
-        insert(queries, "Group", "UNWIND {props} AS prop MERGE (n:Group {objectid: prop.sourceid}) SET n += prop.map", { sourceid: objectId, map: properties })
-
-        processAceArrayNew(aces, objectId, "Group", queries);
-
-        for (let member of members || []) {
-            let memberType = member.MemberType;
-
-            insert(queries, `member-${memberType}`, baseStatement.formatn(memberType), queries);
-        }
-    }
-}
 
 export function buildGroupJson(chunk) {
     let queries = {};
@@ -739,32 +652,7 @@ export function buildGpoAdminJson(chunk) {
     return queries;
 }
 
-export function buildUserJsonNew(chunk) {
-    let queries = {};
 
-    for (let user of chunk) {
-        let properties = user.Properties;
-        let objectId = user.ObjectIdentifier;
-        let primaryGroup = user.PrimaryGroup;
-        let allowedToDelegate = user.AllowedToDelegate;
-        let spnTargets = user.SPNTargets;
-        let aces = user.Aces;
-
-        insert(queries, "properties", "UNWIND {props} AS prop MERGE (n:User {objectid: prop.sourceid}) SET n += prop.map", { sourceid: objectId, map: properties });
-        if (primaryGroup !== null) {
-            let statement = "UNWIND {props} AS prop MERGE (n:User {objectid:prop.sourceid}) MERGE (m:Group {objectid:prop.targetid}) MERGE (n)-[r:MemberOf {isacl: false}]->(m)"
-            insert(queries, "primarygroup", statement, { sourceid: objectid, targetid: primaryGroup });
-        }
-
-
-        processAceArrayNew(aces, objectId, "User", queries);
-
-        for (let target of allowedToDelegate) {
-            let statement = "UNWIND {props} AS prop MERGE (n:User {name: prop.sourceid}) MERGE (m:Computer {name: prop.targetid}) MERGE (n)-[r:AllowedToDelegate {isacl: false}]->(m)"
-            insert(queries, "delegate", statement, { sourceid: objectId, targetid: target })
-        }
-    }
-}
 
 export function buildUserJson(chunk) {
     let queries = {};
@@ -812,87 +700,6 @@ export function buildUserJson(chunk) {
         let spnTargets = user.SPNTargets;
         processSPNTargetArray(spnTargets, name, queries);
     });
-    return queries;
-}
-
-export function buildComputerJsonNew(chunk) {
-    let queries = {}
-    let baseQuery = "UNWIND {props} AS prop MERGE (n:Computer {objectid: prop.sourceid}) MERGE (m:{0} {objectid :prop.targetid}) MERGE (m)-[r:{1} {isacl: false}]->(n)";
-
-    for (let computer of chunk) {
-        let objectId = computer.ObjectIdentifier;
-        let properties = computer.Properties;
-        let localAdmins = computer.LocalAdmins;
-        let rdp = computer.RemoteDesktopUsers;
-        let primaryGroup = computer.PrimaryGroupSid;
-        let allowedToAct = computer.AllowedToAct;
-        let dcom = computer.DcomUsers;
-        let psremote = computer.PsRemoteUsers;
-        let allowedToDelegate = computer.AllowedToDelegate;
-        let sessions = computer.Sessions;
-        let aces = computer.Aces;
-
-        let statement = "UNWIND {props} AS prop MERGE (n:Computer {objectid:prop.sourceid}) SET n += prop.map";
-        insert(queries, "properties", statement, { sourceid: objectId, map: properties })
-
-        if (primaryGroup !== null) {
-            let statement = "UNWIND {props} AS prop MERGE (n:Computer {objectid:prop.sourceid}) MERGE (m:Group {objectid:prop.targetid}) MERGE (n)-[r:MemberOf {isacl: false}]->(m)"
-            insert(queries, "primarygroup", statement, { sourceid: objectId, targetid: primaryGroup });
-        }
-
-        for (let member of allowedToDelegate || []) {
-            let statement = "UNWIND {props} AS prop MERGE (n:Computer {objectid: prop.sourceid}) MERGE (m:Computer {objectid: prop.targetid}) MERGE (n)-[r:AllowedToDelegate {isacl: false}]->(m)";
-            insert(queries, "allowedtodelegate", statement, { sourceid: objectId, targetid: member })
-        }
-
-        for (let member of localAdmins || []) {
-            let targetid = member.MemberId;
-            let targetType = member.MemberType;
-
-            let statement = baseQuery.formatn(targetType, "AdminTo");
-            insert(queries, `${targetType}-AdminTo`, statement, { sourceid: objectId, targetid: targetid })
-        }
-
-        for (let member of rdp || []) {
-            let targetid = member.MemberId;
-            let targetType = member.MemberType;
-
-            let statement = baseQuery.formatn(targetType, "CanRDP");
-            insert(queries, `${targetType}-CanRDP`, statement, { sourceid: objectId, targetid: targetid })
-        }
-
-        for (let member of dcom || []) {
-            let targetid = member.MemberId;
-            let targetType = member.MemberType;
-
-            let statement = baseQuery.formatn(targetType, "ExecuteDCOM");
-            insert(queries, `${targetType}-ExecuteDCOM`, statement, { sourceid: objectId, targetid: targetid })
-        }
-
-        for (let member of psremote || []) {
-            let targetid = member.MemberId;
-            let targetType = member.MemberType;
-
-            let statement = baseQuery.formatn(targetType, "CanPSRemote");
-            insert(queries, `${targetType}-CanPSRemote`, statement, { sourceid: objectId, targetid: targetid })
-        }
-
-        for (let target of allowedToAct || []) {
-            let targetType = target.Type;
-            let targetId = target.MemberId;
-
-            let statement = baseQuery.formatn(targetType, "AllowedToAct");
-            insert(queries, `${targetType}-AllowedToAct`, statement, { sourceid: objectId, targetid: targetId });
-        }
-
-        for (let session of sessions || []) {
-            let statement = "UNWIND {props} AS prop MERGE (n:Computer {objectid: prop.sourceid}) MERGE (m:User {objectid: prop.targetid}) MERGE (n)-[r:HasSession {isacl:false}]->(m)";
-            insert(queries, "sessions", statement, { sourceid: session.ComputerId, targetid: session.UserId })
-        }
-
-        processAceArrayNew(aces, objectId, "Computer", queries);
-    }
-
     return queries;
 }
 
@@ -1018,6 +825,8 @@ function insert(obj, hash, statement, prop) {
         obj[hash].props.push(prop);
     }
 }
+
+
 
 export function escapeRegExp(str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");

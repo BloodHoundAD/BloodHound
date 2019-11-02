@@ -1,31 +1,22 @@
-import React, { Component } from 'react';
-import MenuButton from './MenuButton';
-import ProgressBarMenuButton from './ProgressBarMenuButton';
-import {
-    buildGpoAdminJson,
-    buildSessionJson,
-    buildUserJson,
-    buildComputerJson,
-    buildDomainJson,
-    buildGpoJson,
-    buildGroupJson,
-    buildOuJson,
-    buildComputerJsonNew
-} from 'utils';
-import { If, Then, Else } from 'react-if';
-import { remote } from 'electron';
-const { dialog, app } = remote;
-import { unlinkSync, createReadStream, createWriteStream, statSync } from 'fs';
 import { eachSeries } from 'async';
-import { Parse } from 'unzipper';
+import { remote } from 'electron';
+import { createReadStream, createWriteStream, statSync, unlinkSync } from 'fs';
+import { isZipSync } from 'is-zip-file';
 import { join } from 'path';
-
+import React, { Component } from 'react';
+import { withAlert } from 'react-alert';
+import { Else, If, Then } from 'react-if';
+import sanitize from 'sanitize-filename';
+import { chain } from 'stream-chain';
 import { withParser } from 'stream-json/filters/Pick';
 import { streamArray } from 'stream-json/streamers/StreamArray';
-import { chain } from 'stream-chain';
-import { isZipSync } from 'is-zip-file';
-import { withAlert } from 'react-alert';
-import sanitize from 'sanitize-filename';
+import { Parse } from 'unzipper';
+import { buildComputerJson,buildDomainJson, buildGpoAdminJson, buildGpoJson, buildGroupJson, buildOuJson, buildSessionJson, buildUserJson} from 'utils';
+import * as NewIngestion from '../../js/newingestion.js';
+import MenuButton from './MenuButton';
+import ProgressBarMenuButton from './ProgressBarMenuButton';
+const { dialog, app } = remote;
+
 
 class MenuContainer extends Component {
     constructor() {
@@ -157,10 +148,10 @@ class MenuContainer extends Component {
             'MATCH (n:Computer) WHERE NOT EXISTS(n.owned) SET n.owned=false'
         );
         await s.run(
-            "MATCH (n:Group) WHERE n.name =~ 'EVERYONE@.*' SET n.objectsid='S-1-1-0'"
+            "MATCH (n:Group) WHERE n.name =~ 'EVERYONE@.*' SET n.objectid='S-1-1-0'"
         );
         await s.run(
-            "MATCH (n:Group) WHERE n.name =~ 'AUTHENTICATED USERS@.*' SET n.objectsid='S-1-5-11'"
+            "MATCH (n:Group) WHERE n.name =~ 'AUTHENTICATED USERS@.*' SET n.objectid='S-1-5-11'"
         );
         s.close();
     }
@@ -230,7 +221,6 @@ class MenuContainer extends Component {
             end: size,
         }).on('data', chunk => {
             let type, version;
-            console.log(chunk)
             try {
                 type = /type.?:\s?"(\w*)"/g.exec(chunk)[1];
                 count = /count.?:\s?(\d*)/g.exec(chunk)[1];
@@ -328,10 +318,14 @@ class MenuContainer extends Component {
             };
         }else{
             funcMap = {
-                computers: buildComputerJsonNew,
+                computers: NewIngestion.buildComputerJsonNew,
+                groups: NewIngestion.buildGroupJsonNew,
+                users: NewIngestion.buildUserJsonNew,
+                domains: NewIngestion.buildDomainJsonNew,
+                ous: NewIngestion.buildOuJsonNew
             };
         }
-        
+
         let data = funcMap[type](chunk);
         for (let key in data) {
             if (data[key].props.length === 0) {
@@ -340,11 +334,10 @@ class MenuContainer extends Component {
             let arr = data[key].props.chunk();
             let statement = data[key].statement;
             for (let i = 0; i < arr.length; i++) {
-                //console.log(arr[i]);
-                console.log(statement)
                 await session
                     .run(statement, { props: arr[i] })
                     .catch(function(error) {
+                        console.log(statement)
                         console.log(data[key].props);
                         console.log(error);
                     });
