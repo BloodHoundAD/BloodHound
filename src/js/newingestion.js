@@ -159,7 +159,7 @@ export function buildUserJsonNew(chunk) {
         if (primaryGroup !== null) {
             insertNew(queries, format, {
                 source: identifier,
-                target: primarygroup,
+                target: primaryGroup,
             });
         }
 
@@ -408,7 +408,7 @@ export function buildDomainJsonNew(chunk) {
 }
 
 const baseInsertStatement =
-    'UNWIND {props} AS prop MERGE (n:{0} {objectid: prop.source}) MERGE (m:{1} {objectid: prop.target}) MERGE (n)-[r:{2} {3}]-(m)';
+    'UNWIND {props} AS prop MERGE (n:{0} {objectid: prop.source}) MERGE (m:{1} {objectid: prop.target}) MERGE (n)-[r:{2} {3}]->(m)';
 
 /**
  * Inserts a query into the queries table
@@ -433,7 +433,7 @@ function insertNew(queries, formatProps, queryProps) {
             throw new NotEnoughArgumentsException();
         }
         queries[hash].statement = baseInsertStatement.formatn(...formatProps);
-        queries[hash].props = queryProps;
+        queries[hash].props = [].concat(queryProps);
     }
 }
 
