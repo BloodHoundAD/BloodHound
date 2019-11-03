@@ -459,7 +459,7 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
             rights.push('AddMember');
         } else if (aceType === 'AllowedToAct') {
             rights.push('AddAllowedToAct');
-        } else if (right === 'ExtendedRight') {
+        } else if (right === 'ExtendedRight' && aceType != "") {
             rights.push(aceType);
         }
 
