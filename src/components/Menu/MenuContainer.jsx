@@ -11,7 +11,7 @@ import { chain } from 'stream-chain';
 import { withParser } from 'stream-json/filters/Pick';
 import { streamArray } from 'stream-json/streamers/StreamArray';
 import { Parse } from 'unzipper';
-import { buildComputerJson,buildDomainJson, buildGpoAdminJson, buildGpoJson, buildGroupJson, buildOuJson, buildSessionJson, buildUserJson} from 'utils';
+import * as OldIngestion from '../../js/oldingestion.js';
 import * as NewIngestion from '../../js/newingestion.js';
 import MenuButton from './MenuButton';
 import ProgressBarMenuButton from './ProgressBarMenuButton';
@@ -317,14 +317,14 @@ class MenuContainer extends Component {
         let funcMap;
         if (version == null){
             funcMap = {
-                computers: buildComputerJson,
-                domains: buildDomainJson,
-                gpos: buildGpoJson,
-                users: buildUserJson,
-                groups: buildGroupJson,
-                ous: buildOuJson,
-                sessions: buildSessionJson,
-                gpomembers: buildGpoAdminJson,
+                computers: OldIngestion.buildComputerJson,
+                domains: OldIngestion.buildDomainJson,
+                gpos: OldIngestion.buildGpoJson,
+                users: OldIngestion.buildUserJson,
+                groups: OldIngestion.buildGroupJson,
+                ous: OldIngestion.buildOuJson,
+                sessions: OldIngestion.buildSessionJson,
+                gpomembers: OldIngestion.buildGpoAdminJson,
             };
         }else{
             funcMap = {
