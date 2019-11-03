@@ -147,12 +147,22 @@ class MenuContainer extends Component {
         await s.run(
             'MATCH (n:Computer) WHERE NOT EXISTS(n.owned) SET n.owned=false'
         );
+
         await s.run(
-            "MATCH (n:Group) WHERE n.name =~ 'EVERYONE@.*' SET n.objectid='S-1-1-0'"
-        );
+            'MATCH (n:Group) WHERE n.objectid ENDS WITH "-513" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-1-0" MERGE (n)-[r:MemberOf]->(m)'
+        )
+
         await s.run(
-            "MATCH (n:Group) WHERE n.name =~ 'AUTHENTICATED USERS@.*' SET n.objectid='S-1-5-11'"
-        );
+            'MATCH (n:Group) WHERE n.objectid ENDS WITH "-515" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-1-0" MERGE (n)-[r:MemberOf]->(m)'
+        )
+
+        await s.run(
+            'MATCH (n:Group) WHERE n.objectid ENDS WITH "-513" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-5-11" MERGE (n)-[r:MemberOf]->(m)'
+        )
+
+        await s.run(
+            'MATCH (n:Group) WHERE n.objectid ENDS WITH "-515" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-5-11" MERGE (n)-[r:MemberOf]->(m)'
+        )
         s.close();
     }
 
@@ -322,7 +332,8 @@ class MenuContainer extends Component {
                 groups: NewIngestion.buildGroupJsonNew,
                 users: NewIngestion.buildUserJsonNew,
                 domains: NewIngestion.buildDomainJsonNew,
-                ous: NewIngestion.buildOuJsonNew
+                ous: NewIngestion.buildOuJsonNew,
+                gpos: NewIngestion.buildGpoJsonNew
             };
         }
 
