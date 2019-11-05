@@ -19,6 +19,7 @@ class GroupNodeData extends Component {
 
         this.state = {
             label: '',
+            objectid: '',
             driversessions: [],
             propertyMap: {},
             displayMap: {
@@ -61,10 +62,10 @@ class GroupNodeData extends Component {
         });
 
         this.setState({
-            label: payload,
+            objectid: payload,
         });
 
-        let key = `group_${this.state.label}`;
+        let key = `group_${this.state.objectid}`;
         let c = imageconf.get(key);
         let pics = [];
         if (typeof c !== 'undefined') {
@@ -75,10 +76,11 @@ class GroupNodeData extends Component {
 
         var propCollection = driver.session();
         propCollection
-            .run('MATCH (c:Group {name:{name}}) RETURN c', { name: payload })
+            .run('MATCH (c:Group {objectid: {objectid}}) RETURN c', { objectid: payload })
             .then(
                 function(result) {
                     var properties = result.records[0]._fields[0].properties;
+                    let name = properties.name || properties.objectid;
                     let notes;
                     if (!properties.notes) {
                         notes = null;
@@ -89,6 +91,7 @@ class GroupNodeData extends Component {
                     this.setState({
                         propertyMap: properties,
                         notes: notes,
+                        label: name
                     });
                     propCollection.close();
                 }.bind(this)
@@ -106,14 +109,14 @@ class GroupNodeData extends Component {
                 : this.state.notes;
         let q = driver.session();
         if (notes === null) {
-            q.run('MATCH (n:Group {name:{name}}) REMOVE n.notes', {
-                name: this.state.label,
+            q.run('MATCH (n:Group {objectid: {objectid}}) REMOVE n.notes', {
+                name: this.state.objectid,
             }).then(x => {
                 q.close();
             });
         } else {
-            q.run('MATCH (n:Group {name:{name}}) SET n.notes = {notes}', {
-                name: this.state.label,
+            q.run('MATCH (n:Group {objectid: {objectid}}) SET n.notes = {notes}', {
+                name: this.state.objectid,
                 notes: this.state.notes,
             }).then(x => {
                 q.close();
@@ -130,7 +133,7 @@ class GroupNodeData extends Component {
         }
         let p = this.state.pics;
         let oLen = p.length;
-        let key = `group_${this.state.label}`;
+        let key = `group_${this.state.objectid}`;
 
         $.each(files, (_, f) => {
             let exists = false;
@@ -176,7 +179,7 @@ class GroupNodeData extends Component {
         this.setState({
             pics: pics,
         });
-        let key = `group_${this.state.label}`;
+        let key = `group_${this.state.objectid}`;
         imageconf.set(key, pics);
 
         let check = jQuery(this.refs.piccomplete);
@@ -255,154 +258,154 @@ class GroupNodeData extends Component {
                     />
                     <NodeCypherLink
                         property='Sessions'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (c:Computer)-[n:HasSession]->(u:User)-[r2:MemberOf*1..]->(g:Group {name: {name}})'
+                            'MATCH p = (c:Computer)-[n:HasSession]->(u:User)-[r2:MemberOf*1..]->(g:Group {objectid: {objectid}})'
                         }
-                        end={this.state.label}
+                        end={this.state.objectid}
                     />
 
                     <NodeCypherLink
                         property='Reachable High Value Targets'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH (m:Group {name:{name}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                            'MATCH (m:Group {objectid: {objectid}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                     />
 
-                    {/* <NodeCypherLink property="Sibling Objects in the Same OU" target={this.state.label} baseQuery={"MATCH (o1:OU)-[r1:Contains]->(g1:Group {name:{name}}) WITH o1 MATCH p= (d: Domain)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)"} /> */}
+                    {/* <NodeCypherLink property="Sibling Objects in the Same OU" target={this.state.objectid} baseQuery={"MATCH (o1:OU)-[r1:Contains]->(g1:Group {objectid: {objectid}}) WITH o1 MATCH p= (d: Domain)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)"} /> */}
 
                     <h4>Group Members</h4>
                     <NodeCypherLink
                         property='Direct Members'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n)-[b:MemberOf]->(c:Group {name: {name}})'
+                            'MATCH p=(n)-[b:MemberOf]->(c:Group {objectid: {objectid}})'
                         }
-                        end={this.state.label}
+                        end={this.state.objectid}
                     />
 
                     <NodeCypherLink
                         property='Unrolled Members'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p =(n)-[r:MemberOf*1..]->(g:Group {name:{name}})'
+                            'MATCH p =(n)-[r:MemberOf*1..]->(g:Group {objectid: {objectid}})'
                         }
-                        end={this.state.label}
+                        end={this.state.objectid}
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Foreign Members'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (n)-[r:MemberOf*1..]->(g:Group {name:{name}}) WHERE NOT g.domain = n.domain'
+                            'MATCH p = (n)-[r:MemberOf*1..]->(g:Group {objectid: {objectid}}) WHERE NOT g.domain = n.domain'
                         }
-                        end={this.state.label}
+                        end={this.state.objectid}
                         distinct
                     />
 
                     <h4>Group Membership</h4>
                     <NodeCypherLink
                         property='First Degree Group Membership'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(g1:Group {name:{name}})-[r:MemberOf]->(n:Group)'
+                            'MATCH p=(g1:Group {objectid: {objectid}})-[r:MemberOf]->(n:Group)'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Unrolled Member Of'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (g1:Group {name:{name}})-[r:MemberOf*1..]->(n:Group)'
+                            'MATCH p = (g1:Group {objectid: {objectid}})-[r:MemberOf*1..]->(n:Group)'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Foreign Group Membership'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Group {name:{name}})-[r:MemberOf]->(n) WHERE NOT m.domain=n.domain'
+                            'MATCH p=(m:Group {objectid: {objectid}})-[r:MemberOf]->(n) WHERE NOT m.domain=n.domain'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                     />
 
                     <h4>Local Admin Rights</h4>
 
                     <NodeCypherLink
                         property='First Degree Local Admin'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Group {name: {name}})-[r:AdminTo]->(n:Computer)'
+                            'MATCH p=(m:Group {objectid: {objectid}})-[r:AdminTo]->(n:Computer)'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Group Delegated Local Admin Rights'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (g1:Group {name:{name}})-[r1:MemberOf*1..]->(g2:Group)-[r2:AdminTo]->(n:Computer)'
+                            'MATCH p = (g1:Group {objectid: {objectid}})-[r1:MemberOf*1..]->(g2:Group)-[r2:AdminTo]->(n:Computer)'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Derivative Local Admin Rights'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = shortestPath((g:Group {name:{name}})-[r:MemberOf|AdminTo|HasSession*1..]->(n:Computer))'
+                            'MATCH p = shortestPath((g:Group {objectid: {objectid}})-[r:MemberOf|AdminTo|HasSession*1..]->(n:Computer))'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                         distinct
                     />
 
                     <h4>Execution Privileges</h4>
                     <NodeCypherLink
                         property='First Degree RDP Privileges'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Group {name:{name}})-[r:CanRDP]->(n:Computer)'
+                            'MATCH p=(m:Group {objectid: {objectid}})-[r:CanRDP]->(n:Computer)'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Group Delegated RDP Privileges'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Group {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:CanRDP]->(n:Computer)'
+                            'MATCH p=(m:Group {objectid: {objectid}})-[r1:MemberOf*1..]->(g:Group)-[r2:CanRDP]->(n:Computer)'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                         distinct
                     />
 
                     <NodeCypherLink
                         property='First Degree DCOM Privileges'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Group {name:{name}})-[r:ExecuteDCOM]->(n:Computer)'
+                            'MATCH p=(m:Group {objectid: {objectid}})-[r:ExecuteDCOM]->(n:Computer)'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Group Delegated DCOM Privileges'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Group {name:{name}})-[r1:MemberOf*1..]->(g:Group)-[r2:ExecuteDCOM]->(n:Computer)'
+                            'MATCH p=(m:Group {objectid: {objectid}})-[r1:MemberOf*1..]->(g:Group)-[r2:ExecuteDCOM]->(n:Computer)'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                         distinct
                     />
 
@@ -410,31 +413,31 @@ class GroupNodeData extends Component {
 
                     <NodeCypherLink
                         property='First Degree Object Control'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (g:Group {name:{name}})-[r]->(n) WHERE r.isacl=true'
+                            'MATCH p = (g:Group {objectid: {objectid}})-[r]->(n) WHERE r.isacl=true'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Group Delegated Object Control'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (g1:Group {name:{name}})-[r1:MemberOf*1..]->(g2:Group)-[r2]->(n) WHERE r2.isacl=true'
+                            'MATCH p = (g1:Group {objectid: {objectid}})-[r1:MemberOf*1..]->(g2:Group)-[r2]->(n) WHERE r2.isacl=true'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Transitive Object Control'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((g:Group {name:{name}})-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))'
+                            'MATCH (n) WHERE NOT n.objectid={objectid} WITH n MATCH p = shortestPath((g:Group {objectid: {objectid}})-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))'
                         }
-                        start={this.state.label}
+                        start={this.state.objectid}
                         distinct
                     />
 
@@ -442,31 +445,31 @@ class GroupNodeData extends Component {
 
                     <NodeCypherLink
                         property='Explicit Object Controllers'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:Group {name:{name}})'
+                            'MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:Group {objectid: {objectid}})'
                         }
-                        end={this.state.label}
+                        end={this.state.objectid}
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Unrolled Object Controllers'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:Group {name: {name}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = g2.name) AND NOT n.name = g2.name AND r1.isacl=true'
+                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:Group {objectid: {objectid}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid AND r1.isacl=true'
                         }
-                        end={this.state.label}
+                        end={this.state.objectid}
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Transitive Object Controllers'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH (n) WHERE NOT n.name={name} WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:Group {name:{name}}))'
+                            'MATCH (n) WHERE NOT n.objectid={objectid} WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:Group {objectid: {objectid}}))'
                         }
-                        end={this.state.label}
+                        end={this.state.objectid}
                         distinct
                     />
                 </dl>

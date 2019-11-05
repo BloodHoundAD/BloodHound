@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { object } from 'prop-types';
 import NodeCypherLink from './NodeCypherLink.jsx';
 import NodeCypherNoNumberLink from './NodeCypherNoNumberLink';
 import NodeProps from './NodeProps';
@@ -19,8 +19,8 @@ class OuNodeData extends Component {
         super();
 
         this.state = {
+            objectid: '',
             label: '',
-            guid: '',
             blocks: '',
             propertyMap: {},
             displayMap: {
@@ -54,18 +54,17 @@ class OuNodeData extends Component {
         });
     }
 
-    getNodeData(payload, guid, blocksInheritance) {
+    getNodeData(payload, blocksInheritance) {
         jQuery(this.refs.complete).hide();
         let bi = '' + blocksInheritance;
         bi = bi.toTitleCase();
 
         this.setState({
-            label: payload,
-            guid: guid,
+            objectid: payload,
             blocks: bi,
         });
 
-        let key = `ou_${this.state.guid}`;
+        let key = `ou_${this.state.objectid}`;
         let c = imageconf.get(key);
         let pics = [];
         if (typeof c !== 'undefined') {
@@ -75,23 +74,19 @@ class OuNodeData extends Component {
         }
 
         let props = driver.session();
-        props.run('MATCH (n:OU {guid:{name}}) RETURN n', { name: guid }).then(
-            function(result) {
-                var properties = result.records[0]._fields[0].properties;
+        props.run('MATCH (n:OU {objectid: {objectid}}) RETURN n', { objectid: this.state.objectid }).then(
+            result => {
+                let properties = result.records[0]._fields[0].properties;
+                let name = properties.name || properties.objectid;
                 let notes;
                 if (!properties.notes) {
                     notes = null;
                 } else {
                     notes = properties.notes;
                 }
-                this.setState({
-                    ServicePrincipalNames: [],
-                    propertyMap: properties,
-                    notes: notes,
-                });
-                this.setState({ propertyMap: properties, notes: notes });
+                this.setState({ label: name, propertyMap: properties, notes: notes });
                 props.close();
-            }.bind(this)
+            }
         );
     }
 
@@ -106,14 +101,14 @@ class OuNodeData extends Component {
                 : this.state.notes;
         let q = driver.session();
         if (notes === null) {
-            q.run('MATCH (n:OU {guid:{name}}) REMOVE n.notes', {
-                name: this.state.guid,
+            q.run('MATCH (n:OU {objectid: {objectid}}) REMOVE n.notes', {
+                objectid: this.state.objectid,
             }).then(x => {
                 q.close();
             });
         } else {
-            q.run('MATCH (n:OU {guid:{name}}) SET n.notes = {notes}', {
-                name: this.state.guid,
+            q.run('MATCH (n:OU {objectid: {objectid}}) SET n.notes = {notes}', {
+                objectid: this.state.objectid,
                 notes: this.state.notes,
             }).then(x => {
                 q.close();
@@ -249,7 +244,7 @@ class OuNodeData extends Component {
                     <dt>Ou</dt>
                     <dd>{this.state.label}</dd>
                     <dt>GUID</dt>
-                    <dd>{this.state.guid}</dd>
+                    <dd>{this.state.objectid}</dd>
                     <dt>Blocks Inheritance</dt>
                     <dd>{this.state.blocks}</dd>
                     <NodeProps
@@ -258,8 +253,8 @@ class OuNodeData extends Component {
                         ServicePrincipalNames={[]}
                     />
                     <NodeCypherNoNumberLink
-                        query='MATCH p = (d)-[r:Contains*1..]->(o:OU {guid:{name}}) RETURN p'
-                        target={this.state.guid}
+                        query='MATCH p = (d)-[r:Contains*1..]->(o:OU {objectid: {objectid}}) RETURN p'
+                        target={this.state.objectid}
                         property='See OU Within Domain Tree'
                     />
 
@@ -268,52 +263,52 @@ class OuNodeData extends Component {
                     <h4>Affecting GPOs</h4>
                     <NodeCypherLink
                         property='GPOs Directly Affecting This OU'
-                        target={this.state.guid}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n:GPO)-[r:GpLink]->(o:OU {guid:{name}})'
+                            'MATCH p=(n:GPO)-[r:GpLink]->(o:OU {objectid: {objectid}})'
                         }
                     />
                     <NodeCypherLink
                         property='GPOs Affecting This OU'
-                        target={this.state.guid}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n:GPO)-[r:GpLink|Contains*1..]->(o:OU {guid:{name}})'
+                            'MATCH p=(n:GPO)-[r:GpLink|Contains*1..]->(o:OU {objectid: {objectid}})'
                         }
                     />
 
                     <h4>Descendant Objects</h4>
                     <NodeCypherLink
                         property='Total User Objects'
-                        target={this.state.guid}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(o:OU {guid:{name}})-[r:Contains*1..]->(n:User)'
+                            'MATCH p=(o:OU {objectid: {objectid}})-[r:Contains*1..]->(n:User)'
                         }
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Total Group Objects'
-                        target={this.state.guid}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(o:OU {guid:{name}})-[r:Contains*1..]->(n:Group)'
+                            'MATCH p=(o:OU {objectid: {objectid}})-[r:Contains*1..]->(n:Group)'
                         }
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Total Computer Objects'
-                        target={this.state.guid}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(o:OU {guid:{name}})-[r:Contains*1..]->(n:Computer)'
+                            'MATCH p=(o:OU {objectid: {objectid}})-[r:Contains*1..]->(n:Computer)'
                         }
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Sibling Objects within OU'
-                        target={this.state.guid}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH (o1)-[r1:Contains]->(o2:OU {guid:{name}}) WITH o1 MATCH p=(d)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)'
+                            'MATCH (o1)-[r1:Contains]->(o2:OU {objectid: {objectid}}) WITH o1 MATCH p=(d)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)'
                         }
                         distinct
                     />

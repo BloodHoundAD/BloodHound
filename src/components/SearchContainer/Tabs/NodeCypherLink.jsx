@@ -1,98 +1,64 @@
-import React, { Component, Fragment } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import NodeALink from './NodeALink';
 
-export default class NodeCypherLink extends Component {
-    constructor(props) {
-        super(props);
-    }
+const NodeCypherLink = ({property, target, baseQuery, distinct, start, end, domain}) => {
+    const [ready, setReady] = useState(false);
+    const [value, setValue] = useState(0);
+    const [session, setSession] = useState(null);
 
-    componentWillMount() {
-        this.setState({
-            ready: false,
-            value: 0,
-        });
-    }
-
-    componentWillReceiveProps(newProps) {
-        if (this.props.target !== newProps.target) {
-            var session = driver.session();
-            if (typeof this.state.session !== 'undefined') {
-                this.state.session.close();
-            }
-
-            if (newProps.target === '') {
-                return;
-            }
-
-            this.setState({
-                session: session,
-                ready: false,
-            });
-            let query = this.props.baseQuery;
-            if (this.props.distinct) {
-                query += ' RETURN COUNT(DISTINCT(n))';
-            } else {
-                query += ' RETURN COUNT(n)';
-            }
-            let domain = '@' + newProps.target.split('@').last();
-            this.setState({ domain: domain });
-            session
-                .run(query, {
-                    name: newProps.target,
-                    domain: domain,
-                })
-                .then(
-                    function(result) {
-                        this.setState({
-                            value: result.records[0]._fields[0],
-                            ready: true,
-                        });
-                    }.bind(this)
-                )
-                .catch(function(error) {
-                    if (
-                        !error.message.includes(
-                            'The transaction has been terminated'
-                        )
-                    ) {
-                        console.log(error);
-                    }
-                });
+    useEffect(() => {
+        if (session !== null){
+            session.close();
         }
-    }
 
-    cancelQuery() {
-        if (typeof this.state.session !== 'undefined') {
-            this.state.session.close();
+        if (target === ''){
+            return;
         }
-    }
 
-    render() {
-        return (
-            <Fragment>
-                <dt>{this.props.property}</dt>
-                <dd>
-                    <NodeALink
-                        ready={this.state.ready}
-                        value={this.state.value}
-                        click={function() {
-                            emitter.emit(
-                                'query',
-                                this.props.baseQuery + ' RETURN p',
-                                {
-                                    name: this.props.target,
-                                    domain: this.state.domain,
-                                },
-                                this.props.start,
-                                this.props.end
-                            );
-                        }.bind(this)}
-                    />
-                </dd>
-            </Fragment>
+        let sess = driver.session();
+
+        setSession(sess);
+        setReady(false);
+        let query = `${baseQuery} ${distinct ? 'RETURN COUNT(DISTINCT(n))' : 'RETURN COUNT(n)'}`;
+
+        sess.run(query, {
+            objectid: target,
+            domain: domain
+        }).then(result => {
+            setValue(result.records[0]._fields[0]);
+            setReady(true);
+        }).catch(
+            error => {
+                if (
+                    !error.message.includes(
+                        'The transaction has been terminated'
+                    )
+                ) {
+                    console.log(target)
+                    console.log(baseQuery)
+                    console.log(error);
+                }
+            }
         );
-    }
+    }, [target]);
+
+    return (
+        <>
+            <dt>{property}</dt>
+            <dd>
+                <NodeALink
+                    ready={ready}
+                    value={value}
+                    click={() => {
+                        emitter.emit('query', `${baseQuery} RETURN p`,
+                        {objectid: target},
+                        start,
+                         end)
+                    }} />
+            </dd>
+        </>
+    )
 }
 
 NodeCypherLink.propTypes = {
@@ -103,3 +69,7 @@ NodeCypherLink.propTypes = {
     start: PropTypes.string,
     end: PropTypes.string,
 };
+
+export default NodeCypherLink;
+
+
