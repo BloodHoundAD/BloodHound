@@ -238,7 +238,7 @@ function dropIndexes(indexes) {
     }
 }
 
-async function addConstraints() {
+export async function addConstraints() {
     let session = driver.session();
     await session.run('CREATE CONSTRAINT ON (c:User) ASSERT c.objectid IS UNIQUE');
     await session.run('CREATE CONSTRAINT ON (c:Group) ASSERT c.objectid IS UNIQUE');
@@ -248,7 +248,14 @@ async function addConstraints() {
     await session.run('CREATE CONSTRAINT ON (c:GPO) ASSERT c.objectid IS UNIQUE');
     await session.run('CREATE CONSTRAINT ON (c:Domain) ASSERT c.objectid IS UNIQUE');
     await session.run('CREATE CONSTRAINT ON (c:OU) ASSERT c.objectid IS UNIQUE');
-
+    await session.run('CREATE INDEX :User(name)');
+    await session.run('CREATE INDEX :Group(name)');
+    await session.run(
+        'CREATE INDEX :Computer(name)'
+    );
+    await session.run('CREATE INDEX :GPO(name)');
+    await session.run('CREATE INDEX :Domain(name)');
+    await session.run('CREATE INDEX :OU(name)');
     session.close()
 
     emitter.emit("hideDBClearModal");
