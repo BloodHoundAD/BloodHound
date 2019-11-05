@@ -1,209 +1,150 @@
-import React, { Component } from 'react';
-import NodeEditorRow from './NodeEditorRow.jsx';
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { withAlert } from 'react-alert';
+import NodeEditorRow from './NodeEditorRow.jsx';
+import posed, { PoseGroup } from 'react-pose';
+import {Button, Panel, Table} from 'react-bootstrap';
+import {styles} from './NodeEditor.module.css';
+import whyDidYouRender from '@welldone-software/why-did-you-render';
 
-class NodeEditor extends Component {
-    constructor() {
-        super();
+const NodeEditor = () => {
+    const [name, setName] = useState('');
+    const [type, setType] = useState('');
+    const [id, setId] = useState('');
+    const [properties, setProperties] = useState({});
+    const [visible, setVisible] = useState(false);
+    const [newAttrName, setNewAttrName] = useState('');
+    const [newAttrType, setNewAttrType] = useState('boolean');
+    const [hasError, setHasError] = useState(false);
+    
+    const getNodeData = (node) => {
+        setName(node.label);
+        setType(node.type);
+        setId(node.objectid);
+        setVisible(true)
 
-        this.state = {
-            label: '',
-            type: '',
-            properties: {},
-        };
-    }
+        let session = driver.session();
+        let statement = `MATCH (n:${node.type} {objectid:{id}}) RETURN n`
 
-    componentDidMount() {
-        emitter.on('editnode', this.getNodeData.bind(this));
-        $(this.refs.outer).draggable({
-            stop: (event, _) => {
-                let target = jQuery(event.target);
-                target.css('width', 'auto');
-                target.css('height', 'auto');
-            },
-            handle: '#nodeEditOuter',
-        });
-        $(this.refs.outer).fadeToggle(false);
-    }
-
-    getNodeData(name, type) {
-        closeTooltip();
-        $(this.refs.outer).fadeIn();
-        $(this.refs.newAttrName).val('');
-        let q = driver.session();
-        this.setState({ label: name, type: type, dname: name });
-        let statement = 'MATCH (n:{} {{}:{name}}) RETURN n';
-        let key;
-        if (type === 'OU') {
-            key = 'guid';
-        } else {
-            key = 'name';
-        }
-
-        q.run(statement.format(type, key), { name: name }).then(
-            function(result) {
+        session.run(statement, {id: node.objectid}).then(
+            (result) => {
                 let props = result.records[0]._fields[0].properties;
                 let label = props.name;
                 delete props.name;
-                this.setState({ properties: props, dname: label });
-                q.close();
-            }.bind(this)
+                setName(label);
+                setProperties(props);
+                session.close();
+            }
         );
-    }
+    };
+    
+    const addAttribute = () => {
+        let newValue;
+        if (newAttrType === 'boolean'){
+            newValue = false;
+        }else if (newAttrType === 'number'){
+            newValue = 0;
+        }else if (newAttrType === 'string'){
+            newValue = 'placeholder';
+        }else{
+            newValue = [];
+        }
 
-    closeEditor() {
-        $(this.refs.outer).fadeToggle(false);
-    }
-
-    addAttrib() {
-        let input = $(this.refs.newAttrName);
-        let typeinput = $(this.refs.newAttrType);
-        let val = input.val();
-        let type = typeinput.val();
-        if (val === '') {
-            input.css('border', '3px solid red');
+        if (Object.keys(properties).includes(newAttrName)){
+            setHasError(true);
             return;
         }
 
-        let newval;
-        if (type === 'boolean') {
-            newval = false;
-        } else if (type === 'number') {
-            newval = 0;
-        } else if (type === 'string') {
-            newval = 'placeholder';
-        } else {
-            newval = [];
-        }
-
-        let key;
-        if (this.state.type === 'OU') {
-            key = 'guid';
-        } else {
-            key = 'name';
-        }
-
-        if (Object.keys(this.state.properties).includes(val)) {
-            input.css('border', '3px solid red');
-            this.props.alert.error('No data returned from query');
-            return;
-        }
-
-        let q = driver.session();
-        let statement = 'MATCH (n:{} {{}:{name}}) SET n.{}={newprop} RETURN n'.format(
-            this.state.type,
-            key,
-            val
-        );
-
-        q.run(statement, { name: this.state.label, newprop: newval }).then(
+        let session = driver.session();
+        let statement = `MATCH (n:${type} {objectid: {id}}) SET n.${newAttrName}={newprop} RETURN n`
+        session.run(statement, {id: id, newprop: newValue}).then(
             result => {
                 let props = result.records[0]._fields[0].properties;
                 let label = props.name;
                 delete props.name;
-                this.setState({ properties: props, label: label });
+                setName(label);
+                setProperties(props);
+                session.close();
             }
-        );
-    }
+        )
+    };
 
-    updateHandler(attrName, newVal) {
-        let key;
-        if (this.state.type === 'OU') {
-            key = 'guid';
-        } else {
-            key = 'name';
-        }
+    const updateAttribute = (attributeName, newValue) => {
         let statement;
-        if (
-            attrName === 'serviceprincipalnames' &&
-            this.state.type === 'user'
-        ) {
-            if (newVal[0] === '' && newVal.length === 1) {
-                newVal = [];
+        if (attributeName === 'serviceprincipalnames' && type === 'User'){
+            if (newValue === '' && newValue.length === 1){
+                newValue = [];
             }
 
-            if (newVal.length > 0) {
-                statement = 'MATCH (n:{} {{}:{name}}) SET n.{}={newprop}, n.hasspn=true RETURN n'.format(
-                    this.state.type,
-                    key,
-                    attrName
-                );
-            } else {
-                statement = 'MATCH (n:{} {{}:{name}}) SET n.{}={newprop}, n.hasspn=false RETURN n'.format(
-                    this.state.type,
-                    key,
-                    attrName
-                );
+            if (newValue.length > 0){
+                statement = `MATCH (n:${type} {objectid: {id}}) SET n.${attributeName}={newprop}, n.hasspn=true RETURN n`;
+            }else{
+                statement = `MATCH (n:${type} {objectid: {id}}) SET n.${attributeName}={newprop}, n.hasspn=false RETURN n`;
             }
-        } else {
-            statement = 'MATCH (n:{} {{}:{name}}) SET n.{}={newprop} RETURN n'.format(
-                this.state.type,
-                key,
-                attrName
-            );
+        }else{
+            statement = `MATCH (n:${type} {objectid: {id}}) SET n.${attributeName}={newprop} RETURN n`;
         }
 
-        let q = driver.session();
-        q.run(statement, { name: this.state.label, newprop: newVal }).then(
+        let session = driver.session();
+        session.run(statement, {id: id, newprop: newValue}).then(
             result => {
                 let props = result.records[0]._fields[0].properties;
                 let label = props.name;
                 delete props.name;
-                this.setState({ properties: props, label: label });
+                setName(label);
+                setProperties(props);
+                session.close();
             }
-        );
-    }
+        )
+    };
 
-    deletePropHandler(attrName) {
-        let key;
-        if (this.state.type === 'OU') {
-            key = 'guid';
-        } else {
-            key = 'name';
-        }
-        let statement = 'MATCH (n:{} {{}:{name}}) REMOVE n.{} RETURN n'.format(
-            this.state.type,
-            key,
-            attrName
-        );
-        let q = driver.session();
-        q.run(statement, { name: this.state.label }).then(
-            function(result) {
+    const deleteAttribute = (attributeName) => {
+        let statement = `MATCH (n:${type} {objectid:{id}}) REMOVE n.${attributeName} RETURN n`;
+
+        let session = driver.session();
+        session.run(statement, {id: id}).then(
+            result => {
                 let props = result.records[0]._fields[0].properties;
                 let label = props.name;
                 delete props.name;
-                this.setState({ properties: props, label: label });
-                q.close();
-            }.bind(this)
-        );
+                setName(label);
+                setProperties(props);
+                session.close();
+            }
+        )
+    };
+
+    useEffect(() => {
+        emitter.on('editnode', getNodeData);
+    }, [])
+
+    const config = {
+        visible: {
+            opacity: 1,
+            transition: {duration: 300}
+        },
+        hidden: {
+            opacity: 0,
+            transition: {duration: 300}
+        },
+        draggable: true
     }
 
-    removeValidation() {
-        let input = $(this.refs.newAttrName);
-        input.css('border', '');
-    }
+    const Container = posed.div(config);
 
-    render() {
-        return (
-            <div ref='outer' className='nodeEditor panel panel-default'>
-                <div className='panel-heading' id='nodeEditOuter'>
-                    {this.state.dname}
-                    <button
-                        type='button'
-                        className='close'
-                        onClick={this.closeEditor.bind(this)}
-                        aria-label='Close'
-                    >
+    return (
+        <Container pose={visible ? 'visible' : 'hidden'} className='nodeEditor'>
+            <Panel>
+                <Panel.Heading>
+                    {name}
+                    <Button onClick={() => setVisible(false)} className='close' aria-label='Close'>
                         <span aria-hidden='true'>&times;</span>
-                    </button>
-                </div>
+                    </Button>
+                </Panel.Heading>
 
-                <div className='panel-body'>
+                <Panel.Body>
                     <div className='nodeEditTableContainer'>
-                        <table
-                            data-role='table'
-                            className='table table-striped'
-                        >
+                        <Table striped>
                             <thead align='center'>
                                 <tr>
                                     <td>Delete</td>
@@ -213,65 +154,60 @@ class NodeEditor extends Component {
                                 </tr>
                             </thead>
                             <tbody>
-                                {Object.keys(this.state.properties).map(
+                                {Object.keys(properties).map(
                                     function(key) {
-                                        let val = this.state.properties[key];
+                                        let val = properties[key];
                                         return (
                                             <NodeEditorRow
                                                 key={key}
                                                 attributeName={key}
                                                 val={val}
-                                                deleteHandler={this.deletePropHandler.bind(
-                                                    this
-                                                )}
-                                                updateHandler={this.updateHandler.bind(
-                                                    this
-                                                )}
+                                                deleteHandler={deleteAttribute}
+                                                updateHandler={updateAttribute}
                                             />
                                         );
-                                    }.bind(this)
+                                    }
                                 )}
                             </tbody>
-                        </table>
+                        </Table>
                     </div>
+
                     <form
                         onSubmit={x => x.preventDefault()}
                         className='form-inline pull-right'
                     >
                         <div
-                            onFocus={this.removeValidation.bind(this)}
+                            onFocus={() => setHasError(false)}
                             className='form-group'
                         >
-                            {/* <input
-                                type="text"
-                                className="form-control form-override"
-                                ref="newAttrDisplay"
-                                placeholder="Display Name"
-                            /> */}
                             <input
                                 type='text'
-                                className='form-control form-override'
-                                ref='newAttrName'
+                                className={`${hasError ? styles.error : ''} form-control form-override`}
+                                value={newAttrName}
+                                onChange={e => setNewAttrName(e.target.value)}
                                 placeholder='Internal Name'
+                                required
                             />
-                            <select className='form-control' ref='newAttrType'>
-                                <option>boolean</option>
-                                <option>string</option>
-                                <option>number</option>
-                                <option>array</option>
+                            <select className='form-control' onChange={e => setNewAttrType(e.target.value)}>
+                                <option value='boolean'>boolean</option>
+                                <option value='string'>string</option>
+                                <option value='number'>number</option>
+                                <option value='array'>array</option>
                             </select>
                             <button
                                 className='form-control formButtonFix'
-                                onClick={this.addAttrib.bind(this)}
+                                onClick={() => addAttribute()}
                             >
                                 <span className='fa fa-plus' /> Add
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
-        );
-    }
+                </Panel.Body>
+            </Panel>
+        </Container>
+    )
 }
+NodeEditor.propTypes = {
 
+}
 export default withAlert()(NodeEditor);

@@ -196,7 +196,7 @@ export default class NodeEditorRow extends Component {
                     </button>
                     <button type='button'>
                         <span
-                            className='fa fa-close'
+                            className='fa fa-times'
                             onClick={this.cancelEdit.bind(this)}
                         />
                     </button>
