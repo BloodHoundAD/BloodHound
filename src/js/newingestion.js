@@ -211,6 +211,7 @@ export function buildOuJsonNew(chunk) {
         let admins = ou.LocalAdmins;
         let dcomUsers = ou.DcomUser;
         let psRemoteUsers = ou.PSRemoteUsers;
+        let links = ou.Links || [];
 
         let identifier = ou.ObjectIdentifier;
         let aces = ou.Aces;
@@ -225,6 +226,14 @@ export function buildOuJsonNew(chunk) {
         let format = ['OU', 'User', 'Contains', '{isacl: false}'];
 
         insertNew(queries, format, props);
+
+        format = ['GPO', 'OU', 'GpLink', '{isacl: false, enforced: prop.enforced}']
+
+        props = links.map(link => {
+            return {source: link.Guid, target: identifier, enforced: link.IsEnforced}
+        })
+
+        insertNew(queries, format, props)
 
         props = computers.map(computer => {
             return { source: identifier, target: computer };
@@ -318,6 +327,7 @@ export function buildDomainJsonNew(chunk) {
         let psRemoteUsers = domain.PSRemoteUsers;
         let identifier = domain.ObjectIdentifier;
         let aces = domain.Aces;
+        let links = domain.Links || [];
 
         processAceArrayNew(aces, identifier, 'Domain', queries);
 
@@ -329,6 +339,7 @@ export function buildDomainJsonNew(chunk) {
         let props = users.map(user => {
             return { source: identifier, target: user };
         });
+
         let format = ['Domain', 'User', 'Contains', '{isacl: false}'];
 
         insertNew(queries, format, props);
@@ -336,9 +347,19 @@ export function buildDomainJsonNew(chunk) {
         props = computers.map(computer => {
             return { source: identifier, target: computer };
         });
+
+        format = ['GPO', 'Domain', 'GpLink', '{isacl: false, enforced: prop.enforced}']
+
+        props = links.map(link => {
+            return {source: link.Guid, target: identifier, enforced: link.IsEnforced}
+        })
+
+        insertNew(queries, format, props)
+
         format = ['Domain', 'Computer', 'Contains', '{isacl: false}'];
 
         insertNew(queries, format, props);
+        
 
         props = childOus.map(ou => {
             return { source: identifier, target: ou };
