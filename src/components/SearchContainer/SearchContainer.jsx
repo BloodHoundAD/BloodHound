@@ -25,6 +25,8 @@ const SearchContainer = () => {
     const pathfinding = useRef(null);
     const tabs = useRef(null);
     const edgeFilter = useRef(null);
+    const mainSearchRef = useRef(null);
+    const pathSearchRef = useRef(null);
 
     useEffect(() => {
         jQuery(pathfinding.current).slideToggle(0);
@@ -47,22 +49,36 @@ const SearchContainer = () => {
         emitter.on(
             'setStart',
             (node) => {
+                let temp = {
+                    name: node.label,
+                    objectid: node.objectid,
+                    type: node.type
+                }
                 closeTooltip();
-                setMainSearchValue(node.label);
-                setMainSearchSelected(node);
+                setMainSearchSelected(temp);
+                let instance = mainSearchRef.current.getInstance();
+                instance.clear();
+                instance.setState({text: temp.name});
             }
         );
 
         emitter.on('setEnd', (node) => {
+            let temp = {
+                name: node.label,
+                objectid: node.objectid,
+                type: node.type
+            }
             closeTooltip();
-            setPathSearchValue(node.label);
-            setPathSearchSelected(node);
-            var elem = jQuery(pathfinding);
-            if (!e.is(':visible')){
+            var elem = jQuery(pathfinding.current);
+            if (!elem.is(':visible')){
                 setPathfindingOpen(true);
                 elem.slideToggle();
             }
-        })
+            setPathSearchSelected(temp);
+            let instance = pathSearchRef.current.getInstance();
+            instance.clear();
+            instance.setState({text: temp.name});
+        });
     }, [])
 
     const doSearch = (query, source) =>{
@@ -701,6 +717,7 @@ const SearchContainer = () => {
                             setMainSearchSelected(null); 
                             setMainSearchValue(event)
                         }}
+                    ref={mainSearchRef}
                      />
                 <GlyphiconSpan
                     tooltip
@@ -744,6 +761,7 @@ const SearchContainer = () => {
                         />
                     </GlyphiconSpan>
                     <AsyncTypeahead
+                        ref={pathSearchRef}
                         id={'pathSearchbar'}
                         placeholder={'Target Node'}
                         isLoading={pathSearchLoading}

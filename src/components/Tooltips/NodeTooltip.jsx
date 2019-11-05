@@ -58,7 +58,7 @@ const NodeTooltip = ({ node, x, y }) => {
                     <Else>
                         <li
                             onClick={() => {
-                                emitter.emit('setStart', `${type}:${label}`);
+                                emitter.emit('setStart', node);
                             }}
                         >
                             <i className='fa fa-map-marker-alt' /> Set as
@@ -66,7 +66,7 @@ const NodeTooltip = ({ node, x, y }) => {
                         </li>
                         <li
                             onClick={() => {
-                                emitter.emit('setEnd', `${type}:${label}`);
+                                emitter.emit('setEnd', node);
                             }}
                         >
                             <i className='fa fa-bullseye' /> Set as Ending Node
