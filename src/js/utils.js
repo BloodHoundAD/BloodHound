@@ -42,52 +42,23 @@ export function buildSearchQuery(searchterm) {
         let t = "(?i).*" + term + ".*";
         type = getRealLabel(type);
 
-        let statement = `MATCH (n:${type}) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10`;
+        let statement = `MATCH (n:${type}) WHERE n.name =~ {name} OR n.objectid =~ {name} RETURN n LIMIT 10`;
 
         return [statement, t];
     } else {
         let q = escapeRegExp(searchterm);
         let t = "(?i).*" + q + ".*";
 
-        return ["MATCH (n) WHERE n.name =~ {name} OR n.guid =~ {name} RETURN n LIMIT 10", t];
+        return ["MATCH (n) WHERE n.name =~ {name} OR n.objectid =~ {name} RETURN n LIMIT 10", t];
     }
 }
 
-export function buildSelectQuery(start, end) {
-    let startTerm, endTerm, apart, bpart;
-
-    if (start.includes(':')) {
-        let [type, search] = start.split(':')
-        startTerm = search;
-        type = getRealLabel(type);
-
-        if (type === "OU" || type === "GPO") {
-            apart = `MATCH (n:${type}) WHERE n.name =~ {aprop} OR n.guid =~ {aprop}`;
-        } else {
-            apart = `MATCH (n:${type}) WHERE n.name =~ {aprop}`;
-        }
-    } else {
-        startTerm = start;
-        apart = "MATCH (n) WHERE n.name =~ {aprop}"
-    }
-
-    if (end.includes(':')) {
-        let [type, search] = end.split(':')
-        endTerm = search;
-        type = getRealLabel(type);
-
-        if (type === "OU" || type === "GPO") {
-            bpart = `MATCH (m:${type}) WHERE m.name =~ {bprop} OR m.guid =~ {bprop}`;
-        } else {
-            bpart = `MATCH (m:${type}) WHERE m.name =~ {bprop}`;
-        }
-    } else {
-        endTerm = end;
-        bpart = "MATCH (m) WHERE m.name =~ {bprop}"
-    }
+export function buildSelectQuery(startNode, endNode) {
+    let apart = `MATCH (n:${startNode.type} {objectid: {sourceid}})`
+    let bpart = `MATCH (m:${endNode.type} {objectid: {targetid}})`
 
     let query = `${apart} ${bpart} MATCH p=allShortestPaths((n)-[r:{}*1..]->(m)) RETURN p`
-    return [query, startTerm, endTerm];
+    return [query, {sourceid: startNode.objectid, targetid: endNode.objectid}, startNode.name || startNode.objectid, endNode.name || endNode.objectid];
 }
 
 //Recursive function to highlight paths to start/end nodes
@@ -248,19 +219,19 @@ export async function addConstraints() {
     await session.run('CREATE CONSTRAINT ON (c:GPO) ASSERT c.objectid IS UNIQUE');
     await session.run('CREATE CONSTRAINT ON (c:Domain) ASSERT c.objectid IS UNIQUE');
     await session.run('CREATE CONSTRAINT ON (c:OU) ASSERT c.objectid IS UNIQUE');
-    await session.run('CREATE INDEX :User(name)');
-    await session.run('CREATE INDEX :Group(name)');
+    await session.run('CREATE INDEX ON :User(name)');
+    await session.run('CREATE INDEX ON :Group(name)');
     await session.run(
-        'CREATE INDEX :Computer(name)'
+        'CREATE INDEX ON :Computer(name)'
     );
-    await session.run('CREATE INDEX :GPO(name)');
-    await session.run('CREATE INDEX :Domain(name)');
-    await session.run('CREATE INDEX :OU(name)');
+    await session.run('CREATE INDEX ON :GPO(name)');
+    await session.run('CREATE INDEX ON :Domain(name)');
+    await session.run('CREATE INDEX ON :OU(name)');
     session.close()
 
     emitter.emit("hideDBClearModal");
 }
 
 export function escapeRegExp(str) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    return str.replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
