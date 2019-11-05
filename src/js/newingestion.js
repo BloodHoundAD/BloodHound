@@ -215,7 +215,7 @@ export function buildOuJsonNew(chunk) {
         let identifier = ou.ObjectIdentifier;
         let aces = ou.Aces;
 
-        processAceArrayNew(aces, identifier, 'Domain', queries);
+        processAceArrayNew(aces, identifier, 'OU', queries);
 
         queries.properties.props.push({ source: identifier, map: properties });
 
@@ -504,7 +504,7 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
             format[0] = inner;
             format[2] = right;
             var mapped = innerGrouped[inner].map(x => {
-                return { source: objectid, target: x.pSid };
+                return { source: x.pSid, target: objectid };
             });
             insertNew(queries, format, mapped);
         }
