@@ -5,7 +5,6 @@ import NodeEditorRow from './NodeEditorRow.jsx';
 import posed, { PoseGroup } from 'react-pose';
 import {Button, Panel, Table} from 'react-bootstrap';
 import {styles} from './NodeEditor.module.css';
-import whyDidYouRender from '@welldone-software/why-did-you-render';
 
 const NodeEditor = () => {
     const [name, setName] = useState('');

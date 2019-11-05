@@ -62,7 +62,7 @@ class GraphContainer extends Component {
             }.bind(this)
         );
 
-        await addConstraints();
+        addConstraints();
 
         emitter.on(
             'doLogout',

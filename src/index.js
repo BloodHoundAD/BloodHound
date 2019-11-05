@@ -13,6 +13,9 @@ import { join } from 'path';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 
 import ConfigStore from 'electron-store';
+
+import 'react-bootstrap-typeahead/css/Typeahead.css';
+
 global.conf = new ConfigStore();
 global.imageconf = new ConfigStore({
     name: 'images',
