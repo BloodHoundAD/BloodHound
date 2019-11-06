@@ -388,7 +388,7 @@ class DomainNodeData extends Component {
 
                     <NodeCypherLink
                         property='Foreign GPO Controllers'
-                        target={this.state.objectid}
+                        target={this.state.label}
                         baseQuery={
                             'MATCH (n) WHERE NOT n.domain={objectid} WITH n MATCH (b:GPO) WHERE b.domain={objectid} WITH n,b MATCH p=(n)-[r]->(b) WHERE r.isacl=true'
                         }

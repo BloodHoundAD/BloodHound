@@ -331,7 +331,7 @@ class GroupNodeData extends Component {
                         property='Foreign Group Membership'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Group {objectid: {objectid}})-[r:MemberOf]->(n) WHERE NOT m.domain=n.domain'
+                            'MATCH (m:Group {objectid: {objectid}}) MATCH (n:Group) WHERE NOT m.domain=n.domain MATCH p=(m)-[r:MemberOf*1..]->(n)'
                         }
                         start={this.state.objectid}
                     />

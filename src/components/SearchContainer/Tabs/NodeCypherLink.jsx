@@ -52,7 +52,7 @@ const NodeCypherLink = ({property, target, baseQuery, distinct, start, end, doma
                     value={value}
                     click={() => {
                         emitter.emit('query', `${baseQuery} RETURN p`,
-                        {objectid: target},
+                        {objectid: target, domain: domain},
                         start,
                          end)
                     }} />

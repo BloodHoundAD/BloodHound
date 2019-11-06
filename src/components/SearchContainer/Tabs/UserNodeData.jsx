@@ -250,7 +250,7 @@ class UserNodeData extends Component {
     }
 
     render() {
-        var domain = '@' + this.state.label.split('@').last();
+        let domain = this.state.propertyMap.domain || ''
 
         let gallery;
         if (this.state.pics.length === 0) {
@@ -359,7 +359,7 @@ class UserNodeData extends Component {
                         property='Foreign Group Membership'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (n:Group) WHERE NOT n.domain = {domain} WITH n MATCH (m:User {objectid: {objectid}}) WITH n,m MATCH p=(m)-[r:MemberOf*1..]->(n)'
+                            'MATCH (m:User {objectid: {objectid}}) MATCH (n:Group) WHERE NOT m.domain=n.domain MATCH p=(m)-[r:MemberOf*1..]->(n)'
                         }
                         start={this.state.label}
                         domain={domain}
