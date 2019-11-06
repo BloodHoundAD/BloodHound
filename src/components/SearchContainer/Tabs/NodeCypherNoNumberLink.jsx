@@ -11,7 +11,7 @@ export default class NodeCypherNoNumberLink extends Component {
             emitter.emit(
                 'query',
                 this.props.query,
-                { name: this.props.target },
+                { objectid: this.props.target },
                 this.props.start,
                 this.props.end
             );

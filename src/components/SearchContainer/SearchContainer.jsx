@@ -250,7 +250,7 @@ const SearchContainer = () => {
         if (stop){
             return;
         }
-        
+
         let event = new Event('');
         event.keyCode = 13;
         onEnterPress(event);
@@ -755,7 +755,7 @@ const SearchContainer = () => {
                 <AsyncTypeahead
                     id={'mainSearchBar'}
                     filterBy={(option, props) => {
-                        let name = option.name.toLowerCase();
+                        let name = (option.name || option.objectid).toLowerCase();
                         let id = option.objectid.toLowerCase();
                         let search;
                         if (props.text.includes(':')){
@@ -770,7 +770,7 @@ const SearchContainer = () => {
                     delay={500}
                     renderMenuItemChildren={SearchRow}
                     labelKey={option => {
-                        return option.name;
+                        return option.name || option.objectid;
                     }}
                     useCache={false}
                     options={mainSearchResults}

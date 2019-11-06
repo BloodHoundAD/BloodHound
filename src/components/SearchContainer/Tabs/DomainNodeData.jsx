@@ -405,9 +405,9 @@ class DomainNodeData extends Component {
 
                     <NodeCypherLink
                         property='Effective Inbound Trusts'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH (n:Domain) WHERE NOT n.name={objectid} WITH n MATCH p=shortestPath((a:Domain {name: {objectid}})<-[r:TrustedBy*1..]-(n))'
+                            'MATCH (n:Domain) WHERE NOT n.objectid={objectid} WITH n MATCH p=shortestPath((a:Domain {objectid: {objectid}})<-[r:TrustedBy*1..]-(n))'
                         }
                     />
 
@@ -422,9 +422,9 @@ class DomainNodeData extends Component {
 
                     <NodeCypherLink
                         property='Effective Outbound Trusts'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH (n:Domain) WHERE NOT n.name={objectid} MATCH p=shortestPath((a:Domain {name: {objectid}})-[r:TrustedBy*1..]->(n))'
+                            'MATCH (n:Domain) WHERE NOT n.objectid={objectid} MATCH p=shortestPath((a:Domain {objectid: {objectid}})-[r:TrustedBy*1..]->(n))'
                         }
                     />
 

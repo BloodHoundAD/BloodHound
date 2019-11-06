@@ -213,7 +213,8 @@ export function buildOuJsonNew(chunk) {
         let psRemoteUsers = ou.PSRemoteUsers;
         let links = ou.Links || [];
 
-        let identifier = ou.ObjectIdentifier;
+        let identifier = ou.ObjectIdentifier.toUpperCase();
+        properties.objectid = identifier;
         let aces = ou.Aces;
 
         processAceArrayNew(aces, identifier, 'OU', queries);
@@ -230,7 +231,7 @@ export function buildOuJsonNew(chunk) {
         format = ['GPO', 'OU', 'GpLink', '{isacl: false, enforced: prop.enforced}']
 
         props = links.map(link => {
-            return {source: link.Guid, target: identifier, enforced: link.IsEnforced}
+            return {source: link.Guid.toUpperCase(), target: identifier, enforced: link.IsEnforced}
         })
 
         insertNew(queries, format, props)
@@ -362,7 +363,7 @@ export function buildDomainJsonNew(chunk) {
         
 
         props = childOus.map(ou => {
-            return { source: identifier, target: ou };
+            return { source: identifier, target: ou.toUpperCase() };
         });
 
         format = ['Domain', 'OU', 'Contains', '{isacl: false}'];

@@ -231,14 +231,14 @@ class UserNodeData extends Component {
                 : this.state.notes;
         let q = driver.session();
         if (notes === null) {
-            q.run('MATCH (n:User {name:{name}}) REMOVE n.notes', {
-                name: this.state.label,
+            q.run('MATCH (n:User {objectid:{objectid}}) REMOVE n.notes', {
+                objectid: this.state.objectid,
             }).then(x => {
                 q.close();
             });
         } else {
-            q.run('MATCH (n:User {name:{name}}) SET n.notes = {notes}', {
-                name: this.state.label,
+            q.run('MATCH (n:User {objectid:{objectid}}) SET n.notes = {notes}', {
+                objectid: this.state.objectid,
                 notes: this.state.notes,
             }).then(x => {
                 q.close();

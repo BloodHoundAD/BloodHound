@@ -110,13 +110,13 @@ class GroupNodeData extends Component {
         let q = driver.session();
         if (notes === null) {
             q.run('MATCH (n:Group {objectid: {objectid}}) REMOVE n.notes', {
-                name: this.state.objectid,
+                objectid: this.state.objectid,
             }).then(x => {
                 q.close();
             });
         } else {
             q.run('MATCH (n:Group {objectid: {objectid}}) SET n.notes = {notes}', {
-                name: this.state.objectid,
+                objectid: this.state.objectid,
                 notes: this.state.notes,
             }).then(x => {
                 q.close();
