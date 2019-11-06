@@ -225,6 +225,70 @@ const SearchContainer = () => {
         }
     }
 
+    useEffect(() => {
+        if (mainSearchSelected === null){
+            return;
+        }
+
+        let stop = false;
+        if (!$('.searchSelectorS > ul').is(':hidden')) {
+            $('.searchSelectorS > ul li').each(function(i) {
+                if ($(this).hasClass('active')) {
+                    stop = true;
+                }
+            });
+        }
+
+        if (!$('.searchSelectorP > ul').is(':hidden')) {
+            $('.searchSelectorP > ul li').each(function(i) {
+                if ($(this).hasClass('active')) {
+                    stop = true;
+                }
+            });
+        }
+
+        if (stop){
+            return;
+        }
+        
+        let event = new Event('');
+        event.keyCode = 13;
+        onEnterPress(event);
+        
+    }, [mainSearchSelected])
+
+    useEffect(() => {
+        if (pathSearchSelected === null){
+            return;
+        }
+
+        let stop = false;
+        if (!$('.searchSelectorS > ul').is(':hidden')) {
+            $('.searchSelectorS > ul li').each(function(i) {
+                if ($(this).hasClass('active')) {
+                    stop = true;
+                }
+            });
+        }
+
+        if (!$('.searchSelectorP > ul').is(':hidden')) {
+            $('.searchSelectorP > ul li').each(function(i) {
+                if ($(this).hasClass('active')) {
+                    stop = true;
+                }
+            });
+        }
+
+        if (stop){
+            return;
+        }
+
+        let event = new Event('');
+        event.keyCode = 13;
+        onEnterPress(event);
+        
+    }, [pathSearchSelected])
+
     const openNodeTab = () => {
         let e = jQuery(tabs.current);
         if (!e.is(':visible')) {
@@ -693,7 +757,12 @@ const SearchContainer = () => {
                     filterBy={(option, props) => {
                         let name = option.name.toLowerCase();
                         let id = option.objectid.toLowerCase();
-                        let search = props.text.toLowerCase()
+                        let search;
+                        if (props.text.includes(':')){
+                            search = props.text.split(':')[1];
+                        }else{
+                            search = props.text.toLowerCase()
+                        }
                         return name.includes(search) || id.includes(search)
                     }}
                     placeholder={pathfindingOpen ? 'Start Node' : 'Start typing to search for a node...'}
