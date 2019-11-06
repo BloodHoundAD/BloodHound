@@ -221,38 +221,33 @@ export function buildOuJsonNew(chunk) {
 
         queries.properties.props.push({ source: identifier, map: properties });
 
+        let format = ['OU', 'User', 'Contains', '{isacl: false}'];
         let props = users.map(user => {
             return { source: identifier, target: user };
         });
-        let format = ['OU', 'User', 'Contains', '{isacl: false}'];
-
         insertNew(queries, format, props);
 
-        format = ['GPO', 'OU', 'GpLink', '{isacl: false, enforced: prop.enforced}']
-
-        props = links.map(link => {
-            return {source: link.Guid.toUpperCase(), target: identifier, enforced: link.IsEnforced}
-        })
-
-        insertNew(queries, format, props)
-
+        format = ['OU', 'Computer', 'Contains', '{isacl: false}'];
         props = computers.map(computer => {
             return { source: identifier, target: computer };
         });
-        format = ['OU', 'Computer', 'Contains', '{isacl: false}'];
-
         insertNew(queries, format, props);
 
+        format = ['OU', 'OU', 'Contains', '{isacl: false}'];
         props = childOus.map(ou => {
             return { source: identifier, target: ou };
         });
-
-        format = ['OU', 'OU', 'Contains', '{isacl: false}'];
-
         insertNew(queries, format, props);
 
-        format = ['', 'Computer', '', '{isacl: false, fromgpo: true}'];
 
+        format = ['GPO', 'OU', 'GpLink', '{isacl: false, enforced: prop.enforced}']
+        props = links.map(link => {
+            return {source: link.Guid.toUpperCase(), target: identifier, enforced: link.IsEnforced}
+        })
+        insertNew(queries, format, props)
+
+        
+        format = ['', 'Computer', '', '{isacl: false, fromgpo: true}'];
         let grouped = groupBy(admins, 'MemberType');
         for (let x in grouped) {
             format[0] = x;
@@ -337,36 +332,30 @@ export function buildDomainJsonNew(chunk) {
             map: properties,
         });
 
+        let format = ['Domain', 'User', 'Contains', '{isacl: false}'];
         let props = users.map(user => {
             return { source: identifier, target: user };
         });
-
-        let format = ['Domain', 'User', 'Contains', '{isacl: false}'];
-
         insertNew(queries, format, props);
 
+        format = ['Domain', 'Computer', 'Contains', '{isacl: false}'];
         props = computers.map(computer => {
             return { source: identifier, target: computer };
         });
-
-        format = ['GPO', 'Domain', 'GpLink', '{isacl: false, enforced: prop.enforced}']
-
-        props = links.map(link => {
-            return {source: link.Guid, target: identifier, enforced: link.IsEnforced}
-        })
-
         insertNew(queries, format, props)
 
-        format = ['Domain', 'Computer', 'Contains', '{isacl: false}'];
 
-        insertNew(queries, format, props);
-        
-
+        format = ['Domain', 'OU', 'Contains', '{isacl: false}'];
         props = childOus.map(ou => {
             return { source: identifier, target: ou.toUpperCase() };
         });
+        insertNew(queries, format, props);
 
-        format = ['Domain', 'OU', 'Contains', '{isacl: false}'];
+
+        format = ['GPO', 'Domain', 'GpLink', '{isacl: false, enforced: prop.enforced}']
+        props = links.map(link => {
+            return {source: link.Guid, target: identifier, enforced: link.IsEnforced}
+        })
 
         insertNew(queries, format, props);
 
