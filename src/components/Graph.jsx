@@ -1457,11 +1457,11 @@ class GraphContainer extends Component {
         $(window).on(
             'keyup',
             function(e) {
-                let key = e.keyCode ? e.keyCode : e.which;
+                let key = e.code;
                 let mode = appStore.performance.nodeLabels;
                 let sigmaInstance = this.state.sigmaInstance;
 
-                if (document.activeElement === document.body && key === 17) {
+                if (document.activeElement === document.body && key === "ControlRight") {
                     mode = mode + 1;
                     if (mode > 2) {
                         mode = 0;
