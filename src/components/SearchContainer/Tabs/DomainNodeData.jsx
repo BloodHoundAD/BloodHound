@@ -21,6 +21,7 @@ class DomainNodeData extends Component {
         super();
 
         this.state = {
+            objectid: '',
             label: '',
             users: -1,
             groups: -1,
@@ -61,14 +62,14 @@ class DomainNodeData extends Component {
         });
     }
 
-    getNodeData(payload) {
+    async getNodeData(payload) {
         jQuery(this.refs.complete).hide();
         $.each(this.state.driversessions, (_, record) => {
             record.close();
         });
 
         this.setState({
-            label: payload,
+            objectid: payload,
             users: -1,
             groups: -1,
             computers: -1,
@@ -86,18 +87,20 @@ class DomainNodeData extends Component {
         }
 
         let props = driver.session();
-        props
-            .run('MATCH (n:Domain {name:{name}}) RETURN n', { name: payload })
+        let name;
+        await props
+            .run('MATCH (n:Domain {objectid: {objectid}}) RETURN n', { objectid: payload })
             .then(
                 function(result) {
-                    var properties = result.records[0]._fields[0].properties;
+                    let properties = result.records[0]._fields[0].properties;
+                    name = properties.name || properties.objectid;
                     let notes;
                     if (!properties.notes) {
                         notes = null;
                     } else {
                         notes = properties.notes;
                     }
-                    this.setState({ propertyMap: properties, notes: notes });
+                    this.setState({ propertyMap: properties, notes: notes, label: name });
                     props.close();
                 }.bind(this)
             );
@@ -107,9 +110,8 @@ class DomainNodeData extends Component {
         let s3 = driver.session();
         let s4 = driver.session();
         let s5 = driver.session();
-
-        s1.run('MATCH (a:User) WHERE a.domain={name} RETURN COUNT(a)', {
-            name: payload,
+        s1.run('MATCH (a:User) WHERE a.domain={objectid} RETURN COUNT(a)', {
+            objectid: name,
         }).then(
             function(result) {
                 this.setState({ users: result.records[0]._fields[0] });
@@ -117,8 +119,8 @@ class DomainNodeData extends Component {
             }.bind(this)
         );
 
-        s2.run('MATCH (a:Group) WHERE a.domain={name} RETURN COUNT(a)', {
-            name: payload,
+        s2.run('MATCH (a:Group) WHERE a.domain={objectid} RETURN COUNT(a)', {
+            objectid: name,
         }).then(
             function(result) {
                 this.setState({ groups: result.records[0]._fields[0] });
@@ -126,8 +128,8 @@ class DomainNodeData extends Component {
             }.bind(this)
         );
 
-        s3.run('MATCH (n:Computer) WHERE n.domain={name} RETURN count(n)', {
-            name: payload,
+        s3.run('MATCH (n:Computer) WHERE n.domain={objectid} RETURN count(n)', {
+            objectid: name,
         }).then(
             function(result) {
                 this.setState({ computers: result.records[0]._fields[0] });
@@ -135,8 +137,8 @@ class DomainNodeData extends Component {
             }.bind(this)
         );
 
-        s4.run('MATCH (n:OU {domain:{name}}) RETURN COUNT(n)', {
-            name: payload,
+        s4.run('MATCH (n:OU {domain:{objectid}}) RETURN COUNT(n)', {
+            objectid: name,
         }).then(
             function(result) {
                 this.setState({ ous: result.records[0]._fields[0] });
@@ -144,8 +146,8 @@ class DomainNodeData extends Component {
             }.bind(this)
         );
 
-        s5.run('MATCH (n:GPO {domain:{name}}) RETURN COUNT(n)', {
-            name: payload,
+        s5.run('MATCH (n:GPO {domain:{objectid}}) RETURN COUNT(n)', {
+            objectid: name,
         }).then(
             function(result) {
                 this.setState({ gpos: result.records[0]._fields[0] });
@@ -167,13 +169,13 @@ class DomainNodeData extends Component {
                 : this.state.notes;
         let q = driver.session();
         if (notes === null) {
-            q.run('MATCH (n:Domain {name:{name}}) REMOVE n.notes', {
+            q.run('MATCH (n:Domain {objectid: {objectid}}) REMOVE n.notes', {
                 name: this.state.label,
             }).then(x => {
                 q.close();
             });
         } else {
-            q.run('MATCH (n:Domain {name:{name}}) SET n.notes = {notes}', {
+            q.run('MATCH (n:Domain {objectid: {objectid}}) SET n.notes = {notes}', {
                 name: this.state.label,
                 notes: this.state.notes,
             }).then(x => {
@@ -350,9 +352,9 @@ class DomainNodeData extends Component {
                         />
                     </dd>
                     <NodeCypherNoNumberLink
-                        target={this.state.label}
+                        target={this.state.objectid}
                         property='Map OU Structure'
-                        query='MATCH p = (d:Domain {name:{name}})-[r:Contains*1..]->(n) RETURN p'
+                        query='MATCH p = (d:Domain {objectid: {objectid}})-[r:Contains*1..]->(n) RETURN p'
                     />
                     <br />
                     <h4>Foreign Members</h4>
@@ -361,7 +363,7 @@ class DomainNodeData extends Component {
                         property='Foreign Users'
                         target={this.state.label}
                         baseQuery={
-                            'MATCH (n:User) WHERE NOT n.domain={name} WITH n MATCH (b:Group) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r:MemberOf]->(b)'
+                            'MATCH (n:User) WHERE NOT n.domain={objectid} WITH n MATCH (b:Group) WHERE b.domain={objectid} WITH n,b MATCH p=(n)-[r:MemberOf]->(b)'
                         }
                     />
 
@@ -369,7 +371,7 @@ class DomainNodeData extends Component {
                         property='Foreign Groups'
                         target={this.state.label}
                         baseQuery={
-                            'MATCH (n:Group) WHERE NOT n.domain={name} WITH n MATCH (b:Group) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r:MemberOf]->(b)'
+                            'MATCH (n:Group) WHERE NOT n.domain={objectid} WITH n MATCH (b:Group) WHERE b.domain={objectid} WITH n,b MATCH p=(n)-[r:MemberOf]->(b)'
                         }
                     />
 
@@ -377,27 +379,27 @@ class DomainNodeData extends Component {
                         property='Foreign Admins'
                         target={this.state.label}
                         countQuery={
-                            'MATCH (u:User) WHERE NOT u.domain = {name} OPTIONAL MATCH (u)-[:AdminTo]->(c {domain:{name}}) OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:{name}}) RETURN COUNT(DISTINCT(u))'
+                            'MATCH (u:User) WHERE NOT u.domain = {objectid} OPTIONAL MATCH (u)-[:AdminTo]->(c {domain:{objectid}}) OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:{objectid}}) RETURN COUNT(DISTINCT(u))'
                         }
                         graphQuery={
-                            'MATCH (u:User) WHERE NOT u.domain = {name} OPTIONAL MATCH p1 = (u)-[:AdminTo]->(c {domain:{name}}) OPTIONAL MATCH p2 = (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:{name}}) RETURN p1,p2'
+                            'MATCH (u:User) WHERE NOT u.domain = {objectid} OPTIONAL MATCH p1 = (u)-[:AdminTo]->(c {domain:{objectid}}) OPTIONAL MATCH p2 = (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:{objectid}}) RETURN p1,p2'
                         }
                     />
 
                     <NodeCypherLink
                         property='Foreign GPO Controllers'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH (n) WHERE NOT n.domain={name} WITH n MATCH (b:GPO) WHERE b.domain={name} WITH n,b MATCH p=(n)-[r]->(b) WHERE r.isacl=true'
+                            'MATCH (n) WHERE NOT n.domain={objectid} WITH n MATCH (b:GPO) WHERE b.domain={objectid} WITH n,b MATCH p=(n)-[r]->(b) WHERE r.isacl=true'
                         }
                     />
 
                     <h4>Inbound Trusts</h4>
                     <NodeCypherLink
                         property='First Degree Trusts'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(a:Domain {name:{name}})<-[r:TrustedBy]-(n:Domain)'
+                            'MATCH p=(a:Domain {objectid: {objectid}})<-[r:TrustedBy]-(n:Domain)'
                         }
                     />
 
@@ -405,16 +407,16 @@ class DomainNodeData extends Component {
                         property='Effective Inbound Trusts'
                         target={this.state.label}
                         baseQuery={
-                            'MATCH (n:Domain) WHERE NOT n.name={name} WITH n MATCH p=shortestPath((a:Domain {name:{name}})<-[r:TrustedBy*1..]-(n))'
+                            'MATCH (n:Domain) WHERE NOT n.name={objectid} WITH n MATCH p=shortestPath((a:Domain {name: {objectid}})<-[r:TrustedBy*1..]-(n))'
                         }
                     />
 
                     <h4>Outbound Trusts</h4>
                     <NodeCypherLink
                         property='First Degree Trusts'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(a:Domain {name:{name}})-[r:TrustedBy]->(n:Domain)'
+                            'MATCH p=(a:Domain {objectid: {objectid}})-[r:TrustedBy]->(n:Domain)'
                         }
                     />
 
@@ -422,7 +424,7 @@ class DomainNodeData extends Component {
                         property='Effective Outbound Trusts'
                         target={this.state.label}
                         baseQuery={
-                            'MATCH (n:Domain) WHERE NOT n.name={name} MATCH p=shortestPath((a:Domain {name:{name}})-[r:TrustedBy*1..]->(n))'
+                            'MATCH (n:Domain) WHERE NOT n.name={objectid} MATCH p=shortestPath((a:Domain {name: {objectid}})-[r:TrustedBy*1..]->(n))'
                         }
                     />
 
@@ -430,39 +432,39 @@ class DomainNodeData extends Component {
 
                     <NodeCypherLink
                         property='First Degree Controllers'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n)-[r]->(u:Domain {name: {name}}) WHERE r.isacl=true'
+                            'MATCH p=(n)-[r]->(u:Domain {objectid: {objectid}}) WHERE r.isacl=true'
                         }
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Unrolled Controllers'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1]->(u:Domain {name: {name}}) WHERE r1.isacl=true'
+                            'MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1]->(u:Domain {objectid: {objectid}}) WHERE r1.isacl=true'
                         }
                         distinct
                     />
 
                     <NodeCypherLink
                         property='Transitive Controllers'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=shortestPath((n)-[r1:MemberOf|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(u:Domain {name: {name}})) WHERE NOT n.name={name}'
+                            'MATCH p=shortestPath((n)-[r1:MemberOf|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(u:Domain {objectid: {objectid}})) WHERE NOT n.objectid={objectid}'
                         }
                         distinct
                     />
 
                     <NodeCypherLinkComplex
                         property='Calculated Principals with DCSync Privileges'
-                        target={this.state.label}
+                        target={this.state.objectid}
                         countQuery={
-                            'MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN COUNT(DISTINCT(n1))'
+                            'MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {objectid: {objectid}}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN COUNT(DISTINCT(n1))'
                         }
                         graphQuery={
-                            'MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {name}}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN p'
+                            'MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {objectid: {objectid}}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN p'
                         }
                     />
                 </dl>
