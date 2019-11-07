@@ -383,6 +383,7 @@ export function buildDomainJsonNew(chunk) {
             let sidFilter = trust.SidFilteringEnabled;
             let trustType = trust.TrustType;
             let targetName = trust.TargetDomainName;
+
             switch (trustType){
                 case 0:
                     trustType = 'ParentChild';
@@ -506,6 +507,7 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
         let pType = ace.PrincipalType;
         let right = ace.RightName;
         let aceType = ace.AceType;
+        let isInherited = ace.IsInherited;
 
         if (objectid == pSid) {
             return null;
@@ -551,7 +553,7 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
         }
 
         return rights.map(right => {
-            return { pSid: pSid, right: right, pType: pType };
+            return { pSid: pSid, right: right, pType: pType, isInherited: isInherited };
         });
     });
 
@@ -560,14 +562,14 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
     })
 
     var grouped = groupBy(convertedAces, 'right');
-    let format = ['', objecttype, '', '{isacl: true}'];
+    let format = ['', objecttype, '', '{isacl: true, isinherited: prop.isinherited}'];
     for (let right in grouped) {
         let innerGrouped = groupBy(grouped[right], 'pType');
         for (let inner in innerGrouped) {
             format[0] = inner;
             format[2] = right;
             var mapped = innerGrouped[inner].map(x => {
-                return { source: x.pSid, target: objectid };
+                return { source: x.pSid, target: objectid, isinherited: x.isInherited };
             });
             insertNew(queries, format, mapped);
         }
