@@ -246,7 +246,7 @@ export function buildOuJsonNew(chunk) {
         })
         insertNew(queries, format, props)
 
-        
+
         format = ['', 'Computer', '', '{isacl: false, fromgpo: true}'];
         let grouped = groupBy(admins, 'MemberType');
         for (let x in grouped) {
@@ -324,6 +324,7 @@ export function buildDomainJsonNew(chunk) {
         let identifier = domain.ObjectIdentifier;
         let aces = domain.Aces;
         let links = domain.Links || [];
+        let trusts = domain.Trusts
 
         processAceArrayNew(aces, identifier, 'Domain', queries);
 
@@ -358,6 +359,57 @@ export function buildDomainJsonNew(chunk) {
         })
 
         insertNew(queries, format, props);
+
+        /*
+        TrustDirection
+        Disabled = 0
+        Inbound = 1,
+        Outbound = 2,
+        Bidirectional = 3
+
+        TrustType
+        ParentChild = 0,
+        CrossLink = 1,
+        Forest = 2,
+        External = 3,
+        Unknown = 4
+        "UNWIND {props} AS prop MERGE (n:Domain {name: prop.a}) MERGE (m:Domain {name: prop.b}) MERGE (n)-[:TrustedBy {trusttype : prop.trusttype, transitive: prop.transitive, isacl:false}]->(m)",
+        */
+        format = ['Domain', 'Domain', 'TrustedBy', '{sidfiltering: prop.sidfiltering, trusttype: prop.trusttype, transitive: prop.transitive, isacl: false}']
+        for (let trust of trusts){
+            let direction = trust.TrustDirection;
+            let transitive = trust.IsTransitive;
+            let target = trust.TargetDomainSid;
+            let sidFilter = trust.SidFilteringEnabled;
+            let trustType = trust.TrustType;
+            let targetName = trust.TargetDomainName;
+            switch (trustType){
+                case 0:
+                    trustType = 'ParentChild';
+                    break;
+                case 1:
+                    trustType = 'CrossLink';
+                    break;
+                case 2:
+                    trustType = 'Forest';
+                    break;
+                case 3:
+                    trustType = 'External';
+                    break;
+                case 4:
+                    trustType = 'Unknown';
+            }
+
+            queries.properties.props.push({source: target, map:{name: targetName}});
+            
+            if (direction === 1 || direction === 3){
+                insertNew(queries, format, {source: identifier, target: target, trusttype: trustType, transitive: transitive, sidfiltering: sidFilter});
+            }
+
+            if (direction === 2 || direction === 3){
+                insertNew(queries, format, {source: target, target: identifier, trusttype: trustType, transitive: transitive, sidfiltering: sidFilter});
+            }
+        }
 
         format = ['', 'Computer', '', '{isacl: false, fromgpo: true}'];
 
