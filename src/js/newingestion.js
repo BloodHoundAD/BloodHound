@@ -317,14 +317,14 @@ export function buildDomainJsonNew(chunk) {
         let users = domain.Users;
         let computers = domain.Computers;
         let childOus = domain.ChildOus;
-        let rdpUsers = domain.RemoteDestopUsers;
+        let rdpUsers = domain.RemoteDesktopUsers;
         let admins = domain.LocalAdmins;
         let dcomUsers = domain.DcomUser;
         let psRemoteUsers = domain.PSRemoteUsers;
         let identifier = domain.ObjectIdentifier;
         let aces = domain.Aces;
         let links = domain.Links || [];
-        let trusts = domain.Trusts
+        let trusts = domain.Trusts || []
 
         processAceArrayNew(aces, identifier, 'Domain', queries);
 
@@ -507,7 +507,7 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
         let pType = ace.PrincipalType;
         let right = ace.RightName;
         let aceType = ace.AceType;
-        let isInherited = ace.IsInherited;
+        let isInherited = ace.IsInherited || false;
 
         if (objectid == pSid) {
             return null;
