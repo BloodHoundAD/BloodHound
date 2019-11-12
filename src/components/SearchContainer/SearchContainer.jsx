@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import {AsyncTypeahead} from 'react-bootstrap-typeahead';
+import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import GlyphiconSpan from '../GlyphiconSpan';
 import Icon from '../Icon';
 import TabContainer from './TabContainer';
@@ -20,7 +20,6 @@ const SearchContainer = () => {
     const [pathSearchLoading, setPathSearchLoading] = useState(false);
     const [edgeIncluded, setEdgeIncluded] = useState(appStore.edgeincluded);
     const [darkMode, setDarkMode] = useState(false);
-    
 
     const pathfinding = useRef(null);
     const tabs = useRef(null);
@@ -31,11 +30,14 @@ const SearchContainer = () => {
     useEffect(() => {
         jQuery(pathfinding.current).slideToggle(0);
         jQuery(tabs.current).slideToggle(0);
-        jQuery(edgeFilter.current).animate({
-            height: 'toggle',
-            width: 'toggle'
-        }, 'fast');
-        
+        jQuery(edgeFilter.current).animate(
+            {
+                height: 'toggle',
+                width: 'toggle',
+            },
+            'fast'
+        );
+
         setDarkMode(appStore.performance.darkMode);
 
         emitter.on('userNodeClicked', openNodeTab);
@@ -46,74 +48,71 @@ const SearchContainer = () => {
         emitter.on('ouNodeClicked', openNodeTab);
         emitter.on('toggleDarkMode', toggleDarkMode);
 
-        emitter.on(
-            'setStart',
-            (node) => {
-                let temp = {
-                    name: node.label,
-                    objectid: node.objectid,
-                    type: node.type
-                }
-                closeTooltip();
-                setMainSearchSelected(temp);
-                let instance = mainSearchRef.current.getInstance();
-                instance.clear();
-                instance.setState({text: temp.name});
-            }
-        );
-
-        emitter.on('setEnd', (node) => {
+        emitter.on('setStart', node => {
             let temp = {
                 name: node.label,
                 objectid: node.objectid,
-                type: node.type
-            }
+                type: node.type,
+            };
+            closeTooltip();
+            setMainSearchSelected(temp);
+            let instance = mainSearchRef.current.getInstance();
+            instance.clear();
+            instance.setState({ text: temp.name });
+        });
+
+        emitter.on('setEnd', node => {
+            let temp = {
+                name: node.label,
+                objectid: node.objectid,
+                type: node.type,
+            };
             closeTooltip();
             var elem = jQuery(pathfinding.current);
-            if (!elem.is(':visible')){
+            if (!elem.is(':visible')) {
                 setPathfindingOpen(true);
                 elem.slideToggle();
             }
             setPathSearchSelected(temp);
             let instance = pathSearchRef.current.getInstance();
             instance.clear();
-            instance.setState({text: temp.name});
+            instance.setState({ text: temp.name });
         });
-    }, [])
+    }, []);
 
-    const doSearch = (query, source) =>{
+    const doSearch = (query, source) => {
         let session = driver.session();
         let [statement, term] = buildSearchQuery(query);
-        if (source === 'main'){
-            setMainSearchLoading(true)
-        }else{
+        if (source === 'main') {
+            setMainSearchLoading(true);
+        } else {
             setPathSearchLoading(true);
         }
 
-        session.run(statement, {name: term}).then(result => {
+        session.run(statement, { name: term }).then(result => {
             let data = [];
-            for (let record of result.records){
+            for (let record of result.records) {
                 let properties = record._fields[0].properties;
                 properties.type = record._fields[0].labels[0];
                 data.push(properties);
             }
 
-            if (source === 'main'){
-                setMainSearchResults(data)
-                setMainSearchLoading(false)
-            }else{
+            if (source === 'main') {
+                setMainSearchResults(data);
+                setMainSearchLoading(false);
+            } else {
                 setPathSearchResults(data);
                 setPathSearchLoading(false);
             }
             session.close();
-        })
+        });
     };
 
-    const toggleDarkMode = (enabled) => {
+    const toggleDarkMode = enabled => {
         setDarkMode(enabled);
-    }
+    };
 
-    const clearSection = (section) => {
+    const clearSection = section => {
         let current = edgeIncluded;
         if (section === 'default') {
             current.MemberOf = false;
@@ -141,13 +140,13 @@ const SearchContainer = () => {
             current.GpLink = false;
         }
 
-        setEdgeIncluded(current);
+        setEdgeIncluded({ ...current });
         appStore.edgeincluded = current;
-        conf.set('edgeincluded', current)
-    }
+        conf.set('edgeincluded', current);
+    };
 
-    const setSection = (section) => {
-        let current = edgeIncluded
+    const setSection = section => {
+        let current = edgeIncluded;
         if (section === 'default') {
             current.MemberOf = true;
             current.HasSession = true;
@@ -174,59 +173,69 @@ const SearchContainer = () => {
             current.GpLink = true;
         }
 
-        setEdgeIncluded(current);
+        setEdgeIncluded({ ...current });
         appStore.edgeincluded = current;
-        conf.set('edgeincluded', current)
-    }
+        conf.set('edgeincluded', current);
+    };
 
-    const handleEdgeChange = (e) => {
+    const handleEdgeChange = e => {
         let current = edgeIncluded;
         let edgeName = e.target.getAttribute('name');
         current[edgeName] = !current[edgeName];
         setEdgeIncluded(current);
         appStore.edgeincluded = current;
-        conf.set('edgeincluded', current)
-    }
+        conf.set('edgeincluded', current);
+    };
 
     const onFilterClick = () => {
-        jQuery(edgeFilter.current).animate({
-            height: 'toggle',
-            width: 'toggle'
-        }, 'medium');
-    }
+        jQuery(edgeFilter.current).animate(
+            {
+                height: 'toggle',
+                width: 'toggle',
+            },
+            'medium'
+        );
+    };
 
     const onPathfindClick = () => {
         jQuery(pathfinding.current).slideToggle();
         let open = !pathfindingOpen;
         setPathfindingOpen(open);
-    }
+    };
 
     const onExpandClick = () => {
         jQuery(tabs.current).slideToggle();
-    }
+    };
 
     const onPlayClick = () => {
-        if (mainSearchSelected === null || pathSearchSelected === null || mainSearchSelected.objectid === pathSearchSelected.objectid){
+        if (
+            mainSearchSelected === null ||
+            pathSearchSelected === null ||
+            mainSearchSelected.objectid === pathSearchSelected.objectid
+        ) {
             return;
         }
 
-        let [query, props, startTarget, endTarget] = buildSelectQuery(mainSearchSelected, pathSearchSelected);
+        let [query, props, startTarget, endTarget] = buildSelectQuery(
+            mainSearchSelected,
+            pathSearchSelected
+        );
         emitter.emit('query', query, props, startTarget, endTarget);
-    }
+    };
 
     const setSelection = (selection, source) => {
-        if (selection.length === 0){
+        if (selection.length === 0) {
             return;
         }
-        if (source === 'main'){
+        if (source === 'main') {
             setMainSearchSelected(selection[0]);
-        }else{
+        } else {
             setPathSearchSelected(selection[0]);
         }
-    }
+    };
 
     useEffect(() => {
-        if (mainSearchSelected === null){
+        if (mainSearchSelected === null) {
             return;
         }
 
@@ -247,18 +256,17 @@ const SearchContainer = () => {
             });
         }
 
-        if (stop){
+        if (stop) {
             return;
         }
 
         let event = new Event('');
         event.keyCode = 13;
         onEnterPress(event);
-        
-    }, [mainSearchSelected])
+    }, [mainSearchSelected]);
 
     useEffect(() => {
-        if (pathSearchSelected === null){
+        if (pathSearchSelected === null) {
             return;
         }
 
@@ -279,27 +287,26 @@ const SearchContainer = () => {
             });
         }
 
-        if (stop){
+        if (stop) {
             return;
         }
 
         let event = new Event('');
         event.keyCode = 13;
         onEnterPress(event);
-        
-    }, [pathSearchSelected])
+    }, [pathSearchSelected]);
 
     const openNodeTab = () => {
         let e = jQuery(tabs.current);
         if (!e.is(':visible')) {
             e.slideToggle();
         }
-    }
+    };
 
-    const onEnterPress = (event) => {
+    const onEnterPress = event => {
         let key = event.keyCode ? event.keyCode : event.which;
-        
-        if (key !== 13){
+
+        if (key !== 13) {
             return;
         }
 
@@ -320,27 +327,36 @@ const SearchContainer = () => {
             });
         }
 
-        if (stop){
+        if (stop) {
             return;
         }
 
-        if (!pathfindingOpen){
-            if (mainSearchSelected === null){
+        if (!pathfindingOpen) {
+            if (mainSearchSelected === null) {
                 let [statement, prop] = buildSearchQuery(mainSearchValue);
                 emitter.emit('searchQuery', statement, {
-                    name: prop
+                    name: prop,
                 });
-            }else{
-                let statement = `MATCH (n:${mainSearchSelected.type} {objectid:{objectid}}) RETURN n`
-                emitter.emit('searchQuery', statement, {objectid: mainSearchSelected.objectid})
+            } else {
+                let statement = `MATCH (n:${mainSearchSelected.type} {objectid:{objectid}}) RETURN n`;
+                emitter.emit('searchQuery', statement, {
+                    objectid: mainSearchSelected.objectid,
+                });
             }
-        }else{
+        } else {
             onPlayClick();
         }
-    }
+    };
 
     return (
-        <div id='searchdiv' className={darkMode ? 'searchdiv searchdiv-dark' : 'searchdiv searchdiv-light'}>
+        <div
+            id='searchdiv'
+            className={
+                darkMode
+                    ? 'searchdiv searchdiv-dark'
+                    : 'searchdiv searchdiv-light'
+            }
+        >
             <div ref={edgeFilter} className='edgeFilter'>
                 <div>
                     <h3>Edge Filtering</h3>
@@ -354,14 +370,18 @@ const SearchContainer = () => {
                 <div className={'edge-filter-heading'}>
                     <h4>Default Edges</h4>
                     <button
-                        onClick={() => {setSection('default')}}
+                        onClick={() => {
+                            setSection('default');
+                        }}
                         className={'fa fa-check-double'}
                         data-toggle='tooltip'
                         data-placement='top'
                         title='Check all default edges'
                     />
                     <button
-                        onClick={() => {this.clearSection('default')}}
+                        onClick={() => {
+                            clearSection('default');
+                        }}
                         className={'fa fa-eraser'}
                         data-toggle='tooltip'
                         data-placement='top'
@@ -376,10 +396,7 @@ const SearchContainer = () => {
                         onChange={e => handleEdgeChange(e)}
                         name='MemberOf'
                     />
-                    <label
-                        onClick={e => handleEdgeChange(e)}
-                        name='MemberOf'
-                    >
+                    <label onClick={e => handleEdgeChange(e)} name='MemberOf'>
                         {' '}
                         MemberOf
                     </label>
@@ -392,10 +409,7 @@ const SearchContainer = () => {
                         checked={edgeIncluded.HasSession}
                         onChange={e => handleEdgeChange(e)}
                     />
-                    <label
-                        onClick={e => handleEdgeChange(e)}
-                        name='HasSession'
-                    >
+                    <label onClick={e => handleEdgeChange(e)} name='HasSession'>
                         {' '}
                         HasSession
                     </label>
@@ -408,10 +422,7 @@ const SearchContainer = () => {
                         checked={edgeIncluded.AdminTo}
                         onChange={e => handleEdgeChange(e)}
                     />
-                    <label
-                        onClick={e => handleEdgeChange(e)}
-                        name='AdminTo'
-                    >
+                    <label onClick={e => handleEdgeChange(e)} name='AdminTo'>
                         {' '}
                         AdminTo
                     </label>
@@ -457,10 +468,7 @@ const SearchContainer = () => {
                         checked={edgeIncluded.AddMember}
                         onChange={e => handleEdgeChange(e)}
                     />
-                    <label
-                        onClick={e => handleEdgeChange(e)}
-                        name='AddMember'
-                    >
+                    <label onClick={e => handleEdgeChange(e)} name='AddMember'>
                         {' '}
                         AddMember
                     </label>
@@ -470,9 +478,7 @@ const SearchContainer = () => {
                         className='checkbox-inline'
                         type='checkbox'
                         name='ForceChangePassword'
-                        checked={
-                            edgeIncluded.ForceChangePassword
-                        }
+                        checked={edgeIncluded.ForceChangePassword}
                         onChange={e => handleEdgeChange(e)}
                     />
                     <label
@@ -491,10 +497,7 @@ const SearchContainer = () => {
                         checked={edgeIncluded.GenericAll}
                         onChange={e => handleEdgeChange(e)}
                     />
-                    <label
-                        onClick={e => handleEdgeChange(e)}
-                        name='GenericAll'
-                    >
+                    <label onClick={e => handleEdgeChange(e)} name='GenericAll'>
                         {' '}
                         GenericAll
                     </label>
@@ -523,10 +526,7 @@ const SearchContainer = () => {
                         checked={edgeIncluded.Owns}
                         onChange={e => handleEdgeChange(e)}
                     />
-                    <label
-                        onClick={e => handleEdgeChange(e)}
-                        name='Owns'
-                    >
+                    <label onClick={e => handleEdgeChange(e)} name='Owns'>
                         {' '}
                         Owns
                     </label>
@@ -539,10 +539,7 @@ const SearchContainer = () => {
                         checked={edgeIncluded.WriteDacl}
                         onChange={e => handleEdgeChange(e)}
                     />
-                    <label
-                        onClick={e => handleEdgeChange(e)}
-                        name='WriteDacl'
-                    >
+                    <label onClick={e => handleEdgeChange(e)} name='WriteDacl'>
                         {' '}
                         WriteDacl
                     </label>
@@ -555,10 +552,7 @@ const SearchContainer = () => {
                         checked={edgeIncluded.WriteOwner}
                         onChange={e => handleEdgeChange(e)}
                     />
-                    <label
-                        onClick={e => handleEdgeChange(e)}
-                        name='WriteOwner'
-                    >
+                    <label onClick={e => handleEdgeChange(e)} name='WriteOwner'>
                         {' '}
                         WriteOwner
                     </label>
@@ -604,10 +598,7 @@ const SearchContainer = () => {
                         checked={edgeIncluded.Contains}
                         onChange={e => handleEdgeChange(e)}
                     />
-                    <label
-                        onClick={e => handleEdgeChange(e)}
-                        name='Contains'
-                    >
+                    <label onClick={e => handleEdgeChange(e)} name='Contains'>
                         {' '}
                         Contains
                     </label>
@@ -620,10 +611,7 @@ const SearchContainer = () => {
                         checked={edgeIncluded.GpLink}
                         onChange={e => handleEdgeChange(e)}
                     />
-                    <label
-                        onClick={e => handleEdgeChange(e)}
-                        name='GpLink'
-                    >
+                    <label onClick={e => handleEdgeChange(e)} name='GpLink'>
                         {' '}
                         GpLink
                     </label>
@@ -653,10 +641,7 @@ const SearchContainer = () => {
                         checked={edgeIncluded.CanRDP}
                         onChange={e => handleEdgeChange(e)}
                     />
-                    <label
-                        onClick={e => handleEdgeChange(e)}
-                        name='CanRDP'
-                    >
+                    <label onClick={e => handleEdgeChange(e)} name='CanRDP'>
                         {' '}
                         CanRDP
                     </label>
@@ -733,10 +718,7 @@ const SearchContainer = () => {
                         checked={edgeIncluded.SQLAdmin}
                         onChange={e => handleEdgeChange(e)}
                     />
-                    <label
-                        onClick={e => handleEdgeChange(e)}
-                        name='SQLAdmin'
-                    >
+                    <label onClick={e => handleEdgeChange(e)} name='SQLAdmin'>
                         {' '}
                         SQLAdmin
                     </label>
@@ -755,17 +737,23 @@ const SearchContainer = () => {
                 <AsyncTypeahead
                     id={'mainSearchBar'}
                     filterBy={(option, props) => {
-                        let name = (option.name || option.objectid).toLowerCase();
+                        let name = (
+                            option.name || option.objectid
+                        ).toLowerCase();
                         let id = option.objectid.toLowerCase();
                         let search;
-                        if (props.text.includes(':')){
+                        if (props.text.includes(':')) {
                             search = props.text.split(':')[1];
-                        }else{
-                            search = props.text.toLowerCase()
+                        } else {
+                            search = props.text.toLowerCase();
                         }
-                        return name.includes(search) || id.includes(search)
+                        return name.includes(search) || id.includes(search);
                     }}
-                    placeholder={pathfindingOpen ? 'Start Node' : 'Start typing to search for a node...'}
+                    placeholder={
+                        pathfindingOpen
+                            ? 'Start Node'
+                            : 'Start typing to search for a node...'
+                    }
                     isLoading={mainSearchLoading}
                     delay={500}
                     renderMenuItemChildren={SearchRow}
@@ -774,20 +762,16 @@ const SearchContainer = () => {
                     }}
                     useCache={false}
                     options={mainSearchResults}
-                    onSearch={
-                        query => doSearch(query, 'main')
-                    }
-                    inputProps={
-                        {className:'searchbox', id: styles.searcha}
-                    }
-                    onKeyDown={(event) => onEnterPress(event)}
-                    onChange={(selection) => setSelection(selection, 'main')}
-                    onInputChange={(event) => {
-                            setMainSearchSelected(null); 
-                            setMainSearchValue(event)
-                        }}
+                    onSearch={query => doSearch(query, 'main')}
+                    inputProps={{ className: 'searchbox', id: styles.searcha }}
+                    onKeyDown={event => onEnterPress(event)}
+                    onChange={selection => setSelection(selection, 'main')}
+                    onInputChange={event => {
+                        setMainSearchSelected(null);
+                        setMainSearchValue(event);
+                    }}
                     ref={mainSearchRef}
-                     />
+                />
                 <GlyphiconSpan
                     tooltip
                     tooltipDir='bottom'
@@ -824,10 +808,7 @@ const SearchContainer = () => {
                         tooltip={false}
                         classes='input-group-addon spanfix invisible'
                     >
-                        <Icon
-                            glyph='menu-hamburger'
-                            extraClass='menuglyph'
-                        />
+                        <Icon glyph='menu-hamburger' extraClass='menuglyph' />
                     </GlyphiconSpan>
                     <AsyncTypeahead
                         ref={pathSearchRef}
@@ -842,23 +823,25 @@ const SearchContainer = () => {
                         filterBy={(option, props) => {
                             let name = option.name.toLowerCase();
                             let id = option.objectid.toLowerCase();
-                            let search = props.text.toLowerCase()
-                            return name.includes(search) || id.includes(search)
+                            let search = props.text.toLowerCase();
+                            return name.includes(search) || id.includes(search);
                         }}
                         useCache={false}
                         options={pathSearchResults}
-                        onSearch={
-                            query => doSearch(query, 'secondary')
+                        onSearch={query => doSearch(query, 'secondary')}
+                        onKeyDown={event => onEnterPress(event)}
+                        onChange={selection =>
+                            setSelection(selection, 'secondary')
                         }
-                        onKeyDown={(event) => onEnterPress(event)}
-                        onChange={(selection) => setSelection(selection, 'secondary')}
-                        onInputChange={(event) => {
+                        onInputChange={event => {
                             setPathSearchValue(event);
-                            setPathSearchSelected(null)   
+                            setPathSearchSelected(null);
                         }}
-                        inputProps={
-                            {className:'searchbox',id: styles.searchb}
-                        } />
+                        inputProps={{
+                            className: 'searchbox',
+                            id: styles.searchb,
+                        }}
+                    />
                     <GlyphiconSpan
                         tooltip={false}
                         classes='input-group-addon spanfix invisible'
@@ -881,10 +864,8 @@ const SearchContainer = () => {
                 <TabContainer />
             </div>
         </div>
-    )
-}
+    );
+};
 
-SearchContainer.propTypes = {
-
-}
+SearchContainer.propTypes = {};
 export default SearchContainer;
