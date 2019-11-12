@@ -182,7 +182,7 @@ const SearchContainer = () => {
         let current = edgeIncluded;
         let edgeName = e.target.getAttribute('name');
         current[edgeName] = !current[edgeName];
-        setEdgeIncluded(current);
+        setEdgeIncluded({ ...current });
         appStore.edgeincluded = current;
         conf.set('edgeincluded', current);
     };
