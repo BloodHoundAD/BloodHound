@@ -49,7 +49,7 @@ String.prototype.formatAll = function() {
 String.prototype.formatn = function() {
     var formatted = this;
     for (var i = 0; i < arguments.length; i++) {
-        var regexp = new RegExp('\\{'+i+'\\}', 'gi');
+        var regexp = new RegExp('\\{' + i + '\\}', 'gi');
         formatted = formatted.replace(regexp, arguments[i]);
     }
     return formatted;
@@ -149,6 +149,12 @@ global.appStore = {
                 scale: 1.25,
                 color: '#7F72FD',
             },
+            Unknown: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uF128',
+                scale: 1.25,
+                color: '#E6E600',
+            },
         },
         edgeScheme: {
             AdminTo: 'tapered',
@@ -185,6 +191,7 @@ global.appStore = {
             Domain: '#17E6B9',
             OU: '#FFAA00',
             GPO: '#7F72FD',
+            Unknown: '#E6E600',
         },
         edgeScheme: {
             AdminTo: 'line',
