@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { withAlert } from 'react-alert';
 import NodeEditorRow from './NodeEditorRow.jsx';
 import posed, { PoseGroup } from 'react-pose';
-import {Button, Panel, Table} from 'react-bootstrap';
-import {styles} from './NodeEditor.module.css';
+import { Button, Panel, Table } from 'react-bootstrap';
+import { styles } from './NodeEditor.module.css';
 
 const NodeEditor = () => {
     const [name, setName] = useState('');
@@ -15,119 +15,114 @@ const NodeEditor = () => {
     const [newAttrName, setNewAttrName] = useState('');
     const [newAttrType, setNewAttrType] = useState('boolean');
     const [hasError, setHasError] = useState(false);
-    
-    const getNodeData = (node) => {
+
+    const getNodeData = node => {
         setName(node.label);
         setType(node.type);
         setId(node.objectid);
-        setVisible(true)
+        setVisible(true);
 
         let session = driver.session();
-        let statement = `MATCH (n:${node.type} {objectid:{id}}) RETURN n`
+        let statement = `MATCH (n:${node.type} {objectid:{id}}) RETURN n`;
 
-        session.run(statement, {id: node.objectid}).then(
-            (result) => {
-                let props = result.records[0]._fields[0].properties;
-                let label = props.name;
-                delete props.name;
-                setName(label);
-                setProperties(props);
-                session.close();
-            }
-        );
+        session.run(statement, { id: node.objectid }).then(result => {
+            let props = result.records[0]._fields[0].properties;
+            let label = props.name;
+            delete props.name;
+            setName(label);
+            setProperties(props);
+            session.close();
+        });
     };
-    
+
     const addAttribute = () => {
         let newValue;
-        if (newAttrType === 'boolean'){
+        if (newAttrType === 'boolean') {
             newValue = false;
-        }else if (newAttrType === 'number'){
+        } else if (newAttrType === 'number') {
             newValue = 0;
-        }else if (newAttrType === 'string'){
+        } else if (newAttrType === 'string') {
             newValue = 'placeholder';
-        }else{
+        } else {
             newValue = [];
         }
 
-        if (Object.keys(properties).includes(newAttrName)){
+        if (Object.keys(properties).includes(newAttrName)) {
             setHasError(true);
             return;
         }
 
         let session = driver.session();
-        let statement = `MATCH (n:${type} {objectid: {id}}) SET n.${newAttrName}={newprop} RETURN n`
-        session.run(statement, {id: id, newprop: newValue}).then(
-            result => {
-                let props = result.records[0]._fields[0].properties;
-                let label = props.name;
-                delete props.name;
-                setName(label);
-                setProperties(props);
-                session.close();
-            }
-        )
+        let statement = `MATCH (n:${type} {objectid: {id}}) SET n.${newAttrName}={newprop} RETURN n`;
+        session.run(statement, { id: id, newprop: newValue }).then(result => {
+            let props = result.records[0]._fields[0].properties;
+            let label = props.name;
+            delete props.name;
+            setName(label);
+            setProperties(props);
+            session.close();
+        });
     };
 
     const updateAttribute = (attributeName, newValue) => {
         let statement;
-        if (attributeName === 'serviceprincipalnames' && type === 'User'){
-            if (newValue === '' && newValue.length === 1){
+        if (attributeName === 'serviceprincipalnames' && type === 'User') {
+            if (newValue === '' && newValue.length === 1) {
                 newValue = [];
             }
 
-            if (newValue.length > 0){
+            if (newValue.length > 0) {
                 statement = `MATCH (n:${type} {objectid: {id}}) SET n.${attributeName}={newprop}, n.hasspn=true RETURN n`;
-            }else{
+            } else {
                 statement = `MATCH (n:${type} {objectid: {id}}) SET n.${attributeName}={newprop}, n.hasspn=false RETURN n`;
             }
-        }else{
+        } else {
             statement = `MATCH (n:${type} {objectid: {id}}) SET n.${attributeName}={newprop} RETURN n`;
         }
 
         let session = driver.session();
-        session.run(statement, {id: id, newprop: newValue}).then(
-            result => {
-                let props = result.records[0]._fields[0].properties;
-                let label = props.name;
-                delete props.name;
-                setName(label);
-                setProperties(props);
-                session.close();
-            }
-        )
+        session.run(statement, { id: id, newprop: newValue }).then(result => {
+            let props = result.records[0]._fields[0].properties;
+            let label = props.name;
+            delete props.name;
+            setName(label);
+            setProperties(props);
+            session.close();
+        });
     };
 
-    const deleteAttribute = (attributeName) => {
+    const deleteAttribute = attributeName => {
         let statement = `MATCH (n:${type} {objectid:{id}}) REMOVE n.${attributeName} RETURN n`;
 
         let session = driver.session();
-        session.run(statement, {id: id}).then(
-            result => {
-                let props = result.records[0]._fields[0].properties;
-                let label = props.name;
-                delete props.name;
-                setName(label);
-                setProperties(props);
-                session.close();
-            }
-        )
+        session.run(statement, { id: id }).then(result => {
+            let props = result.records[0]._fields[0].properties;
+            let label = props.name;
+            delete props.name;
+            setName(label);
+            setProperties(props);
+            session.close();
+        });
     };
 
     useEffect(() => {
         emitter.on('editnode', getNodeData);
-    }, [])
+    }, []);
 
     const config = {
         visible: {
             opacity: 1,
-            transition: {duration: 300}
+            transition: { duration: 1000 },
+            applyAtStart: { display: 'block' },
         },
         hidden: {
             opacity: 0,
-            transition: {duration: 300}
+            transition: { duration: 1000 },
+            applyAtEnd: { display: 'none' },
         },
-        draggable: true
-    }
+
+        draggable: true,
+    };
 
     const Container = posed.div(config);
 
@@ -136,7 +131,11 @@ const NodeEditor = () => {
             <Panel>
                 <Panel.Heading>
                     {name}
-                    <Button onClick={() => setVisible(false)} className='close' aria-label='Close'>
+                    <Button
+                        onClick={() => setVisible(false)}
+                        className='close'
+                        aria-label='Close'
+                    >
                         <span aria-hidden='true'>&times;</span>
                     </Button>
                 </Panel.Heading>
@@ -153,20 +152,18 @@ const NodeEditor = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {Object.keys(properties).map(
-                                    function(key) {
-                                        let val = properties[key];
-                                        return (
-                                            <NodeEditorRow
-                                                key={key}
-                                                attributeName={key}
-                                                val={val}
-                                                deleteHandler={deleteAttribute}
-                                                updateHandler={updateAttribute}
-                                            />
-                                        );
-                                    }
-                                )}
+                                {Object.keys(properties).map(function(key) {
+                                    let val = properties[key];
+                                    return (
+                                        <NodeEditorRow
+                                            key={key}
+                                            attributeName={key}
+                                            val={val}
+                                            deleteHandler={deleteAttribute}
+                                            updateHandler={updateAttribute}
+                                        />
+                                    );
+                                })}
                             </tbody>
                         </Table>
                     </div>
@@ -181,13 +178,18 @@ const NodeEditor = () => {
                         >
                             <input
                                 type='text'
-                                className={`${hasError ? styles.error : ''} form-control form-override`}
+                                className={`${
+                                    hasError ? styles.error : ''
+                                } form-control form-override`}
                                 value={newAttrName}
                                 onChange={e => setNewAttrName(e.target.value)}
                                 placeholder='Internal Name'
                                 required
                             />
-                            <select className='form-control' onChange={e => setNewAttrType(e.target.value)}>
+                            <select
+                                className='form-control'
+                                onChange={e => setNewAttrType(e.target.value)}
+                            >
                                 <option value='boolean'>boolean</option>
                                 <option value='string'>string</option>
                                 <option value='number'>number</option>
@@ -204,9 +206,7 @@ const NodeEditor = () => {
                 </Panel.Body>
             </Panel>
         </Container>
-    )
-}
-NodeEditor.propTypes = {
-
-}
+    );
+};
+NodeEditor.propTypes = {};
 export default withAlert()(NodeEditor);
