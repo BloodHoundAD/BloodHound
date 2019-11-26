@@ -843,7 +843,7 @@ class GraphContainer extends Component {
 
         var edge = {
             id: id,
-            type: type,
+            etype: type,
             source: source,
             target: target,
             label: type,
@@ -1009,7 +1009,7 @@ class GraphContainer extends Component {
         var node = sigmaInstance.graph.nodes(id);
         node.glyphs = node.glyphs.filter(glyph => {
             return glyph.position !== 'bottom-left';
-        })
+        });
         node.isGrouped = false;
         sigmaInstance.graph.read(node.folded);
         this.state.design.deprecate();
@@ -1063,10 +1063,7 @@ class GraphContainer extends Component {
             } else if (n.data.node.type_domain) {
                 emitter.emit('domainNodeClicked', n.data.node.objectid);
             } else if (n.data.node.type_gpo) {
-                emitter.emit(
-                    'gpoNodeClicked',
-                    n.data.node.objectid
-                );
+                emitter.emit('gpoNodeClicked', n.data.node.objectid);
             } else if (n.data.node.type_ou) {
                 emitter.emit(
                     'ouNodeClicked',
@@ -1461,7 +1458,10 @@ class GraphContainer extends Component {
                 let mode = appStore.performance.nodeLabels;
                 let sigmaInstance = this.state.sigmaInstance;
 
-                if (document.activeElement === document.body && key === "ControlRight") {
+                if (
+                    document.activeElement === document.body &&
+                    key === 'ControlRight'
+                ) {
                     mode = mode + 1;
                     if (mode > 2) {
                         mode = 0;
