@@ -189,9 +189,171 @@
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((n)-[:{}*1..]->(m {highvalue:true})) WHERE m.domain={result} AND m<>n RETURN p",
+                    "query": "MATCH p=shortestPath((n)-[*1..]->(m {highvalue:true})) WHERE m.domain={result} AND m<>n RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
+                }
+            ]
+        },
+        {
+            "name": "List Computers where DOMAIN USERS are Local Admin",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain Users Group...",
+                    "query": "MATCH (n:Group) WHERE n.name STARTS WITH 'DOMAIN USERS' RETURN n.name ORDER BY n.name DESC"
+                },
+                {
+                    "final": true,
+                    "query":
+                        "MATCH p=(m:Group {name:{result}})-[:AdminTo]->(n:Computer) RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Shortest Path from DOMAIN USERS to High Value Targets",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain Users Group...",
+                    "query": "MATCH (n:Group) WHERE n.name STARTS WITH 'DOMAIN USERS' RETURN n.name ORDER BY n.name DESC"
+                },
+                {
+                    "final": true,
+                    "query":
+                        "MATCH p=shortestPath((g:Group {name:{result}})-[*1..]->(n {highvalue:true})) WHERE g.name STARTS WITH 'DOMAIN USERS' return p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "All Paths from DOMAIN USERS to High Value Targets",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain Users Group...",
+                    "query": "MATCH (n:Group) WHERE n.name STARTS WITH 'DOMAIN USERS' RETURN n.name ORDER BY n.name DESC"
+                },
+                {
+                    "final": true,
+                    "query":
+                        "MATCH p=shortestPath((g:Group {name:{result}})-[*1..]->(n {highvalue:true})) return p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find Workstations where DOMAIN USERS can RDP To",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain Users Group...",
+                    "query": "MATCH (n:Group) WHERE n.name STARTS WITH 'DOMAIN USERS' RETURN n.name ORDER BY n.name DESC"
+                },
+                {
+                    "final": true,
+                    "query":
+                        "match p=(g:Group {name:{result}})-[:CanRDP]->(c:Computer) where NOT c.operatingsystem CONTAINS 'Server' return p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find Servers where DOMAIN USERS can RDP To",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain Users Group...",
+                    "query": "MATCH (n:Group) WHERE n.name STARTS WITH 'DOMAIN USERS' RETURN n.name ORDER BY n.name DESC"
+                },
+                {
+                    "final": true,
+                    "query":
+                        "MATCH p=(g:Group {name:{result}})-[:CanRDP]->(c:Computer) WHERE c.operatingsystem CONTAINS 'Server' return p",
+                    "allowCollapse": false
+                }
+            ]
+        },
+        {
+            "name": "Find all other Rights DOMAIN USERS shouldn’t have",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain Users Group...",
+                    "query": "MATCH (n:Group) WHERE n.name STARTS WITH 'DOMAIN USERS' RETURN n.name ORDER BY n.name DESC"
+                },
+                {
+                    "final": true,
+                    "query":
+                        "MATCH p=(m:Group)-[r:Owns|:WriteDacl|:GenericAll|:WriteOwner|:ExecuteDCOM|:GenericWrite|:AllowedToDelegate|:ForceChangePassword]->(n:Computer) WHERE m.name STARTS WITH 'DOMAIN USERS' RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Kerberoastable Accounts member of High Value Group",
+            "queryList": [
+                {
+                    "final": true,
+                    "query":
+                        "MATCH p=shortestPath((n:User)-[r:MemberOf]->(g:Group)) WHERE g.highvalue=true AND n.hasspn=true RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "List all Kerberoastable Accounts",
+            "queryList": [
+                {
+                    "final": true,
+                    "query":
+                        "MATCH (n:User)WHERE n.hasspn=true RETURN n",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Kerberoastable Users with most privileges",
+            "queryList": [
+                {
+                    "final": true,
+                    "query":
+                        "MATCH (u:User {hasspn:true}) OPTIONAL MATCH (u)-[:AdminTo]->(c1:Computer) OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c2:Computer) WITH u,COLLECT(c1) + COLLECT(c2) AS tempVar UNWIND tempVar AS comps RETURN u.name,COUNT(DISTINCT(comps)) ORDER BY COUNT(DISTINCT(comps)) DESC",
+                    "allowCollapse": true
+                }
+            ]
+        },       
+        {
+            "name": "DA Account Sessions to NON DC",
+            "queryList": [
+                {
+                    "final": true,
+                    "query":
+                        "MATCH (c:Computer)-[:MemberOf]->(t:Group) WHERE NOT t.name STARTS WITH 'DOMAIN CONTROLLERS' WITH c as NonDC MATCH p=(NonDC)-[:HasSession]->(n:User)-[:MemberOf]-> (g:Group) WHERE g.name STARTS WITH 'DOMAIN ADMINS' RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find unsupported OSs",
+            "queryList": [
+                {
+                    "final": true,
+                    "query":
+                        "MATCH (n:Computer) WHERE n.operatingsystem =~ '(?i).(2000|2003|2008|xp|vista|7|me).' RETURN n",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find AS-REP Roasting users (no kerberos pre-authentication)",
+            "queryList": [
+                {
+                    "final": true,
+                    "query":
+                        "MATCH (u:User {dontreqpreauth: true}) RETURN u",
+                    "allowCollapse": true
                 }
             ]
         }
