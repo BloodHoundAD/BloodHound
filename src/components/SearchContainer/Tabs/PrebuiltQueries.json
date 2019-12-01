@@ -5,7 +5,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query": "MATCH p=(n:Group)<-[r:MemberOf*1..]-(m) WHERE n.objectsid =~ {name} RETURN p",
+                    "query": "MATCH p=(n:Group)<-[:MemberOf*1..]-(m) WHERE n.objectsid =~ {name} RETURN p",
                     "props": {
                         "name": "(?i)S-1-5-.*-512"
                     },
@@ -26,7 +26,7 @@
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((n)-[r:{}*1..]->(m:Group {name:{result}})) RETURN p",
+                    "query": "MATCH p=shortestPath((n)-[:{}*1..]->(m:Group {name:{result}})) RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
                 }
