@@ -1,30 +1,53 @@
-import React, { useEffect, useState, useImperativeHandle } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Button } from 'react-bootstrap';
+import { writeFile } from 'fs';
+import { remote } from 'electron';
+const { dialog } = remote;
 
-const ConfirmDrawModal = (props, ref) => {
+const ConfirmDrawModal = ({ promise }) => {
+    const [data, setData] = useState({});
     const [show, setShow] = useState(false);
-    const [resolve, setResolve] = useState(null);
-    const [reject, setReject] = useState(null);
 
-    useImperativeHandle(ref, () => {
-        open: () => {
-            return new Promise((res, rej) => {
-                setResolve(res);
-                setReject(rej);
-                setShow(true);
-            });
-        };
-    });
     const handleClose = () => {
-        promise.resolve(false);
+        emitter.emit('confirmGraphDraw', false);
+        setData({});
         setShow(false);
+    };
+
+    const handleOpen = data => {
+        setData(data);
+        setShow(true);
     };
 
     const handleConfirm = () => {
-        promise.resolve(true);
+        emitter.emit('confirmGraphDraw', true, data);
+        setData({});
         setShow(false);
     };
+
+    const handleSave = () => {
+        let target = dialog.showSaveDialogSync({
+            defaultPath: 'data.json',
+        });
+
+        if (target !== undefined) {
+            writeFile(target, JSON.stringify(data, null, 2), err => {
+                if (err) console.log(err);
+                else console.log('Saved ' + target + ' successfully');
+            });
+        }
+        setShow(false);
+        setData({});
+        emitter.emit('confirmGraphDraw', false);
+    };
+
+    useEffect(() => {
+        emitter.on('showGraphConfirm', handleOpen);
+        return () => {
+            emitter.removeListener('showGraphConfirm', handleOpen);
+        };
+    }, []);
 
     return (
         <Modal show={show} onHide={() => handleClose()}>
@@ -35,13 +58,13 @@ const ConfirmDrawModal = (props, ref) => {
             <Modal.Body>
                 <p>
                     This graph will likely take a long time to render. Do you
-                    want to continue?
+                    want to continue, cancel, or save the data to json?
                 </p>
             </Modal.Body>
 
             <Modal.Footer>
                 <Button
-                    variant='secondary'
+                    bsStyle='danger'
                     onClick={() => {
                         handleClose();
                     }}
@@ -49,16 +72,25 @@ const ConfirmDrawModal = (props, ref) => {
                     Cancel
                 </Button>
                 <Button
-                    variant='primary'
+                    bsStyle='primary'
+                    onClick={() => {
+                        handleSave();
+                    }}
+                >
+                    Save Data
+                </Button>
+                <Button
+                    bsStyle='success'
                     onClick={() => {
                         handleConfirm();
                     }}
                 >
-                    Confirm
+                    Draw Graph
                 </Button>
             </Modal.Footer>
         </Modal>
     );
 };
 
+ConfirmDrawModal.propTypes = {};
 export default ConfirmDrawModal;

@@ -12,6 +12,7 @@ import { withAlert } from 'react-alert';
 import NodeTooltip from './Tooltips/NodeTooltip';
 import StageTooltip from './Tooltips/StageTooltip';
 import EdgeTooltip from './Tooltips/EdgeTooltip';
+import ConfirmDrawModal from './Modals/ConfirmDrawModal';
 
 class GraphContainer extends Component {
     constructor(props) {
@@ -103,6 +104,7 @@ class GraphContainer extends Component {
         emitter.on('getHelp', this.getHelpEdge.bind(this));
         emitter.on('toggleDarkMode', this.toggleDarkMode.bind(this));
         emitter.on('closeTooltip', this.hideTooltip.bind(this));
+        emitter.on('confirmGraphDraw', this.drawGraph.bind(this));
     }
 
     componentDidMount() {
@@ -415,49 +417,64 @@ class GraphContainer extends Component {
                 emitter.emit('showLoadingIndicator', false);
             }, 1500);
         } else {
-            if (!this.state.firstDraw) {
-                appStore.queryStack.push({
-                    nodes: this.state.sigmaInstance.graph.nodes(),
-                    edges: this.state.sigmaInstance.graph.edges(),
-                    spotlight: appStore.spotlightData,
-                    startNode: appStore.startNode,
-                    endNode: appStore.endNode,
-                    params: this.state.currentQuery,
-                });
-            }
-            $.each(graph.nodes, function(i, node) {
-                if (node.start) {
-                    appStore.startNode = node;
-                }
-
-                if (node.end) {
-                    appStore.endNode = node;
-                }
-
-                node.glyphs = $.map(node.glyphs, function(value, index) {
-                    return [value];
-                });
-            });
-
-            this.setState({ firstDraw: false });
-            sigma.misc.animation.camera(this.state.sigmaInstance.camera, {
-                x: 0,
-                y: 0,
-                ratio: 1.075,
-            });
-
-            appStore.spotlightData = graph.spotlight;
-            this.state.sigmaInstance.graph.clear();
-            this.state.sigmaInstance.graph.read(graph);
-            this.applyDesign();
-
-            if (appStore.dagre) {
-                sigma.layouts.dagre.start(this.state.sigmaInstance);
+            if (graph.nodes.length < 500) {
+                this.drawGraph(true, graph);
             } else {
-                sigma.layouts.startForceLink();
+                emitter.emit('showGraphConfirm', graph);
             }
-            emitter.emit('spotlightUpdate');
         }
+    }
+
+    drawGraph(confirm, graph) {
+        if (!confirm) {
+            emitter.emit('updateLoadingText', 'Done!');
+            setTimeout(function() {
+                emitter.emit('showLoadingIndicator', false);
+            }, 1500);
+            return;
+        }
+        if (!this.state.firstDraw) {
+            appStore.queryStack.push({
+                nodes: this.state.sigmaInstance.graph.nodes(),
+                edges: this.state.sigmaInstance.graph.edges(),
+                spotlight: appStore.spotlightData,
+                startNode: appStore.startNode,
+                endNode: appStore.endNode,
+                params: this.state.currentQuery,
+            });
+        }
+        $.each(graph.nodes, function(i, node) {
+            if (node.start) {
+                appStore.startNode = node;
+            }
+
+            if (node.end) {
+                appStore.endNode = node;
+            }
+
+            node.glyphs = $.map(node.glyphs, function(value, index) {
+                return [value];
+            });
+        });
+
+        this.setState({ firstDraw: false });
+        sigma.misc.animation.camera(this.state.sigmaInstance.camera, {
+            x: 0,
+            y: 0,
+            ratio: 1.075,
+        });
+
+        appStore.spotlightData = graph.spotlight;
+        this.state.sigmaInstance.graph.clear();
+        this.state.sigmaInstance.graph.read(graph);
+        this.applyDesign();
+
+        if (appStore.dagre) {
+            sigma.layouts.dagre.start(this.state.sigmaInstance);
+        } else {
+            sigma.layouts.startForceLink();
+        }
+        emitter.emit('spotlightUpdate');
     }
 
     import(payload) {
@@ -1621,6 +1638,7 @@ class GraphContainer extends Component {
                 {this.state.edgeTooltip.visible && (
                     <EdgeTooltip {...this.state.edgeTooltip} />
                 )}
+                <ConfirmDrawModal />
             </div>
         );
     }
