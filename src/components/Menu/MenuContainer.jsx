@@ -170,6 +170,7 @@ class MenuContainer extends Component {
         var index = 0;
         var processed = [];
         var tempPath = app.getPath('temp');
+        let promises = [];
         while (index < files.length) {
             var path = files[index].path;
             var name = files[index].name;
@@ -177,20 +178,28 @@ class MenuContainer extends Component {
             if (isZipSync(path)) {
                 await createReadStream(path)
                     .pipe(Parse())
+                    .on('error', function(error) {
+                        this.props.alert.error(
+                            '{} is corrupted or password protected'.format(name)
+                        );
+                    })
                     .on('entry', function(entry) {
                         let sanitized = sanitize(entry.path);
-                        var output = join(tempPath, sanitized);
-                        entry.pipe(createWriteStream(output));
+                        let output = join(tempPath, sanitized);
+                        let write = entry.pipe(createWriteStream(output));
+
+                        let promise = new Promise(res => {
+                            write.on('finish', () => {
+                                res();
+                            });
+                        });
+
+                        promises.push(promise);
                         processed.push({
                             path: output,
                             name: sanitized,
                             delete: true,
                         });
-                    })
-                    .on('error', function(error) {
-                        this.props.alert.error(
-                            '{} is corrupted or password protected'.format(name)
-                        );
                     })
                     .promise();
             } else {
@@ -198,7 +207,7 @@ class MenuContainer extends Component {
             }
             index++;
         }
-
+        await Promise.all(promises);
         return processed;
     }
 
