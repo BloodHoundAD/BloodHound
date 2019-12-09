@@ -14,6 +14,7 @@ import { remote } from 'electron';
 const { app } = remote;
 import { join } from 'path';
 import { withAlert } from 'react-alert';
+import NodePlayCypherLink from './NodePlayCypherLink';
 
 class UserNodeData extends Component {
     constructor() {
@@ -161,7 +162,7 @@ class UserNodeData extends Component {
     getNodeData(payload) {
         jQuery(this.refs.complete).hide();
         jQuery(this.refs.piccomplete).hide();
-        $.each(this.state.driversessions, function(index, record) {
+        $.each(this.state.driversessions, function (index, record) {
             record.close();
         });
 
@@ -387,7 +388,7 @@ class UserNodeData extends Component {
                         distinct
                     />
 
-                    <NodeCypherLink
+                    <NodePlayCypherLink
                         property='Derivative Local Admin Rights'
                         target={this.state.objectid}
                         baseQuery={
@@ -480,7 +481,7 @@ class UserNodeData extends Component {
                         distinct
                     />
 
-                    <NodeCypherLink
+                    <NodePlayCypherLink
                         property='Transitive Object Control'
                         target={this.state.objectid}
                         baseQuery={
@@ -512,7 +513,7 @@ class UserNodeData extends Component {
                         distinct
                     />
 
-                    <NodeCypherLink
+                    <NodePlayCypherLink
                         property='Transitive Object Controllers'
                         target={this.state.objectid}
                         baseQuery={

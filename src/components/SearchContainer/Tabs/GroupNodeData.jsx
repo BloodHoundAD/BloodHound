@@ -12,6 +12,7 @@ import { remote } from 'electron';
 const { app } = remote;
 import { join } from 'path';
 import { withAlert } from 'react-alert';
+import NodePlayCypherLink from './NodePlayCypherLink';
 
 class GroupNodeData extends Component {
     constructor() {
@@ -57,7 +58,7 @@ class GroupNodeData extends Component {
 
     getNodeData(payload) {
         jQuery(this.refs.complete).hide();
-        $.each(this.state.driversessions, function(_, record) {
+        $.each(this.state.driversessions, function (_, record) {
             record.close();
         });
 
@@ -78,7 +79,7 @@ class GroupNodeData extends Component {
         propCollection
             .run('MATCH (c:Group {objectid: {objectid}}) RETURN c', { objectid: payload })
             .then(
-                function(result) {
+                function (result) {
                     var properties = result.records[0]._fields[0].properties;
                     let name = properties.name || properties.objectid;
                     let notes;
@@ -358,7 +359,7 @@ class GroupNodeData extends Component {
                         distinct
                     />
 
-                    <NodeCypherLink
+                    <NodePlayCypherLink
                         property='Derivative Local Admin Rights'
                         target={this.state.objectid}
                         baseQuery={
@@ -431,7 +432,7 @@ class GroupNodeData extends Component {
                         distinct
                     />
 
-                    <NodeCypherLink
+                    <NodePlayCypherLink
                         property='Transitive Object Control'
                         target={this.state.objectid}
                         baseQuery={
@@ -463,7 +464,7 @@ class GroupNodeData extends Component {
                         distinct
                     />
 
-                    <NodeCypherLink
+                    <NodePlayCypherLink
                         property='Transitive Object Controllers'
                         target={this.state.objectid}
                         baseQuery={

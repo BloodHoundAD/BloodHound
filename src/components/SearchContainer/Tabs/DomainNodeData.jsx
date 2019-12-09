@@ -15,6 +15,7 @@ import { remote } from 'electron';
 const { app } = remote;
 import { join } from 'path';
 import { withAlert } from 'react-alert';
+import NodePlayCypherLink from './NodePlayCypherLink.jsx';
 
 class DomainNodeData extends Component {
     constructor() {
@@ -91,7 +92,7 @@ class DomainNodeData extends Component {
         await props
             .run('MATCH (n:Domain {objectid: {objectid}}) RETURN n', { objectid: payload })
             .then(
-                function(result) {
+                function (result) {
                     let properties = result.records[0]._fields[0].properties;
                     name = properties.name || properties.objectid;
                     let notes;
@@ -113,7 +114,7 @@ class DomainNodeData extends Component {
         s1.run('MATCH (a:User) WHERE a.domain={objectid} RETURN COUNT(a)', {
             objectid: name,
         }).then(
-            function(result) {
+            function (result) {
                 this.setState({ users: result.records[0]._fields[0] });
                 s1.close();
             }.bind(this)
@@ -122,7 +123,7 @@ class DomainNodeData extends Component {
         s2.run('MATCH (a:Group) WHERE a.domain={objectid} RETURN COUNT(a)', {
             objectid: name,
         }).then(
-            function(result) {
+            function (result) {
                 this.setState({ groups: result.records[0]._fields[0] });
                 s2.close();
             }.bind(this)
@@ -131,7 +132,7 @@ class DomainNodeData extends Component {
         s3.run('MATCH (n:Computer) WHERE n.domain={objectid} RETURN count(n)', {
             objectid: name,
         }).then(
-            function(result) {
+            function (result) {
                 this.setState({ computers: result.records[0]._fields[0] });
                 s3.close();
             }.bind(this)
@@ -140,7 +141,7 @@ class DomainNodeData extends Component {
         s4.run('MATCH (n:OU {domain:{objectid}}) RETURN COUNT(n)', {
             objectid: name,
         }).then(
-            function(result) {
+            function (result) {
                 this.setState({ ous: result.records[0]._fields[0] });
                 s4.close();
             }.bind(this)
@@ -149,7 +150,7 @@ class DomainNodeData extends Component {
         s5.run('MATCH (n:GPO {domain:{objectid}}) RETURN COUNT(n)', {
             objectid: name,
         }).then(
-            function(result) {
+            function (result) {
                 this.setState({ gpos: result.records[0]._fields[0] });
                 s5.close();
             }.bind(this)
@@ -448,7 +449,7 @@ class DomainNodeData extends Component {
                         distinct
                     />
 
-                    <NodeCypherLink
+                    <NodePlayCypherLink
                         property='Transitive Controllers'
                         target={this.state.objectid}
                         baseQuery={

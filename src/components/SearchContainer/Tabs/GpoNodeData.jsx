@@ -13,6 +13,7 @@ import { remote } from 'electron';
 const { app } = remote;
 import { join } from 'path';
 import { withAlert } from 'react-alert';
+import NodePlayCypherLink from './NodePlayCypherLink.jsx';
 
 class GpoNodeData extends Component {
     constructor() {
@@ -74,7 +75,7 @@ class GpoNodeData extends Component {
         props
             .run('MATCH (n:GPO {objectid:{objectid}}) RETURN n', { objectid: payload })
             .then(
-                function(result) {
+                function (result) {
                     let properties = result.records[0]._fields[0].properties;
                     let name = properties.name || properties.objectid;
                     let notes;
@@ -322,7 +323,7 @@ class GpoNodeData extends Component {
                         distinct
                     />
 
-                    <NodeCypherLink
+                    <NodePlayCypherLink
                         property='Transitive Object Controllers'
                         target={this.state.objectid}
                         baseQuery={

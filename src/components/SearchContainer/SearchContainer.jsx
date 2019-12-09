@@ -241,7 +241,7 @@ const SearchContainer = () => {
 
         let stop = false;
         if (!$('.searchSelectorS > ul').is(':hidden')) {
-            $('.searchSelectorS > ul li').each(function(i) {
+            $('.searchSelectorS > ul li').each(function (i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -249,7 +249,7 @@ const SearchContainer = () => {
         }
 
         if (!$('.searchSelectorP > ul').is(':hidden')) {
-            $('.searchSelectorP > ul li').each(function(i) {
+            $('.searchSelectorP > ul li').each(function (i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -272,7 +272,7 @@ const SearchContainer = () => {
 
         let stop = false;
         if (!$('.searchSelectorS > ul').is(':hidden')) {
-            $('.searchSelectorS > ul li').each(function(i) {
+            $('.searchSelectorS > ul li').each(function (i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -280,7 +280,7 @@ const SearchContainer = () => {
         }
 
         if (!$('.searchSelectorP > ul').is(':hidden')) {
-            $('.searchSelectorP > ul li').each(function(i) {
+            $('.searchSelectorP > ul li').each(function (i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -312,7 +312,7 @@ const SearchContainer = () => {
 
         let stop = false;
         if (!$('.searchSelectorS > ul').is(':hidden')) {
-            $('.searchSelectorS > ul li').each(function(i) {
+            $('.searchSelectorS > ul li').each(function (i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -320,7 +320,7 @@ const SearchContainer = () => {
         }
 
         if (!$('.searchSelectorP > ul').is(':hidden')) {
-            $('.searchSelectorP > ul li').each(function(i) {
+            $('.searchSelectorP > ul li').each(function (i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -786,7 +786,7 @@ const SearchContainer = () => {
                     tooltipDir='bottom'
                     tooltipTitle='Back'
                     classes='input-group-addon spanfix glyph-hover-style'
-                    click={function() {
+                    click={function () {
                         emitter.emit('graphBack');
                     }}
                 >

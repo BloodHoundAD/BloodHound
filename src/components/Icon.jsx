@@ -15,6 +15,7 @@ export default class Icon extends Component {
                     ' ' +
                     this.props.extraClass
                 }
+                onClick={this.props.onClick}
             />
         );
     }
@@ -23,4 +24,5 @@ export default class Icon extends Component {
 Icon.propTypes = {
     glyph: PropTypes.string.isRequired,
     extraClass: PropTypes.string,
+    onClick: PropTypes.func
 };

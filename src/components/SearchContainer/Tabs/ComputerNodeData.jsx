@@ -14,6 +14,7 @@ import { remote } from 'electron';
 const { app } = remote;
 import { join } from 'path';
 import { withAlert } from 'react-alert';
+import NodePlayCypherLink from './NodePlayCypherLink';
 
 class ComputerNodeData extends Component {
     constructor() {
@@ -63,7 +64,7 @@ class ComputerNodeData extends Component {
     getNodeData(payload) {
         jQuery(this.refs.complete).hide();
         jQuery(this.refs.piccomplete).hide();
-        $.each(this.state.driversessions, function(_, record) {
+        $.each(this.state.driversessions, function (_, record) {
             record.close();
         });
         this.setState({
@@ -359,7 +360,7 @@ class ComputerNodeData extends Component {
                         }
                     />
 
-                    <NodeCypherLink
+                    <NodePlayCypherLink
                         property='Derivative Local Admins'
                         target={this.state.objectid}
                         baseQuery={
@@ -463,7 +464,7 @@ class ComputerNodeData extends Component {
                         distinct
                     />
 
-                    <NodeCypherLink
+                    <NodePlayCypherLink
                         property='Derivative Local Admin'
                         target={this.state.objectid}
                         baseQuery={
@@ -556,7 +557,7 @@ class ComputerNodeData extends Component {
                         distinct
                     />
 
-                    <NodeCypherLink
+                    <NodePlayCypherLink
                         property='Transitive Object Controllers'
                         target={this.state.objectid}
                         baseQuery={
@@ -587,7 +588,7 @@ class ComputerNodeData extends Component {
                         distinct
                     />
 
-                    <NodeCypherLink
+                    <NodePlayCypherLink
                         property='Transitive Object Control'
                         target={this.state.objectid}
                         baseQuery={
