@@ -24,12 +24,33 @@ import HelpModal from './components/Modals/HelpModal.jsx';
 import NodeEditor from './components/Float/NodeEditor';
 import WarmupModal from './components/Modals/WarmupModal.jsx';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { AppContext } from './AppContext';
 
 export default class AppContainer extends Component {
+    constructor(props) {
+        super(props)
+
+        this.toggleDarkMode = () => {
+            let darkMode = { state };
+
+            this.setState({
+                darkMode: !darkMode
+            })
+
+            appStore.performance.darkMode = !darkMode;
+            conf.set('performance', appStore.performance)
+        }
+
+        this.state = {
+            darkMode: appStore.performance.darkMode,
+            toggleDarkMode: this.toggleDarkMode
+        }
+    }
+
     componentDidMount() {
         document.addEventListener(
             'dragover',
-            function(event) {
+            function (event) {
                 event.preventDefault();
                 return false;
             },
@@ -38,7 +59,7 @@ export default class AppContainer extends Component {
 
         document.addEventListener(
             'drop',
-            function(event) {
+            function (event) {
                 event.preventDefault();
                 if (
                     jQuery('#tabcontainer').has(jQuery(event.target)).length ===
@@ -59,32 +80,34 @@ export default class AppContainer extends Component {
         return (
             <TransitionGroup className='max'>
                 <CSSTransition classNames='mainfade' appear timeout={1000}>
-                    <div className='max'>
-                        <ExportContainer />
-                        <LoadingContainer />
-                        <SpotlightContainer />
-                        <GraphContainer />
-                        <SearchContainer />
-                        <LogoutModal />
-                        <DeleteEdgeModal />
-                        <DeleteNodeModal />
-                        <AddNodeModal />
-                        <AddEdgeModal />
-                        <ClearWarnModal />
-                        <ClearConfirmModal />
-                        <ClearingModal />
-                        <CancelUploadModal />
-                        <SessionClearModal />
-                        <WarmupModal />
-                        <RawQuery />
-                        <MenuContainer />
-                        <Settings />
-                        <ZoomContainer />
-                        <QueryNodeSelect />
-                        <About />
-                        <NodeEditor />
-                        <HelpModal />
-                    </div>
+                    <AppContext.Provider value={this.state}>
+                        <div className='max'>
+                            <ExportContainer />
+                            <LoadingContainer />
+                            <SpotlightContainer />
+                            <GraphContainer />
+                            <SearchContainer />
+                            <LogoutModal />
+                            <DeleteEdgeModal />
+                            <DeleteNodeModal />
+                            <AddNodeModal />
+                            <AddEdgeModal />
+                            <ClearWarnModal />
+                            <ClearConfirmModal />
+                            <ClearingModal />
+                            <CancelUploadModal />
+                            <SessionClearModal />
+                            <WarmupModal />
+                            <RawQuery />
+                            <MenuContainer />
+                            <Settings />
+                            <ZoomContainer />
+                            <QueryNodeSelect />
+                            <About />
+                            <NodeEditor />
+                            <HelpModal />
+                        </div>
+                    </AppContext.Provider>
                 </CSSTransition>
             </TransitionGroup>
         );
