@@ -205,7 +205,7 @@ div.tooltip-inner-custom {
     overflow-y: auto;
 }
 
-.nodeEditor {
+.optionModal {
     position: absolute;
     z-index: 20;
     top: 1em;
@@ -213,6 +213,10 @@ div.tooltip-inner-custom {
     overflow: auto;
     background-color: rgba(255, 255, 255, 0.9);
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+.optionModal .panel-heading {
+    cursor: move;
 }
 
 .formButtonFix:focus {

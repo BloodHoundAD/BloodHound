@@ -127,7 +127,10 @@ const NodeEditor = () => {
     const Container = posed.div(config);
 
     return (
-        <Container pose={visible ? 'visible' : 'hidden'} className='nodeEditor'>
+        <Container
+            pose={visible ? 'visible' : 'hidden'}
+            className='optionModal'
+        >
             <Panel>
                 <Panel.Heading>
                     {name}

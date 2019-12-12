@@ -186,7 +186,7 @@ const AddEdgeModal = () => {
             <Modal.Body>
                 <form
                     noValidate
-                    onSubmit={e => {
+                    onSubmit={() => {
                         return false;
                     }}
                 >

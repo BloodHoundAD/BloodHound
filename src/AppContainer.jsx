@@ -31,7 +31,7 @@ export default class AppContainer extends Component {
         super(props);
 
         this.toggleDarkMode = () => {
-            let darkMode = { state };
+            let { darkMode } = this.state;
 
             this.setState({
                 darkMode: !darkMode,
@@ -41,9 +41,48 @@ export default class AppContainer extends Component {
             conf.set('performance', appStore.performance);
         };
 
+        this.toggleDebugMode = () => {
+            let { debugMode } = this.state;
+
+            this.setState({
+                debugMode: !debugMode,
+            });
+
+            appStore.performance.debug = !debugMode;
+            conf.set('performance', appStore.performance);
+        };
+
+        this.toggleLowDetailMode = () => {
+            let { lowDetail } = this.state;
+
+            this.setState({
+                lowDetail: !lowDetail,
+            });
+
+            appStore.performance.lowGraphics = !lowDetail;
+            conf.set('performance', appStore.performance);
+        };
+
+        this.setNodeLabels = val => {
+            this.setState({
+                nodeLabels: val,
+            });
+        };
+
+        this.setEdgeLabels = val => {
+            this.setState({ edgeLabels: val });
+        };
+
         this.state = {
             darkMode: appStore.performance.darkMode,
             toggleDarkMode: this.toggleDarkMode,
+            debugMode: appStore.performance.debug,
+            toggleDebugMode: this.toggleDebugMode,
+            lowDetail: appStore.performance.lowGraphics,
+            nodeLabels: appStore.performance.nodeLabels,
+            setNodeLabels: this.setNodeLabels,
+            edgeLabels: appStore.performance.edgeLabels,
+            setEdgeLabels: this.setEdgeLabels,
         };
     }
 
@@ -77,10 +116,11 @@ export default class AppContainer extends Component {
     }
 
     render() {
+        const context = this.state;
         return (
             <TransitionGroup className='max'>
                 <CSSTransition classNames='mainfade' appear timeout={1000}>
-                    <AppContext.Provider value={this.state}>
+                    <AppContext.Provider value={context}>
                         <div className='max'>
                             <ExportContainer />
                             <LoadingContainer />
