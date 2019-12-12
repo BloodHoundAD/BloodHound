@@ -783,10 +783,12 @@ div.tooltip-inner-custom {
     .spotlight {
         position: absolute;
         z-index: 30;
-        top: 15%;
+        top: 10%;
         left: 50%;
         width: 60%;
+        bottom: 10%;
         transform: translate(-50%, 0);
+        overflow-y: auto;
     }
 }
 
@@ -794,16 +796,17 @@ div.tooltip-inner-custom {
     .spotlight {
         position: absolute;
         z-index: 30;
-        top: 15%;
+        top: 10%;
         left: 50%;
         width: 45%;
+        bottom: 10%;
         transform: translate(-50%, 0);
+        overflow-y: auto;
     }
 }
 
 .spotlight-nodelist {
     overflow: auto;
-    max-height: 30em;
     background-color: white;
 }
 
