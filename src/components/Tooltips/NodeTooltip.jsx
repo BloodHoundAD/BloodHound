@@ -78,7 +78,7 @@ const NodeTooltip = ({ node, x, y }) => {
                         emitter.emit(
                             'query',
                             `MATCH (n:${type} {objectid: {objectid}}), (m), p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p`,
-                            {objectid: objectid},
+                            { objectid: objectid },
                             label
                         );
                     }}
@@ -89,8 +89,8 @@ const NodeTooltip = ({ node, x, y }) => {
                     onClick={() => {
                         emitter.emit(
                             'query',
-                            `MATCH (n:${type} {objectid: {objectid}), (m {owned: true}), p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p`,
-                            {objectid: objectid},
+                            `MATCH (n:${type} {objectid: {objectid}}), (m {owned: true}), p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p`,
+                            { objectid: objectid },
                             label
                         );
                     }}
@@ -101,7 +101,7 @@ const NodeTooltip = ({ node, x, y }) => {
                 <li
                     onClick={() => {
                         emitter.emit('editnode', node);
-                        closeTooltip()
+                        closeTooltip();
                     }}
                 >
                     <i className='fa fa-edit' />
