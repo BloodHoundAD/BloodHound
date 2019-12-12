@@ -15,19 +15,7 @@ import styles from './Settings.module.css';
 import Draggable from 'react-draggable';
 import clsx from 'clsx';
 import { AppContext } from '../../AppContext';
-
-const Container = posed.div({
-    visible: {
-        opacity: 1,
-        transition: { duration: 250 },
-        applyAtStart: { display: 'block' },
-    },
-    hidden: {
-        opacity: 0,
-        transition: { duration: 250 },
-        applyAtEnd: { display: 'none' },
-    },
-});
+import PoseContainer from '../PoseContainer';
 
 const Settings = () => {
     const [nodeCollapse, setNodeCollapse] = useState(appStore.performance.edge);
@@ -69,7 +57,7 @@ const Settings = () => {
 
     return (
         <Draggable handle={'.panel-heading'}>
-            <Container
+            <PoseContainer
                 pose={open ? 'visible' : 'hidden'}
                 className='optionModal'
             >
@@ -250,7 +238,7 @@ const Settings = () => {
                         </Form>
                     </Panel.Body>
                 </Panel>
-            </Container>
+            </PoseContainer>
         </Draggable>
     );
 };

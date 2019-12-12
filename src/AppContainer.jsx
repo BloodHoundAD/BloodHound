@@ -39,6 +39,7 @@ export default class AppContainer extends Component {
 
             appStore.performance.darkMode = !darkMode;
             conf.set('performance', appStore.performance);
+            emitter.emit('toggleDarkMode', !darkMode);
         };
 
         this.toggleDebugMode = () => {
@@ -61,16 +62,21 @@ export default class AppContainer extends Component {
 
             appStore.performance.lowGraphics = !lowDetail;
             conf.set('performance', appStore.performance);
+            emitter.emit('changeGraphicsMode', !lowDetail);
         };
 
         this.setNodeLabels = val => {
             this.setState({
                 nodeLabels: val,
             });
+            appStore.performance.nodeLabels = val;
+            emitter.emit('changeNodeLabels');
         };
 
         this.setEdgeLabels = val => {
             this.setState({ edgeLabels: val });
+            appStore.performance.edgeLabels = val;
+            emitter.emit('changeEdgeLabels');
         };
 
         this.state = {
@@ -79,6 +85,7 @@ export default class AppContainer extends Component {
             debugMode: appStore.performance.debug,
             toggleDebugMode: this.toggleDebugMode,
             lowDetail: appStore.performance.lowGraphics,
+            toggleLowDetailMode: this.toggleLowDetailMode,
             nodeLabels: appStore.performance.nodeLabels,
             setNodeLabels: this.setNodeLabels,
             edgeLabels: appStore.performance.edgeLabels,

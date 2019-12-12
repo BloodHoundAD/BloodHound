@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { withAlert } from 'react-alert';
 import NodeEditorRow from './NodeEditorRow.jsx';
-import posed, { PoseGroup } from 'react-pose';
 import { Button, Panel, Table } from 'react-bootstrap';
 import { styles } from './NodeEditor.module.css';
+import PoseContainer from '../PoseContainer';
+import Draggable from 'react-draggable';
 
 const NodeEditor = () => {
     const [name, setName] = useState('');
@@ -109,106 +110,95 @@ const NodeEditor = () => {
         emitter.on('editnode', getNodeData);
     }, []);
 
-    const config = {
-        visible: {
-            opacity: 1,
-            transition: { duration: 1000 },
-            applyAtStart: { display: 'block' },
-        },
-        hidden: {
-            opacity: 0,
-            transition: { duration: 1000 },
-            applyAtEnd: { display: 'none' },
-        },
-
-        draggable: true,
-    };
-
-    const Container = posed.div(config);
-
     return (
-        <Container
-            pose={visible ? 'visible' : 'hidden'}
-            className='optionModal'
-        >
-            <Panel>
-                <Panel.Heading>
-                    {name}
-                    <Button
-                        onClick={() => setVisible(false)}
-                        className='close'
-                        aria-label='Close'
-                    >
-                        <span aria-hidden='true'>&times;</span>
-                    </Button>
-                </Panel.Heading>
-
-                <Panel.Body>
-                    <div className='nodeEditTableContainer'>
-                        <Table striped>
-                            <thead align='center'>
-                                <tr>
-                                    <td>Delete</td>
-                                    <td>Edit</td>
-                                    <td>Name</td>
-                                    <td>Value</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Object.keys(properties).map(function(key) {
-                                    let val = properties[key];
-                                    return (
-                                        <NodeEditorRow
-                                            key={key}
-                                            attributeName={key}
-                                            val={val}
-                                            deleteHandler={deleteAttribute}
-                                            updateHandler={updateAttribute}
-                                        />
-                                    );
-                                })}
-                            </tbody>
-                        </Table>
-                    </div>
-
-                    <form
-                        onSubmit={x => x.preventDefault()}
-                        className='form-inline pull-right'
-                    >
-                        <div
-                            onFocus={() => setHasError(false)}
-                            className='form-group'
+        <Draggable handle={'.panel-heading'}>
+            <PoseContainer
+                pose={visible ? 'visible' : 'hidden'}
+                className='optionModal'
+            >
+                <Panel>
+                    <Panel.Heading>
+                        {name}
+                        <Button
+                            onClick={() => setVisible(false)}
+                            className='close'
+                            aria-label='Close'
                         >
-                            <input
-                                type='text'
-                                className={`${
-                                    hasError ? styles.error : ''
-                                } form-control form-override`}
-                                value={newAttrName}
-                                onChange={e => setNewAttrName(e.target.value)}
-                                placeholder='Internal Name'
-                                required
-                            />
-                            <select
-                                className='form-control'
-                                onChange={e => setNewAttrType(e.target.value)}
-                            >
-                                <option value='boolean'>boolean</option>
-                                <option value='string'>string</option>
-                                <option value='number'>number</option>
-                                <option value='array'>array</option>
-                            </select>
-                            <button
-                                className='form-control formButtonFix'
-                                onClick={() => addAttribute()}
-                            >
-                                <span className='fa fa-plus' /> Add
-                            </button>
+                            <span aria-hidden='true'>&times;</span>
+                        </Button>
+                    </Panel.Heading>
+
+                    <Panel.Body>
+                        <div className='nodeEditTableContainer'>
+                            <Table striped>
+                                <thead align='center'>
+                                    <tr>
+                                        <td>Delete</td>
+                                        <td>Edit</td>
+                                        <td>Name</td>
+                                        <td>Value</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Object.keys(properties).map(function(key) {
+                                        let val = properties[key];
+                                        return (
+                                            <NodeEditorRow
+                                                key={key}
+                                                attributeName={key}
+                                                val={val}
+                                                deleteHandler={deleteAttribute}
+                                                updateHandler={updateAttribute}
+                                            />
+                                        );
+                                    })}
+                                </tbody>
+                            </Table>
                         </div>
-                    </form>
-                </Panel.Body>
-            </Panel>
-        </Container>
+
+                        <form
+                            onSubmit={x => x.preventDefault()}
+                            className='form-inline pull-right'
+                        >
+                            <div
+                                onFocus={() => setHasError(false)}
+                                className='form-group'
+                            >
+                                <input
+                                    type='text'
+                                    className={`${
+                                        hasError ? styles.error : ''
+                                    } form-control form-override`}
+                                    value={newAttrName}
+                                    onChange={e =>
+                                        setNewAttrName(e.target.value)
+                                    }
+                                    placeholder='Internal Name'
+                                    required
+                                />
+                                <select
+                                    className='form-control'
+                                    onChange={e =>
+                                        setNewAttrType(e.target.value)
+                                    }
+                                >
+                                    <option value='boolean'>boolean</option>
+                                    <option value='string'>string</option>
+                                    <option value='number'>number</option>
+                                    <option value='array'>array</option>
+                                </select>
+                                <button
+                                    className='form-control formButtonFix'
+                                    onClick={() => addAttribute()}
+                                >
+                                    <span className='fa fa-plus' /> Add
+                                </button>
+                            </div>
+                        </form>
+                    </Panel.Body>
+                </Panel>
+            </PoseContainer>
+        </Draggable>
     );
 };
 NodeEditor.propTypes = {};
