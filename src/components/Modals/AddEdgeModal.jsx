@@ -12,6 +12,7 @@ import posed from 'react-pose';
 import styles from './AddEdgeModal.module.css';
 import SearchRow from '../SearchContainer/SearchRow';
 import { buildSearchQuery, buildSelectQuery } from 'utils';
+import BaseModal from './BaseModal';
 
 const CompleteCheck = posed.div({
     visible: {
@@ -23,7 +24,7 @@ const CompleteCheck = posed.div({
 });
 
 const AddEdgeModal = () => {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     const [showComplete, setShowComplete] = useState(false);
     const [source, setSource] = useState(null);
     const [target, setTarget] = useState(null);
@@ -177,11 +178,7 @@ const AddEdgeModal = () => {
     };
 
     return (
-        <Modal
-            show={open}
-            onHide={handleClose}
-            aria-labelledby='AddEdgeModalHeader'
-        >
+        <BaseModal show={open} onHide={handleClose} label='AddEdgeModalHeader'>
             <Modal.Header closeButton>
                 <Modal.Title id='AddEdgeModalHeader'>Add Edge</Modal.Title>
             </Modal.Header>
@@ -331,7 +328,7 @@ const AddEdgeModal = () => {
                 <Button onClick={validateAndSubmit}>Confirm</Button>
                 <Button onClick={handleClose}>Cancel</Button>
             </Modal.Footer>
-        </Modal>
+        </BaseModal>
     );
 };
 

@@ -28,29 +28,29 @@ import { AppContext } from './AppContext';
 
 export default class AppContainer extends Component {
     constructor(props) {
-        super(props)
+        super(props);
 
         this.toggleDarkMode = () => {
             let darkMode = { state };
 
             this.setState({
-                darkMode: !darkMode
-            })
+                darkMode: !darkMode,
+            });
 
             appStore.performance.darkMode = !darkMode;
-            conf.set('performance', appStore.performance)
-        }
+            conf.set('performance', appStore.performance);
+        };
 
         this.state = {
             darkMode: appStore.performance.darkMode,
-            toggleDarkMode: this.toggleDarkMode
-        }
+            toggleDarkMode: this.toggleDarkMode,
+        };
     }
 
     componentDidMount() {
         document.addEventListener(
             'dragover',
-            function (event) {
+            function(event) {
                 event.preventDefault();
                 return false;
             },
@@ -59,7 +59,7 @@ export default class AppContainer extends Component {
 
         document.addEventListener(
             'drop',
-            function (event) {
+            function(event) {
                 event.preventDefault();
                 if (
                     jQuery('#tabcontainer').has(jQuery(event.target)).length ===

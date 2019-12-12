@@ -1069,11 +1069,31 @@ div.tooltip-inner-custom {
     width: 40%;
 }
 
-#alertContainer > div > div{
+#alertContainer > div > div {
     width: unset !important;
 }
 
-.modal-dark .modal-dialog .modal-content{
+.modal-dark .modal-dialog .modal-content {
+    background-color: #383332;
+    color: white;
+}
+
+.modal-dark input {
     background-color: black;
     color: white;
+}
+
+.modal-dark select {
+    background-color: black;
+    color: white;
+}
+
+.modal-dark button {
+    background: black;
+    color: white;
+}
+
+.modal-dark button.close {
+    opacity: 1;
+    background-color: #383332;
 }
