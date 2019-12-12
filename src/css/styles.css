@@ -803,7 +803,7 @@ div.tooltip-inner-custom {
 
 .spotlight-nodelist {
     overflow: auto;
-    height: 11em;
+    max-height: 30em;
     background-color: white;
 }
 
