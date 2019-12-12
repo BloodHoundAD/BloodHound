@@ -184,7 +184,12 @@ const AddEdgeModal = () => {
             </Modal.Header>
 
             <Modal.Body>
-                <form noValidate>
+                <form
+                    noValidate
+                    onSubmit={e => {
+                        return false;
+                    }}
+                >
                     <FormGroup>
                         <ControlLabel>Source Node</ControlLabel>
                         <AsyncTypeahead

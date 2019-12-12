@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import { Modal, Tabs, Tab } from 'react-bootstrap';
 import { encode } from 'he';
+import BaseModal from './BaseModal';
 
 export default class HelpModal extends Component {
     constructor() {
@@ -1973,10 +1974,10 @@ export default class HelpModal extends Component {
 
     render() {
         return (
-            <Modal
+            <BaseModal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby='HelpHeader'
+                label='HelpHeader'
                 className='help-modal-width'
             >
                 <Modal.Header closeButton>
@@ -2025,7 +2026,7 @@ export default class HelpModal extends Component {
                         Close
                     </button>
                 </Modal.Footer>
-            </Modal>
+            </BaseModal>
         );
     }
 }

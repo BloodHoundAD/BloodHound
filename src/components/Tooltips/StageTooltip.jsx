@@ -34,7 +34,6 @@ const StageTooltip = ({ x, y }) => {
                 <li
                     onClick={() => {
                         emitter.emit('addNode');
-                        closeTooltip();
                     }}
                 >
                     <i className='fa fa-plus' /> Add Node
@@ -42,7 +41,6 @@ const StageTooltip = ({ x, y }) => {
                 <li
                     onClick={() => {
                         emitter.emit('addEdge');
-                        closeTooltip();
                     }}
                 >
                     <i className='fa fa-arrow-right' /> Add Edge

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Modal } from 'react-bootstrap';
+import BaseModal from './BaseModal';
 
 export default class DeleteEdgeModal extends Component {
     constructor() {
@@ -29,10 +30,10 @@ export default class DeleteEdgeModal extends Component {
 
     render() {
         return (
-            <Modal
+            <BaseModal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby='DeleteEdgeModalHeader'
+                label='DeleteEdgeModalHeader'
             >
                 <Modal.Header closeButton>
                     <Modal.Title id='DeleteEdgeModalHeader'>
@@ -60,7 +61,7 @@ export default class DeleteEdgeModal extends Component {
                         Cancel
                     </button>
                 </Modal.Footer>
-            </Modal>
+            </BaseModal>
         );
     }
 }

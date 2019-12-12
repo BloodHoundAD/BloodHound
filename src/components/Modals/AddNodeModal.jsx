@@ -94,7 +94,12 @@ const AddNodeModal = () => {
                 <Modal.Title id='AddNodeModalHeader'>Add Node</Modal.Title>
 
                 <Modal.Body>
-                    <form noValidate>
+                    <form
+                        noValidate
+                        onSubmit={() => {
+                            return false;
+                        }}
+                    >
                         <FormGroup>
                             <ControlLabel>Node Name</ControlLabel>
                             <FormControl

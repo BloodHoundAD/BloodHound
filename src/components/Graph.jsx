@@ -250,40 +250,37 @@ class GraphContainer extends Component {
         });
     }
 
-    addNode(name, type) {
-        let q = driver.session();
+    async addNode(name, type) {
         let guid = uuidv4();
 
-        let key = type === 'OU' ? 'guid' : 'name';
-        let varn = type === 'OU' ? guid : name;
-        let typevar = `type_${type.toLowerCase()}`;
-
-        let statement = `MERGE (n:${type} {${key}:{name}})`;
-        if (key === 'Computer' || key === 'User') {
-            statement = `${statement} SET n.owned=false`;
+        let statement = `MERGE (n:${type} {objectid:{guid}}) SET n.name={name}`;
+        if (type === 'Computer' || type === 'User') {
+            statement = `${statement}, n.owned=false`;
         }
+        let session = driver.session();
+        await session.run(statement, { name: name, guid: guid });
+        session.close();
 
-        q.run(statement, { name: varn }).then(x => {
-            let instance = this.state.sigmaInstance;
-            let id = generateUniqueId(instance, true);
-            let node = {
-                id: id,
-                label: varn,
-                type: type,
-                x: this.state.stageTooltip.x,
-                y: this.state.stageTooltip.y,
-                folded: {
-                    nodes: [],
-                    edges: [],
-                },
-                groupedNode: false,
-                degree: 1,
-            };
-            node[typevar] = true;
-            instance.graph.addNode(node);
-            this.applyDesign();
-            q.close();
-        });
+        let instance = this.state.sigmaInstance;
+        let id = generateUniqueId(instance, true);
+        let node = {
+            id: id,
+            label: name,
+            type: type,
+            x: this.state.stageTooltip.x,
+            y: this.state.stageTooltip.y,
+            folded: {
+                nodes: [],
+                edges: [],
+            },
+            groupedNode: false,
+            degree: 1,
+        };
+        node[type] = true;
+        instance.graph.addNode(node);
+        closeTooltip();
+        this.applyDesign();
+        session.close();
     }
 
     relayout() {

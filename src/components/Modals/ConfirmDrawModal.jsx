@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Modal, Button } from 'react-bootstrap';
 import { writeFile } from 'fs';
 import { remote } from 'electron';
+import BaseModal from './BaseModal';
 const { dialog } = remote;
 
 const ConfirmDrawModal = ({ promise }) => {
@@ -50,7 +51,7 @@ const ConfirmDrawModal = ({ promise }) => {
     }, []);
 
     return (
-        <Modal show={show} onHide={() => handleClose()}>
+        <BaseModal show={show} onHide={() => handleClose()}>
             <Modal.Header closeButton>
                 <Modal.Title>Confirm Graph Draw</Modal.Title>
             </Modal.Header>
@@ -88,7 +89,7 @@ const ConfirmDrawModal = ({ promise }) => {
                     Draw Graph
                 </Button>
             </Modal.Footer>
-        </Modal>
+        </BaseModal>
     );
 };
 
