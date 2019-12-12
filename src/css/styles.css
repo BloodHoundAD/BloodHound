@@ -887,27 +887,6 @@ div.tooltip-inner-custom {
     cursor: move;
 }
 
-.sliderinput {
-    float: left;
-    width: 3em;
-}
-
-.sliderfix .slideinline {
-    display: inline-block;
-}
-
-.sliderfix .slideinline > .track {
-    margin-top: -2.5px !important;
-}
-
-.sliderfix .slideinline > .dragger {
-    margin-top: -5px !important;
-}
-
-.sliderfix i {
-    margin-left: 5px;
-}
-
 .center-align {
     text-align: center;
 }
