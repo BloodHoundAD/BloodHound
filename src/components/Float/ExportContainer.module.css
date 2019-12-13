@@ -58,3 +58,8 @@
 .dark :global .list-group-item:hover .list-group-item-heading {
     color: black !important;
 }
+
+.dark .centerButton :global button {
+    background: black;
+    color: white;
+}
