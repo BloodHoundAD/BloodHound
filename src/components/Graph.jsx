@@ -46,6 +46,8 @@ class GraphContainer extends Component {
                 y: null,
                 edge: null,
             },
+            ctrlDown: false,
+            otherDown: false,
         };
 
         child.stdout.on('data', data => {
@@ -1465,16 +1467,28 @@ class GraphContainer extends Component {
         });
 
         //Some key binds
+        $(window).on('keydown', e => {
+            let key = e.key;
+            if (key === 'Control' || key === 'ControlRight') {
+                this.setState({
+                    ctrlDown: true,
+                });
+            } else {
+                this.setState({
+                    otherDown: true,
+                });
+            }
+        });
         $(window).on(
             'keyup',
             function(e) {
-                let key = e.code;
                 let mode = appStore.performance.nodeLabels;
                 let sigmaInstance = this.state.sigmaInstance;
 
                 if (
                     document.activeElement === document.body &&
-                    key === 'ControlRight'
+                    this.state.ctrlDown &&
+                    !this.state.otherDown
                 ) {
                     mode = mode + 1;
                     if (mode > 2) {
@@ -1496,6 +1510,11 @@ class GraphContainer extends Component {
 
                     sigmaInstance.refresh({ skipIndexation: true });
                 }
+
+                this.setState({
+                    ctrlDown: false,
+                    otherDown: false,
+                });
             }.bind(this)
         );
 
