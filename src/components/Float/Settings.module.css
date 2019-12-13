@@ -40,3 +40,13 @@
     background-color: black;
     color: white;
 }
+
+.dark :global select {
+    background-color: black;
+    color: white;
+}
+
+.dark :global input {
+    background-color: black;
+    color: white;
+}
