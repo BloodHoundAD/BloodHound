@@ -1,5 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
+import styles from './Tooltips.module.css';
+import clsx from 'clsx';
+import { AppContext } from '../../AppContext';
 
 const EdgeTooltip = ({ edge, x, y }) => {
     let label = edge.label;
@@ -9,6 +12,7 @@ const EdgeTooltip = ({ edge, x, y }) => {
 
     const [realX, setRealX] = useState(0);
     const [realY, setRealY] = useState(0);
+    const context = useContext(AppContext);
 
     useEffect(() => {
         let rect = tooltipDiv.current.getBoundingClientRect();
@@ -27,14 +31,17 @@ const EdgeTooltip = ({ edge, x, y }) => {
     return (
         <div
             ref={tooltipDiv}
-            className={'new-tooltip'}
+            className={clsx(
+                styles.tooltip,
+                context.darkMode ? styles.dark : null
+            )}
             style={{
                 left: realX === 0 ? x : realX,
                 top: realY === 0 ? y : realY,
             }}
         >
-            <div className='header'>{label}</div>
-            <ul className='tooltip-ul'>
+            <div>{label}</div>
+            <ul>
                 <li
                     onClick={() => {
                         emitter.emit('getHelp', id);

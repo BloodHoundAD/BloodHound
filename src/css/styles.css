@@ -264,11 +264,6 @@ div.tooltip-inner-custom {
     margin-left: 5px;
 }
 
-.tooltip-ul i {
-    width: 20px;
-    text-align: center;
-}
-
 .glyph-hover-style:hover {
     background-color: #247ba0;
     color: white;
@@ -989,16 +984,6 @@ div.tooltip-inner-custom {
     width: 0;
     height: 0;
     overflow: hidden;
-}
-
-.floating-div {
-    position: absolute;
-    z-index: 20;
-    top: 1em;
-    right: 10em;
-    overflow: auto;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
 .queryNodeSelect {

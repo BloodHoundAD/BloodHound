@@ -1,5 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import { If, Then, Else } from 'react-if';
+import styles from './Tooltips.module.css';
+import clsx from 'clsx';
+import { AppContext } from '../../AppContext';
 
 const NodeTooltip = ({ node, x, y }) => {
     let type = node.type;
@@ -9,6 +12,8 @@ const NodeTooltip = ({ node, x, y }) => {
 
     const [realX, setRealX] = useState(0);
     const [realY, setRealY] = useState(0);
+
+    const context = useContext(AppContext);
 
     const tooltipDiv = useRef(null);
 
@@ -29,14 +34,17 @@ const NodeTooltip = ({ node, x, y }) => {
     return (
         <div
             ref={tooltipDiv}
-            className={'new-tooltip'}
+            className={clsx(
+                styles.tooltip,
+                context.darkMode ? styles.dark : null
+            )}
             style={{
                 left: realX === 0 ? x : realX,
                 top: realY === 0 ? y : realY,
             }}
         >
-            <div className='header'>{label}</div>
-            <ul className='tooltip-ul'>
+            <div>{label}</div>
+            <ul>
                 <If condition={type === 'OU'}>
                     <Then>
                         <li
