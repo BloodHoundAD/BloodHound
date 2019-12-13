@@ -1051,6 +1051,11 @@ div.tooltip-inner-custom {
     overflow-y: auto;
 }
 
+.tab-content > div:last-child > div {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
 .help-modal-width > div {
     width: 40%;
 }
