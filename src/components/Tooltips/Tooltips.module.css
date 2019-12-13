@@ -50,3 +50,7 @@
     background: black;
     color: white;
 }
+
+.dark :global li:hover {
+    color: black;
+}

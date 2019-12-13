@@ -786,13 +786,8 @@ div.tooltip-inner-custom {
     }
 }
 
-.spotlight-nodelist {
-    overflow: auto;
-    background-color: white;
-}
-
-.spotlight-nodelist table > thead {
-    text-align: center;
+.spotlight table {
+    margin-bottom: 0;
 }
 
 .no-border-radius span {

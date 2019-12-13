@@ -1,15 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import PoseContainer from '../PoseContainer';
 import GlyphiconSpan from '../GlyphiconSpan';
 import Icon from '../Icon';
 import SpotlightRow from './SpotlightRow';
+import { Table } from 'react-bootstrap';
+import { AppContext } from '../../AppContext';
+import clsx from 'clsx';
+import styles from './SpotlightContainer.module.css';
 
 const SpotlightContainer = () => {
     const [data, setData] = useState(appStore.spotlightData);
     const [searchVal, setSearchVal] = useState('');
     const [regex, setRegex] = useState(new RegExp('', 'i'));
     const [visible, setVisible] = useState(false);
+    const context = useContext(AppContext);
 
     const updateSpotlight = () => {
         setData(appStore.spotlightData);
@@ -47,15 +52,18 @@ const SpotlightContainer = () => {
             emitter.removeListener('spotlightUpdate', updateSpotlight);
             emitter.removeListener('spotlightClick', closeSpotlight);
             emitter.removeListener('resetSpotlight', resetSpotlight);
+            window.removeEventListener('keyup', handleSpace);
         };
     }, []);
 
     return (
         <PoseContainer
             pose={visible ? 'visible' : 'hidden'}
-            className='spotlight'
+            className={clsx('spotlight', context.darkMode ? styles.dark : null)}
         >
-            <div className='input-group input-group-unstyled no-border-radius'>
+            <div
+                className={'input-group input-group-unstyled no-border-radius'}
+            >
                 <GlyphiconSpan
                     tooltip={false}
                     classes='input-group-addon spanfix'
@@ -73,8 +81,8 @@ const SpotlightContainer = () => {
                 />
             </div>
 
-            <div className='spotlight-nodelist'>
-                <table data-role='table' className='table table-striped'>
+            <div className={styles.nodelist}>
+                <Table>
                     <thead>
                         <tr>
                             <td>Node Label</td>
@@ -103,7 +111,7 @@ const SpotlightContainer = () => {
                                 }.bind(this)
                             )}
                     </tbody>
-                </table>
+                </Table>
             </div>
         </PoseContainer>
     );
