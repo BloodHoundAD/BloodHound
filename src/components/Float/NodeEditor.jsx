@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { withAlert } from 'react-alert';
 import NodeEditorRow from './NodeEditorRow.jsx';
 import { Button, Panel, Table } from 'react-bootstrap';
-import { styles } from './NodeEditor.module.css';
+import styles from './NodeEditor.module.css';
 import PoseContainer from '../PoseContainer';
 import Draggable from 'react-draggable';
+import clsx from 'clsx';
+import { AppContext } from '../../AppContext.jsx';
 
 const NodeEditor = () => {
     const [name, setName] = useState('');
@@ -16,6 +18,7 @@ const NodeEditor = () => {
     const [newAttrName, setNewAttrName] = useState('');
     const [newAttrType, setNewAttrType] = useState('boolean');
     const [hasError, setHasError] = useState(false);
+    const context = useContext(AppContext);
 
     const getNodeData = node => {
         setName(node.label);
@@ -114,7 +117,10 @@ const NodeEditor = () => {
         <Draggable handle={'.panel-heading'}>
             <PoseContainer
                 pose={visible ? 'visible' : 'hidden'}
-                className='optionModal'
+                className={clsx(
+                    styles.container,
+                    context.darkMode ? styles.dark : null
+                )}
             >
                 <Panel>
                     <Panel.Heading>
@@ -130,7 +136,7 @@ const NodeEditor = () => {
 
                     <Panel.Body>
                         <div className='nodeEditTableContainer'>
-                            <Table striped>
+                            <Table>
                                 <thead align='center'>
                                     <tr>
                                         <td>Delete</td>

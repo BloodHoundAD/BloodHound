@@ -205,20 +205,6 @@ div.tooltip-inner-custom {
     overflow-y: auto;
 }
 
-.optionModal {
-    position: absolute;
-    z-index: 20;
-    top: 1em;
-    right: 10em;
-    overflow: auto;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
-}
-
-.optionModal .panel-heading {
-    cursor: move;
-}
-
 .formButtonFix:focus {
     border: 1px solid #ccc !important;
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075) !important;

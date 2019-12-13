@@ -59,7 +59,10 @@ const Settings = () => {
         <Draggable handle={'.panel-heading'}>
             <PoseContainer
                 pose={open ? 'visible' : 'hidden'}
-                className='optionModal'
+                className={clsx(
+                    styles.container,
+                    context.darkMode ? styles.dark : null
+                )}
             >
                 <Panel>
                     <Panel.Heading>
