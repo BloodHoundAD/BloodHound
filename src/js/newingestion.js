@@ -3,7 +3,8 @@ import { groupBy } from 'lodash/collection';
 export function buildGroupJsonNew(chunk) {
     let queries = {};
     queries.properties = {};
-    queries.properties.statement = 'UNWIND {props} AS prop MERGE (n:Group {objectid: prop.source}) SET n += prop.map';
+    queries.properties.statement =
+        'UNWIND {props} AS prop MERGE (n:Group {objectid: prop.source}) SET n += prop.map';
     queries.properties.props = [];
 
     for (let group of chunk) {
@@ -12,19 +13,21 @@ export function buildGroupJsonNew(chunk) {
         let aces = group.Aces;
         let members = group.Members;
 
-        queries.properties.props.push({source:identifier, map: properties})
+        queries.properties.props.push({ source: identifier, map: properties });
 
         processAceArrayNew(aces, identifier, 'Group', queries);
 
-        let format = ['', 'Group', 'MemberOf', '{isacl: false}']
+        let format = ['', 'Group', 'MemberOf', '{isacl: false}'];
         let grouped = groupBy(members || [], 'MemberType');
-        for (let group in grouped){
+        for (let group in grouped) {
             format[0] = group;
-            let props = grouped[group].filter(g => {
-                return g.MemberId != null;
-            }).map(g => {
-                return {source: g.MemberId, target: identifier}
-            });
+            let props = grouped[group]
+                .filter(g => {
+                    return g.MemberId != null;
+                })
+                .map(g => {
+                    return { source: g.MemberId, target: identifier };
+                });
 
             insertNew(queries, format, props);
         }
@@ -71,7 +74,7 @@ export function buildComputerJsonNew(chunk) {
         });
 
         insertNew(queries, format, props);
-        
+
         format = ['', 'Computer', 'AllowedToAct', '{isacl:false}'];
         grouped = groupBy(allowedToAct || [], 'MemberType');
         for (let group in grouped) {
@@ -175,19 +178,20 @@ export function buildUserJsonNew(chunk) {
     return queries;
 }
 
-export function buildGpoJsonNew(chunk){
+export function buildGpoJsonNew(chunk) {
     let queries = {};
     queries.properties = {
-        statement: 'UNWIND {props} AS prop MERGE (n:GPO {objectid: prop.source}) SET n+= prop.map',
-        props: []
-    }
+        statement:
+            'UNWIND {props} AS prop MERGE (n:GPO {objectid: prop.source}) SET n+= prop.map',
+        props: [],
+    };
 
-    for (let gpo of chunk){
+    for (let gpo of chunk) {
         let identifier = gpo.ObjectIdentifier;
         let aces = gpo.Aces;
         let properties = gpo.Properties;
 
-        queries.properties.props.push({source: identifier, map: properties})
+        queries.properties.props.push({ source: identifier, map: properties });
         processAceArrayNew(aces, identifier, 'GPO', queries);
     }
 
@@ -239,13 +243,20 @@ export function buildOuJsonNew(chunk) {
         });
         insertNew(queries, format, props);
 
-
-        format = ['GPO', 'OU', 'GpLink', '{isacl: false, enforced: prop.enforced}']
+        format = [
+            'GPO',
+            'OU',
+            'GpLink',
+            '{isacl: false, enforced: prop.enforced}',
+        ];
         props = links.map(link => {
-            return {source: link.Guid.toUpperCase(), target: identifier, enforced: link.IsEnforced}
-        })
-        insertNew(queries, format, props)
-
+            return {
+                source: link.Guid.toUpperCase(),
+                target: identifier,
+                enforced: link.IsEnforced,
+            };
+        });
+        insertNew(queries, format, props);
 
         format = ['', 'Computer', '', '{isacl: false, fromgpo: true}'];
         let grouped = groupBy(admins, 'MemberType');
@@ -324,7 +335,7 @@ export function buildDomainJsonNew(chunk) {
         let identifier = domain.ObjectIdentifier;
         let aces = domain.Aces;
         let links = domain.Links || [];
-        let trusts = domain.Trusts || []
+        let trusts = domain.Trusts || [];
 
         processAceArrayNew(aces, identifier, 'Domain', queries);
 
@@ -343,8 +354,7 @@ export function buildDomainJsonNew(chunk) {
         props = computers.map(computer => {
             return { source: identifier, target: computer };
         });
-        insertNew(queries, format, props)
-
+        insertNew(queries, format, props);
 
         format = ['Domain', 'OU', 'Contains', '{isacl: false}'];
         props = childOus.map(ou => {
@@ -352,11 +362,19 @@ export function buildDomainJsonNew(chunk) {
         });
         insertNew(queries, format, props);
 
-
-        format = ['GPO', 'Domain', 'GpLink', '{isacl: false, enforced: prop.enforced}']
+        format = [
+            'GPO',
+            'Domain',
+            'GpLink',
+            '{isacl: false, enforced: prop.enforced}',
+        ];
         props = links.map(link => {
-            return {source: link.Guid, target: identifier, enforced: link.IsEnforced}
-        })
+            return {
+                source: link.Guid,
+                target: identifier,
+                enforced: link.IsEnforced,
+            };
+        });
 
         insertNew(queries, format, props);
 
@@ -375,8 +393,13 @@ export function buildDomainJsonNew(chunk) {
         Unknown = 4
         "UNWIND {props} AS prop MERGE (n:Domain {name: prop.a}) MERGE (m:Domain {name: prop.b}) MERGE (n)-[:TrustedBy {trusttype : prop.trusttype, transitive: prop.transitive, isacl:false}]->(m)",
         */
-        format = ['Domain', 'Domain', 'TrustedBy', '{sidfiltering: prop.sidfiltering, trusttype: prop.trusttype, transitive: prop.transitive, isacl: false}']
-        for (let trust of trusts){
+        format = [
+            'Domain',
+            'Domain',
+            'TrustedBy',
+            '{sidfiltering: prop.sidfiltering, trusttype: prop.trusttype, transitive: prop.transitive, isacl: false}',
+        ];
+        for (let trust of trusts) {
             let direction = trust.TrustDirection;
             let transitive = trust.IsTransitive;
             let target = trust.TargetDomainSid;
@@ -384,7 +407,7 @@ export function buildDomainJsonNew(chunk) {
             let trustType = trust.TrustType;
             let targetName = trust.TargetDomainName;
 
-            switch (trustType){
+            switch (trustType) {
                 case 0:
                     trustType = 'ParentChild';
                     break;
@@ -401,14 +424,29 @@ export function buildDomainJsonNew(chunk) {
                     trustType = 'Unknown';
             }
 
-            queries.properties.props.push({source: target, map:{name: targetName}});
-            
-            if (direction === 1 || direction === 3){
-                insertNew(queries, format, {source: identifier, target: target, trusttype: trustType, transitive: transitive, sidfiltering: sidFilter});
+            queries.properties.props.push({
+                source: target,
+                map: { name: targetName },
+            });
+
+            if (direction === 1 || direction === 3) {
+                insertNew(queries, format, {
+                    source: identifier,
+                    target: target,
+                    trusttype: trustType,
+                    transitive: transitive,
+                    sidfiltering: sidFilter,
+                });
             }
 
-            if (direction === 2 || direction === 3){
-                insertNew(queries, format, {source: target, target: identifier, trusttype: trustType, transitive: transitive, sidfiltering: sidFilter});
+            if (direction === 2 || direction === 3) {
+                insertNew(queries, format, {
+                    source: target,
+                    target: identifier,
+                    trusttype: trustType,
+                    transitive: transitive,
+                    sidfiltering: sidFilter,
+                });
             }
         }
 
@@ -524,7 +562,7 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
             rights.push('AddMember');
         } else if (aceType === 'AllowedToAct') {
             rights.push('AddAllowedToAct');
-        } else if (right === 'ExtendedRight' && aceType != "") {
+        } else if (right === 'ExtendedRight' && aceType != '') {
             rights.push(aceType);
         }
 
@@ -552,24 +590,42 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
             rights.push('ReadLAPSPassword');
         }
 
+        if (right === 'ReadGMSAPassword') {
+            rights.push('ReadGMSAPassword');
+        }
+
         return rights.map(right => {
-            return { pSid: pSid, right: right, pType: pType, isInherited: isInherited };
+            return {
+                pSid: pSid,
+                right: right,
+                pType: pType,
+                isInherited: isInherited,
+            };
         });
     });
 
     convertedAces = convertedAces.filter(ace => {
         return ace != null;
-    })
+    });
 
     var grouped = groupBy(convertedAces, 'right');
-    let format = ['', objecttype, '', '{isacl: true, isinherited: prop.isinherited}'];
+    let format = [
+        '',
+        objecttype,
+        '',
+        '{isacl: true, isinherited: prop.isinherited}',
+    ];
     for (let right in grouped) {
         let innerGrouped = groupBy(grouped[right], 'pType');
         for (let inner in innerGrouped) {
             format[0] = inner;
             format[2] = right;
             var mapped = innerGrouped[inner].map(x => {
-                return { source: x.pSid, target: objectid, isinherited: x.isInherited };
+                return {
+                    source: x.pSid,
+                    target: objectid,
+                    isinherited: x.isInherited,
+                };
             });
             insertNew(queries, format, mapped);
         }

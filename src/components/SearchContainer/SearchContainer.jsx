@@ -128,6 +128,7 @@ const SearchContainer = () => {
             current.WriteDacl = false;
             current.WriteOwner = false;
             current.ReadLAPSPassword = false;
+            current.ReadGMSAPassword = false;
         } else if (section === 'special') {
             current.CanRDP = false;
             current.ExecuteDCOM = false;
@@ -161,6 +162,7 @@ const SearchContainer = () => {
             current.WriteDacl = true;
             current.WriteOwner = true;
             current.ReadLAPSPassword = true;
+            current.ReadGMSAPassword = true;
         } else if (section === 'special') {
             current.CanRDP = true;
             current.ExecuteDCOM = true;
@@ -241,7 +243,7 @@ const SearchContainer = () => {
 
         let stop = false;
         if (!$('.searchSelectorS > ul').is(':hidden')) {
-            $('.searchSelectorS > ul li').each(function (i) {
+            $('.searchSelectorS > ul li').each(function(i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -249,7 +251,7 @@ const SearchContainer = () => {
         }
 
         if (!$('.searchSelectorP > ul').is(':hidden')) {
-            $('.searchSelectorP > ul li').each(function (i) {
+            $('.searchSelectorP > ul li').each(function(i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -272,7 +274,7 @@ const SearchContainer = () => {
 
         let stop = false;
         if (!$('.searchSelectorS > ul').is(':hidden')) {
-            $('.searchSelectorS > ul li').each(function (i) {
+            $('.searchSelectorS > ul li').each(function(i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -280,7 +282,7 @@ const SearchContainer = () => {
         }
 
         if (!$('.searchSelectorP > ul').is(':hidden')) {
-            $('.searchSelectorP > ul li').each(function (i) {
+            $('.searchSelectorP > ul li').each(function(i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -312,7 +314,7 @@ const SearchContainer = () => {
 
         let stop = false;
         if (!$('.searchSelectorS > ul').is(':hidden')) {
-            $('.searchSelectorS > ul li').each(function (i) {
+            $('.searchSelectorS > ul li').each(function(i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -320,7 +322,7 @@ const SearchContainer = () => {
         }
 
         if (!$('.searchSelectorP > ul').is(':hidden')) {
-            $('.searchSelectorP > ul li').each(function (i) {
+            $('.searchSelectorP > ul li').each(function(i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -573,6 +575,22 @@ const SearchContainer = () => {
                         ReadLAPSPassword
                     </label>
                 </div>
+                <div>
+                    <input
+                        className='checkbox-inline'
+                        type='checkbox'
+                        name='ReadGMSAPassword'
+                        checked={edgeIncluded.ReadGMSAPassword}
+                        onChange={e => handleEdgeChange(e)}
+                    />
+                    <label
+                        onClick={e => handleEdgeChange(e)}
+                        name='ReadGMSAPassword'
+                    >
+                        {' '}
+                        ReadGMSAPassword
+                    </label>
+                </div>
                 <div className={'edge-filter-heading'}>
                     <h4>Containers</h4>
                     <button
@@ -786,7 +804,7 @@ const SearchContainer = () => {
                     tooltipDir='bottom'
                     tooltipTitle='Back'
                     classes='input-group-addon spanfix glyph-hover-style'
-                    click={function () {
+                    click={function() {
                         emitter.emit('graphBack');
                     }}
                 >
