@@ -26,6 +26,7 @@ class UserNodeData extends Component {
             propertyMap: {},
             ServicePrincipalNames: [],
             AllowedToDelegate: [],
+            HasSIDHistory: [],
             displayMap: {
                 displayname: 'Display Name',
                 pwdlastset: 'Password Last Changed',
@@ -45,7 +46,7 @@ class UserNodeData extends Component {
             pics: [],
             currentImage: 0,
             lightboxIsOpen: false,
-            objectid: ''
+            objectid: '',
         };
 
         emitter.on('userNodeClicked', this.getNodeData.bind(this));
@@ -162,7 +163,7 @@ class UserNodeData extends Component {
     getNodeData(payload) {
         jQuery(this.refs.complete).hide();
         jQuery(this.refs.piccomplete).hide();
-        $.each(this.state.driversessions, function (index, record) {
+        $.each(this.state.driversessions, function(index, record) {
             record.close();
         });
 
@@ -184,7 +185,9 @@ class UserNodeData extends Component {
 
         var props = driver.session();
         props
-            .run('MATCH (n:User {objectid: {objectid}}) RETURN n', { objectid: payload })
+            .run('MATCH (n:User {objectid: {objectid}}) RETURN n', {
+                objectid: payload,
+            })
             .then(result => {
                 var properties = result.records[0]._fields[0].properties;
                 let name = properties.name || properties.objectid;
@@ -208,12 +211,21 @@ class UserNodeData extends Component {
                 } else {
                     del = properties.allowedtodelegate;
                 }
+
+                let sih;
+                if (!properties.sidhistory) {
+                    sih = [];
+                } else {
+                    sih = properties.sidhistory;
+                }
+
                 this.setState({
                     ServicePrincipalNames: spn,
                     AllowedToDelegate: del,
+                    HasSIDHistory: sih,
                     propertyMap: properties,
                     notes: notes,
-                    label: name
+                    label: name,
                 });
 
                 props.close();
@@ -238,10 +250,13 @@ class UserNodeData extends Component {
                 q.close();
             });
         } else {
-            q.run('MATCH (n:User {objectid:{objectid}}) SET n.notes = {notes}', {
-                objectid: this.state.objectid,
-                notes: this.state.notes,
-            }).then(x => {
+            q.run(
+                'MATCH (n:User {objectid:{objectid}}) SET n.notes = {notes}',
+                {
+                    objectid: this.state.objectid,
+                    notes: this.state.notes,
+                }
+            ).then(x => {
                 q.close();
             });
         }
@@ -251,7 +266,7 @@ class UserNodeData extends Component {
     }
 
     render() {
-        let domain = this.state.propertyMap.domain || ''
+        let domain = this.state.propertyMap.domain || '';
 
         let gallery;
         if (this.state.pics.length === 0) {
@@ -286,6 +301,7 @@ class UserNodeData extends Component {
                         properties={this.state.propertyMap}
                         displayMap={this.state.displayMap}
                         ServicePrincipalNames={this.state.ServicePrincipalNames}
+                        HasSIDHistory={this.state.HasSIDHistory}
                         AllowedToDelegate={this.state.AllowedToDelegate}
                     />
 

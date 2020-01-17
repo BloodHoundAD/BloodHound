@@ -136,6 +136,7 @@ const SearchContainer = () => {
             current.AddAllowedToAct = false;
             current.AllowedToAct = false;
             current.SQLAdmin = false;
+            current.HasSIDHistory = false;
         } else {
             current.Contains = false;
             current.GpLink = false;
@@ -170,6 +171,7 @@ const SearchContainer = () => {
             current.AddAllowedToAct = true;
             current.AllowedToAct = true;
             current.SQLAdmin = true;
+            current.HasSIDHistory = true;
         } else {
             current.Contains = true;
             current.GpLink = true;
@@ -739,6 +741,22 @@ const SearchContainer = () => {
                     <label onClick={e => handleEdgeChange(e)} name='SQLAdmin'>
                         {' '}
                         SQLAdmin
+                    </label>
+                </div>
+                <div>
+                    <input
+                        className='checkbox-inline'
+                        type='checkbox'
+                        name='HasSIDHistory'
+                        checked={edgeIncluded.HasSIDHistory}
+                        onChange={e => handleEdgeChange(e)}
+                    />
+                    <label
+                        onClick={e => handleEdgeChange(e)}
+                        name='HasSIDHistory'
+                    >
+                        {' '}
+                        HasSIDHistory
                     </label>
                 </div>
             </div>

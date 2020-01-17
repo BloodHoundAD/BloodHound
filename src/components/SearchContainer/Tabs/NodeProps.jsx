@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export default class componentName extends Component {
+export default class NodeProps extends Component {
     constructor(props) {
         super(props);
     }
@@ -40,6 +40,14 @@ export default class componentName extends Component {
                 }
             }.bind(this)
         );
+
+        if (this.props.HasSIDHistory && this.props.HasSIDHistory.length > 0) {
+            l.push(<dt key='sih'>SID History</dt>);
+            $.each(this.props.HasSIDHistory, function(_, value) {
+                l.push(<dd key={count}>{value}</dd>);
+                count++;
+            });
+        }
 
         if (
             this.props.ServicePrincipalNames &&

@@ -273,6 +273,7 @@ const AddEdgeModal = () => {
                             </option>
                             <option value='AllowedToAct'>AllowedToAct</option>
                             <option value='SQLAdmin'>SQLAdmin</option>
+                            <option value='HasSIDHistory'>HasSIDHistory</option>
                         </FormControl>
                         {errors.edgeErrors.length > 0 && (
                             <span className={styles.error}>

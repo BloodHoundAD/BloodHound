@@ -149,6 +149,7 @@ export function buildUserJsonNew(chunk) {
         let primaryGroup = user.PrimaryGroupSid;
         let allowedToDelegate = user.AllowedToDelegate;
         let spnTargets = user.SPNTargets;
+        let sidHistory = user.HasSIDHistory;
         let aces = user.Aces;
 
         processAceArrayNew(aces, identifier, 'User', queries);
@@ -172,6 +173,18 @@ export function buildUserJsonNew(chunk) {
         });
 
         insertNew(queries, format, props);
+
+        format = ['User', '', 'HasSIDHistory', '{isacl: false}'];
+        let grouped = groupBy(sidHistory, 'ObjectType');
+        for (let x in grouped) {
+            format[1] = x;
+            format[2] = 'HasSIDHistory';
+            props = grouped[x].map(history => {
+                return { source: identifier, target: history.ObjectIdentifier };
+            });
+
+            insertNew(queries, format, props);
+        }
 
         processSPNTargetArrayNew(spnTargets, identifier, queries);
     }

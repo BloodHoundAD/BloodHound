@@ -25,6 +25,8 @@ import GpLink from './HelpTexts/GpLink/GpLink';
 import AddAllowedToAct from './HelpTexts/AddAllowedToAct/AddAllowedToAct';
 import AllowedToAct from './HelpTexts/AllowedToAct/AllowedToAct';
 import SQLAdmin from './HelpTexts/SQLAdmin/SQLAdmin';
+import ReadGMSAPassword from './HelpTexts/ReadGMSAPassword/ReadGMSAPassword';
+import HasSIDHistory from './HelpTexts/HasSIDHistory/HasSIDHistory';
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -77,6 +79,8 @@ const HelpModal = () => {
         AddAllowedToAct: AddAllowedToAct,
         AllowedToAct: AllowedToAct,
         SQLAdmin: SQLAdmin,
+        ReadGMSAPassword: ReadGMSAPassword,
+        HasSIDHistory: HasSIDHistory,
     };
 
     const Component = components[edge];
