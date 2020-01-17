@@ -268,6 +268,10 @@ const AddEdgeModal = () => {
                             <option value='AllowedToDelegate'>
                                 AllowedToDelegate
                             </option>
+                            <option value='AddAllowedToAct'>
+                                AddAllowedToAct
+                            </option>
+                            <option value='AllowedToAct'>AllowedToAct</option>
                             <option value='SQLAdmin'>SQLAdmin</option>
                         </FormControl>
                         {errors.edgeErrors.length > 0 && (
