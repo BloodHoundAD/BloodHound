@@ -1,6 +1,5 @@
 const Opsec = () => {
-    //TODO: Add This
-    let text = ``;
+    let text = `No opsec considerations apply to this edge.`;
     return { __html: text };
 };
 
