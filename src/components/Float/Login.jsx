@@ -1,33 +1,54 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import PropTypes from 'prop-types';
+import { Button } from 'react-bootstrap';
+import clsx from 'clsx';
+import posed from 'react-pose';
 
-export default class Login extends Component {
-    constructor() {
-        super();
-        this.state = {
-            url: 'bolt://localhost:7687',
-            icon: null,
-            loginEnabled: false,
-            user: '',
-            password: '',
-            loginInProgress: false,
-            save: false,
-        };
-    }
+const LoginContainer = posed.div({
+    visible: {
+        opacity: 1,
+        transition: { duration: 400 },
+        applyAtStart: { display: 'block' },
+    },
+    hidden: {
+        opacity: 0,
+        transition: { duration: 400 },
+        applyAtEnd: { display: 'none' },
+    },
+});
 
-    componentWillMount() {
-        var c = conf.get('databaseInfo');
-        if (typeof c !== 'undefined') {
-            this.setState({
-                url: c.url,
-                user: c.user,
-                password: c.password,
-                save: true,
-            });
+const Login = () => {
+    const [url, setUrl] = useState('bolt://localhost:7687');
+    const [loginEnabled, setLoginEnabled] = useState(false);
+    const [loginRunning, setLoginRunning] = useState(false);
+    const [user, setUser] = useState('');
+    const [password, setPassword] = useState('');
+    const [save, setSave] = useState(false);
+    const [icon, setIcon] = useState(null);
+
+    const [pwfReady, setPwfReady] = useState(false);
+    const [iconReady, setIconReady] = useState(false);
+    const [buttonReady, setButtonReady] = useState(false);
+
+    const [loginSuccess, setLoginSuccess] = useState(false);
+    const [visible, setVisible] = useState(true);
+
+    const passwordRef = useRef(null);
+    const iconRef = useRef(null);
+    const buttonRef = useRef(null);
+
+    useEffect(() => {
+        let config = conf.get('databaseInfo');
+        if (typeof config !== 'undefined') {
+            setUrl(config.url);
+            setUser(config.user);
+            setPassword(config.password);
+            setSave(true);
         }
-    }
+    }, []);
 
-    componentDidMount() {
-        jQuery(this.refs.password).tooltip({
+    useEffect(() => {
+        jQuery(passwordRef.current).tooltip({
             placement: 'right',
             title: '',
             container: 'body',
@@ -35,17 +56,12 @@ export default class Login extends Component {
             template:
                 '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-custom"></div></div>',
         });
-        this.setIcon();
 
-        if (this.state.password !== '') {
-            this.checkDBCreds();
-        } else {
-            this.checkDBPresence();
-        }
-    }
+        setPwfReady(true);
+    }, [passwordRef]);
 
-    setIcon() {
-        var icon = jQuery(this.refs.urlspinner);
+    useEffect(() => {
+        let icon = jQuery(iconRef.current);
         icon.tooltip({
             placement: 'right',
             title: '',
@@ -54,340 +70,301 @@ export default class Login extends Component {
             template:
                 '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-custom"></div></div>',
         });
+
         icon.toggle(false);
-        this.setState({ icon: jQuery(this.refs.urlspinner) });
-    }
+        setIcon(icon);
 
-    checkDBPresence() {
-        let url = this.state.url;
-        let icon = jQuery(this.refs.urlspinner);
+        setIconReady(true);
+    }, [iconRef]);
 
-        if (url === '') {
-            return;
-        }
+    useEffect(() => {
+        setButtonReady(true);
+    }, [buttonRef]);
 
-        jQuery(this.refs.urlspinner).toggle(true);
-
-        url = url.replace(/\/$/, '');
-
-        if (!url.includes(':')) {
-            url = url + ':7687';
-        }
-
-        if (!url.startsWith('bolt://')) {
-            url = 'bolt://' + url;
-        }
-
-        icon.removeClass();
-        icon.addClass('fa fa-spinner fa-spin form-control-feedback');
-        icon.toggle(true);
-        var driver = neo4j.driver(url, neo4j.auth.basic('', ''));
-        var session = driver.session();
-
-        driver.onCompleted = function() {
-            session.close();
-            driver.close();
-        };
-        driver.onError = error => {
-            if (error.code.includes('Unauthorized')) {
-                icon.removeClass();
-                icon.addClass(
-                    'fa fa-check-circle green-icon-color form-control-feedback'
-                );
-                this.setState({ loginEnabled: true, url: url });
+    useEffect(() => {
+        if (pwfReady && iconReady && buttonReady) {
+            if (password !== '') {
+                checkDatabaseCreds();
             } else {
-                icon.removeClass();
-                icon.addClass(
-                    'fa fa-times-circle red-icon-color form-control-feedback'
-                );
-                icon.attr('data-original-title', 'No database found')
-                    .tooltip('fixTitle')
-                    .tooltip('show');
-                this.setState({
-                    loginInProgress: false,
-                    loginEnabled: false,
-                });
+                checkDatabaseExists();
             }
-            session.close();
-            driver.close();
-        };
-    }
+        }
+    }, [pwfReady, iconReady, buttonReady]);
 
-    checkDBCreds() {
-        if (this.state.loginInProgress) {
+    const checkDatabaseCreds = () => {
+        if (loginRunning) {
             return;
         }
-        this.setState({
-            loginInProgress: true,
-            loginEnabled: false,
-        });
 
-        var btn = jQuery(this.refs.loginButton);
-        var pwf = jQuery(this.refs.password);
+        setLoginRunning(true);
+        setLoginEnabled(false);
 
-        var driver = neo4j.driver(
-            this.state.url,
-            neo4j.auth.basic(this.state.user, this.state.password)
-        );
-        driver.onError = error => {
-            console.log(error);
-            if (error.message.includes('authentication failure')) {
-                btn.removeClass('activate');
-                this.setState({
-                    loginInProgress: false,
-                    loginEnabled: true,
-                });
-                pwf.attr('data-original-title', 'Invalid username or password')
-                    .tooltip('fixTitle')
-                    .tooltip('show');
-            } else if (error.message.includes('too many times in a row')) {
-                btn.removeClass('activate');
-                this.setState({
-                    loginInProgress: false,
-                    loginEnabled: true,
-                });
-                pwf.attr(
-                    'data-original-title',
-                    'Too many authentication attempts, please wait'
-                )
-                    .tooltip('fixTitle')
-                    .tooltip('show');
-            } else if (error.toString().includes('ECONNREFUSED')) {
-                var icon = this.state.icon;
-                icon.toggle('true');
-                icon.removeClass();
-                icon.addClass(
-                    'fa fa-times-circle red-icon-color form-control-feedback'
-                );
-                icon.attr('data-original-title', 'No database found')
-                    .tooltip('fixTitle')
-                    .tooltip('show');
-                this.setState({
-                    loginInProgress: false,
-                    loginEnabled: false,
-                });
-            }
-            driver.close();
-        };
-        var session = driver.session();
-        session.run('MATCH (n) RETURN (n) LIMIT 1').subscribe({
-            onError: error => {
-                btn.removeClass('activate');
-                var url = this.state.url
-                    .replace('bolt://', 'http://')
-                    .replace('7687', '7474');
-                //This block will trip for neo4j < 3.4
-                if (
-                    error.fields &&
-                    error.fields[0].code ===
-                        'Neo.ClientError.Security.CredentialsExpired'
-                ) {
-                    pwf.attr(
-                        'data-original-title',
-                        'Credentials need to be changed from the neo4j browser first. Go to {} and change them.'.format(
-                            url
-                        )
-                    )
-                        .tooltip('fixTitle')
-                        .tooltip('show');
-                    this.setState({
-                        loginInProgress: false,
-                        loginEnabled: true,
-                    });
-                }
+        let driver = neo4j.driver(url, neo4j.auth.basic(user, password));
+        let session = driver.session();
 
-                if (
-                    error.code &&
-                    error.code === 'Neo.ClientError.Security.CredentialsExpired'
-                ) {
-                    pwf.attr(
-                        'data-original-title',
-                        'Credentials need to be changed from the neo4j browser first. Go to {} and change them.'.format(
-                            url
-                        )
-                    )
-                        .tooltip('fixTitle')
-                        .tooltip('show');
-                    this.setState({
-                        loginInProgress: false,
-                        loginEnabled: true,
-                    });
-                }
-            },
-            onNext: _ => {},
-            onCompleted: _ => {
-                btn.toggleClass('activate');
-                btn.removeClass('btn-default');
-                btn.addClass('btn-success');
-                btn.html('Success!');
-                this.setState({
-                    loginInProgress: false,
-                });
+        let pwf = jQuery(passwordRef.current);
+        pwf.tooltip('hide');
 
-                var dbinfo = {
-                    url: this.state.url,
-                    user: this.state.user,
-                    password: this.state.password,
+        let btn = jQuery(buttonRef.current);
+
+        let tempUrl = url.replace('bolt://', 'http://').replace('7687', '7474');
+
+        session
+            .run('MATCH (n) RETURN n LIMIT 1')
+            .then(_ => {
+                setLoginRunning(false);
+                setLoginSuccess(true);
+
+                var dbInfo = {
+                    url: url,
+                    user: user,
+                    password: password,
                 };
 
-                if (this.state.save) {
-                    conf.set('databaseInfo', dbinfo);
+                if (save) {
+                    conf.set('databaseInfo', dbInfo);
                 }
 
-                appStore.databaseInfo = dbinfo;
+                appStore.databaseInfo = dbInfo;
 
-                jQuery(this.refs.password).tooltip('hide');
-                jQuery(this.refs.urlspinner).tooltip('hide');
-                setTimeout(_ => {
-                    jQuery(this.refs.outer).fadeOut(400, _ => {
-                        renderEmit.emit('login');
-                    });
-                }, 1500);
+                pwf.tooltip('hide');
+                icon.tooltip('hide');
+
+                session.close();
                 driver.close();
+
                 global.driver = neo4j.driver(
-                    this.state.url,
-                    neo4j.auth.basic(this.state.user, this.state.password),
+                    url,
+                    neo4j.auth.basic(user, password),
                     {
                         disableLosslessIntegers: true,
                         connectionTimeout: 120000,
                     }
                 );
-            },
-        });
 
-        btn.toggleClass('activate');
-    }
+                setTimeout(() => {
+                    setVisible(true);
+                    renderEmit.emit('login');
+                }, 1500);
+            })
+            .catch(error => {
+                console.log(error);
+                if (error.message.includes('authentication failure')) {
+                    setLoginEnabled(true);
+                    setLoginRunning(false);
 
-    _saveChange(event) {
-        this.setState({ save: event.target.checked });
-    }
+                    pwf.attr(
+                        'data-original-title',
+                        'Invalid username or password'
+                    )
+                        .tooltip('fixTitle')
+                        .tooltip('show');
+                } else if (error.message.includes('too many times in a row')) {
+                    setLoginRunning(false);
 
-    _urlChanged(event) {
-        this.setState({ url: event.target.value });
-    }
+                    pwf.attr(
+                        'data-original-title',
+                        'Too many wrong authentication attempts. Please wait'
+                    )
+                        .tooltip('fixTitle')
+                        .tooltip('show');
 
-    _userChanged(event) {
-        this.setState({ user: event.target.value });
-        jQuery(this.refs.password).tooltip('hide');
-    }
+                    setTimeout(() => {
+                        setLoginEnabled(true);
+                        pwf.tooltip('hide');
+                    }, 5000);
+                } else if (
+                    error.message.includes('WebSocket connection failure')
+                ) {
+                    icon.toggle('true');
+                    icon.removeClass();
+                    icon.addClass(
+                        'fa fa-times-circle red-icon-color form-control-feedback'
+                    );
+                    icon.attr('data-original-title', 'No database found')
+                        .tooltip('fixTitle')
+                        .tooltip('show');
+                    setLoginEnabled(false);
+                    setLoginRunning(false);
+                } else if (
+                    error.message.includes(
+                        'The credentials you provided were valid'
+                    )
+                ) {
+                    pwf.attr(
+                        'data-original-title',
+                        'Credentials need to be changed from the neo4j browser first. Go to {} and change them.'.format(
+                            tempUrl
+                        )
+                    )
+                        .tooltip('fixTitle')
+                        .tooltip('show');
 
-    _passChanged(event) {
-        this.setState({ password: event.target.value });
-        jQuery(this.refs.password).tooltip('hide');
-    }
+                    setLoginEnabled(true);
+                    setLoginRunning(false);
+                }
+            });
+    };
 
-    _triggerLogin(e) {
-        var key = e.keyCode ? e.keyCode : e.which;
-
-        if (key === 13) {
-            this.checkDBCreds();
+    const checkDatabaseExists = () => {
+        if (url === '') {
+            return;
         }
-    }
 
-    render() {
-        return (
-            <div className='loginwindow'>
-                <div id='loginpanel' ref='outer'>
-                    <img src='src/img/logo-white-transparent-full.png' />
-                    <div className='text-center'>
-                        <span>Log in to Neo4j Database</span>
-                    </div>
-                    <form>
-                        <div className='form-group has-feedback'>
-                            <div className='input-group'>
-                                <span
-                                    className='input-group-addon'
-                                    id='dburladdon'
-                                >
-                                    Database URL
-                                </span>
-                                <input
-                                    ref='url'
-                                    onFocus={function() {
-                                        jQuery(this.state.icon).tooltip('hide');
-                                    }.bind(this)}
-                                    onBlur={this.checkDBPresence.bind(this)}
-                                    onChange={this._urlChanged.bind(this)}
-                                    type='text'
-                                    className='form-control'
-                                    value={this.state.url}
-                                    placeholder='bolt://localhost:7687'
-                                    aria-describedby='dburladdon'
-                                />
-                                <i
-                                    ref='urlspinner'
-                                    className='fa fa-spinner fa-spin form-control-feedback'
-                                />
+        icon.toggle(true);
+
+        let tempUrl = url.replace(/\/$/, '');
+        if (!tempUrl.includes(':')) {
+            tempUrl = `${tempUrl}:7687`;
+        }
+
+        if (!url.startsWith('bolt://')) {
+            tempUrl = `bolt://${tempUrl}`;
+        }
+
+        icon.removeClass();
+        icon.addClass('fa fa-spinner fa-spin form-control-feedback');
+        icon.toggle(true);
+
+        var driver = neo4j.driver(url, neo4j.auth.basic('', ''));
+        var session = driver.session();
+
+        session
+            .run('MATCH (n) RETURN n LIMIT 1')
+            .then(result => {})
+            .catch(error => {
+                if (error.message.includes('WebSocket connection failure')) {
+                    icon.removeClass();
+                    icon.addClass(
+                        'fa fa-times-circle red-icon-color form-control-feedback'
+                    );
+                    icon.attr('data-original-title', 'No database found')
+                        .tooltip('fixTitle')
+                        .tooltip('show');
+                    setLoginRunning(false);
+                    setLoginEnabled(false);
+                } else if (error.code.includes('Unauthorized')) {
+                    icon.removeClass();
+                    icon.addClass(
+                        'fa fa-check-circle green-icon-color form-control-feedback'
+                    );
+                    setLoginEnabled(true);
+                    setUrl(tempUrl);
+                }
+
+                session.close();
+                driver.close();
+            });
+    };
+
+    return (
+        <div className='loginwindow'>
+            <LoginContainer pose={visible ? 'visible' : 'hidden'}>
+                <img src='src/img/logo-white-transparent-full.png' />
+                <div className='text-center'>
+                    <span>Log in to Neo4j Database</span>
+                </div>
+                <form>
+                    <div className='form-group has-feedback'>
+                        <div className='input-group'>
+                            <span className='input-group-addon' id='dburladdon'>
+                                Database URL
+                            </span>
+                            <input
+                                onFocus={function() {
+                                    icon.tooltip('hide');
+                                }}
+                                onBlur={checkDatabaseExists}
+                                onChange={event => {
+                                    setUrl(event.target.value);
+                                }}
+                                type='text'
+                                className='form-control'
+                                value={url}
+                                placeholder='bolt://localhost:7687'
+                                aria-describedby='dburladdon'
+                            />
+                            <i
+                                ref={iconRef}
+                                className='fa fa-spinner fa-spin form-control-feedback'
+                            />
+                        </div>
+                        <div className='input-group spacing'>
+                            <span
+                                className='input-group-addon'
+                                id='dbuseraddon'
+                            >
+                                DB Username
+                            </span>
+                            <input
+                                type='text'
+                                value={user}
+                                //onKeyUp={this._triggerLogin.bind(this)}
+                                onChange={event => {
+                                    setUser(event.target.value);
+                                }}
+                                className='form-control'
+                                placeholder='neo4j'
+                                aria-describedby='dbuseraddon'
+                            />
+                        </div>
+                        <div className='input-group spacing'>
+                            <span className='input-group-addon' id='dbpwaddon'>
+                                DB Password
+                            </span>
+                            <input
+                                ref={passwordRef}
+                                value={password}
+                                //onKeyDown={this._triggerLogin.bind(this)}
+                                onChange={event => {
+                                    setPassword(event.target.value);
+                                }}
+                                type='password'
+                                className='form-control'
+                                placeholder='neo4j'
+                                aria-describedby='dbpwaddon'
+                            />
+                        </div>
+                        <div className='savecontainer'>
+                            <div className='checkbox logincheck'>
+                                <label>
+                                    <input
+                                        checked={save}
+                                        onChange={event =>
+                                            setSave(event.target.checked)
+                                        }
+                                        type='checkbox'
+                                    />
+                                    Save Password
+                                </label>
                             </div>
-                            <div className='input-group spacing'>
-                                <span
-                                    className='input-group-addon'
-                                    id='dbuseraddon'
+                            <div className='buttoncontainer'>
+                                <Button
+                                    disabled={!loginEnabled}
+                                    className={clsx(
+                                        'loginbutton',
+                                        'has-spinner',
+                                        loginRunning && 'activate'
+                                    )}
+                                    bsStyle={
+                                        loginSuccess ? 'success' : 'primary'
+                                    }
+                                    onClick={checkDatabaseCreds}
+                                    ref={buttonRef}
                                 >
-                                    DB Username
-                                </span>
-                                <input
-                                    ref='user'
-                                    type='text'
-                                    value={this.state.user}
-                                    onKeyUp={this._triggerLogin.bind(this)}
-                                    onChange={this._userChanged.bind(this)}
-                                    className='form-control'
-                                    placeholder='neo4j'
-                                    aria-describedby='dbuseraddon'
-                                />
-                            </div>
-                            <div className='input-group spacing'>
-                                <span
-                                    className='input-group-addon'
-                                    id='dbpwaddon'
-                                >
-                                    DB Password
-                                </span>
-                                <input
-                                    ref='password'
-                                    value={this.state.password}
-                                    onKeyDown={this._triggerLogin.bind(this)}
-                                    onChange={this._passChanged.bind(this)}
-                                    type='password'
-                                    className='form-control'
-                                    placeholder='neo4j'
-                                    aria-describedby='dbpwaddon'
-                                />
-                            </div>
-                            <div className='savecontainer'>
-                                <div className='checkbox logincheck'>
-                                    <label>
-                                        <input
-                                            checked={this.state.save}
-                                            onChange={this._saveChange.bind(
-                                                this
-                                            )}
-                                            ref='save'
-                                            type='checkbox'
-                                        />
-                                        Save Password
-                                    </label>
-                                </div>
-                                <div className='buttoncontainer'>
-                                    <button
-                                        ref='loginButton'
-                                        disabled={!this.state.loginEnabled}
-                                        type='button'
-                                        onClick={this.checkDBCreds.bind(this)}
-                                        className='btn btn-primary loginbutton has-spinner'
-                                    >
-                                        Login
-                                        <span className='button-spinner'>
-                                            <i className='fa fa-spinner fa-spin' />
-                                        </span>
-                                    </button>
-                                </div>
+                                    {loginSuccess ? 'Success' : 'Login'}
+                                    <span className='button-spinner'>
+                                        <i className='fa fa-spinner fa-spin' />
+                                    </span>
+                                </Button>
                             </div>
                         </div>
-                    </form>
-                </div>
-            </div>
-        );
-    }
-}
+                    </div>
+                </form>
+            </LoginContainer>
+        </div>
+    );
+};
+
+Login.propTypes = {};
+export default Login;

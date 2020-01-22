@@ -1,22 +1,15 @@
-import {groupBy} from 'lodash/collection'
+import { groupBy } from 'lodash/collection';
 
-var labels = [
-    "OU",
-    "GPO",
-    "User",
-    "Computer",
-    "Group",
-    "Domain"
-];
+var labels = ['OU', 'GPO', 'User', 'Computer', 'Group', 'Domain'];
 
 export function generateUniqueId(sigmaInstance, isNode) {
     var i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
     if (isNode) {
-        while (typeof sigmaInstance.graph.nodes(i) !== "undefined") {
+        while (typeof sigmaInstance.graph.nodes(i) !== 'undefined') {
             i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
         }
     } else {
-        while (typeof sigmaInstance.graph.edges(i) !== "undefined") {
+        while (typeof sigmaInstance.graph.edges(i) !== 'undefined') {
             i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
         }
     }
@@ -36,10 +29,10 @@ function getRealLabel(label) {
 }
 
 export function buildSearchQuery(searchterm) {
-    if (searchterm.includes(":")) {
-        let [type, term] = searchterm.split(":");
+    if (searchterm.includes(':')) {
+        let [type, term] = searchterm.split(':');
         term = escapeRegExp(term);
-        let t = "(?i).*" + term + ".*";
+        let t = '(?i).*' + term + '.*';
         type = getRealLabel(type);
 
         let statement = `MATCH (n:${type}) WHERE n.name =~ {name} OR n.objectid =~ {name} RETURN n LIMIT 10`;
@@ -47,18 +40,26 @@ export function buildSearchQuery(searchterm) {
         return [statement, t];
     } else {
         let q = escapeRegExp(searchterm);
-        let t = "(?i).*" + q + ".*";
+        let t = '(?i).*' + q + '.*';
 
-        return ["MATCH (n) WHERE n.name =~ {name} OR n.objectid =~ {name} RETURN n LIMIT 10", t];
+        return [
+            'MATCH (n) WHERE n.name =~ {name} OR n.objectid =~ {name} RETURN n LIMIT 10',
+            t,
+        ];
     }
 }
 
 export function buildSelectQuery(startNode, endNode) {
-    let apart = `MATCH (n:${startNode.type} {objectid: {sourceid}})`
-    let bpart = `MATCH (m:${endNode.type} {objectid: {targetid}})`
+    let apart = `MATCH (n:${startNode.type} {objectid: {sourceid}})`;
+    let bpart = `MATCH (m:${endNode.type} {objectid: {targetid}})`;
 
-    let query = `${apart} ${bpart} MATCH p=allShortestPaths((n)-[r:{}*1..]->(m)) RETURN p`
-    return [query, {sourceid: startNode.objectid, targetid: endNode.objectid}, startNode.name || startNode.objectid, endNode.name || endNode.objectid];
+    let query = `${apart} ${bpart} MATCH p=allShortestPaths((n)-[r:{}*1..]->(m)) RETURN p`;
+    return [
+        query,
+        { sourceid: startNode.objectid, targetid: endNode.objectid },
+        startNode.name || startNode.objectid,
+        endNode.name || endNode.objectid,
+    ];
 }
 
 //Recursive function to highlight paths to start/end nodes
@@ -72,14 +73,14 @@ export function findGraphPath(sigmaInstance, reverse, nodeid, traversed) {
             ? sigmaInstance.graph.inboundNodes(nodeid)
             : sigmaInstance.graph.outboundNodes(nodeid);
         //Loop over the nodes near us and the edges connecting to those nodes
-        $.each(nodes, function (index, node) {
-            $.each(edges, function (index, edge) {
+        $.each(nodes, function(index, node) {
+            $.each(edges, function(index, edge) {
                 var check = reverse ? edge.source : edge.target;
                 //If an edge is pointing in the right direction, set its color
                 //Push the edge into our store and then
                 node = parseInt(node);
                 if (check === node && !traversed.includes(node)) {
-                    edge.color = reverse ? "blue" : "red";
+                    edge.color = reverse ? 'blue' : 'red';
                     appStore.highlightedEdges.push(edge);
                     findGraphPath(sigmaInstance, reverse, node, traversed);
                 }
@@ -91,7 +92,7 @@ export function findGraphPath(sigmaInstance, reverse, nodeid, traversed) {
 }
 
 export function clearSessions() {
-    emitter.emit("openClearingModal");
+    emitter.emit('openClearingModal');
     deleteSessions();
 }
 
@@ -99,14 +100,14 @@ function deleteSessions() {
     var session = driver.session();
     session
         .run(
-            "MATCH ()-[r:HasSession]-() WITH r LIMIT 100000 DELETE r RETURN count(r)"
+            'MATCH ()-[r:HasSession]-() WITH r LIMIT 100000 DELETE r RETURN count(r)'
         )
-        .then(function (results) {
+        .then(function(results) {
             session.close();
-            emitter.emit("refreshDBData");
+            emitter.emit('refreshDBData');
             var count = results.records[0]._fields[0];
             if (count === 0) {
-                emitter.emit("hideDBClearModal");
+                emitter.emit('hideDBClearModal');
             } else {
                 deleteSessions();
             }
@@ -114,16 +115,16 @@ function deleteSessions() {
 }
 
 export function clearDatabase() {
-    emitter.emit("openClearingModal");
+    emitter.emit('openClearingModal');
     deleteEdges();
 }
 
 function deleteEdges() {
     var session = driver.session();
     session
-        .run("MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)")
-        .then(function (results) {
-            emitter.emit("refreshDBData");
+        .run('MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)')
+        .then(function(results) {
+            emitter.emit('refreshDBData');
             session.close();
             var count = results.records[0]._fields[0];
             if (count === 0) {
@@ -137,9 +138,9 @@ function deleteEdges() {
 function deleteNodes() {
     var session = driver.session();
     session
-        .run("MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)")
-        .then(function (results) {
-            emitter.emit("refreshDBData");
+        .run('MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)')
+        .then(function(results) {
+            emitter.emit('refreshDBData');
             session.close();
             var count = results.records[0]._fields[0];
             if (count === 0) {
@@ -153,10 +154,10 @@ function deleteNodes() {
 function grabConstraints() {
     var session = driver.session();
     let constraints = [];
-    session.run("CALL db.constraints").then(function (results) {
-        $.each(results.records, function (index, container) {
+    session.run('CALL db.constraints').then(function(results) {
+        $.each(results.records, function(index, container) {
             let constraint = container._fields[0];
-            let query = "DROP " + constraint;
+            let query = 'DROP ' + constraint;
             constraints.push(query);
         });
 
@@ -170,7 +171,7 @@ function dropConstraints(constraints) {
     if (constraints.length > 0) {
         let constraint = constraints.shift();
         let session = driver.session();
-        session.run(constraint).then(function () {
+        session.run(constraint).then(function() {
             dropConstraints(constraints);
             session.close();
         });
@@ -183,10 +184,10 @@ function grabIndexes() {
     var session = driver.session();
     let constraints = [];
 
-    session.run("CALL db.indexes").then(function (results) {
-        $.each(results.records, function (index, container) {
+    session.run('CALL db.indexes').then(function(results) {
+        $.each(results.records, function(index, container) {
             let constraint = container._fields[0];
-            let query = "DROP " + constraint;
+            let query = 'DROP ' + constraint;
             constraints.push(query);
         });
 
@@ -200,7 +201,7 @@ function dropIndexes(indexes) {
     if (indexes.length > 0) {
         let constraint = indexes.shift();
         let session = driver.session();
-        session.run(constraint).then(function () {
+        session.run(constraint).then(function() {
             dropConstraints(indexes);
             session.close();
         });
@@ -211,27 +212,35 @@ function dropIndexes(indexes) {
 
 export async function addConstraints() {
     let session = driver.session();
-    await session.run('CREATE CONSTRAINT ON (c:User) ASSERT c.objectid IS UNIQUE');
-    await session.run('CREATE CONSTRAINT ON (c:Group) ASSERT c.objectid IS UNIQUE');
+    await session.run(
+        'CREATE CONSTRAINT ON (c:User) ASSERT c.objectid IS UNIQUE'
+    );
+    await session.run(
+        'CREATE CONSTRAINT ON (c:Group) ASSERT c.objectid IS UNIQUE'
+    );
     await session.run(
         'CREATE CONSTRAINT ON (c:Computer) ASSERT c.objectid IS UNIQUE'
     );
-    await session.run('CREATE CONSTRAINT ON (c:GPO) ASSERT c.objectid IS UNIQUE');
-    await session.run('CREATE CONSTRAINT ON (c:Domain) ASSERT c.objectid IS UNIQUE');
-    await session.run('CREATE CONSTRAINT ON (c:OU) ASSERT c.objectid IS UNIQUE');
+    await session.run(
+        'CREATE CONSTRAINT ON (c:GPO) ASSERT c.objectid IS UNIQUE'
+    );
+    await session.run(
+        'CREATE CONSTRAINT ON (c:Domain) ASSERT c.objectid IS UNIQUE'
+    );
+    await session.run(
+        'CREATE CONSTRAINT ON (c:OU) ASSERT c.objectid IS UNIQUE'
+    );
     await session.run('CREATE INDEX ON :User(name)');
     await session.run('CREATE INDEX ON :Group(name)');
-    await session.run(
-        'CREATE INDEX ON :Computer(name)'
-    );
+    await session.run('CREATE INDEX ON :Computer(name)');
     await session.run('CREATE INDEX ON :GPO(name)');
     await session.run('CREATE INDEX ON :Domain(name)');
     await session.run('CREATE INDEX ON :OU(name)');
-    session.close()
+    session.close();
 
-    emitter.emit("hideDBClearModal");
+    emitter.emit('hideDBClearModal');
 }
 
 export function escapeRegExp(str) {
-    return str.replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    return str.replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 }
