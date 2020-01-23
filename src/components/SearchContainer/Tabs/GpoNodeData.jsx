@@ -73,9 +73,11 @@ class GpoNodeData extends Component {
 
         let props = driver.session();
         props
-            .run('MATCH (n:GPO {objectid:{objectid}}) RETURN n', { objectid: payload })
+            .run('MATCH (n:GPO {objectid: $objectid}) RETURN n', {
+                objectid: payload,
+            })
             .then(
-                function (result) {
+                function(result) {
                     let properties = result.records[0]._fields[0].properties;
                     let name = properties.name || properties.objectid;
                     let notes;
@@ -84,7 +86,11 @@ class GpoNodeData extends Component {
                     } else {
                         notes = properties.notes;
                     }
-                    this.setState({ propertyMap: properties, notes: notes, label: name });
+                    this.setState({
+                        propertyMap: properties,
+                        notes: notes,
+                        label: name,
+                    });
                     props.close();
                 }.bind(this)
             );
@@ -196,13 +202,13 @@ class GpoNodeData extends Component {
                 : this.state.notes;
         let q = driver.session();
         if (notes === null) {
-            q.run('MATCH (n:GPO {objectid:{objectid}}) REMOVE n.notes', {
+            q.run('MATCH (n:GPO {objectid: $objectid}) REMOVE n.notes', {
                 objectid: this.state.objectid,
             }).then(x => {
                 q.close();
             });
         } else {
-            q.run('MATCH (n:GPO {objectid:{objectid}}) SET n.notes = {notes}', {
+            q.run('MATCH (n:GPO {objectid: $objectid}) SET n.notes = {notes}', {
                 objectid: this.state.objectid,
                 notes: this.state.notes,
             }).then(x => {
@@ -255,7 +261,7 @@ class GpoNodeData extends Component {
                         property='Reachable High Value Targets'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (m:GPO {objectid:{objectid}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                            'MATCH (m:GPO {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
                         }
                         start={this.state.label}
                     />
@@ -265,7 +271,7 @@ class GpoNodeData extends Component {
                         property='Directly Affected OUs'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (m:GPO {objectid:{objectid}})-[r:GpLink]->(n)'
+                            'MATCH p = (m:GPO {objectid: $objectid})-[r:GpLink]->(n)'
                         }
                         start={this.state.label}
                     />
@@ -274,7 +280,7 @@ class GpoNodeData extends Component {
                         property='Affected OUs'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (m:GPO {objectid:{objectid}})-[r:GpLink|Contains*1..]->(n) WHERE n:OU OR n:Domain'
+                            'MATCH p = (m:GPO {objectid: $objectid})-[r:GpLink|Contains*1..]->(n) WHERE n:OU OR n:Domain'
                         }
                         start={this.state.label}
                     />
@@ -283,10 +289,10 @@ class GpoNodeData extends Component {
                         property='Computer Objects'
                         target={this.state.objectid}
                         countQuery={
-                            "MATCH (g:GPO {objectid:{objectid}}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:Computer) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:Computer) RETURN count(n1) + count(n2)"
+                            "MATCH (g:GPO {objectid: $objectid}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:Computer) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:Computer) RETURN count(n1) + count(n2)"
                         }
                         graphQuery={
-                            "MATCH (g:GPO {objectid:{objectid}}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:Computer) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:Computer) RETURN p1,p2"
+                            "MATCH (g:GPO {objectid: $objectid}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:Computer) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:Computer) RETURN p1,p2"
                         }
                     />
 
@@ -294,10 +300,10 @@ class GpoNodeData extends Component {
                         property='User Objects'
                         target={this.state.objectid}
                         countQuery={
-                            "MATCH (g:GPO {objectid:{objectid}}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:User) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:User) RETURN count(n1) + count(n2)"
+                            "MATCH (g:GPO {objectid: $objectid}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:User) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:User) RETURN count(n1) + count(n2)"
                         }
                         graphQuery={
-                            "MATCH (g:GPO {objectid:{objectid}}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:User) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:User) RETURN p1,p2"
+                            "MATCH (g:GPO {objectid: $objectid}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:User) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:User) RETURN p1,p2"
                         }
                     />
 
@@ -307,7 +313,7 @@ class GpoNodeData extends Component {
                         property='Explicit Object Controllers'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:GPO {objectid:{objectid}})'
+                            'MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:GPO {objectid: $objectid})'
                         }
                         end={this.state.label}
                         distinct
@@ -317,7 +323,7 @@ class GpoNodeData extends Component {
                         property='Unrolled Object Controllers'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:GPO {objectid: {objectid}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = g2.name) AND NOT n.name = g2.name AND r1.isacl=true'
+                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:GPO {objectid:  $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.name = g2.name) AND NOT n.name = g2.name AND r1.isacl=true'
                         }
                         end={this.state.label}
                         distinct
@@ -327,7 +333,7 @@ class GpoNodeData extends Component {
                         property='Transitive Object Controllers'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (n) WHERE NOT n.objectid={objectid} WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:GPO {objectid:{objectid}}))'
+                            'MATCH (n) WHERE NOT n.objectid= $objectid WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:GPO {objectid: $objectid}))'
                         }
                         end={this.state.label}
                         distinct

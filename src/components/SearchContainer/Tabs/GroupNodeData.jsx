@@ -58,7 +58,7 @@ class GroupNodeData extends Component {
 
     getNodeData(payload) {
         jQuery(this.refs.complete).hide();
-        $.each(this.state.driversessions, function (_, record) {
+        $.each(this.state.driversessions, function(_, record) {
             record.close();
         });
 
@@ -77,9 +77,11 @@ class GroupNodeData extends Component {
 
         var propCollection = driver.session();
         propCollection
-            .run('MATCH (c:Group {objectid: {objectid}}) RETURN c', { objectid: payload })
+            .run('MATCH (c:Group {objectid: $objectid}) RETURN c', {
+                objectid: payload,
+            })
             .then(
-                function (result) {
+                function(result) {
                     var properties = result.records[0]._fields[0].properties;
                     let name = properties.name || properties.objectid;
                     let notes;
@@ -92,7 +94,7 @@ class GroupNodeData extends Component {
                     this.setState({
                         propertyMap: properties,
                         notes: notes,
-                        label: name
+                        label: name,
                     });
                     propCollection.close();
                 }.bind(this)
@@ -110,16 +112,19 @@ class GroupNodeData extends Component {
                 : this.state.notes;
         let q = driver.session();
         if (notes === null) {
-            q.run('MATCH (n:Group {objectid: {objectid}}) REMOVE n.notes', {
+            q.run('MATCH (n:Group {objectid: $objectid}) REMOVE n.notes', {
                 objectid: this.state.objectid,
             }).then(x => {
                 q.close();
             });
         } else {
-            q.run('MATCH (n:Group {objectid: {objectid}}) SET n.notes = {notes}', {
-                objectid: this.state.objectid,
-                notes: this.state.notes,
-            }).then(x => {
+            q.run(
+                'MATCH (n:Group {objectid: $objectid}) SET n.notes = {notes}',
+                {
+                    objectid: this.state.objectid,
+                    notes: this.state.notes,
+                }
+            ).then(x => {
                 q.close();
             });
         }
@@ -261,7 +266,7 @@ class GroupNodeData extends Component {
                         property='Sessions'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (c:Computer)-[n:HasSession]->(u:User)-[r2:MemberOf*1..]->(g:Group {objectid: {objectid}})'
+                            'MATCH p = (c:Computer)-[n:HasSession]->(u:User)-[r2:MemberOf*1..]->(g:Group {objectid: $objectid})'
                         }
                         end={this.state.objectid}
                     />
@@ -270,19 +275,19 @@ class GroupNodeData extends Component {
                         property='Reachable High Value Targets'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (m:Group {objectid: {objectid}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                            'MATCH (m:Group {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
                         }
                         start={this.state.objectid}
                     />
 
-                    {/* <NodeCypherLink property="Sibling Objects in the Same OU" target={this.state.objectid} baseQuery={"MATCH (o1:OU)-[r1:Contains]->(g1:Group {objectid: {objectid}}) WITH o1 MATCH p= (d: Domain)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)"} /> */}
+                    {/* <NodeCypherLink property="Sibling Objects in the Same OU" target={this.state.objectid} baseQuery={"MATCH (o1:OU)-[r1:Contains]->(g1:Group {objectid: $objectid}) WITH o1 MATCH p= (d: Domain)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)"} /> */}
 
                     <h4>Group Members</h4>
                     <NodeCypherLink
                         property='Direct Members'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n)-[b:MemberOf]->(c:Group {objectid: {objectid}})'
+                            'MATCH p=(n)-[b:MemberOf]->(c:Group {objectid: $objectid})'
                         }
                         end={this.state.objectid}
                     />
@@ -291,7 +296,7 @@ class GroupNodeData extends Component {
                         property='Unrolled Members'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p =(n)-[r:MemberOf*1..]->(g:Group {objectid: {objectid}})'
+                            'MATCH p =(n)-[r:MemberOf*1..]->(g:Group {objectid: $objectid})'
                         }
                         end={this.state.objectid}
                         distinct
@@ -301,7 +306,7 @@ class GroupNodeData extends Component {
                         property='Foreign Members'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (n)-[r:MemberOf*1..]->(g:Group {objectid: {objectid}}) WHERE NOT g.domain = n.domain'
+                            'MATCH p = (n)-[r:MemberOf*1..]->(g:Group {objectid: $objectid}) WHERE NOT g.domain = n.domain'
                         }
                         end={this.state.objectid}
                         distinct
@@ -312,7 +317,7 @@ class GroupNodeData extends Component {
                         property='First Degree Group Membership'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(g1:Group {objectid: {objectid}})-[r:MemberOf]->(n:Group)'
+                            'MATCH p=(g1:Group {objectid: $objectid})-[r:MemberOf]->(n:Group)'
                         }
                         start={this.state.objectid}
                         distinct
@@ -322,7 +327,7 @@ class GroupNodeData extends Component {
                         property='Unrolled Member Of'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (g1:Group {objectid: {objectid}})-[r:MemberOf*1..]->(n:Group)'
+                            'MATCH p = (g1:Group {objectid: $objectid})-[r:MemberOf*1..]->(n:Group)'
                         }
                         start={this.state.objectid}
                         distinct
@@ -332,7 +337,7 @@ class GroupNodeData extends Component {
                         property='Foreign Group Membership'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (m:Group {objectid: {objectid}}) MATCH (n:Group) WHERE NOT m.domain=n.domain MATCH p=(m)-[r:MemberOf*1..]->(n)'
+                            'MATCH (m:Group {objectid: $objectid}) MATCH (n:Group) WHERE NOT m.domain=n.domain MATCH p=(m)-[r:MemberOf*1..]->(n)'
                         }
                         start={this.state.objectid}
                     />
@@ -343,7 +348,7 @@ class GroupNodeData extends Component {
                         property='First Degree Local Admin'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Group {objectid: {objectid}})-[r:AdminTo]->(n:Computer)'
+                            'MATCH p=(m:Group {objectid: $objectid})-[r:AdminTo]->(n:Computer)'
                         }
                         start={this.state.objectid}
                         distinct
@@ -353,7 +358,7 @@ class GroupNodeData extends Component {
                         property='Group Delegated Local Admin Rights'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (g1:Group {objectid: {objectid}})-[r1:MemberOf*1..]->(g2:Group)-[r2:AdminTo]->(n:Computer)'
+                            'MATCH p = (g1:Group {objectid: $objectid})-[r1:MemberOf*1..]->(g2:Group)-[r2:AdminTo]->(n:Computer)'
                         }
                         start={this.state.objectid}
                         distinct
@@ -363,7 +368,7 @@ class GroupNodeData extends Component {
                         property='Derivative Local Admin Rights'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = shortestPath((g:Group {objectid: {objectid}})-[r:MemberOf|AdminTo|HasSession*1..]->(n:Computer))'
+                            'MATCH p = shortestPath((g:Group {objectid: $objectid})-[r:MemberOf|AdminTo|HasSession*1..]->(n:Computer))'
                         }
                         start={this.state.objectid}
                         distinct
@@ -374,7 +379,7 @@ class GroupNodeData extends Component {
                         property='First Degree RDP Privileges'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Group {objectid: {objectid}})-[r:CanRDP]->(n:Computer)'
+                            'MATCH p=(m:Group {objectid: $objectid})-[r:CanRDP]->(n:Computer)'
                         }
                         start={this.state.objectid}
                         distinct
@@ -384,7 +389,7 @@ class GroupNodeData extends Component {
                         property='Group Delegated RDP Privileges'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Group {objectid: {objectid}})-[r1:MemberOf*1..]->(g:Group)-[r2:CanRDP]->(n:Computer)'
+                            'MATCH p=(m:Group {objectid: $objectid})-[r1:MemberOf*1..]->(g:Group)-[r2:CanRDP]->(n:Computer)'
                         }
                         start={this.state.objectid}
                         distinct
@@ -394,7 +399,7 @@ class GroupNodeData extends Component {
                         property='First Degree DCOM Privileges'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Group {objectid: {objectid}})-[r:ExecuteDCOM]->(n:Computer)'
+                            'MATCH p=(m:Group {objectid: $objectid})-[r:ExecuteDCOM]->(n:Computer)'
                         }
                         start={this.state.objectid}
                         distinct
@@ -404,7 +409,7 @@ class GroupNodeData extends Component {
                         property='Group Delegated DCOM Privileges'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Group {objectid: {objectid}})-[r1:MemberOf*1..]->(g:Group)-[r2:ExecuteDCOM]->(n:Computer)'
+                            'MATCH p=(m:Group {objectid: $objectid})-[r1:MemberOf*1..]->(g:Group)-[r2:ExecuteDCOM]->(n:Computer)'
                         }
                         start={this.state.objectid}
                         distinct
@@ -416,7 +421,7 @@ class GroupNodeData extends Component {
                         property='First Degree Object Control'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (g:Group {objectid: {objectid}})-[r]->(n) WHERE r.isacl=true'
+                            'MATCH p = (g:Group {objectid: $objectid})-[r]->(n) WHERE r.isacl=true'
                         }
                         start={this.state.objectid}
                         distinct
@@ -426,7 +431,7 @@ class GroupNodeData extends Component {
                         property='Group Delegated Object Control'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (g1:Group {objectid: {objectid}})-[r1:MemberOf*1..]->(g2:Group)-[r2]->(n) WHERE r2.isacl=true'
+                            'MATCH p = (g1:Group {objectid: $objectid})-[r1:MemberOf*1..]->(g2:Group)-[r2]->(n) WHERE r2.isacl=true'
                         }
                         start={this.state.objectid}
                         distinct
@@ -436,7 +441,7 @@ class GroupNodeData extends Component {
                         property='Transitive Object Control'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (n) WHERE NOT n.objectid={objectid} WITH n MATCH p = shortestPath((g:Group {objectid: {objectid}})-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))'
+                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((g:Group {objectid: $objectid})-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))'
                         }
                         start={this.state.objectid}
                         distinct
@@ -448,7 +453,7 @@ class GroupNodeData extends Component {
                         property='Explicit Object Controllers'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:Group {objectid: {objectid}})'
+                            'MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:Group {objectid: $objectid})'
                         }
                         end={this.state.objectid}
                         distinct
@@ -458,7 +463,7 @@ class GroupNodeData extends Component {
                         property='Unrolled Object Controllers'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:Group {objectid: {objectid}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid AND r1.isacl=true'
+                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1]->(g2:Group {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid AND r1.isacl=true'
                         }
                         end={this.state.objectid}
                         distinct
@@ -468,7 +473,7 @@ class GroupNodeData extends Component {
                         property='Transitive Object Controllers'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (n) WHERE NOT n.objectid={objectid} WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:Group {objectid: {objectid}}))'
+                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:Group {objectid: $objectid}))'
                         }
                         end={this.state.objectid}
                         distinct

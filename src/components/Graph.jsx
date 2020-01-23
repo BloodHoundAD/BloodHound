@@ -205,7 +205,7 @@ class GraphContainer extends Component {
 
         let q = driver.session();
         q.run(
-            `MATCH (n:${node.type} {objectid:{objectid}}) SET n.owned={status}`,
+            `MATCH (n:${node.type} {objectid:$objectid}) SET n.owned={status}`,
             {
                 objectid: node.objectid,
                 status: status,
@@ -245,7 +245,7 @@ class GraphContainer extends Component {
         let q = driver.session();
 
         q.run(
-            `MATCH (n:${node.type} {objectid: {objectid}}) SET n.highvalue={status}`,
+            `MATCH (n:${node.type} {objectid: $objectid}) SET n.highvalue={status}`,
             { objectid: node.objectid, status: status }
         ).then(() => {
             q.close();
@@ -309,7 +309,7 @@ class GraphContainer extends Component {
         let node = instance.graph.nodes(id);
         let type = node.type;
 
-        let statement = `MATCH (n:${type} {objectid: {objectid}}) DETACH DELETE n`;
+        let statement = `MATCH (n:${type} {objectid: $objectid}) DETACH DELETE n`;
 
         instance.graph.dropNode(node.id);
         instance.refresh();

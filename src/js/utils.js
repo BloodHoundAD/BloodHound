@@ -35,7 +35,7 @@ export function buildSearchQuery(searchterm) {
         let t = '(?i).*' + term + '.*';
         type = getRealLabel(type);
 
-        let statement = `MATCH (n:${type}) WHERE n.name =~ {name} OR n.objectid =~ {name} RETURN n LIMIT 10`;
+        let statement = `MATCH (n:${type}) WHERE n.name =~ $name OR n.objectid =~ $name RETURN n LIMIT 10`;
 
         return [statement, t];
     } else {
@@ -43,7 +43,7 @@ export function buildSearchQuery(searchterm) {
         let t = '(?i).*' + q + '.*';
 
         return [
-            'MATCH (n) WHERE n.name =~ {name} OR n.objectid =~ {name} RETURN n LIMIT 10',
+            'MATCH (n) WHERE n.name =~ $name OR n.objectid =~ $name RETURN n LIMIT 10',
             t,
         ];
     }
@@ -212,30 +212,30 @@ function dropIndexes(indexes) {
 
 export async function addConstraints() {
     let session = driver.session();
-    await session.run(
-        'CREATE CONSTRAINT ON (c:User) ASSERT c.objectid IS UNIQUE'
-    );
-    await session.run(
-        'CREATE CONSTRAINT ON (c:Group) ASSERT c.objectid IS UNIQUE'
-    );
-    await session.run(
-        'CREATE CONSTRAINT ON (c:Computer) ASSERT c.objectid IS UNIQUE'
-    );
-    await session.run(
-        'CREATE CONSTRAINT ON (c:GPO) ASSERT c.objectid IS UNIQUE'
-    );
-    await session.run(
-        'CREATE CONSTRAINT ON (c:Domain) ASSERT c.objectid IS UNIQUE'
-    );
-    await session.run(
-        'CREATE CONSTRAINT ON (c:OU) ASSERT c.objectid IS UNIQUE'
-    );
-    await session.run('CREATE INDEX ON :User(name)');
-    await session.run('CREATE INDEX ON :Group(name)');
-    await session.run('CREATE INDEX ON :Computer(name)');
-    await session.run('CREATE INDEX ON :GPO(name)');
-    await session.run('CREATE INDEX ON :Domain(name)');
-    await session.run('CREATE INDEX ON :OU(name)');
+    await session
+        .run('CREATE CONSTRAINT ON (c:User) ASSERT c.objectid IS UNIQUE')
+        .catch(_ => {});
+    await session
+        .run('CREATE CONSTRAINT ON (c:Group) ASSERT c.objectid IS UNIQUE')
+        .catch(_ => {});
+    await session
+        .run('CREATE CONSTRAINT ON (c:Computer) ASSERT c.objectid IS UNIQUE')
+        .catch(_ => {});
+    await session
+        .run('CREATE CONSTRAINT ON (c:GPO) ASSERT c.objectid IS UNIQUE')
+        .catch(_ => {});
+    await session
+        .run('CREATE CONSTRAINT ON (c:Domain) ASSERT c.objectid IS UNIQUE')
+        .catch(_ => {});
+    await session
+        .run('CREATE CONSTRAINT ON (c:OU) ASSERT c.objectid IS UNIQUE')
+        .catch(_ => {});
+    await session.run('CREATE INDEX ON :User(name)').catch(_ => {});
+    await session.run('CREATE INDEX ON :Group(name)').catch(_ => {});
+    await session.run('CREATE INDEX ON :Computer(name)').catch(_ => {});
+    await session.run('CREATE INDEX ON :GPO(name)').catch(_ => {});
+    await session.run('CREATE INDEX ON :Domain(name)').catch(_ => {});
+    await session.run('CREATE INDEX ON :OU(name)').catch(_ => {});
     session.close();
 
     emitter.emit('hideDBClearModal');

@@ -4,7 +4,7 @@ export function buildGroupJsonNew(chunk) {
     let queries = {};
     queries.properties = {};
     queries.properties.statement =
-        'UNWIND {props} AS prop MERGE (n:Group {objectid: prop.source}) SET n += prop.map';
+        'UNWIND $props AS prop MERGE (n:Group {objectid: prop.source}) SET n += prop.map';
     queries.properties.props = [];
 
     for (let group of chunk) {
@@ -39,7 +39,7 @@ export function buildComputerJsonNew(chunk) {
     let queries = {};
     queries.properties = {};
     queries.properties.statement =
-        'UNWIND {props} AS prop MERGE (n:Computer {objectid:prop.source}) SET n += prop.map';
+        'UNWIND $props AS prop MERGE (n:Computer {objectid:prop.source}) SET n += prop.map';
     queries.properties.props = [];
 
     for (let computer of chunk) {
@@ -139,7 +139,7 @@ export function buildUserJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND {props} AS prop MERGE (n:User {objectid: prop.sourceid}) SET n += prop.map',
+            'UNWIND $props AS prop MERGE (n:User {objectid: prop.sourceid}) SET n += prop.map',
         props: [],
     };
 
@@ -195,7 +195,7 @@ export function buildGpoJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND {props} AS prop MERGE (n:GPO {objectid: prop.source}) SET n+= prop.map',
+            'UNWIND $props AS prop MERGE (n:GPO {objectid: prop.source}) SET n+= prop.map',
         props: [],
     };
 
@@ -215,7 +215,7 @@ export function buildOuJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND {props} AS prop MERGE (n:OU {objectid: prop.source}) SET n+= prop.map',
+            'UNWIND $props AS prop MERGE (n:OU {objectid: prop.source}) SET n+= prop.map',
         props: [],
     };
 
@@ -332,7 +332,7 @@ export function buildDomainJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND {props} AS prop MERGE (n:Domain {objectid: prop.source}) SET n+= prop.map',
+            'UNWIND $props AS prop MERGE (n:Domain {objectid: prop.source}) SET n+= prop.map',
         props: [],
     };
 
@@ -404,7 +404,7 @@ export function buildDomainJsonNew(chunk) {
         Forest = 2,
         External = 3,
         Unknown = 4
-        "UNWIND {props} AS prop MERGE (n:Domain {name: prop.a}) MERGE (m:Domain {name: prop.b}) MERGE (n)-[:TrustedBy {trusttype : prop.trusttype, transitive: prop.transitive, isacl:false}]->(m)",
+        "UNWIND $props AS prop MERGE (n:Domain {name: prop.a}) MERGE (m:Domain {name: prop.b}) MERGE (n)-[:TrustedBy {trusttype : prop.trusttype, transitive: prop.transitive, isacl:false}]->(m)",
         */
         format = [
             'Domain',
@@ -523,7 +523,7 @@ export function buildDomainJsonNew(chunk) {
 }
 
 const baseInsertStatement =
-    'UNWIND {props} AS prop MERGE (n:{0} {objectid: prop.source}) MERGE (m:{1} {objectid: prop.target}) MERGE (n)-[r:{2} {3}]->(m)';
+    'UNWIND $props AS prop MERGE (n:{0} {objectid: prop.source}) MERGE (m:{1} {objectid: prop.target}) MERGE (n)-[r:{2} {3}]->(m)';
 
 /**
  * Inserts a query into the queries table

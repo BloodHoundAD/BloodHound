@@ -64,7 +64,7 @@ class ComputerNodeData extends Component {
     getNodeData(payload) {
         jQuery(this.refs.complete).hide();
         jQuery(this.refs.piccomplete).hide();
-        $.each(this.state.driversessions, function (_, record) {
+        $.each(this.state.driversessions, function(_, record) {
             record.close();
         });
         this.setState({
@@ -85,7 +85,9 @@ class ComputerNodeData extends Component {
 
         var propCollection = driver.session();
         propCollection
-            .run('MATCH (c:Computer {objectid: {objectid}}) RETURN c', { objectid: payload })
+            .run('MATCH (c:Computer {objectid: $objectid}) RETURN c', {
+                objectid: payload,
+            })
             .then(result => {
                 var properties = result.records[0]._fields[0].properties;
                 let name = properties.name || property.objectid;
@@ -113,7 +115,7 @@ class ComputerNodeData extends Component {
                     AllowedToDelegate: del,
                     propertyMap: properties,
                     notes: notes,
-                    label: name
+                    label: name,
                 });
                 propCollection.close();
             });
@@ -227,16 +229,19 @@ class ComputerNodeData extends Component {
                 : this.state.notes;
         let q = driver.session();
         if (notes === null) {
-            q.run('MATCH (n:Computer {objectid: {objectid}}) REMOVE n.notes', {
+            q.run('MATCH (n:Computer {objectid: $objectid}) REMOVE n.notes', {
                 objectid: this.state.objectid,
             }).then(() => {
                 q.close();
             });
         } else {
-            q.run('MATCH (n:Computer {objectid: {objectid}}) SET n.notes = {notes}', {
-                objectid: this.state.objectid,
-                notes: this.state.notes,
-            }).then(() => {
+            q.run(
+                'MATCH (n:Computer {objectid: $objectid}) SET n.notes = {notes}',
+                {
+                    objectid: this.state.objectid,
+                    notes: this.state.notes,
+                }
+            ).then(() => {
                 q.close();
             });
         }
@@ -286,7 +291,7 @@ class ComputerNodeData extends Component {
                         property='Sessions'
                         target={this.state.objectid}
                         baseQuery={
-                            "MATCH p=(m:Computer {objectid: {objectid}})-[r:HasSession]->(n:User) WHERE NOT n.objectid ENDS WITH '$'"
+                            "MATCH p=(m:Computer {objectid: $objectid})-[r:HasSession]->(n:User) WHERE NOT n.objectid ENDS WITH '$'"
                         }
                         start={this.state.label}
                         distinct
@@ -296,7 +301,7 @@ class ComputerNodeData extends Component {
                         property='Reachable High Value Targets'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (m:Computer {objectid: {objectid}}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                            'MATCH (m:Computer {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
                         }
                         start={this.state.label}
                     />
@@ -305,10 +310,10 @@ class ComputerNodeData extends Component {
                         property='Sibling Objects in the Same OU'
                         target={this.state.objectid}
                         countQuery={
-                            'MATCH (o1)-[r1:Contains]->(o2:Computer {objectid: {objectid}}) WITH o1 OPTIONAL MATCH p1=(d)-[r2:Contains*1..]->(o1) OPTIONAL MATCH p2=(o1)-[r3:Contains]->(n) WHERE n:User OR n:Computer RETURN count(distinct(n))'
+                            'MATCH (o1)-[r1:Contains]->(o2:Computer {objectid: $objectid}) WITH o1 OPTIONAL MATCH p1=(d)-[r2:Contains*1..]->(o1) OPTIONAL MATCH p2=(o1)-[r3:Contains]->(n) WHERE n:User OR n:Computer RETURN count(distinct(n))'
                         }
                         graphQuery={
-                            'MATCH (o1)-[r1:Contains]->(o2:Computer {objectid: {objectid}}) WITH o1 OPTIONAL MATCH p1=(d)-[r2:Contains*1..]->(o1) OPTIONAL MATCH p2=(o1)-[r3:Contains]->(n) WHERE n:User OR n:Computer RETURN p1,p2'
+                            'MATCH (o1)-[r1:Contains]->(o2:Computer {objectid: $objectid}) WITH o1 OPTIONAL MATCH p1=(d)-[r2:Contains*1..]->(o1) OPTIONAL MATCH p2=(o1)-[r3:Contains]->(n) WHERE n:User OR n:Computer RETURN p1,p2'
                         }
                     />
 
@@ -316,17 +321,17 @@ class ComputerNodeData extends Component {
                         property='Effective Inbound GPOs'
                         target={this.state.objectid}
                         countQuery={
-                            'MATCH (c:Computer {objectid: {objectid}}) OPTIONAL MATCH p1 = (g1:GPO)-[r1:GpLink {enforced:true}]->(container1)-[r2:Contains*1..]->(c) OPTIONAL MATCH p2 = (g2:GPO)-[r3:GpLink {enforced:false}]->(container2)-[r4:Contains*1..]->(c) WHERE NONE (x in NODES(p2) WHERE x.blocksinheritance = true AND x:OU AND NOT (g2)-->(x)) RETURN count(g1)+count(g2)'
+                            'MATCH (c:Computer {objectid: $objectid}) OPTIONAL MATCH p1 = (g1:GPO)-[r1:GpLink {enforced:true}]->(container1)-[r2:Contains*1..]->(c) OPTIONAL MATCH p2 = (g2:GPO)-[r3:GpLink {enforced:false}]->(container2)-[r4:Contains*1..]->(c) WHERE NONE (x in NODES(p2) WHERE x.blocksinheritance = true AND x:OU AND NOT (g2)-->(x)) RETURN count(g1)+count(g2)'
                         }
                         graphQuery={
-                            'MATCH (c:Computer {objectid: {objectid}}) OPTIONAL MATCH p1 = (g1:GPO)-[r1:GpLink {enforced:true}]->(container1)-[r2:Contains*1..]->(c) OPTIONAL MATCH p2 = (g2:GPO)-[r3:GpLink {enforced:false}]->(container2)-[r4:Contains*1..]->(c) WHERE NONE (x in NODES(p2) WHERE x.blocksinheritance = true AND x:OU AND NOT (g2)-->(x)) RETURN p1,p2'
+                            'MATCH (c:Computer {objectid: $objectid}) OPTIONAL MATCH p1 = (g1:GPO)-[r1:GpLink {enforced:true}]->(container1)-[r2:Contains*1..]->(c) OPTIONAL MATCH p2 = (g2:GPO)-[r3:GpLink {enforced:false}]->(container2)-[r4:Contains*1..]->(c) WHERE NONE (x in NODES(p2) WHERE x.blocksinheritance = true AND x:OU AND NOT (g2)-->(x)) RETURN p1,p2'
                         }
                     />
 
                     <NodeCypherNoNumberLink
                         target={this.state.objectid}
                         property='See Computer within Domain/OU Tree'
-                        query='MATCH p = (d:Domain)-[r:Contains*1..]->(u:Computer {objectid: {objectid}}) RETURN p'
+                        query='MATCH p = (d:Domain)-[r:Contains*1..]->(u:Computer {objectid: $objectid}) RETURN p'
                     />
                     <h4>Local Admins</h4>
 
@@ -334,7 +339,7 @@ class ComputerNodeData extends Component {
                         property='Explicit Admins'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n)-[b:AdminTo]->(c:Computer {objectid: {objectid}})'
+                            'MATCH p=(n)-[b:AdminTo]->(c:Computer {objectid: $objectid})'
                         }
                         end={this.state.label}
                     />
@@ -343,7 +348,7 @@ class ComputerNodeData extends Component {
                         property='Unrolled Admins'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n)-[r:MemberOf|AdminTo*1..]->(m:Computer {objectid: {objectid}}) WHERE NOT n:Group'
+                            'MATCH p=(n)-[r:MemberOf|AdminTo*1..]->(m:Computer {objectid: $objectid}) WHERE NOT n:Group'
                         }
                         end={this.state.label}
                         distinct
@@ -353,10 +358,10 @@ class ComputerNodeData extends Component {
                         property='Foreign Admins'
                         target={this.state.objectid}
                         countQuery={
-                            'MATCH (c:Computer {objectid: {objectid}}) OPTIONAL MATCH (u1)-[:AdminTo]->(c) WHERE NOT u1.domain = c.domain WITH u1,c OPTIONAL MATCH (u2)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c) WHERE NOT u2.domain = c.domain WITH COLLECT(u1) + COLLECT(u2) as tempVar,c UNWIND tempVar as principals RETURN COUNT(DISTINCT(principals))'
+                            'MATCH (c:Computer {objectid: $objectid}) OPTIONAL MATCH (u1)-[:AdminTo]->(c) WHERE NOT u1.domain = c.domain WITH u1,c OPTIONAL MATCH (u2)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c) WHERE NOT u2.domain = c.domain WITH COLLECT(u1) + COLLECT(u2) as tempVar,c UNWIND tempVar as principals RETURN COUNT(DISTINCT(principals))'
                         }
                         graphQuery={
-                            'MATCH (c:Computer {objectid: {objectid}}) OPTIONAL MATCH p1 = (u1)-[:AdminTo]->(c) WHERE NOT u1.domain = c.domain WITH p1,c OPTIONAL MATCH p2 = (u2)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c) WHERE NOT u2.domain = c.domain RETURN p1,p2'
+                            'MATCH (c:Computer {objectid: $objectid}) OPTIONAL MATCH p1 = (u1)-[:AdminTo]->(c) WHERE NOT u1.domain = c.domain WITH p1,c OPTIONAL MATCH p2 = (u2)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c) WHERE NOT u2.domain = c.domain RETURN p1,p2'
                         }
                     />
 
@@ -364,7 +369,7 @@ class ComputerNodeData extends Component {
                         property='Derivative Local Admins'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (n) WHERE NOT n.objectid={objectid} WITH n MATCH p = shortestPath((n)-[r:AdminTo|MemberOf|HasSession*1..]->(m:Computer {objectid: {objectid}}))'
+                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r:AdminTo|MemberOf|HasSession*1..]->(m:Computer {objectid: $objectid}))'
                         }
                         end={this.state.label}
                         distinct
@@ -375,7 +380,7 @@ class ComputerNodeData extends Component {
                         property='First Degree Remote Desktop Users'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n)-[r:CanRDP]->(m:Computer {objectid: {objectid}})'
+                            'MATCH p=(n)-[r:CanRDP]->(m:Computer {objectid: $objectid})'
                         }
                         end={this.state.label}
                         distinct
@@ -385,7 +390,7 @@ class ComputerNodeData extends Component {
                         property='Group Delegated Remote Desktop Users'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n)-[r1:MemberOf*1..]->(g:Group)-[r:CanRDP]->(m:Computer {objectid: {objectid}})'
+                            'MATCH p=(n)-[r1:MemberOf*1..]->(g:Group)-[r:CanRDP]->(m:Computer {objectid: $objectid})'
                         }
                         end={this.state.label}
                         distinct
@@ -395,7 +400,7 @@ class ComputerNodeData extends Component {
                         property='First Degree Distributed COM Users'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n)-[r:ExecuteDCOM]->(m:Computer {objectid: {objectid}})'
+                            'MATCH p=(n)-[r:ExecuteDCOM]->(m:Computer {objectid: $objectid})'
                         }
                         end={this.state.label}
                         distinct
@@ -405,7 +410,7 @@ class ComputerNodeData extends Component {
                         property='Group Delegated Distributed COM Users'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n)-[r1:MemberOf*1..]->(g:Group)-[r:ExecuteDCOM]->(m:Computer {objectid: {objectid}})'
+                            'MATCH p=(n)-[r1:MemberOf*1..]->(g:Group)-[r:ExecuteDCOM]->(m:Computer {objectid: $objectid})'
                         }
                         end={this.state.label}
                         distinct
@@ -417,7 +422,7 @@ class ComputerNodeData extends Component {
                         property='First Degree Group Membership'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (m:Computer {objectid: {objectid}}),(n:Group), p=(m)-[r:MemberOf]->(n)'
+                            'MATCH (m:Computer {objectid: $objectid}),(n:Group), p=(m)-[r:MemberOf]->(n)'
                         }
                         start={this.state.label}
                     />
@@ -426,7 +431,7 @@ class ComputerNodeData extends Component {
                         property='Unrolled Group Membership'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(c:Computer {objectid: {objectid}})-[r:MemberOf*1..]->(n:Group)'
+                            'MATCH p=(c:Computer {objectid: $objectid})-[r:MemberOf*1..]->(n:Group)'
                         }
                         start={this.state.label}
                         distinct
@@ -436,7 +441,7 @@ class ComputerNodeData extends Component {
                         property='Foreign Group Membership'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(c:Computer {objectid: {objectid}})-[r:MemberOf*1..]->(n:Group) WHERE NOT n.domain = c.domain'
+                            'MATCH p=(c:Computer {objectid: $objectid})-[r:MemberOf*1..]->(n:Group) WHERE NOT n.domain = c.domain'
                         }
                         start={this.state.label}
                         distinct
@@ -448,7 +453,7 @@ class ComputerNodeData extends Component {
                         property='First Degree Local Admin'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (m:Computer {objectid: {objectid}}), (n:Computer), p=(m)-[r:AdminTo]->(n)'
+                            'MATCH (m:Computer {objectid: $objectid}), (n:Computer), p=(m)-[r:AdminTo]->(n)'
                         }
                         start={this.state.label}
                         distinct
@@ -458,7 +463,7 @@ class ComputerNodeData extends Component {
                         property='Group Delegated Local Admin'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Computer {objectid: {objectid}})-[r1:MemberOf*1..]->(g:Group)-[r2:AdminTo]->(n:Computer) WHERE NOT n.objectid={objectid}'
+                            'MATCH p=(m:Computer {objectid: $objectid})-[r1:MemberOf*1..]->(g:Group)-[r2:AdminTo]->(n:Computer) WHERE NOT n.objectid=$objectid'
                         }
                         start={this.state.label}
                         distinct
@@ -468,7 +473,7 @@ class ComputerNodeData extends Component {
                         property='Derivative Local Admin'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (m:Computer {objectid: {objectid}}), (n:Computer) WHERE NOT n.objectid={objectid} MATCH p=shortestPath((m)-[r:AdminTo|MemberOf*1..]->(n))'
+                            'MATCH (m:Computer {objectid: $objectid}), (n:Computer) WHERE NOT n.objectid=$objectid MATCH p=shortestPath((m)-[r:AdminTo|MemberOf*1..]->(n))'
                         }
                         start={this.state.label}
                         distinct
@@ -479,7 +484,7 @@ class ComputerNodeData extends Component {
                         property='SQL Admins'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n:User)-[r:SQLAdmin]->(m:Computer {objectid: {objectid}})'
+                            'MATCH p=(n:User)-[r:SQLAdmin]->(m:Computer {objectid: $objectid})'
                         }
                         start={this.state.label}
                         distinct
@@ -490,7 +495,7 @@ class ComputerNodeData extends Component {
                         property='First Degree RDP Privileges'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Computer {objectid: {objectid}})-[r:CanRDP]->(n:Computer)'
+                            'MATCH p=(m:Computer {objectid: $objectid})-[r:CanRDP]->(n:Computer)'
                         }
                         start={this.state.label}
                         distinct
@@ -500,7 +505,7 @@ class ComputerNodeData extends Component {
                         property='Group Delegated RDP Privileges'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Computer {objectid: {objectid}})-[r1:MemberOf*1..]->(g:Group)-[r2:CanRDP]->(n:Computer)'
+                            'MATCH p=(m:Computer {objectid: $objectid})-[r1:MemberOf*1..]->(g:Group)-[r2:CanRDP]->(n:Computer)'
                         }
                         start={this.state.label}
                         distinct
@@ -510,7 +515,7 @@ class ComputerNodeData extends Component {
                         property='First Degree DCOM Privileges'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Computer {objectid: {objectid}})-[r:ExecuteDCOM]->(n:Computer)'
+                            'MATCH p=(m:Computer {objectid: $objectid})-[r:ExecuteDCOM]->(n:Computer)'
                         }
                         start={this.state.label}
                         distinct
@@ -520,7 +525,7 @@ class ComputerNodeData extends Component {
                         property='Group Delegated DCOM Privileges'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:Computer {objectid: {objectid}})-[r1:MemberOf*1..]->(g:Group)-[r2:ExecuteDCOM]->(n:Computer)'
+                            'MATCH p=(m:Computer {objectid: $objectid})-[r1:MemberOf*1..]->(g:Group)-[r2:ExecuteDCOM]->(n:Computer)'
                         }
                         start={this.state.label}
                         distinct
@@ -530,7 +535,7 @@ class ComputerNodeData extends Component {
                         property='Constrained Delegation Privileges'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(m:User {objectid: {objectid}})-[r:AllowedToDelegate]->(n:Computer)'
+                            'MATCH p=(m:User {objectid: $objectid})-[r:AllowedToDelegate]->(n:Computer)'
                         }
                         start={this.state.label}
                         distinct
@@ -541,7 +546,7 @@ class ComputerNodeData extends Component {
                         property='Explicit Object Controllers'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n)-[r]->(u1:Computer {objectid:{objectid}}) WHERE r.isacl=true'
+                            'MATCH p=(n)-[r]->(u1:Computer {objectid:$objectid}) WHERE r.isacl=true'
                         }
                         end={this.state.label}
                         distinct
@@ -551,7 +556,7 @@ class ComputerNodeData extends Component {
                         property='Unrolled Object Controllers'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1:AddMember|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(u:Computer {objectid:{objectid}}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = u.objectid) AND NOT n.objectid = u.objectid'
+                            'MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1:AddMember|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(u:Computer {objectid:$objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = u.objectid) AND NOT n.objectid = u.objectid'
                         }
                         end={this.state.label}
                         distinct
@@ -561,7 +566,7 @@ class ComputerNodeData extends Component {
                         property='Transitive Object Controllers'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (n) WHERE NOT n.objectid={objectid} WITH n MATCH p = shortestPath((n)-[r1:MemberOf|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(u1:Computer {objectid:{objectid}}))'
+                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r1:MemberOf|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(u1:Computer {objectid:$objectid}))'
                         }
                         end={this.state.label}
                         distinct
@@ -572,7 +577,7 @@ class ComputerNodeData extends Component {
                         property='First Degree Object Control'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (c:Computer {objectid: {objectid}})-[r]->(n) WHERE r.isacl=true'
+                            'MATCH p = (c:Computer {objectid: $objectid})-[r]->(n) WHERE r.isacl=true'
                         }
                         start={this.state.label}
                         distinct
@@ -582,7 +587,7 @@ class ComputerNodeData extends Component {
                         property='Group Delegated Object Control'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p = (c:Computer {objectid: {objectid}})-[r1:MemberOf*1..]->(g:Group)-[r2]->(n) WHERE r2.isacl=true'
+                            'MATCH p = (c:Computer {objectid: $objectid})-[r1:MemberOf*1..]->(g:Group)-[r2]->(n) WHERE r2.isacl=true'
                         }
                         start={this.state.label}
                         distinct
@@ -592,7 +597,7 @@ class ComputerNodeData extends Component {
                         property='Transitive Object Control'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (n) WHERE NOT n.objectid={objectid} WITH n MATCH p = shortestPath((c:Computer {objectid: {objectid}})-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))'
+                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((c:Computer {objectid: $objectid})-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))'
                         }
                         start={this.state.label}
                         distinct

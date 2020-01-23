@@ -342,7 +342,7 @@ const SearchContainer = () => {
                     name: prop,
                 });
             } else {
-                let statement = `MATCH (n:${mainSearchSelected.type} {objectid:{objectid}}) RETURN n`;
+                let statement = `MATCH (n:${mainSearchSelected.type} {objectid:$objectid}) RETURN n`;
                 emitter.emit('searchQuery', statement, {
                     objectid: mainSearchSelected.objectid,
                 });

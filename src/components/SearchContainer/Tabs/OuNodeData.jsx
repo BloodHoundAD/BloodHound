@@ -74,8 +74,11 @@ class OuNodeData extends Component {
         }
 
         let props = driver.session();
-        props.run('MATCH (n:OU {objectid: {objectid}}) RETURN n', { objectid: this.state.objectid }).then(
-            result => {
+        props
+            .run('MATCH (n:OU {objectid: $objectid}) RETURN n', {
+                objectid: this.state.objectid,
+            })
+            .then(result => {
                 let properties = result.records[0]._fields[0].properties;
                 let name = properties.name || properties.objectid;
                 let notes;
@@ -84,10 +87,13 @@ class OuNodeData extends Component {
                 } else {
                     notes = properties.notes;
                 }
-                this.setState({ label: name, propertyMap: properties, notes: notes });
+                this.setState({
+                    label: name,
+                    propertyMap: properties,
+                    notes: notes,
+                });
                 props.close();
-            }
-        );
+            });
     }
 
     notesChanged(event) {
@@ -101,13 +107,13 @@ class OuNodeData extends Component {
                 : this.state.notes;
         let q = driver.session();
         if (notes === null) {
-            q.run('MATCH (n:OU {objectid: {objectid}}) REMOVE n.notes', {
+            q.run('MATCH (n:OU {objectid: $objectid}) REMOVE n.notes', {
                 objectid: this.state.objectid,
             }).then(x => {
                 q.close();
             });
         } else {
-            q.run('MATCH (n:OU {objectid: {objectid}}) SET n.notes = {notes}', {
+            q.run('MATCH (n:OU {objectid: $objectid}) SET n.notes = {notes}', {
                 objectid: this.state.objectid,
                 notes: this.state.notes,
             }).then(x => {
@@ -253,7 +259,7 @@ class OuNodeData extends Component {
                         ServicePrincipalNames={[]}
                     />
                     <NodeCypherNoNumberLink
-                        query='MATCH p = (d)-[r:Contains*1..]->(o:OU {objectid: {objectid}}) RETURN p'
+                        query='MATCH p = (d)-[r:Contains*1..]->(o:OU {objectid: $objectid}) RETURN p'
                         target={this.state.objectid}
                         property='See OU Within Domain Tree'
                     />
@@ -265,14 +271,14 @@ class OuNodeData extends Component {
                         property='GPOs Directly Affecting This OU'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n:GPO)-[r:GpLink]->(o:OU {objectid: {objectid}})'
+                            'MATCH p=(n:GPO)-[r:GpLink]->(o:OU {objectid: $objectid})'
                         }
                     />
                     <NodeCypherLink
                         property='GPOs Affecting This OU'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(n:GPO)-[r:GpLink|Contains*1..]->(o:OU {objectid: {objectid}})'
+                            'MATCH p=(n:GPO)-[r:GpLink|Contains*1..]->(o:OU {objectid: $objectid})'
                         }
                     />
 
@@ -281,7 +287,7 @@ class OuNodeData extends Component {
                         property='Total User Objects'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(o:OU {objectid: {objectid}})-[r:Contains*1..]->(n:User)'
+                            'MATCH p=(o:OU {objectid: $objectid})-[r:Contains*1..]->(n:User)'
                         }
                         distinct
                     />
@@ -290,7 +296,7 @@ class OuNodeData extends Component {
                         property='Total Group Objects'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(o:OU {objectid: {objectid}})-[r:Contains*1..]->(n:Group)'
+                            'MATCH p=(o:OU {objectid: $objectid})-[r:Contains*1..]->(n:Group)'
                         }
                         distinct
                     />
@@ -299,7 +305,7 @@ class OuNodeData extends Component {
                         property='Total Computer Objects'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH p=(o:OU {objectid: {objectid}})-[r:Contains*1..]->(n:Computer)'
+                            'MATCH p=(o:OU {objectid: $objectid})-[r:Contains*1..]->(n:Computer)'
                         }
                         distinct
                     />
@@ -308,7 +314,7 @@ class OuNodeData extends Component {
                         property='Sibling Objects within OU'
                         target={this.state.objectid}
                         baseQuery={
-                            'MATCH (o1)-[r1:Contains]->(o2:OU {objectid: {objectid}}) WITH o1 MATCH p=(d)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)'
+                            'MATCH (o1)-[r1:Contains]->(o2:OU {objectid: $objectid}) WITH o1 MATCH p=(d)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)'
                         }
                         distinct
                     />

@@ -257,6 +257,14 @@ const Login = () => {
             });
     };
 
+    const triggerLogin = event => {
+        let key = event.keyCode ? event.KeyCode : event.which;
+
+        if (key === 13) {
+            checkDatabaseCreds();
+        }
+    };
+
     return (
         <div className='loginwindow'>
             <LoginContainer pose={visible ? 'visible' : 'hidden'}>
@@ -299,7 +307,7 @@ const Login = () => {
                             <input
                                 type='text'
                                 value={user}
-                                //onKeyUp={this._triggerLogin.bind(this)}
+                                onKeyDown={triggerLogin}
                                 onChange={event => {
                                     setUser(event.target.value);
                                 }}
@@ -315,7 +323,7 @@ const Login = () => {
                             <input
                                 ref={passwordRef}
                                 value={password}
-                                //onKeyDown={this._triggerLogin.bind(this)}
+                                onKeyDown={triggerLogin}
                                 onChange={event => {
                                     setPassword(event.target.value);
                                 }}
