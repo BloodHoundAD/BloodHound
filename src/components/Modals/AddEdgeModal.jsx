@@ -130,7 +130,7 @@ const AddEdgeModal = () => {
         }
 
         let session = driver.session();
-        let statement = `MATCH (n:${source.type} {objectid: {sourceid}}) MATCH (m:${target.type} {objectid:{targetid}}) MATCH (n)-[r:${edgeValue}]->(m) RETURN r`;
+        let statement = `MATCH (n:${source.type} {objectid: $sourceid}) MATCH (m:${target.type} {objectid: $targetid}) MATCH (n)-[r:${edgeValue}]->(m) RETURN r`;
         let results = await session.run(statement, {
             sourceid: source.objectid,
             targetid: target.objectid,
@@ -164,7 +164,7 @@ const AddEdgeModal = () => {
         }
 
         session = driver.session();
-        statement = `MATCH (n:${source.type} {objectid: {sourceid}}) MATCH (m:${target.type} {objectid:{targetid}}) MERGE (n)-${edgepart}->(m) RETURN r`;
+        statement = `MATCH (n:${source.type} {objectid: $sourceid}) MATCH (m:${target.type} {objectid: $targetid}) MERGE (n)-${edgepart}->(m) RETURN r`;
 
         results = await session.run(statement, {
             sourceid: source.objectid,

@@ -50,8 +50,8 @@ export function buildSearchQuery(searchterm) {
 }
 
 export function buildSelectQuery(startNode, endNode) {
-    let apart = `MATCH (n:${startNode.type} {objectid: {sourceid}})`;
-    let bpart = `MATCH (m:${endNode.type} {objectid: {targetid}})`;
+    let apart = `MATCH (n:${startNode.type} {objectid: $sourceid})`;
+    let bpart = `MATCH (m:${endNode.type} {objectid: $targetid})`;
 
     let query = `${apart} ${bpart} MATCH p=allShortestPaths((n)-[r:{}*1..]->(m)) RETURN p`;
     return [

@@ -326,7 +326,7 @@ class GraphContainer extends Component {
         let sourcenode = instance.graph.nodes(edge.source);
         let targetnode = instance.graph.nodes(edge.target);
 
-        let statement = `MATCH (n:${sourcenode.type} {objectid: {sourceid}}) MATCH (m:${targetnode.type} {objectid: {targetid}}) MATCH (n)-[r:${edge.label}]->(m) DELETE r`;
+        let statement = `MATCH (n:${sourcenode.type} {objectid: $sourceid}) MATCH (m:${targetnode.type} {objectid: $targetid}) MATCH (n)-[r:${edge.label}]->(m) DELETE r`;
 
         instance.graph.dropEdge(edge.id);
         instance.refresh();

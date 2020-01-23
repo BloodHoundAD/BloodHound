@@ -27,7 +27,7 @@ const NodeEditor = () => {
         setVisible(true);
 
         let session = driver.session();
-        let statement = `MATCH (n:${node.type} {objectid:{id}}) RETURN n`;
+        let statement = `MATCH (n:${node.type} {objectid: $id}) RETURN n`;
 
         session.run(statement, { id: node.objectid }).then(result => {
             let props = result.records[0]._fields[0].properties;
@@ -57,7 +57,7 @@ const NodeEditor = () => {
         }
 
         let session = driver.session();
-        let statement = `MATCH (n:${type} {objectid: {id}}) SET n.${newAttrName}={newprop} RETURN n`;
+        let statement = `MATCH (n:${type} {objectid:  $id}) SET n.${newAttrName}={newprop} RETURN n`;
         session.run(statement, { id: id, newprop: newValue }).then(result => {
             let props = result.records[0]._fields[0].properties;
             let label = props.name;
@@ -76,12 +76,12 @@ const NodeEditor = () => {
             }
 
             if (newValue.length > 0) {
-                statement = `MATCH (n:${type} {objectid: {id}}) SET n.${attributeName}={newprop}, n.hasspn=true RETURN n`;
+                statement = `MATCH (n:${type} {objectid:  $id}) SET n.${attributeName}={newprop}, n.hasspn=true RETURN n`;
             } else {
-                statement = `MATCH (n:${type} {objectid: {id}}) SET n.${attributeName}={newprop}, n.hasspn=false RETURN n`;
+                statement = `MATCH (n:${type} {objectid:  $id}) SET n.${attributeName}={newprop}, n.hasspn=false RETURN n`;
             }
         } else {
-            statement = `MATCH (n:${type} {objectid: {id}}) SET n.${attributeName}={newprop} RETURN n`;
+            statement = `MATCH (n:${type} {objectid:  $id}) SET n.${attributeName}={newprop} RETURN n`;
         }
 
         let session = driver.session();
@@ -96,7 +96,7 @@ const NodeEditor = () => {
     };
 
     const deleteAttribute = attributeName => {
-        let statement = `MATCH (n:${type} {objectid:{id}}) REMOVE n.${attributeName} RETURN n`;
+        let statement = `MATCH (n:${type} {objectid: $id}) REMOVE n.${attributeName} RETURN n`;
 
         let session = driver.session();
         session.run(statement, { id: id }).then(result => {

@@ -5,7 +5,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query": "MATCH (n:Group) WHERE n.objectid =~ {name} WITH n MATCH p=(n)<-[r:MemberOf*1..]-(m) RETURN p",
+                    "query": "MATCH (n:Group) WHERE n.objectid =~ $name WITH n MATCH p=(n)<-[r:MemberOf*1..]-(m) RETURN p",
                     "props": {
                         "name": "(?i)S-1-5-.*-512"
                     },
@@ -19,7 +19,7 @@
                 {
                     "final": false,
                     "title": "Select a Domain Admin group...",
-                    "query": "MATCH (n:Group) WHERE n.objectid =~ {name} RETURN n.name ORDER BY n.name DESC",
+                    "query": "MATCH (n:Group) WHERE n.objectid =~ $name RETURN n.name ORDER BY n.name DESC",
                     "props": {
                         "name": "(?i)S-1-5-.*-512"
                     }
@@ -126,7 +126,7 @@
                 {
                     "final": false,
                     "title": "Select a Domain Admin group...",
-                    "query": "MATCH (n:Group) WHERE n.objectid =~ {name} RETURN n.name ORDER BY n.name DESC",
+                    "query": "MATCH (n:Group) WHERE n.objectid =~ $name RETURN n.name ORDER BY n.name DESC",
                     "props": {
                         "name": "(?i)S-1-5-.*-512"
                     }
@@ -166,7 +166,7 @@
                 {
                     "final": false,
                     "title": "Select a Domain Admin group...",
-                    "query": "MATCH (n:Group) WHERE n.objectid =~ {name} RETURN n.name ORDER BY n.name DESC",
+                    "query": "MATCH (n:Group) WHERE n.objectid =~ $name RETURN n.name ORDER BY n.name DESC",
                     "props": {
                         "name": "(?i)S-1-5-.*-512"
                     }
