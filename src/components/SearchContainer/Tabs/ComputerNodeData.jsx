@@ -30,6 +30,8 @@ class ComputerNodeData extends Component {
                 unconstraineddelegation: 'Allows Unconstrained Delegation',
                 owned: 'Compromised',
                 haslaps: 'LAPS Enabled',
+                pwdlastset: 'Password Last Changed',
+                lastlogon: 'Last Logon',
             },
             notes: null,
             pics: [],
