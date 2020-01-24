@@ -491,7 +491,7 @@ export default class HelpModal extends Component {
             } else if (targetType === 'Domain') {
                 text = `Full control of a domain object grants you both DS-Replication-Get-Changes as well as DS-Replication-Get-Changes-All rights. The combination of these rights allows you to perform the dcsync attack using mimikatz. To grab the credential of the user harmj0y using these rights:
 
-                <code>sekurlsa::dcsync /domain:testlab.local /user:harmj0y</code>`;
+                <code>lsadump::dcsync /domain:testlab.local /user:harmj0y</code>`;
             } else if (targetType === 'GPO') {
                 text = `With full control of a GPO, you may make modifications to that GPO which will then apply to the users and computers affected by the GPO. Select the target object you wish to push an evil policy down to, then use the gpedit GUI to modify the GPO, using an evil policy that allows item-level targeting, such as a new immediate scheduled task. Then wait at least 2 hours for the group policy client to pick up and execute the new evil policy. See the references tab for a more detailed write up on this abuse`;
             }
@@ -801,7 +801,7 @@ export default class HelpModal extends Component {
                 
                 Once you have granted yourself this privilege, you may use the mimikatz dcsync function to dcsync the password of arbitrary principals on the domain
 
-                <code>sekurlsa::dcsync /domain:testlab.local /user:Administrator</code>
+                <code>lsadump::dcsync /domain:testlab.local /user:Administrator</code>
                 
                 Cleanup can be done using the Remove-DomainObjectAcl function:
                 <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity testlab.local -Rights DCSync</code>`;
@@ -1054,7 +1054,7 @@ export default class HelpModal extends Component {
                 
                 Once you have granted yourself this privilege, you may use the mimikatz dcsync function to dcsync the password of arbitrary principals on the domain
 
-                <code>sekurlsa::dcsync /domain:testlab.local /user:Administrator</code>
+                <code>lsadump::dcsync /domain:testlab.local /user:Administrator</code>
                 
                 Cleanup can be done using the Remove-DomainObjectAcl function:
                 <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity testlab.local -Rights DCSync</code>`;
@@ -1394,7 +1394,7 @@ export default class HelpModal extends Component {
                 
                 Once you have granted yourself this privilege, you may use the mimikatz dcsync function to dcsync the password of arbitrary principals on the domain
 
-                <code>sekurlsa::dcsync /domain:testlab.local /user:Administrator</code>
+                <code>lsadump::dcsync /domain:testlab.local /user:Administrator</code>
                 
                 Cleanup can be done using the Remove-DomainObjectAcl function:
                 <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity testlab.local -Rights DCSync</code>
@@ -1500,14 +1500,14 @@ export default class HelpModal extends Component {
         } else if (edge.label === 'GetChanges') {
             let text = `With both GetChanges and GetChangesAll privileges in BloodHound, you may perform a dcsync attack to get the password hash of an arbitrary principal using mimikatz:
             
-            <code>sekurlsa::dcsync /domain:testlab.local /user:Administrator</code>
+            <code>lsadump::dcsync /domain:testlab.local /user:Administrator</code>
             
             You can also perform the more complicated ExtraSids attack to hop domain trusts. For information on this see the blod post by harmj0y in the references tab.`;
             formatted = text;
         } else if (edge.label === 'GetChangesAll') {
             let text = `With both GetChanges and GetChangesAll privileges in BloodHound, you may perform a dcsync attack to get the password hash of an arbitrary principal using mimikatz:
             
-            <code>sekurlsa::dcsync /domain:testlab.local /user:Administrator</code>
+            <code>lsadump::dcsync /domain:testlab.local /user:Administrator</code>
             
             You can also perform the more complicated ExtraSids attack to hop domain trusts. For information on this see the blod post by harmj0y in the references tab.`;
             formatted = text;
