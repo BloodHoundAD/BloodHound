@@ -12,7 +12,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
 
             First, inject the NTLM credential for the user you're abusing into memory using mimikatz:
             
-            <code>sekurlsa::pth /user:dfm /domain:testlab.local /ntlm:&lt;ntlm hash&gt; /run:"mstsc.exe /restrictedadmin"</code>
+            <code>lsadump::pth /user:dfm /domain:testlab.local /ntlm:&lt;ntlm hash&gt; /run:"mstsc.exe /restrictedadmin"</code>
 
             This will open a new RDP window. Input the computer ${targetName} to initiate the remote desktop connection. If the target server does not support Restricted Admin Mode, the session will fail.
 

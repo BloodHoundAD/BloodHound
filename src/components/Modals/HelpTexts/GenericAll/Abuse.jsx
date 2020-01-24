@@ -136,7 +136,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
     } else if (targetType === 'Domain') {
         text = `Full control of a domain object grants you both DS-Replication-Get-Changes as well as DS-Replication-Get-Changes-All rights. The combination of these rights allows you to perform the dcsync attack using mimikatz. To grab the credential of the user harmj0y using these rights:
 
-        <code>sekurlsa::dcsync /domain:testlab.local /user:harmj0y</code>`;
+        <code>lsadump::dcsync /domain:testlab.local /user:harmj0y</code>`;
     } else if (targetType === 'GPO') {
         text = `With full control of a GPO, you may make modifications to that GPO which will then apply to the users and computers affected by the GPO. Select the target object you wish to push an evil policy down to, then use the gpedit GUI to modify the GPO, using an evil policy that allows item-level targeting, such as a new immediate scheduled task. Then wait at least 2 hours for the group policy client to pick up and execute the new evil policy. See the references tab for a more detailed write up on this abuse`;
     } else if (targetType === 'OU') {
