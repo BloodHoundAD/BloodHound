@@ -288,7 +288,10 @@ const SearchContainer = () => {
                         let name = (
                             option.name || option.objectid
                         ).toLowerCase();
-                        let id = option.objectid.toLowerCase();
+                        let id =
+                            option.objectid != null
+                                ? option.objectid.toLowerCase()
+                                : '';
                         let search;
                         if (props.text.includes(':')) {
                             search = props.text.split(':')[1];
@@ -369,9 +372,19 @@ const SearchContainer = () => {
                             return option.name || option.objectid;
                         }}
                         filterBy={(option, props) => {
-                            let name = option.name.toLowerCase();
-                            let id = option.objectid.toLowerCase();
-                            let search = props.text.toLowerCase();
+                            let name = (
+                                option.name || option.objectid
+                            ).toLowerCase();
+                            let id =
+                                option.objectid != null
+                                    ? option.objectid.toLowerCase()
+                                    : '';
+                            let search;
+                            if (props.text.includes(':')) {
+                                search = props.text.split(':')[1];
+                            } else {
+                                search = props.text.toLowerCase();
+                            }
                             return name.includes(search) || id.includes(search);
                         }}
                         useCache={false}
