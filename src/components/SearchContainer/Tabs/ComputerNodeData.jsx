@@ -418,6 +418,16 @@ class ComputerNodeData extends Component {
                         distinct
                     />
 
+                    <NodeCypherLink
+                        property='SQL Admins'
+                        target={this.state.objectid}
+                        baseQuery={
+                            'MATCH p=(n:User)-[r:SQLAdmin]->(m:Computer {objectid: $objectid})'
+                        }
+                        start={this.state.label}
+                        distinct
+                    />
+
                     <h4>Group Memberships</h4>
 
                     <NodeCypherLink
@@ -476,17 +486,6 @@ class ComputerNodeData extends Component {
                         target={this.state.objectid}
                         baseQuery={
                             'MATCH (m:Computer {objectid: $objectid}), (n:Computer) WHERE NOT n.objectid=$objectid MATCH p=shortestPath((m)-[r:AdminTo|MemberOf*1..]->(n))'
-                        }
-                        start={this.state.label}
-                        distinct
-                    />
-
-                    <h4>Inbound Execution Privileges</h4>
-                    <NodeCypherLink
-                        property='SQL Admins'
-                        target={this.state.objectid}
-                        baseQuery={
-                            'MATCH p=(n:User)-[r:SQLAdmin]->(m:Computer {objectid: $objectid})'
                         }
                         start={this.state.label}
                         distinct
