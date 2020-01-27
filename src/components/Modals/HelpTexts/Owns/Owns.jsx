@@ -6,7 +6,7 @@ import Abuse from './Abuse';
 import Opsec from './Opsec';
 import References from './References';
 
-const Owns = ({ sourceName, sourceType, targetName, targetType }) => {
+const Owns = ({ sourceName, sourceType, targetName, targetType, targetId }) => {
     return (
         <Tabs defaultActiveKey={1} id='help-tab-container' justified>
             <Tab
@@ -26,7 +26,8 @@ const Owns = ({ sourceName, sourceType, targetName, targetType }) => {
                     sourceName,
                     sourceType,
                     targetName,
-                    targetType
+                    targetType,
+                    targetId
                 )}
             />
             <Tab

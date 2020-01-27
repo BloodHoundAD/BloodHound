@@ -7,7 +7,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
     }. To do this in conjunction with Get-DomainObject, first create a PSCredential object (these examples comes from the PowerView help documentation):
 
     <code>$SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-    $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\dfm.a', $SecPassword)</code>
+    $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
 
     Then, use Get-DomainObject, optionally specifying $Cred if you are not already running a process as ${sourceName}:
 

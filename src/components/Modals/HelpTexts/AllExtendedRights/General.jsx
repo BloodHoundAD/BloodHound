@@ -6,7 +6,9 @@ const General = (sourceName, sourceType, targetName, targetType) => {
         sourceName
     )} the AllExtendedRights privilege to the ${typeFormat(
         targetType
-    )} ${targetName}. Extended rights are special rights granted on objects which allow reading of privileged attributes, as well as performing special actions. `;
+    )} ${targetName}. 
+    
+    Extended rights are special rights granted on objects which allow reading of privileged attributes, as well as performing special actions. `;
     return { __html: text };
 };
 

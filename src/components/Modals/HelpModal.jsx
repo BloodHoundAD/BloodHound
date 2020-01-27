@@ -33,6 +33,7 @@ const HelpModal = () => {
     const [sourceType, setSourceType] = useState('');
     const [targetName, setTargetName] = useState('');
     const [targetType, setTargetType] = useState('');
+    const [targetId, settargetId] = useState('');
     const [edge, setEdge] = useState('MemberOf');
     const [open, setOpen] = useState(false);
 
@@ -52,6 +53,7 @@ const HelpModal = () => {
         setSourceType(source.type);
         setTargetName(encode(target.label));
         setTargetType(target.type);
+        settargetId(target.objectid);
         setEdge(edge.etype);
         setOpen(true);
     };
@@ -102,6 +104,7 @@ const HelpModal = () => {
                     sourceType={sourceType}
                     targetName={targetName}
                     targetType={targetType}
+                    targetId={targetId}
                 />
             </Modal.Body>
 

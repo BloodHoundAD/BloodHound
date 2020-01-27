@@ -6,7 +6,13 @@ import Abuse from './Abuse';
 import Opsec from './Opsec';
 import References from './References';
 
-const WriteOwner = ({ sourceName, sourceType, targetName, targetType }) => {
+const WriteOwner = ({
+    sourceName,
+    sourceType,
+    targetName,
+    targetType,
+    targetId,
+}) => {
     return (
         <Tabs defaultActiveKey={1} id='help-tab-container' justified>
             <Tab
@@ -26,7 +32,8 @@ const WriteOwner = ({ sourceName, sourceType, targetName, targetType }) => {
                     sourceName,
                     sourceType,
                     targetName,
-                    targetType
+                    targetType,
+                    targetId
                 )}
             />
             <Tab
