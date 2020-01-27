@@ -172,6 +172,7 @@ div.tooltip-inner-custom {
     background-color: white;
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
     margin-left: 2px;
+    overflow: hidden;
 }
 
 .edgeFilter > h4 {
