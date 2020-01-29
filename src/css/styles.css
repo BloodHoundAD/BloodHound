@@ -768,7 +768,7 @@ div.tooltip-inner-custom {
         top: 10%;
         left: 50%;
         width: 60%;
-        bottom: 10%;
+        max-height: calc(100vh - 20%);
         transform: translate(-50%, 0);
         overflow-y: auto;
     }
@@ -781,7 +781,7 @@ div.tooltip-inner-custom {
         top: 10%;
         left: 50%;
         width: 45%;
-        bottom: 10%;
+        max-height: calc(100vh - 20%);
         transform: translate(-50%, 0);
         overflow-y: auto;
     }

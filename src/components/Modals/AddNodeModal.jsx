@@ -10,15 +10,7 @@ import {
     FormControl,
 } from 'react-bootstrap';
 import styles from './AddNodeModal.module.css';
-
-const CompleteCheck = posed.div({
-    visible: {
-        opacity: 1,
-    },
-    hidden: {
-        opacity: 0,
-    },
-});
+import { motion } from 'framer-motion';
 
 const AddNodeModal = () => {
     const [open, setOpen] = useState(false);
@@ -132,12 +124,20 @@ const AddNodeModal = () => {
                 </Modal.Body>
 
                 <Modal.Footer>
-                    <CompleteCheck
-                        pose={showComplete ? 'visible' : 'hidden'}
+                    <motion.div
+                        animate={showComplete ? 'visible' : 'hidden'}
+                        variants={{
+                            visible: {
+                                opacity: 1,
+                            },
+                            hidden: {
+                                opacity: 0,
+                            },
+                        }}
                         className={styles.checkbox}
                     >
                         <i className='fa fa-check-circle green-icon-color' />
-                    </CompleteCheck>
+                    </motion.div>
                     <Button onClick={validateAndSubmit}>Confirm</Button>
                     <Button onClick={handleClose}>Cancel</Button>
                 </Modal.Footer>

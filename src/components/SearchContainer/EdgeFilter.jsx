@@ -1,19 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import posed from 'react-pose';
-
-const EdgeContainer = posed.div({
-    visible: {
-        height: 'auto',
-        width: 'auto',
-        transition: { duration: 400 },
-    },
-    hidden: {
-        height: 0,
-        width: 0,
-        transition: { duration: 400 },
-    },
-});
+import { motion } from 'framer-motion';
 
 const EdgeFilter = ({ open }) => {
     const [edgeIncluded, setEdgeIncluded] = useState(appStore.edgeincluded);
@@ -98,8 +86,20 @@ const EdgeFilter = ({ open }) => {
     };
 
     return (
-        <EdgeContainer
-            pose={open ? 'visible' : 'hidden'}
+        <motion.div
+            variants={{
+                visible: {
+                    height: 'auto',
+                    width: 'auto',
+                    transition: { duration: 0.4 },
+                },
+                hidden: {
+                    height: 0,
+                    width: 0,
+                    transition: { duration: 0.4 },
+                },
+            }}
+            animate={open ? 'visible' : 'hidden'}
             className={'edgeFilter'}
         >
             <div>
@@ -487,7 +487,7 @@ const EdgeFilter = ({ open }) => {
                     HasSIDHistory
                 </label>
             </div>
-        </EdgeContainer>
+        </motion.div>
     );
 };
 

@@ -27,7 +27,7 @@ const LoadingContainer = () => {
 
     return (
         <PoseContainer
-            pose={visible ? 'visible' : 'hidden'}
+            visible={visible}
             className={clsx(
                 'loadingIndicator',
                 `loading-indicator-${context.darkMode ? 'dark' : 'light'}`

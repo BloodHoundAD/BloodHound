@@ -3,19 +3,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import clsx from 'clsx';
 import posed from 'react-pose';
-
-const LoginContainer = posed.div({
-    visible: {
-        opacity: 1,
-        transition: { duration: 400 },
-        applyAtStart: { display: 'block' },
-    },
-    hidden: {
-        opacity: 0,
-        transition: { duration: 400 },
-        applyAtEnd: { display: 'none' },
-    },
-});
+import { motion } from 'framer-motion';
 
 const Login = () => {
     const [url, setUrl] = useState('bolt://localhost:7687');
@@ -36,6 +24,19 @@ const Login = () => {
     const passwordRef = useRef(null);
     const iconRef = useRef(null);
     const buttonRef = useRef(null);
+
+    const variants = {
+        visible: {
+            opacity: 1,
+            transition: { duration: 0.4 },
+            display: 'block',
+        },
+        hidden: {
+            opacity: 0,
+            transition: { duration: 0.4 },
+            transitionEnd: { display: 'none' },
+        },
+    };
 
     useEffect(() => {
         let config = conf.get('databaseInfo');
@@ -143,8 +144,10 @@ const Login = () => {
                 );
 
                 setTimeout(() => {
-                    setVisible(true);
-                    renderEmit.emit('login');
+                    setVisible(false);
+                    setTimeout(() => {
+                        renderEmit.emit('login');
+                    }, 400);
                 }, 1500);
             })
             .catch(error => {
@@ -267,7 +270,11 @@ const Login = () => {
 
     return (
         <div className='loginwindow'>
-            <LoginContainer pose={visible ? 'visible' : 'hidden'}>
+            <motion.div
+                variants={variants}
+                animate={visible ? 'visible' : 'hidden'}
+                initial={'hidden'}
+            >
                 <img src='src/img/logo-white-transparent-full.png' />
                 <div className='text-center'>
                     <span>Log in to Neo4j Database</span>
@@ -369,7 +376,7 @@ const Login = () => {
                         </div>
                     </div>
                 </form>
-            </LoginContainer>
+            </motion.div>
         </div>
     );
 };

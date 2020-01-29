@@ -58,7 +58,7 @@ const Settings = () => {
     return (
         <Draggable handle={'.panel-heading'}>
             <PoseContainer
-                pose={open ? 'visible' : 'hidden'}
+                visible={open}
                 className={clsx(
                     styles.container,
                     context.darkMode ? styles.dark : null

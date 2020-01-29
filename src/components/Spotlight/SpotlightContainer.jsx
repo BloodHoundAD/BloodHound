@@ -58,7 +58,7 @@ const SpotlightContainer = () => {
 
     return (
         <PoseContainer
-            pose={visible ? 'visible' : 'hidden'}
+            visible={visible}
             className={clsx('spotlight', context.darkMode ? styles.dark : null)}
         >
             <div
