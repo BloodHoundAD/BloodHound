@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import posed from 'react-pose';
 import styles from './CollapsibleSection.module.css';
 import clsx from 'clsx';
 import { Row, Col, Grid } from 'react-bootstrap';

@@ -8,7 +8,6 @@ import {
     ControlLabel,
 } from 'react-bootstrap';
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
-import posed from 'react-pose';
 import styles from './AddEdgeModal.module.css';
 import SearchRow from '../SearchContainer/SearchRow';
 import { buildSearchQuery, buildSelectQuery } from 'utils';

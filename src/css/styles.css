@@ -252,19 +252,6 @@ div.tooltip-inner-custom {
     white-space: pre-line;
 }
 
-.node-notes-textarea {
-    resize: none;
-    width: 98%;
-    height: 100px;
-    color: black;
-}
-
-.notes-check-style {
-    position: relative;
-    font-size: 18px;
-    margin-left: 5px;
-}
-
 .glyph-hover-style:hover {
     background-color: #247ba0;
     color: white;

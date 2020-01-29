@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import clsx from 'clsx';
-import posed from 'react-pose';
 import { motion } from 'framer-motion';
 
 const Login = () => {
