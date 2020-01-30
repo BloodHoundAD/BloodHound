@@ -128,6 +128,9 @@ const SearchContainer = () => {
             mainSearchSelected,
             pathSearchSelected
         );
+
+        mainSearchRef.current.getInstance().blur();
+        pathSearchRef.current.getInstance().blur();
         emitter.emit('query', query, props, startTarget, endTarget);
     };
 
@@ -238,6 +241,9 @@ const SearchContainer = () => {
         if (stop) {
             return;
         }
+
+        mainSearchRef.current.getInstance().blur();
+        pathSearchRef.current.getInstance().blur();
 
         if (!pathfindingOpen) {
             if (mainSearchSelected === null) {
