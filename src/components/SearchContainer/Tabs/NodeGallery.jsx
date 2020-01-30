@@ -15,11 +15,43 @@ import { motion } from 'framer-motion';
 import clsx from 'clsx';
 
 const NodeGallery = ({ objectid, type, visible }) => {
-    const [pics, setPics] = useState([]);
+    const [pics, setPics] = useState(null);
     const [currentImage, setCurrentImage] = useState(0);
     const [showCheck, setShowCheck] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
+
+    useEffect(() => {
+        emitter.on('imageUploadFinal', uploadImage);
+        emitter.on('clickPhoto', imageClick);
+        return () => {
+            emitter.removeListener('imageUploadFinal', uploadImage);
+            emitter.removeListener('clickPhoto', imageClick);
+        };
+    }, []);
+
     const alert = useAlert();
+
+    const imageRenderer = useCallback(({ index, left, top, key, photo }) => (
+        <SelectedImage
+            key={key}
+            margin={'2px'}
+            index={index}
+            left={left}
+            top={top}
+            photo={photo}
+        />
+    ));
+
+    useEffect(() => {
+        let key = getKey();
+        let conf = imageconf.get(key);
+
+        if (typeof conf !== 'undefined') {
+            setPics(conf);
+        } else {
+            setPics([]);
+        }
+    }, [objectid]);
 
     const variants = {
         visible: {
@@ -42,32 +74,26 @@ const NodeGallery = ({ objectid, type, visible }) => {
 
     let noPics = <span>Drop pictures here to upload!</span>;
 
-    useEffect(() => {
-        let key = getKey();
-        let conf = imageconf.get(key);
-
-        if (typeof conf !== 'undefined') {
-            setPics(conf);
-        } else {
-            setPics([]);
+    const imageClick = (del, photo) => {
+        if (!visible) {
+            return;
         }
-    }, [objectid]);
 
-    useEffect(() => {
-        emitter.on('imageUploadFinal', uploadImage);
-        return () => {
-            emitter.removeListener('imageUploadFinal', uploadImage);
-        };
-    }, []);
-
-    const openLightbox = useCallback((event, { photo, index }) => {
-        setCurrentImage(index);
-        setModalOpen(true);
-    });
-
-    useEffect(() => {
-        console.log(currentImage);
-    }, [currentImage]);
+        if (del) {
+            let p = pics;
+            p.splice(photo.index, 1);
+            setPics(p);
+            let key = getKey();
+            imageconf.set(key, p);
+            setShowCheck(true);
+            setTimeout(() => {
+                setShowCheck(false);
+            }, 2000);
+        } else {
+            setCurrentImage(photo.index);
+            setModalOpen(true);
+        }
+    };
 
     const uploadImage = files => {
         if (!visible || files.length === 0) {
@@ -135,15 +161,15 @@ const NodeGallery = ({ objectid, type, visible }) => {
     };
 
     const gallery = () => {
-        if (pics.length === 0) {
+        if (!pics || pics.length === 0) {
             return noPics;
         } else {
             return (
                 <>
                     <Gallery
                         photos={pics}
-                        onClick={openLightbox}
                         className={'gallerymod'}
+                        renderImage={imageRenderer}
                     />
                     <ModalGateway>
                         {modalOpen && (
