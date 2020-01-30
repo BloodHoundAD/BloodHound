@@ -13,6 +13,7 @@ import NodeTooltip from './Tooltips/NodeTooltip';
 import StageTooltip from './Tooltips/StageTooltip';
 import EdgeTooltip from './Tooltips/EdgeTooltip';
 import ConfirmDrawModal from './Modals/ConfirmDrawModal';
+import { escapeRegExp } from '../js/utils';
 
 class GraphContainer extends Component {
     constructor(props) {
@@ -716,10 +717,12 @@ class GraphContainer extends Component {
         if (appStore.performance.debug) {
             let temp = statement;
             $.each(Object.keys(params.props), function(_, key) {
-                let replace = `$${key}`;
+                let propKey = `$${key}`;
+                let replace = escapeRegExp(propKey);
+                let regexp = new RegExp(replace, 'g');
                 let props = `"${params.props[key]}"`;
 
-                temp = temp.replace(replace, props);
+                temp = temp.replace(regexp, props);
             });
             emitter.emit('setRawQuery', temp);
         }
