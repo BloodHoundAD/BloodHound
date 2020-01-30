@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Gallery from 'react-photo-gallery';
 import SelectedImage from './SelectedImage';
@@ -19,6 +19,11 @@ const NodeGallery = ({ objectid, type, visible }) => {
     const [currentImage, setCurrentImage] = useState(0);
     const [showCheck, setShowCheck] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
+    const picsRef = useRef(pics);
+
+    useEffect(() => {
+        picsRef.current = pics;
+    }, [pics]);
 
     useEffect(() => {
         emitter.on('imageUploadFinal', uploadImage);
@@ -80,7 +85,7 @@ const NodeGallery = ({ objectid, type, visible }) => {
         }
 
         if (del) {
-            let p = pics;
+            let p = picsRef.current;
             p.splice(photo.index, 1);
             setPics(p);
             let key = getKey();
@@ -100,7 +105,7 @@ const NodeGallery = ({ objectid, type, visible }) => {
             return;
         }
 
-        let p = pics;
+        let p = picsRef.current;
         let originalLength = p.length;
         let key = getKey();
 
