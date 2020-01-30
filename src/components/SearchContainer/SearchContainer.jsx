@@ -34,13 +34,7 @@ const SearchContainer = () => {
         jQuery(tabs.current).slideToggle(0);
 
         setDarkMode(appStore.performance.darkMode);
-
-        emitter.on('userNodeClicked', openNodeTab);
-        emitter.on('groupNodeClicked', openNodeTab);
-        emitter.on('computerNodeClicked', openNodeTab);
-        emitter.on('domainNodeClicked', openNodeTab);
-        emitter.on('gpoNodeClicked', openNodeTab);
-        emitter.on('ouNodeClicked', openNodeTab);
+        emitter.on('nodeClicked', openNodeTab);
         emitter.on('toggleDarkMode', toggleDarkMode);
 
         emitter.on('setStart', node => {

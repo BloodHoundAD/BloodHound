@@ -28,13 +28,24 @@ class TabContainer extends Component {
         };
     }
 
+    nodeClickHandler(type) {
+        if (type === 'User') {
+            this._userNodeClicked();
+        } else if (type === 'Group') {
+            this._groupNodeClicked();
+        } else if (type === 'Computer') {
+            this._computerNodeClicked();
+        } else if (type === 'Domain') {
+            this._domainNodeClicked();
+        } else if (type === 'OU') {
+            this._ouNodeClicked();
+        } else if (type === 'GPO') {
+            this._gpoNodeClicked();
+        }
+    }
+
     componentDidMount() {
-        emitter.on('userNodeClicked', this._userNodeClicked.bind(this));
-        emitter.on('groupNodeClicked', this._groupNodeClicked.bind(this));
-        emitter.on('computerNodeClicked', this._computerNodeClicked.bind(this));
-        emitter.on('domainNodeClicked', this._domainNodeClicked.bind(this));
-        emitter.on('gpoNodeClicked', this._gpoNodeClicked.bind(this));
-        emitter.on('ouNodeClicked', this._ouNodeClicked.bind(this));
+        emitter.on('nodeClicked', this.nodeClickHandler.bind(this));
         emitter.on('imageupload', this.uploadImage.bind(this));
     }
 

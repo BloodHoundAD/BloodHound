@@ -661,13 +661,7 @@ class GraphContainer extends Component {
             child = parent;
         }
         label = child.objectid;
-        if (child.type_user) {
-            emitter.emit('userNodeClicked', label);
-        } else if (child.type_group) {
-            emitter.emit('groupNodeClicked', label);
-        } else if (child.type_computer) {
-            emitter.emit('computerNodeClicked', label);
-        }
+        emitter.emit('nodeClicked', child.type, label);
         parent.color = '#2DC486';
         sigma.misc.animation.camera(
             sigmaInstance.camera,
@@ -1067,26 +1061,12 @@ class GraphContainer extends Component {
 
     _nodeClicked(n) {
         if (!this.state.dragged) {
-            if (n.data.node.type_user) {
-                emitter.emit('userNodeClicked', n.data.node.objectid);
-            } else if (n.data.node.type_group) {
-                emitter.emit('groupNodeClicked', n.data.node.objectid);
-            } else if (
-                n.data.node.type_computer &&
-                n.data.node.label !== 'Grouped Computers'
-            ) {
-                emitter.emit('computerNodeClicked', n.data.node.objectid);
-            } else if (n.data.node.type_domain) {
-                emitter.emit('domainNodeClicked', n.data.node.objectid);
-            } else if (n.data.node.type_gpo) {
-                emitter.emit('gpoNodeClicked', n.data.node.objectid);
-            } else if (n.data.node.type_ou) {
-                emitter.emit(
-                    'ouNodeClicked',
-                    n.data.node.objectid,
-                    n.data.node.blocksinheritance
-                );
-            }
+            emitter.emit(
+                'nodeClicked',
+                n.data.node.type,
+                n.data.node.objectid,
+                n.data.node.blocksinheritance
+            );
         } else {
             this.setState({ dragged: false });
         }
