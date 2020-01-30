@@ -716,7 +716,7 @@ class GraphContainer extends Component {
         if (appStore.performance.debug) {
             let temp = statement;
             $.each(Object.keys(params.props), function(_, key) {
-                let replace = `{${key}}`;
+                let replace = `$${key}`;
                 let props = `"${params.props[key]}"`;
 
                 temp = temp.replace(replace, props);
