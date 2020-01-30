@@ -5,6 +5,8 @@ import CollapsibleSection from './CollapsibleSection';
 const ExtraNodeProps = ({ label, properties, displayMap }) => {
     const [elements, setElements] = useState([]);
 
+    const blacklist = ['highvalue'];
+
     const createValue = value => {
         let type = typeof value;
         if (type === 'number') {
@@ -71,7 +73,7 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
         Object.keys(properties)
             .sort()
             .forEach(val => {
-                if (!mapped.includes(val)) {
+                if (!mapped.includes(val) && !blacklist.includes(val)) {
                     temp = temp.concat(convertProperty(val));
                 }
             });
