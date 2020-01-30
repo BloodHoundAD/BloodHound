@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import LoadLabel from './LoadLabel.jsx';
+import LoadLabel from './Components/LoadLabel.jsx';
 import PropTypes from 'prop-types';
-import NodeCypherLink from './NodeCypherLink.jsx';
-import NodeCypherNoNumberLink from './NodeCypherNoNumberLink';
-import NodeCypherLinkComplex from './NodeCypherLinkComplex';
+import NodeCypherLink from './Components/NodeCypherLink.jsx';
+import NodeCypherNoNumberLink from './Components/NodeCypherNoNumberLink';
+import NodeCypherLinkComplex from './Components/NodeCypherLinkComplex';
 import NodeProps from './NodeProps';
 import Gallery from 'react-photo-gallery';
-import SelectedImage from './SelectedImage';
+import SelectedImage from './Components/SelectedImage';
 import Lightbox from 'react-images';
 import { readFileSync, writeFileSync } from 'fs';
 import sizeOf from 'image-size';
@@ -15,7 +15,7 @@ import { remote } from 'electron';
 const { app } = remote;
 import { join } from 'path';
 import { withAlert } from 'react-alert';
-import NodePlayCypherLink from './NodePlayCypherLink.jsx';
+import NodePlayCypherLink from './Components/NodePlayCypherLink.jsx';
 
 class DomainNodeData extends Component {
     constructor() {

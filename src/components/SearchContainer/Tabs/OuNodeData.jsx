@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes, { object } from 'prop-types';
-import NodeCypherLink from './NodeCypherLink.jsx';
-import NodeCypherNoNumberLink from './NodeCypherNoNumberLink';
+import NodeCypherLink from './Components/NodeCypherLink.jsx';
+import NodeCypherNoNumberLink from './Components/NodeCypherNoNumberLink';
 import NodeProps from './NodeProps';
 import Gallery from 'react-photo-gallery';
-import SelectedImage from './SelectedImage';
+import SelectedImage from './Components/SelectedImage';
 import Lightbox from 'react-images';
 import { readFileSync, writeFileSync } from 'fs';
 import sizeOf from 'image-size';

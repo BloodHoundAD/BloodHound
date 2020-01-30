@@ -2,17 +2,25 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import NodeALink from './NodeALink';
 
-const NodeCypherLink = ({property, target, baseQuery, distinct, start, end, domain}) => {
+const NodeCypherLink = ({
+    property,
+    target,
+    baseQuery,
+    distinct,
+    start,
+    end,
+    domain,
+}) => {
     const [ready, setReady] = useState(false);
     const [value, setValue] = useState(0);
     const [session, setSession] = useState(null);
 
     useEffect(() => {
-        if (session !== null){
+        if (session !== null) {
             session.close();
         }
 
-        if (target === ''){
+        if (target === '') {
             return;
         }
 
@@ -20,27 +28,29 @@ const NodeCypherLink = ({property, target, baseQuery, distinct, start, end, doma
 
         setSession(sess);
         setReady(false);
-        let query = `${baseQuery} ${distinct ? 'RETURN COUNT(DISTINCT(n))' : 'RETURN COUNT(n)'}`;
+        let query = `${baseQuery} ${
+            distinct ? 'RETURN COUNT(DISTINCT(n))' : 'RETURN COUNT(n)'
+        }`;
 
         sess.run(query, {
             objectid: target,
-            domain: domain
-        }).then(result => {
-            setValue(result.records[0]._fields[0]);
-            setReady(true);
-        }).catch(
-            error => {
+            domain: domain,
+        })
+            .then(result => {
+                setValue(result.records[0]._fields[0]);
+                setReady(true);
+            })
+            .catch(error => {
                 if (
                     !error.message.includes(
                         'The transaction has been terminated'
                     )
                 ) {
-                    console.log(target)
-                    console.log(baseQuery)
+                    console.log(target);
+                    console.log(baseQuery);
                     console.log(error);
                 }
-            }
-        );
+            });
     }, [target]);
 
     return (
@@ -51,15 +61,19 @@ const NodeCypherLink = ({property, target, baseQuery, distinct, start, end, doma
                     ready={ready}
                     value={value}
                     click={() => {
-                        emitter.emit('query', `${baseQuery} RETURN p`,
-                        {objectid: target, domain: domain},
-                        start,
-                         end)
-                    }} />
+                        emitter.emit(
+                            'query',
+                            `${baseQuery} RETURN p`,
+                            { objectid: target, domain: domain },
+                            start,
+                            end
+                        );
+                    }}
+                />
             </dd>
         </>
-    )
-}
+    );
+};
 
 NodeCypherLink.propTypes = {
     target: PropTypes.string.isRequired,
@@ -71,5 +85,3 @@ NodeCypherLink.propTypes = {
 };
 
 export default NodeCypherLink;
-
-

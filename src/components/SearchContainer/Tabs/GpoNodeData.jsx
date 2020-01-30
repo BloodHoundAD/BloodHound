@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import NodeCypherLink from './NodeCypherLink.jsx';
-import NodeCypherLinkComplex from './NodeCypherLinkComplex.jsx';
+import NodeCypherLink from './Components/NodeCypherLink.jsx';
+import NodeCypherLinkComplex from './Components/NodeCypherLinkComplex.jsx';
 import NodeProps from './NodeProps';
 import Gallery from 'react-photo-gallery';
-import SelectedImage from './SelectedImage';
+import SelectedImage from './Components/SelectedImage';
 import Lightbox from 'react-images';
 import { readFileSync, writeFileSync } from 'fs';
 import sizeOf from 'image-size';
@@ -13,7 +13,7 @@ import { remote } from 'electron';
 const { app } = remote;
 import { join } from 'path';
 import { withAlert } from 'react-alert';
-import NodePlayCypherLink from './NodePlayCypherLink.jsx';
+import NodePlayCypherLink from './Components/NodePlayCypherLink.jsx';
 
 class GpoNodeData extends Component {
     constructor() {

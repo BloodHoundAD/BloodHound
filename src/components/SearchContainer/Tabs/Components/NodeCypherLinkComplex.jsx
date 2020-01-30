@@ -2,17 +2,25 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import NodeALink from './NodeALink';
 
-const NodeCypherLinkComplex = ({property,target, countQuery, graphQuery, start, end, domain}) => {
+const NodeCypherLinkComplex = ({
+    property,
+    target,
+    countQuery,
+    graphQuery,
+    start,
+    end,
+    domain,
+}) => {
     const [ready, setReady] = useState(false);
     const [value, setValue] = useState(0);
     const [session, setSession] = useState(null);
 
     useEffect(() => {
-        if (session !== null){
+        if (session !== null) {
             session.close();
         }
 
-        if (target === ''){
+        if (target === '') {
             return;
         }
 
@@ -24,12 +32,13 @@ const NodeCypherLinkComplex = ({property,target, countQuery, graphQuery, start, 
 
         sess.run(query, {
             objectid: target,
-            domain: domain
-        }).then(result => {
-            setValue(result.records[0]._fields[0]);
-            setReady(true);
-        }).catch(
-            error => {
+            domain: domain,
+        })
+            .then(result => {
+                setValue(result.records[0]._fields[0]);
+                setReady(true);
+            })
+            .catch(error => {
                 if (
                     !error.message.includes(
                         'The transaction has been terminated'
@@ -37,10 +46,8 @@ const NodeCypherLinkComplex = ({property,target, countQuery, graphQuery, start, 
                 ) {
                     console.log(error);
                 }
-            }
-        );
+            });
     }, [target]);
-
 
     return (
         <>
@@ -61,8 +68,8 @@ const NodeCypherLinkComplex = ({property,target, countQuery, graphQuery, start, 
                 />
             </dd>
         </>
-    )
-}
+    );
+};
 
 NodeCypherLinkComplex.propTypes = {
     target: PropTypes.string.isRequired,
@@ -74,6 +81,3 @@ NodeCypherLinkComplex.propTypes = {
 };
 
 export default NodeCypherLinkComplex;
-
-
-

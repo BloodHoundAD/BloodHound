@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import CollapsibleSection from './CollapsibleSection';
+import CollapsibleSection from './Components/CollapsibleSection';
 
 const MappedNodeProps = ({ label, properties, displayMap }) => {
     const [elements, setElements] = useState([]);
