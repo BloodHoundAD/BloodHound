@@ -27,10 +27,11 @@ const ComputerNodeData = () => {
         };
     }, []);
 
-    const nodeClickEvent = (type, id, blocksinheritance) => {
+    const nodeClickEvent = (type, id, blocksinheritance, domain) => {
         if (type === 'Computer') {
             setVisible(true);
             setObjectid(id);
+            setDomain(domain);
             let session = driver.session();
             session
                 .run(
@@ -42,8 +43,7 @@ const ComputerNodeData = () => {
                 .then(r => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
-                    setLabel(props.name);
-                    setDomain(props.domain);
+                    setLabel(props.name || objectid);
                     session.close();
                 });
         } else {

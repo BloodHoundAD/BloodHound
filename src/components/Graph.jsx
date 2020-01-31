@@ -893,6 +893,7 @@ class GraphContainer extends Component {
             type: type,
             label: label,
             Enabled: data.properties.Enabled,
+            props: data.properties,
             glyphs: [],
             folded: {
                 nodes: [],
@@ -1068,7 +1069,8 @@ class GraphContainer extends Component {
                 'nodeClicked',
                 n.data.node.type,
                 n.data.node.objectid,
-                n.data.node.blocksinheritance
+                n.data.node.blocksinheritance,
+                n.data.node.props.domain
             );
         } else {
             this.setState({ dragged: false });

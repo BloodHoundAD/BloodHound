@@ -6,7 +6,7 @@ import UserNodeData from './Tabs/UserNodeData';
 import GroupNodeData from './Tabs/GroupNodeData';
 import ComputerNodeData from './Tabs/ComputerNodeData';
 import DomainNodeData from './Tabs/DomainNodeData';
-import GpoNodeData from './Tabs/GpoNodeData';
+import GpoNodeData from './Tabs/GPONodeData';
 import OuNodeData from './Tabs/OuNodeData';
 import { Tabs, Tab } from 'react-bootstrap';
 import { openSync, readSync, closeSync } from 'fs';

@@ -28,10 +28,11 @@ const DomainNodeData = () => {
         };
     }, []);
 
-    const nodeClickEvent = (type, id, blocksinheritance) => {
+    const nodeClickEvent = (type, id, blocksinheritance, domain) => {
         if (type === 'Domain') {
             setVisible(true);
             setObjectid(id);
+            setDomain(domain);
             let session = driver.session();
             session
                 .run(
@@ -44,7 +45,6 @@ const DomainNodeData = () => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
                     setLabel(props.name);
-                    setDomain(props.domain);
                     session.close();
                 });
         } else {
@@ -221,6 +221,12 @@ const DomainNodeData = () => {
                         }
                     />
                 </CollapsibleSection>
+                <Notes objectid={objectid} type={'Domain'} />
+                <NodeGallery
+                    objectid={objectid}
+                    type={'Domain'}
+                    visible={visible}
+                />
             </dl>
         </div>
     );

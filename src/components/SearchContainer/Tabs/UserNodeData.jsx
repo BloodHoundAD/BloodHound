@@ -27,10 +27,11 @@ const UserNodeData = () => {
         };
     }, []);
 
-    const nodeClickEvent = (type, id, blocksinheritance) => {
+    const nodeClickEvent = (type, id, blocksinheritance, domain) => {
         if (type === 'User') {
             setVisible(true);
             setObjectId(id);
+            setDomain(domain);
             let session = driver.session();
             session
                 .run(`MATCH (n:User {objectid: $objectid}) RETURN n AS node`, {
@@ -39,8 +40,7 @@ const UserNodeData = () => {
                 .then(r => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
-                    setLabel(props.name);
-                    setDomain(props.domain);
+                    setLabel(props.name || objectid);
                     session.close();
                 });
         } else {
