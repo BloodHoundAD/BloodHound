@@ -5,7 +5,7 @@ import CollapsibleSection from './Components/CollapsibleSection';
 import NodeCypherLinkComplex from './Components/NodeCypherLinkComplex';
 import NodeCypherLink from './Components/NodeCypherLink';
 import NodeCypherNoNumberLink from './Components/NodeCypherNoNumberLink';
-import MappedNodeProps from './MappedNodeProps';
+import MappedNodeProps from './Components/MappedNodeProps';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import NodePlayCypherLink from './Components/NodePlayCypherLink';
 import Notes from './Components/Notes';
