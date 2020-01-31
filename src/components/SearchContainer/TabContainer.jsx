@@ -7,7 +7,7 @@ import GroupNodeData from './Tabs/GroupNodeData';
 import ComputerNodeData from './Tabs/ComputerNodeData';
 import DomainNodeData from './Tabs/DomainNodeData';
 import GpoNodeData from './Tabs/GPONodeData';
-import OuNodeData from './Tabs/OuNodeData';
+import OuNodeData from './Tabs/OUNodeData';
 import { Tabs, Tab } from 'react-bootstrap';
 import { openSync, readSync, closeSync } from 'fs';
 import imageType from 'image-type';
