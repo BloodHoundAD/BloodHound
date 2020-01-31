@@ -7,12 +7,12 @@ import BaseModal from './BaseModal';
 const { dialog } = remote;
 
 const ConfirmDrawModal = ({ promise }) => {
-    const [data, setData] = useState({});
+    const [data, setData] = useState(null);
     const [show, setShow] = useState(false);
 
     const handleClose = () => {
         emitter.emit('confirmGraphDraw', false);
-        setData({});
+        setData(null);
         setShow(false);
     };
 
@@ -23,7 +23,7 @@ const ConfirmDrawModal = ({ promise }) => {
 
     const handleConfirm = () => {
         emitter.emit('confirmGraphDraw', true, data);
-        setData({});
+        setData(null);
         setShow(false);
     };
 
@@ -39,7 +39,7 @@ const ConfirmDrawModal = ({ promise }) => {
             });
         }
         setShow(false);
-        setData({});
+        setData(null);
         emitter.emit('confirmGraphDraw', false);
     };
 
@@ -50,6 +50,9 @@ const ConfirmDrawModal = ({ promise }) => {
         };
     }, []);
 
+    const nodeCount = data == null ? 0 : data.nodes.length;
+    const edgeCount = data == null ? 0 : data.edges.length;
+
     return (
         <BaseModal show={show} onHide={() => handleClose()}>
             <Modal.Header closeButton>
@@ -58,8 +61,13 @@ const ConfirmDrawModal = ({ promise }) => {
 
             <Modal.Body>
                 <p>
-                    This graph will likely take a long time to render. Do you
-                    want to continue, cancel, or save the data to json?
+                    This graph has will likely take a long time to render. Do
+                    you want to continue, cancel, or save the data to json?
+                    <br />
+                    <br />
+                    Total nodes to draw: {nodeCount}
+                    <br />
+                    Total edges to draw: {edgeCount}
                 </p>
             </Modal.Body>
 
