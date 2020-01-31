@@ -8,7 +8,7 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
     const createValue = value => {
         let type = typeof value;
         if (type === 'number') {
-            return value;
+            return value.toLocaleString();
         }
 
         if (type === 'boolean') {

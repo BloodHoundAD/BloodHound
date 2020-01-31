@@ -11,7 +11,7 @@ export default class NodeALink extends Component {
             <If condition={this.props.ready}>
                 <Then>
                     <a href='#' onClick={this.props.click}>
-                        {this.props.value}
+                        {this.props.value.toLocaleString()}
                     </a>
                 </Then>
                 <Else>

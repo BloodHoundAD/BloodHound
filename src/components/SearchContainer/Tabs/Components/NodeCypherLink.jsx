@@ -29,7 +29,9 @@ const NodeCypherLink = ({
         setSession(sess);
         setReady(false);
         let query = `${baseQuery} ${
-            distinct ? 'RETURN COUNT(DISTINCT(n))' : 'RETURN COUNT(n)'
+            distinct
+                ? 'RETURN COUNT(DISTINCT(n)) AS count'
+                : 'RETURN COUNT(n) AS count'
         }`;
 
         sess.run(query, {
@@ -37,7 +39,7 @@ const NodeCypherLink = ({
             domain: domain,
         })
             .then(result => {
-                setValue(result.records[0]._fields[0]);
+                setValue(result.records[0].get('count'));
                 setReady(true);
             })
             .catch(error => {

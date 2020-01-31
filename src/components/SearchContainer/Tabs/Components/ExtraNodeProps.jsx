@@ -5,12 +5,12 @@ import CollapsibleSection from './CollapsibleSection';
 const ExtraNodeProps = ({ label, properties, displayMap }) => {
     const [elements, setElements] = useState([]);
 
-    const blacklist = ['highvalue'];
+    const blacklist = ['highvalue', 'hasspn', 'primarygroupid'];
 
     const createValue = value => {
         let type = typeof value;
         if (type === 'number') {
-            return value;
+            return value.toLocaleString();
         }
 
         if (type === 'boolean') {

@@ -33,7 +33,7 @@ const NodeCypherLabel = ({ property, target, baseQuery, domain }) => {
                 sess.close();
                 setSession(null);
                 let v = r.records[0].get('count');
-                setValue(v);
+                setValue(v.toLocaleString());
                 setReady(true);
             })
             .catch(error => {

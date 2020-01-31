@@ -67,39 +67,45 @@ export default class DatabaseDataDisplay extends Component {
         s1.run(
             "MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)"
         ).then(result => {
-            this.setState({ num_users: result.records[0]._fields[0] });
+            this.setState({
+                num_users: result.records[0]._fields[0].toLocaleString(),
+            });
             s1.close();
         });
 
         s2.run('MATCH (n:Group) RETURN count(n)').then(result => {
-            this.setState({ num_groups: result.records[0]._fields[0] });
+            this.setState({
+                num_groups: result.records[0]._fields[0].toLocaleString(),
+            });
             s2.close();
         });
 
         s3.run('MATCH (n:Computer) RETURN count(n)').then(result => {
             this.setState({
-                num_computers: result.records[0]._fields[0],
+                num_computers: result.records[0]._fields[0].toLocaleString(),
             });
             s3.close();
         });
 
         s4.run('MATCH ()-[r:HasSession]->() RETURN count(r)').then(result => {
             this.setState({
-                num_sessions: result.records[0]._fields[0],
+                num_sessions: result.records[0]._fields[0].toLocaleString(),
             });
             s4.close();
         });
 
         s6.run('MATCH ()-[r {isacl: true}]->() RETURN count(r)').then(
             result => {
-                this.setState({ num_acls: result.records[0]._fields[0] });
+                this.setState({
+                    num_acls: result.records[0]._fields[0].toLocaleString(),
+                });
                 s6.close();
             }
         );
 
         s5.run('MATCH ()-[r]->() RETURN count(r)').then(result => {
             this.setState({
-                num_relationships: result.records[0]._fields[0],
+                num_relationships: result.records[0]._fields[0].toLocaleString(),
             });
             s5.close();
         });
