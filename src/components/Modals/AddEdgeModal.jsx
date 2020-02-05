@@ -330,6 +330,7 @@ const AddEdgeModal = () => {
                             opacity: 0,
                         },
                     }}
+                    initial={'hidden'}
                     className={styles.checkbox}
                 >
                     <i className='fa fa-check-circle green-icon-color' />

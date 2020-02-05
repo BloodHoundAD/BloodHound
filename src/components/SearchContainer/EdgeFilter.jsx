@@ -98,6 +98,7 @@ const EdgeFilter = ({ open }) => {
                     transition: { duration: 0.4 },
                 },
             }}
+            initial={'hidden'}
             animate={open ? 'visible' : 'hidden'}
             className={'edgeFilter'}
         >
