@@ -12,12 +12,14 @@ import Notes from './Components/Notes';
 import { withAlert } from 'react-alert';
 import NodeGallery from './Components/NodeGallery';
 
+
 const ComputerNodeData = () => {
     const [visible, setVisible] = useState(false);
     const [objectid, setObjectid] = useState(null);
     const [label, setLabel] = useState(null);
     const [domain, setDomain] = useState(null);
     const [nodeProps, setNodeProps] = useState({});
+
 
     useEffect(() => {
         emitter.on('nodeClicked', nodeClickEvent);
