@@ -28,6 +28,7 @@ import SQLAdmin from './HelpTexts/SQLAdmin/SQLAdmin';
 import ReadGMSAPassword from './HelpTexts/ReadGMSAPassword/ReadGMSAPassword';
 import HasSIDHistory from './HelpTexts/HasSIDHistory/HasSIDHistory';
 import TrustedBy from './HelpTexts/TrustedBy/TrustedBy';
+import CanPSRemote from './HelpTexts/CanPSRemote/CanPSRemote';
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -85,6 +86,7 @@ const HelpModal = () => {
         ReadGMSAPassword: ReadGMSAPassword,
         HasSIDHistory: HasSIDHistory,
         TrustedBy: TrustedBy,
+        CanPSRemote: CanPSRemote,
     };
 
     const Component = components[edge];
@@ -119,4 +121,3 @@ const HelpModal = () => {
 
 HelpModal.propTypes = {};
 export default HelpModal;
-

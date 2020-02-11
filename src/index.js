@@ -183,6 +183,7 @@ global.appStore = {
             SQLAdmin: 'tapered',
             ReadGMSAPassword: 'tapered',
             HasSIDHistory: 'tapered',
+            CanPSRemote: 'tapered',
         },
     },
     lowResPalette: {
@@ -222,6 +223,7 @@ global.appStore = {
             SQLAdmin: 'line',
             ReadGMSAPassword: 'line',
             HasSIDHistory: 'line',
+            CanPSRemote: 'line',
         },
     },
     highResStyle: {
@@ -355,6 +357,11 @@ if (!appStore.edgeincluded.hasOwnProperty('ReadGMSAPassword')) {
 }
 
 if (!appStore.edgeincluded.hasOwnProperty('HasSIDHistory')) {
+    appStore.edgeincluded.HasSIDHistory = true;
+    conf.set('edgeincluded', appStore.edgeincluded);
+}
+
+if (!appStore.edgeincluded.hasOwnProperty('CanPSRemote')) {
     appStore.edgeincluded.HasSIDHistory = true;
     conf.set('edgeincluded', appStore.edgeincluded);
 }

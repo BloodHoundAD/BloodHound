@@ -24,6 +24,7 @@ const EdgeFilter = ({ open }) => {
             current.ReadGMSAPassword = false;
         } else if (section === 'special') {
             current.CanRDP = false;
+            current.CanPSRemote = false;
             current.ExecuteDCOM = false;
             current.AllowedToDelegate = false;
             current.AddAllowedToAct = false;
@@ -59,6 +60,7 @@ const EdgeFilter = ({ open }) => {
             current.ReadGMSAPassword = true;
         } else if (section === 'special') {
             current.CanRDP = true;
+            current.CanPSRemote = true;
             current.ExecuteDCOM = true;
             current.AllowedToDelegate = true;
             current.AddAllowedToAct = true;
@@ -401,6 +403,19 @@ const EdgeFilter = ({ open }) => {
                 <label onClick={e => handleEdgeChange(e)} name='CanRDP'>
                     {' '}
                     CanRDP
+                </label>
+            </div>
+            <div>
+                <input
+                    className='checkbox-inline'
+                    type='checkbox'
+                    name='CanPSRemote'
+                    checked={edgeIncluded.CanRDP}
+                    onChange={e => handleEdgeChange(e)}
+                />
+                <label onClick={e => handleEdgeChange(e)} name='CanPSRemote'>
+                    {' '}
+                    CanPSRemote
                 </label>
             </div>
             <div>
