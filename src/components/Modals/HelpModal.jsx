@@ -27,6 +27,7 @@ import AllowedToAct from './HelpTexts/AllowedToAct/AllowedToAct';
 import SQLAdmin from './HelpTexts/SQLAdmin/SQLAdmin';
 import ReadGMSAPassword from './HelpTexts/ReadGMSAPassword/ReadGMSAPassword';
 import HasSIDHistory from './HelpTexts/HasSIDHistory/HasSIDHistory';
+import TrustedBy from './HelpTexts/TrustedBy/TrustedBy';
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -83,6 +84,7 @@ const HelpModal = () => {
         SQLAdmin: SQLAdmin,
         ReadGMSAPassword: ReadGMSAPassword,
         HasSIDHistory: HasSIDHistory,
+        TrustedBy: TrustedBy,
     };
 
     const Component = components[edge];
