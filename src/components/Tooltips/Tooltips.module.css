@@ -1,0 +1,56 @@
+.tooltip {
+    z-index: 29;
+    max-height: 400px;
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    position: absolute;
+    top: 100px;
+    left: 20px;
+    border: 0px solid #000000;
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+.tooltip :global div:first-child {
+    text-align: center;
+    border-bottom: 1px solid black;
+    font-weight: bold;
+    font-size: 20px;
+    padding: 5px 10px;
+}
+
+.tooltip :global ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    padding-top: 5px;
+    white-space: nowrap;
+}
+
+.tooltip :global ul li {
+    padding: 8px 20px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.tooltip :global ul li:hover {
+    background-color: #ecf0f1;
+    cursor: pointer;
+}
+
+.tooltip :global ul li:last-child {
+    border-radius: 0 0 12px 12px;
+}
+
+.tooltip :global ul i {
+    width: 20px;
+    text-align: center;
+}
+
+.dark {
+    background: black;
+    color: white;
+}
+
+.dark :global li:hover {
+    color: black;
+}

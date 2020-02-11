@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Modal } from 'react-bootstrap';
+import BaseModal from './BaseModal';
 
 export default class DeleteNodeModal extends Component {
     constructor() {
@@ -10,7 +11,7 @@ export default class DeleteNodeModal extends Component {
     }
 
     componentDidMount() {
-        emitter.on('deletenode', this.openModal.bind(this));
+        emitter.on('deleteNode', this.openModal.bind(this));
     }
 
     closeModal() {
@@ -30,10 +31,10 @@ export default class DeleteNodeModal extends Component {
 
     render() {
         return (
-            <Modal
+            <BaseModal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby='DeleteNodeModalHeader'
+                label='DeleteNodeModalHeader'
             >
                 <Modal.Header closeButton>
                     <Modal.Title id='DeleteNodeModalHeader'>
@@ -61,7 +62,7 @@ export default class DeleteNodeModal extends Component {
                         Cancel
                     </button>
                 </Modal.Footer>
-            </Modal>
+            </BaseModal>
         );
     }
 }

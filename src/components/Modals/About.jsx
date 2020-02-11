@@ -1,140 +1,125 @@
-import React, { Component } from 'react';
-
-import { Modal } from 'react-bootstrap';
+import React, { useEffect, useState, useContext } from 'react';
+import clsx from 'clsx';
+const { app, shell } = require('electron').remote;
 import { join } from 'path';
-import { readFileSync, readFile } from 'fs';
-import { remote } from 'electron';
-const { app, shell } = remote;
+import { promises } from 'fs';
+import { Modal, Button } from 'react-bootstrap';
+import styles from './About.module.css';
+import { AppContext } from '../../AppContext';
+import BaseModal from './BaseModal';
 
-export default class About extends Component {
-    constructor() {
-        super();
+const About = () => {
+    const [data, setData] = useState('');
+    const [version, setVersion] = useState('');
+    const [open, setOpen] = useState(false);
+    const context = useContext(AppContext);
 
-        var json = JSON.parse(
-            readFileSync(join(app.getAppPath(), 'package.json'))
-        );
+    const getVersion = async () => {
+        let data = await promises.readFile(join(app.getAppPath(), 'package.json'))
+        let version = JSON.parse(data).version;
 
-        readFile(
-            join(app.getAppPath(), 'LICENSE.md'),
-            'utf8',
-            function(err, data) {
-                this.setState({
-                    license: data,
-                });
-            }.bind(this)
-        );
+        setVersion(version);
+    }
 
-        this.state = {
-            open: false,
-            version: json.version,
+    const getLicense = async () => {
+        let data = await promises.readFile(join(app.getAppPath(), 'LICENSE.md'), 'utf-8');
+        setData(data);
+    }
+
+    const handleOpen = () => {
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+    }
+
+    const openLink = (link) => {
+        shell.openExternal(link)
+    }
+
+    useEffect(() => {
+        getVersion();
+        getLicense();
+
+        emitter.on('showAbout', handleOpen)
+        return () => {
+            emitter.removeListener('showAbout', handleOpen);
         };
-    }
+    }, [])
 
-    componentDidMount() {
-        emitter.on('showAbout', this.openModal.bind(this));
-    }
+    return (
+        <BaseModal
+            show={open}
+            onHide={handleClose}
+            label='AboutHeader'
+        >
+            <Modal.Header closeButton>
+                <Modal.Title id='AboutHeader'>About BloodHound</Modal.Title>
+            </Modal.Header>
 
-    closeModal() {
-        this.setState({ open: false });
-    }
-
-    openModal() {
-        this.setState({ open: true });
-    }
-
-    render() {
-        return (
-            <Modal
-                show={this.state.open}
-                onHide={this.closeModal.bind(this)}
-                aria-labelledby='AboutHeader'
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title id='AboutHeader'>About BloodHound</Modal.Title>
-                </Modal.Header>
-
-                <Modal.Body>
-                    <h5>
-                        <b>Version:</b> {this.state.version}
-                    </h5>
-                    <h5>
-                        <b>GitHub:</b>{' '}
-                        <a
-                            href='#'
-                            onClick={function() {
-                                shell.openExternal(
-                                    'https://www.github.com/BloodHoundAD/BloodHound'
-                                );
-                            }}
-                        >
-                            https://www.github.com/BloodHoundAD/BloodHound
-                        </a>
-                    </h5>
-                    <h5>
-                        <b>BloodHound Slack:</b>{' '}
-                        <a
-                            href='#'
-                            onClick={function() {
-                                shell.openExternal(
-                                    'https://bloodhoundgang.herokuapp.com/'
-                                );
-                            }}
-                        >
-                            https://bloodhoundgang.herokuapp.com/
-                        </a>
-                    </h5>
-                    <h5>
-                        <b>Authors:</b>{' '}
-                        <a
-                            href='#'
-                            onClick={function() {
-                                shell.openExternal(
-                                    'https://www.twitter.com/harmj0y'
-                                );
-                            }}
-                        >
-                            @harmj0y
-                        </a>
-                        ,{' '}
-                        <a
-                            href='#'
-                            onClick={function() {
-                                shell.openExternal(
-                                    'https://www.twitter.com/_wald0'
-                                );
-                            }}
-                        >
-                            @_wald0
-                        </a>
-                        ,{' '}
-                        <a
-                            href='#'
-                            onClick={function() {
-                                shell.openExternal(
-                                    'https://www.twitter.com/cptjesus'
-                                );
-                            }}
-                        >
-                            @cptjesus
-                        </a>
-                    </h5>
-                    <br />
-                    <h5>
-                        <b>License</b>
-                    </h5>
-                    <div className='aboutscroll'>{this.state.license}</div>
-                </Modal.Body>
-
-                <Modal.Footer>
-                    <button
-                        type='button'
-                        className='btn btn-primary'
-                        onClick={this.closeModal.bind(this)}
+            <Modal.Body>
+                <h5>
+                    <b>Version:</b> {version}
+                </h5>
+                <h5>
+                    <b>GitHub:</b>{' '}
+                    <a
+                        href='#'
+                        onClick={() => { openLink('https://www.github.com/BloodHoundAD/BloodHound') }}
                     >
-                        Close
-                    </button>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
+                        https://www.github.com/BloodHoundAD/BloodHound
+                        </a>
+                </h5>
+                <h5>
+                    <b>BloodHound Slack:</b>{' '}
+                    <a
+                        href='#'
+                        onClick={() => { openLink('https://bloodhoundgang.herokuapp.com/') }}
+                    >
+                        https://bloodhoundgang.herokuapp.com/
+                        </a>
+                </h5>
+                <h5>
+                    <b>Authors:</b>{' '}
+                    <a
+                        href='#'
+                        onClick={() => { openLink('https://www.twitter.com/harmj0y') }}
+                    >
+                        @harmj0y
+                        </a>
+                    ,{' '}
+                    <a
+                        href='#'
+                        onClick={() => { openLink('https://www.twitter.com/_wald0') }}
+                    >
+                        @_wald0
+                        </a>
+                    ,{' '}
+                    <a
+                        href='#'
+                        onClick={() => { openLink('https://www.twitter.com/cptjesus') }}
+                    >
+                        @cptjesus
+                        </a>
+                </h5>
+                <br />
+                <h5>
+                    <b>License</b>
+                </h5>
+                <div className={styles.scroll}>{data}</div>
+            </Modal.Body>
+
+            <Modal.Footer>
+                <Button variant='primary' onClick={handleClose}>
+                    Close
+                </Button>
+            </Modal.Footer>
+        </BaseModal >
+    )
 }
+
+About.propTypes = {
+
+}
+export default About

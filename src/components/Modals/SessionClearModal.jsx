@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { clearSessions } from 'utils';
 
 import { Modal } from 'react-bootstrap';
+import BaseModal from './BaseModal';
 
 export default class SessionClearModal extends Component {
     constructor() {
@@ -31,10 +32,10 @@ export default class SessionClearModal extends Component {
 
     render() {
         return (
-            <Modal
+            <BaseModal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby='SessionModalHeader'
+                label='SessionModalHeader'
             >
                 <Modal.Header closeButton>
                     <Modal.Title id='SessionModalHeader'>
@@ -62,7 +63,7 @@ export default class SessionClearModal extends Component {
                         Cancel
                     </button>
                 </Modal.Footer>
-            </Modal>
+            </BaseModal>
         );
     }
 }

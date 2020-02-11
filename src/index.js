@@ -13,6 +13,9 @@ import { join } from 'path';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 
 import ConfigStore from 'electron-store';
+
+import 'react-bootstrap-typeahead/css/Typeahead.css';
+
 global.conf = new ConfigStore();
 global.imageconf = new ConfigStore({
     name: 'images',
@@ -41,6 +44,15 @@ String.prototype.format = function() {
 String.prototype.formatAll = function() {
     var args = arguments;
     return this.replace(/{}/g, args[0]);
+};
+
+String.prototype.formatn = function() {
+    var formatted = this;
+    for (var i = 0; i < arguments.length; i++) {
+        var regexp = new RegExp('\\{' + i + '\\}', 'gi');
+        formatted = formatted.replace(regexp, arguments[i]);
+    }
+    return formatted;
 };
 
 String.prototype.toTitleCase = function() {
@@ -137,6 +149,12 @@ global.appStore = {
                 scale: 1.25,
                 color: '#7F72FD',
             },
+            Unknown: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uF128',
+                scale: 1.25,
+                color: '#E6E600',
+            },
         },
         edgeScheme: {
             AdminTo: 'tapered',
@@ -163,6 +181,8 @@ global.appStore = {
             GetChanges: 'tapered',
             GetChangeAll: 'tapered',
             SQLAdmin: 'tapered',
+            ReadGMSAPassword: 'tapered',
+            HasSIDHistory: 'tapered',
         },
     },
     lowResPalette: {
@@ -173,6 +193,7 @@ global.appStore = {
             Domain: '#17E6B9',
             OU: '#FFAA00',
             GPO: '#7F72FD',
+            Unknown: '#E6E600',
         },
         edgeScheme: {
             AdminTo: 'line',
@@ -199,6 +220,8 @@ global.appStore = {
             GetChanges: 'line',
             GetChangeAll: 'line',
             SQLAdmin: 'line',
+            ReadGMSAPassword: 'line',
+            HasSIDHistory: 'line',
         },
     },
     highResStyle: {
@@ -293,6 +316,8 @@ if (typeof conf.get('edgeincluded') === 'undefined') {
         AddAllowedToAct: true,
         AllowedToAct: true,
         SQLAdmin: true,
+        ReadGMSAPassword: true,
+        HasSIDHistory: true,
     });
 }
 
@@ -324,6 +349,16 @@ if (!appStore.edgeincluded.hasOwnProperty('SQLAdmin')) {
     conf.set('edgeincluded', appStore.edgeincluded);
 }
 
+if (!appStore.edgeincluded.hasOwnProperty('ReadGMSAPassword')) {
+    appStore.edgeincluded.ReadGMSAPassword = true;
+    conf.set('edgeincluded', appStore.edgeincluded);
+}
+
+if (!appStore.edgeincluded.hasOwnProperty('HasSIDHistory')) {
+    appStore.edgeincluded.HasSIDHistory = true;
+    conf.set('edgeincluded', appStore.edgeincluded);
+}
+
 // if (!appStore.edgeincluded.hasOwnProperty("ReadLAPSPassword")) {
 //     appStore.edgeincluded.ReadLAPSPassword = true;
 //     conf.set("edgeincluded", appStore.edgeincluded)
@@ -343,7 +378,7 @@ if (typeof appStore.performance.darkMode === 'undefined') {
 
 var custompath = join(app.getPath('userData'), 'customqueries.json');
 if (!existsSync(custompath)) {
-    writeFileSync(custompath, '{queries: []}');
+    writeFileSync(custompath, '{"queries": []}');
 }
 
 let imagepath = join(app.getPath('userData'), 'images');

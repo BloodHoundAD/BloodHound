@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
-import Highlight from 'react-highlighter';
+import React from 'react';
+import {Highlighter} from 'react-bootstrap-typeahead';
 
-const SearchRow = ({ item, search }) => {
+const SearchRow = (item, props) => {
     let searched;
+    let search = props.text;
     if (search.includes(':')) {
         searched = search.split(':')[1];
     } else {
         searched = search;
     }
-
     let type = item.type;
     let icon = {};
     icon.style = { marginLeft: '10px' };
@@ -34,15 +34,17 @@ const SearchRow = ({ item, search }) => {
             break;
     }
 
-    let name = item.name;
+    let name = item.name || item.objectid;
 
     return (
-        <div>
-            <Highlight matchElement='strong' search={searched}>
+        <>
+            <span>
+                <i {...icon} />
+            </span>
+            <Highlighter matchElement='strong' search={searched}>
                 {name}
-            </Highlight>
-            <i {...icon} />
-        </div>
+            </Highlighter>
+        </>
     );
 };
 

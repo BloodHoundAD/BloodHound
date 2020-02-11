@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Modal } from 'react-bootstrap';
+import BaseModal from './BaseModal';
 
 export default class ClearWarnModal extends Component {
     constructor() {
@@ -29,10 +30,10 @@ export default class ClearWarnModal extends Component {
 
     render() {
         return (
-            <Modal
+            <BaseModal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby='WarnModalHeader'
+                label='WarnModalHeader'
             >
                 <Modal.Header closeButton>
                     <Modal.Title id='WarnModalHeader'>
@@ -63,7 +64,7 @@ export default class ClearWarnModal extends Component {
                         Cancel
                     </button>
                 </Modal.Footer>
-            </Modal>
+            </BaseModal>
         );
     }
 }

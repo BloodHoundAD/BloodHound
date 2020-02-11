@@ -1,11 +1,12 @@
+environment:
+  nodejs_version: 12
+
 # Install scripts. (runs after repo cloning)
 install:
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version
   # install modules
-  - npm install -g npm@5.2
   - npm install
-  - npm install -g electron-packager
 
 # Post-install test scripts.
 test_script:

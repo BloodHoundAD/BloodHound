@@ -52,13 +52,6 @@ div.tooltip-inner-custom {
     max-width: 250px;
 }
 
-.aboutscroll {
-    width: 100%;
-    overflow: auto;
-    height: 150px;
-    white-space: pre-wrap;
-}
-
 .queryInput {
     position: relative;
     left: 50%;
@@ -179,6 +172,7 @@ div.tooltip-inner-custom {
     background-color: white;
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
     margin-left: 2px;
+    overflow: hidden;
 }
 
 .edgeFilter > h4 {
@@ -210,16 +204,6 @@ div.tooltip-inner-custom {
     margin-top: 5px;
     max-height: 300px;
     overflow-y: auto;
-}
-
-.nodeEditor {
-    position: absolute;
-    z-index: 20;
-    top: 1em;
-    right: 10em;
-    overflow: auto;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
 .formButtonFix:focus {
@@ -266,31 +250,6 @@ div.tooltip-inner-custom {
     max-width: 400px;
     overflow-y: scroll;
     white-space: pre-line;
-}
-
-.node-notes-textarea {
-    resize: none;
-    width: 98%;
-    height: 100px;
-    color: black;
-}
-
-.add-modal-check-style {
-    position: relative;
-    font-size: 24px;
-    margin-right: 5px;
-    top: 5px;
-}
-
-.notes-check-style {
-    position: relative;
-    font-size: 18px;
-    margin-left: 5px;
-}
-
-.tooltip-ul i {
-    width: 20px;
-    text-align: center;
 }
 
 .glyph-hover-style:hover {
@@ -793,10 +752,12 @@ div.tooltip-inner-custom {
     .spotlight {
         position: absolute;
         z-index: 30;
-        top: 15%;
+        top: 10%;
         left: 50%;
         width: 60%;
+        max-height: calc(100vh - 20%);
         transform: translate(-50%, 0);
+        overflow-y: auto;
     }
 }
 
@@ -804,21 +765,17 @@ div.tooltip-inner-custom {
     .spotlight {
         position: absolute;
         z-index: 30;
-        top: 15%;
+        top: 10%;
         left: 50%;
         width: 45%;
+        max-height: calc(100vh - 20%);
         transform: translate(-50%, 0);
+        overflow-y: auto;
     }
 }
 
-.spotlight-nodelist {
-    overflow: auto;
-    height: 11em;
-    background-color: white;
-}
-
-.spotlight-nodelist table > thead {
-    text-align: center;
+.spotlight table {
+    margin-bottom: 0;
 }
 
 .no-border-radius span {
@@ -895,27 +852,6 @@ div.tooltip-inner-custom {
 
 .settingsDiv .panel-heading {
     cursor: move;
-}
-
-.sliderinput {
-    float: left;
-    width: 3em;
-}
-
-.sliderfix .slideinline {
-    display: inline-block;
-}
-
-.sliderfix .slideinline > .track {
-    margin-top: -2.5px !important;
-}
-
-.sliderfix .slideinline > .dragger {
-    margin-top: -5px !important;
-}
-
-.sliderfix i {
-    margin-left: 5px;
 }
 
 .center-align {
@@ -1033,16 +969,6 @@ div.tooltip-inner-custom {
     overflow: hidden;
 }
 
-.floating-div {
-    position: absolute;
-    z-index: 20;
-    top: 1em;
-    right: 10em;
-    overflow: auto;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
-}
-
 .queryNodeSelect {
     position: absolute;
     z-index: 50;
@@ -1079,10 +1005,40 @@ div.tooltip-inner-custom {
     overflow-y: auto;
 }
 
+.tab-content > div:last-child > div {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
 .help-modal-width > div {
     width: 40%;
 }
 
-#alertContainer > div > div{
+#alertContainer > div > div {
     width: unset !important;
+}
+
+.modal-dark .modal-dialog .modal-content {
+    background-color: #383332;
+    color: white;
+}
+
+.modal-dark input {
+    background-color: black;
+    color: white;
+}
+
+.modal-dark select {
+    background-color: black;
+    color: white;
+}
+
+.modal-dark button {
+    background: black;
+    color: white;
+}
+
+.modal-dark button.close {
+    opacity: 1;
+    background-color: #383332;
 }
