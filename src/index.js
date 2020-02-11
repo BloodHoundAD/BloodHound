@@ -320,6 +320,7 @@ if (typeof conf.get('edgeincluded') === 'undefined') {
         SQLAdmin: true,
         ReadGMSAPassword: true,
         HasSIDHistory: true,
+        CanPSRemote: true,
     });
 }
 
