@@ -1,0 +1,29 @@
+.inline {
+    display: inline;
+}
+
+.check {
+    position: relative;
+    font-size: 18px;
+    margin-left: 5px;
+}
+
+.green {
+    color: green;
+}
+
+.textarea {
+    resize: none;
+    width: 98%;
+    height: 100px;
+    color: black;
+}
+
+.modal {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.imageContainer {
+    cursor: pointer;
+    position: relative;
+}

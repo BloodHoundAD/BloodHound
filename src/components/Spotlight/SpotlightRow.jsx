@@ -1,68 +1,68 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 export default class SpotlightRow extends Component {
     _handleClick() {
         emitter.emit(
-            "spotlightClick",
+            'spotlightClick',
             this.props.nodeId,
             this.props.parentNodeId
         );
     }
 
     render() {
-        var nodeIcon = "";
-        var parentIcon = "";
+        var nodeIcon = '';
+        var parentIcon = '';
         switch (this.props.nodeType) {
-            case "Group":
-                nodeIcon = "fa fa-users";
+            case 'Group':
+                nodeIcon = 'fa fa-users';
                 break;
-            case "User":
-                nodeIcon = "fa fa-user";
+            case 'User':
+                nodeIcon = 'fa fa-user';
                 break;
-            case "Computer":
-                nodeIcon = "fa fa-desktop";
+            case 'Computer':
+                nodeIcon = 'fa fa-desktop';
                 break;
-            case "Domain":
-                nodeIcon = "fa fa-globe";
+            case 'Domain':
+                nodeIcon = 'fa fa-globe';
                 break;
-            case "OU":
-                nodeIcon = "fa fa-sitemap";
+            case 'OU':
+                nodeIcon = 'fa fa-sitemap';
                 break;
-            case "GPO":
-                nodeIcon = "fa fa-list";
+            case 'GPO':
+                nodeIcon = 'fa fa-list';
                 break;
             default:
-                nodeIcon = "";
+                nodeIcon = '';
                 break;
         }
 
         switch (this.props.parentNodeType) {
-            case "Group":
-                parentIcon = "fa fa-users";
+            case 'Group':
+                parentIcon = 'fa fa-users';
                 break;
-            case "User":
-                parentIcon = "fa fa-user";
+            case 'User':
+                parentIcon = 'fa fa-user';
                 break;
-            case "Computer":
-                parentIcon = "fa fa-desktop";
+            case 'Computer':
+                parentIcon = 'fa fa-desktop';
                 break;
-            case "Domain":
-                parentIcon = "fa fa-globe";
+            case 'Domain':
+                parentIcon = 'fa fa-globe';
                 break;
-            case "OU":
-                nodeIcon = "fa fa-sitemap";
+            case 'OU':
+                nodeIcon = 'fa fa-sitemap';
                 break;
-            case "GPO":
-                nodeIcon = "fa fa-list";
+            case 'GPO':
+                nodeIcon = 'fa fa-list';
                 break;
             default:
-                parentIcon = "";
+                parentIcon = '';
                 break;
         }
         return (
             <tr
-                style={{ cursor: "pointer" }}
+                style={{ cursor: 'pointer' }}
                 onClick={this._handleClick.bind(this)}
                 data-id={this.props.nodeId}
                 data-parent-id={this.props.parentNodeId}
@@ -84,5 +84,5 @@ SpotlightRow.propTypes = {
     nodeLabel: PropTypes.string.isRequired,
     parentNodeLabel: PropTypes.string.isRequired,
     nodeType: PropTypes.string.isRequired,
-    parentNodeType: PropTypes.string.isRequired
+    parentNodeType: PropTypes.string.isRequired,
 };

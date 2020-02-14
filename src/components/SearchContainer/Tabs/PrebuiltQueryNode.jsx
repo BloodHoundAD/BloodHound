@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
 export default class PrebuiltQueryNode extends Component {
     render() {
@@ -9,13 +9,13 @@ export default class PrebuiltQueryNode extends Component {
                 appStore.prebuiltQuery = JSON.parse(
                     JSON.stringify(this.props.info.queryList)
                 );
-                emitter.emit("prebuiltQueryStart");
+                emitter.emit('prebuiltQueryStart');
             }
         }.bind(this);
 
         return (
             <div>
-                <a href="#" onClick={c}>
+                <a href='#' onClick={c}>
                     {this.props.info.name}
                 </a>
                 <br />

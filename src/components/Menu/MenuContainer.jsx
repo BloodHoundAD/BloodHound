@@ -1,31 +1,24 @@
-import React, { Component } from "react";
-import MenuButton from "./MenuButton";
-import ProgressBarMenuButton from "./ProgressBarMenuButton";
-import {
-    buildGpoAdminJson,
-    buildSessionJson,
-    buildUserJson,
-    buildComputerJson,
-    buildDomainJson,
-    buildGpoJson,
-    buildGroupJson,
-    buildOuJson
-} from "utils";
-import { If, Then, Else } from "react-if";
-import { remote } from "electron";
-const { dialog, app } = remote;
-import { unlinkSync, createReadStream, createWriteStream, statSync } from "fs";
-import { eachSeries } from "async";
-import { Parse } from "unzipper";
-import { join } from "path";
-
-import { withParser } from "stream-json/filters/Pick";
-import { streamArray } from "stream-json/streamers/StreamArray";
-import { chain } from "stream-chain";
-import { connectTo } from "stream-json/Assembler";
+import { eachSeries } from 'async';
+import { remote } from 'electron';
+import { createReadStream, createWriteStream, statSync, unlinkSync } from 'fs';
 import { isZipSync } from 'is-zip-file';
+import { join } from 'path';
+import React, { Component } from 'react';
+import { withAlert } from 'react-alert';
+import { Else, If, Then } from 'react-if';
+import sanitize from 'sanitize-filename';
+import { chain } from 'stream-chain';
+import { withParser } from 'stream-json/filters/Pick';
+import { streamArray } from 'stream-json/streamers/StreamArray';
+import { Parse } from 'unzipper';
+import * as OldIngestion from '../../js/oldingestion.js';
+import * as NewIngestion from '../../js/newingestion.js';
+import MenuButton from './MenuButton';
+import ProgressBarMenuButton from './ProgressBarMenuButton';
+const { dialog, app } = remote;
 
-export default class MenuContainer extends Component {
+
+class MenuContainer extends Component {
     constructor() {
         super();
 
@@ -33,93 +26,83 @@ export default class MenuContainer extends Component {
             refreshHover: false,
             uploading: false,
             progress: 0,
-            cancelled: false
+            cancelled: false,
         };
 
-        emitter.on("cancelUpload", this.cancelUpload.bind(this));
-        emitter.on("filedrop", this.fileDrop.bind(this))
-        emitter.on("importShim", this._importClick.bind(this))
+        emitter.on('cancelUpload', this.cancelUpload.bind(this));
+        emitter.on('filedrop', this.fileDrop.bind(this));
+        emitter.on('importShim', this._importClick.bind(this));
     }
 
-    fileDrop(e){
-        let fileNames = []
-        $.each(e.dataTransfer.files, function(_, file){
+    fileDrop(e) {
+        let fileNames = [];
+        $.each(e.dataTransfer.files, function(_, file) {
             fileNames.push({ path: file.path, name: file.name });
         });
 
-        this.unzipNecessary(fileNames).then(
-            results => {
-                eachSeries(
-                    results,
-                    (file, callback) => {
-                        emitter.emit(
-                            "showAlert",
-                            "Processing file {}".format(file.name)
-                        );
-                        this.getFileMeta(file.path, callback);
-                    },
-                    () => {
-                        setTimeout(
-                            () => {
-                                this.setState({ uploading: false });
-                            },
-                            3000
-                        );
-                        this.addBaseProps();
-                        $.each(results, function(_, file) {
-                            if (file.delete) {
-                                unlinkSync(file.path);
-                            }
-                        });
-                    }
-                );
-            }
-        );
+        this.unzipNecessary(fileNames).then(results => {
+            eachSeries(
+                results,
+                (file, callback) => {
+                    this.props.alert.info(
+                        'Processing file {}'.format(file.name)
+                    );
+                    this.getFileMeta(file.path, callback);
+                },
+                () => {
+                    setTimeout(() => {
+                        this.setState({ uploading: false });
+                    }, 3000);
+                    this.addBaseProps();
+                    $.each(results, function(_, file) {
+                        if (file.delete) {
+                            unlinkSync(file.path);
+                        }
+                    });
+                }
+            );
+        });
     }
 
     cancelUpload() {
         this.setState({ cancelled: true });
-        setTimeout(
-            _ => {
-                this.setState({ uploading: false });
-            },
-            1000
-        );
+        setTimeout(_ => {
+            this.setState({ uploading: false });
+        }, 1000);
     }
 
     _refreshClick(event) {
-        if (event.ctrlKey){
-            emitter.emit("graphReload");
-        }else{
-            emitter.emit("graphRefresh");
+        if (event.ctrlKey) {
+            emitter.emit('graphReload');
+        } else {
+            emitter.emit('graphRefresh');
         }
-        
     }
 
     _changeLayoutClick() {
-        emitter.emit("changeLayout");
+        emitter.emit('changeLayout');
     }
 
     _exportClick() {
-        emitter.emit("showExport");
+        emitter.emit('showExport');
     }
 
     _importClick() {
-        closeTooltip()
+        closeTooltip();
         var fname = dialog.showOpenDialog({
-            properties: ["openFile"]
+            properties: ['openFile'],
         });
-        if (typeof fname !== "undefined") {
-            emitter.emit("import", fname[0]);
+        if (typeof fname !== 'undefined') {
+            emitter.emit('import', fname[0]);
         }
     }
 
     _settingsClick() {
-        emitter.emit("openSettings");
+        emitter.emit('openSettings');
     }
 
     _cancelUploadClick() {
-        emitter.emit("showCancelUpload");
+        emitter.emit('showCancelUpload');
     }
 
     _uploadClick() {
@@ -130,51 +113,64 @@ export default class MenuContainer extends Component {
             fileNames.push({ path: file.path, name: file.name });
         });
 
-        this.unzipNecessary(fileNames).then(
-            results => {
-                eachSeries(
-                    results,
-                    (file, callback) => {
-                        emitter.emit(
-                            "showAlert",
-                            "Processing file {}".format(file.name)
-                        );
-                        this.getFileMeta(file.path, callback);
-                    },
-                    () => {
-                        setTimeout(
-                            () => {
-                                this.setState({ uploading: false });
-                            },
-                            3000
-                        );
-                        this.addBaseProps();
-                        $.each(results, function(_, file) {
-                            if (file.delete) {
-                                unlinkSync(file.path);
-                            }
-                        });
-                    }
-                );
+        this.unzipNecessary(fileNames).then(results => {
+            eachSeries(
+                results,
+                (file, callback) => {
+                    this.props.alert.info(
+                        'Processing file {}'.format(file.name)
+                    );
+                    this.getFileMeta(file.path, callback);
+                },
+                () => {
+                    setTimeout(() => {
+                        this.setState({ uploading: false });
+                    }, 3000);
+                    this.addBaseProps();
+                    $.each(results, function(_, file) {
+                        if (file.delete) {
+                            unlinkSync(file.path);
+                        }
+                    });
+                }
+            );
 
-                input.val("");
-            }
-        );
+            input.val('');
+        });
     }
 
-    async addBaseProps(){
+    async addBaseProps() {
         let s = driver.session();
-        await s.run("MATCH (n:User) WHERE NOT EXISTS(n.owned) SET n.owned=false");
-        await s.run("MATCH (n:Computer) WHERE NOT EXISTS(n.owned) SET n.owned=false");
-        await s.run("MATCH (n:Group) WHERE n.name =~ 'EVERYONE@.*' SET n.objectsid='S-1-1-0'")
-        await s.run("MATCH (n:Group) WHERE n.name =~ 'AUTHENTICATED USERS@.*' SET n.objectsid='S-1-5-11'")
+        await s.run(
+            'MATCH (n:User) WHERE NOT EXISTS(n.owned) SET n.owned=false'
+        );
+        await s.run(
+            'MATCH (n:Computer) WHERE NOT EXISTS(n.owned) SET n.owned=false'
+        );
+
+        await s.run(
+            'MATCH (n:Group) WHERE n.objectid ENDS WITH "-513" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-1-0" MERGE (n)-[r:MemberOf]->(m)'
+        )
+
+        await s.run(
+            'MATCH (n:Group) WHERE n.objectid ENDS WITH "-515" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-1-0" MERGE (n)-[r:MemberOf]->(m)'
+        )
+
+        await s.run(
+            'MATCH (n:Group) WHERE n.objectid ENDS WITH "-513" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-5-11" MERGE (n)-[r:MemberOf]->(m)'
+        )
+
+        await s.run(
+            'MATCH (n:Group) WHERE n.objectid ENDS WITH "-515" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-5-11" MERGE (n)-[r:MemberOf]->(m)'
+        )
         s.close();
     }
 
     async unzipNecessary(files) {
         var index = 0;
         var processed = [];
-        var tempPath = app.getPath("temp");
+        var tempPath = app.getPath('temp');
+        let promises = [];
         while (index < files.length) {
             var path = files[index].path;
             var name = files[index].name;
@@ -182,16 +178,28 @@ export default class MenuContainer extends Component {
             if (isZipSync(path)) {
                 await createReadStream(path)
                     .pipe(Parse())
-                    .on("entry", function (entry) {
-                        var output = join(tempPath, entry.path);
-                        entry.pipe(createWriteStream(output));
+                    .on('error', function(error) {
+                        this.props.alert.error(
+                            '{} is corrupted or password protected'.format(name)
+                        );
+                    })
+                    .on('entry', function(entry) {
+                        let sanitized = sanitize(entry.path);
+                        let output = join(tempPath, sanitized);
+                        let write = entry.pipe(createWriteStream(output));
+
+                        let promise = new Promise(res => {
+                            write.on('finish', () => {
+                                res();
+                            });
+                        });
+
+                        promises.push(promise);
                         processed.push({
                             path: output,
-                            name: entry.path,
-                            delete: true
+                            name: sanitized,
+                            delete: true,
                         });
-                    }).on("error", function(error){
-                        emitter.emit('showAlert', `${name} is corrupted or password protected`);
                     })
                     .promise();
             } else {
@@ -199,64 +207,71 @@ export default class MenuContainer extends Component {
             }
             index++;
         }
-
+        await Promise.all(promises);
         return processed;
     }
 
     _aboutClick() {
-        emitter.emit("showAbout");
+        emitter.emit('showAbout');
     }
 
-    getFileMeta(file, callback){
+    getFileMeta(file, callback) {
         let acceptableTypes = [
-            "sessions",
-            "ous",
-            "groups",
-            "gpomembers",
-            "gpos",
-            "computers",
-            "users",
-            "domains"
+            'sessions',
+            'ous',
+            'groups',
+            'gpomembers',
+            'gpos',
+            'computers',
+            'users',
+            'domains',
         ];
         let count;
-        
+
         this.setState({
             uploading: true,
-            progress: 0
+            progress: 0,
         });
 
         let size = statSync(file).size;
-        createReadStream(file, {encoding: 'utf8', start: size-100, end: size}).on('data', chunk => {
-            let type;
-            try{
+        createReadStream(file, {
+            encoding: 'utf8',
+            start: size - 200,
+            end: size,
+        }).on('data', chunk => {
+            let type, version;
+            try {
                 type = /type.?:\s?"(\w*)"/g.exec(chunk)[1];
                 count = /count.?:\s?(\d*)/g.exec(chunk)[1];
-            }catch(e){
+            } catch (e) {
                 type = null;
+            }
+            try{
+                version = /version.?:\s?(\d*)/g.exec(chunk)[1];
+            }catch (e){
+                version = null;
             }
             
 
-            if (!acceptableTypes.includes(type)){
-                emitter.emit("showAlert", "Unrecognized File");
+            if (!acceptableTypes.includes(type)) {
+                this.props.alert.error('Unrecognized File');
                 this.setState({
-                    uploading: false
+                    uploading: false,
                 });
                 callback();
                 return;
             }
 
-            this.processJson(file, callback, parseInt(count), type)
+            this.processJson(file, callback, parseInt(count), type, version);
         });
     }
 
-
-    processJson(file, callback, count, type) {
+    processJson(file, callback, count, type, version = null) {
         let pipeline = chain([
-            createReadStream(file, { encoding: "utf8" }),
+            createReadStream(file, { encoding: 'utf8' }),
             withParser({ filter: type }),
-            streamArray()
+            streamArray(),
         ]);
-        
 
         let localcount = 0;
         let sent = 0;
@@ -265,24 +280,24 @@ export default class MenuContainer extends Component {
 
         this.setState({
             uploading: true,
-            progress: 0
+            progress: 0,
         });
 
         console.log(`Processing ${file}`);
-        console.time("IngestTime");
+        console.time('IngestTime');
         pipeline
             .on(
-                "data",
+                'data',
                 async function(data) {
                     chunk.push(data.value);
                     localcount++;
-                    
+
                     if (localcount % 1000 === 0) {
                         pipeline.pause();
-                        await this.uploadData(chunk, type);
+                        await this.uploadData(chunk, type, version);
                         sent += chunk.length;
                         this.setState({
-                            progress: Math.floor((sent / count) * 100)
+                            progress: Math.floor((sent / count) * 100),
                         });
                         chunk = [];
                         pipeline.resume();
@@ -290,12 +305,12 @@ export default class MenuContainer extends Component {
                 }.bind(this)
             )
             .on(
-                "end",
+                'end',
                 async function() {
-                    await this.uploadData(chunk, type);
+                    await this.uploadData(chunk, type, version);
                     this.setState({ progress: 100 });
-                    emitter.emit("refreshDBData");
-                    console.timeEnd("IngestTime");
+                    emitter.emit('refreshDBData');
+                    console.timeEnd('IngestTime');
                     callback();
                 }.bind(this)
             );
@@ -306,34 +321,47 @@ export default class MenuContainer extends Component {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    async uploadData(chunk, type) {
+    async uploadData(chunk, type, version) {
         let session = driver.session();
-        let funcMap = {
-            computers: buildComputerJson,
-            domains: buildDomainJson,
-            gpos: buildGpoJson,
-            users: buildUserJson,
-            groups: buildGroupJson,
-            ous: buildOuJson,
-            sessions: buildSessionJson,
-            gpomembers: buildGpoAdminJson
-        };
+        let funcMap;
+        if (version == null){
+            funcMap = {
+                computers: OldIngestion.buildComputerJson,
+                domains: OldIngestion.buildDomainJson,
+                gpos: OldIngestion.buildGpoJson,
+                users: OldIngestion.buildUserJson,
+                groups: OldIngestion.buildGroupJson,
+                ous: OldIngestion.buildOuJson,
+                sessions: OldIngestion.buildSessionJson,
+                gpomembers: OldIngestion.buildGpoAdminJson,
+            };
+        }else{
+            funcMap = {
+                computers: NewIngestion.buildComputerJsonNew,
+                groups: NewIngestion.buildGroupJsonNew,
+                users: NewIngestion.buildUserJsonNew,
+                domains: NewIngestion.buildDomainJsonNew,
+                ous: NewIngestion.buildOuJsonNew,
+                gpos: NewIngestion.buildGpoJsonNew
+            };
+        }
+
         let data = funcMap[type](chunk);
         for (let key in data) {
-            if (data[key].props.length === 0){
+            if (data[key].props.length === 0) {
                 continue;
             }
-            let arr = data[key].props.chunk()
+            let arr = data[key].props.chunk();
             let statement = data[key].statement;
-            for (let i = 0; i < arr.length; i++){
-                //console.log(arr[i]);
+            for (let i = 0; i < arr.length; i++) {
                 await session
-                .run(statement, { props: arr[i] })
-                .catch(function(error) {
-                    console.log(data[key].props)
-                    console.log(error);
-                });
-            }            
+                    .run(statement, { props: arr[i] })
+                    .catch(function(error) {
+                        console.log(statement)
+                        console.log(data[key].props);
+                        console.log(error);
+                    });
+            }
         }
 
         session.close();
@@ -341,26 +369,26 @@ export default class MenuContainer extends Component {
 
     render() {
         return (
-            <div className="menudiv">
+            <div className='menudiv'>
                 <div>
                     <MenuButton
                         click={this._refreshClick.bind(this)}
-                        hoverVal="Refresh"
-                        glyphicon="fas fa-sync-alt"
+                        hoverVal='Refresh'
+                        glyphicon='fas fa-sync-alt'
                     />
                 </div>
                 <div>
                     <MenuButton
                         click={this._exportClick.bind(this)}
-                        hoverVal="Export Graph"
-                        glyphicon="fa fa-upload"
+                        hoverVal='Export Graph'
+                        glyphicon='fa fa-upload'
                     />
                 </div>
                 <div>
                     <MenuButton
                         click={this._importClick.bind(this)}
-                        hoverVal="Import Graph"
-                        glyphicon="fa fa-download"
+                        hoverVal='Import Graph'
+                        glyphicon='fa fa-download'
                     />
                 </div>
                 <div>
@@ -378,8 +406,8 @@ export default class MenuContainer extends Component {
                                     click={function() {
                                         jQuery(this.refs.fileInput).click();
                                     }.bind(this)}
-                                    hoverVal="Upload Data"
-                                    glyphicon="glyphicon glyphicon-upload"
+                                    hoverVal='Upload Data'
+                                    glyphicon='glyphicon glyphicon-upload'
                                 />
                             )}
                         </Else>
@@ -388,32 +416,34 @@ export default class MenuContainer extends Component {
                 <div>
                     <MenuButton
                         click={this._changeLayoutClick.bind(this)}
-                        hoverVal="Change Layout Type"
-                        glyphicon="fa fa-chart-line"
+                        hoverVal='Change Layout Type'
+                        glyphicon='fa fa-chart-line'
                     />
                 </div>
                 <div>
                     <MenuButton
                         click={this._settingsClick.bind(this)}
-                        hoverVal="Settings"
-                        glyphicon="fa fa-cogs"
+                        hoverVal='Settings'
+                        glyphicon='fa fa-cogs'
                     />
                 </div>
                 <div>
                     <MenuButton
                         click={this._aboutClick.bind(this)}
-                        hoverVal="About"
-                        glyphicon="fa fa-info"
+                        hoverVal='About'
+                        glyphicon='fa fa-info'
                     />
                 </div>
                 <input
-                    ref="fileInput"
+                    ref='fileInput'
                     multiple
-                    className="hide"
-                    type="file"
+                    className='hide'
+                    type='file'
                     onChange={this._uploadClick.bind(this)}
                 />
             </div>
         );
     }
 }
+
+export default withAlert()(MenuContainer);

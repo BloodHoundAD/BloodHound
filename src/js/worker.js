@@ -1,5 +1,5 @@
-global.sigma = require("linkurious");
-require("./sigma.helpers.graph.min.js");
+global.sigma = require('linkurious');
+require('./sigma.helpers.graph.min.js');
 Array.prototype.allEdgesSameType = function() {
     for (var i = 1; i < this.length; i++) {
         if (this[i].type !== this[0].type) return false;
@@ -10,13 +10,13 @@ Array.prototype.allEdgesSameType = function() {
 
 var sigmaInstance = new sigma();
 
-process.on("message", function(m) {
+process.on('message', function(m) {
     var data = JSON.parse(m);
     params = {
         edge: data.edge,
         sibling: data.sibling,
         start: data.start,
-        end: data.end
+        end: data.end,
     };
     var spotlightData = {};
     sigmaInstance.graph.clear();
@@ -32,13 +32,13 @@ process.on("message", function(m) {
     //spotlightData = result[1];
     sigmaInstance.graph.nodes().forEach(function(node) {
         if (!spotlightData.hasOwnProperty(node.id)) {
-            spotlightData[node.id] = [node.label, 0, "", node.type, ""];
+            spotlightData[node.id] = [node.label, 0, '', node.type, ''];
         }
     });
     var toSend = {
         nodes: sigmaInstance.graph.nodes(),
         edges: sigmaInstance.graph.edges(),
-        spotlight: spotlightData
+        spotlight: spotlightData,
     };
     process.send(toSend);
 });
@@ -85,7 +85,7 @@ function collapseEdgeNodes(sigmaInstance, params, spotlightData) {
             if (
                 anode.type_user ||
                 anode.type_computer ||
-                (anode.type_group && edge.label === "AdminTo")
+                (anode.type_group && edge.label === 'AdminTo')
             ) {
                 node.isGrouped = true;
                 node.folded.nodes.push(anode);
@@ -95,15 +95,15 @@ function collapseEdgeNodes(sigmaInstance, params, spotlightData) {
                     node.id,
                     node.label,
                     anode.type,
-                    node.type
+                    node.type,
                 ];
                 sigmaInstance.graph.dropNode(anode.id);
             }
         });
         if (node.folded.nodes.length > 0) {
             node.glyphs.push({
-                position: "bottom-left",
-                content: node.folded.nodes.length
+                position: 'bottom-left',
+                content: node.folded.nodes.length,
             });
         }
     });
@@ -145,7 +145,7 @@ function collapseSiblingNodes(sigmaInstance, params, spotlightData) {
 
             //Generate our string to compare other nodes to
             //by sorting the parents and turning it into a string
-            var checkString = parents.sort().join(",");
+            var checkString = parents.sort().join(',');
             var testString;
 
             //Loop back over nodes in the graph and look for any nodes
@@ -157,7 +157,7 @@ function collapseSiblingNodes(sigmaInstance, params, spotlightData) {
                         return e.source;
                     })
                     .sort()
-                    .join(",");
+                    .join(',');
                 if (testString === checkString) {
                     siblings.push(node2);
                 }
@@ -172,20 +172,20 @@ function collapseSiblingNodes(sigmaInstance, params, spotlightData) {
                     x: node.x,
                     y: node.y,
                     degree: siblings.length,
-                    label: "Grouped Computers",
-                    type: "Computer",
+                    label: 'Grouped Computers',
+                    type: 'Computer',
                     type_computer: true,
                     groupedNode: true,
                     glyphs: [
                         {
-                            position: "bottom-left",
-                            content: siblings.length
-                        }
+                            position: 'bottom-left',
+                            content: siblings.length,
+                        },
                     ],
                     folded: {
                         nodes: [],
-                        edges: []
-                    }
+                        edges: [],
+                    },
                 });
 
                 //Generate new edges for each parent going to our new node
@@ -196,9 +196,9 @@ function collapseSiblingNodes(sigmaInstance, params, spotlightData) {
                         id: id,
                         source: parent,
                         target: nodeId,
-                        label: "AdminTo",
-                        neo4j_type: "AdminTo",
-                        size: 1
+                        label: 'AdminTo',
+                        neo4j_type: 'AdminTo',
+                        size: 1,
                     });
                 });
 
@@ -218,7 +218,7 @@ function collapseSiblingNodes(sigmaInstance, params, spotlightData) {
                         nodeId,
                         n.label,
                         sibling.type,
-                        n.type
+                        n.type,
                     ];
                     sigmaInstance.graph.dropNode(sibling.id);
                 });
@@ -231,11 +231,11 @@ function collapseSiblingNodes(sigmaInstance, params, spotlightData) {
 function generateUniqueId(sigmaInstance, isNode) {
     var i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
     if (isNode) {
-        while (typeof sigmaInstance.graph.nodes(i) !== "undefined") {
+        while (typeof sigmaInstance.graph.nodes(i) !== 'undefined') {
             i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
         }
     } else {
-        while (typeof sigmaInstance.graph.edges(i) !== "undefined") {
+        while (typeof sigmaInstance.graph.edges(i) !== 'undefined') {
             i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
         }
     }

@@ -1,12 +1,17 @@
-import React, { Component } from "react";
-import { Modal } from "react-bootstrap";
+import React, { Component } from 'react';
+import { Modal } from 'react-bootstrap';
+import BaseModal from './BaseModal';
 
 export default class DeleteEdgeModal extends Component {
     constructor() {
         super();
         this.state = {
-            open: false
+            open: false,
         };
+    }
+
+    componentDidMount() {
+        emitter.on('deleteEdge', this.openModal.bind(this));
     }
 
     closeModal() {
@@ -15,27 +20,25 @@ export default class DeleteEdgeModal extends Component {
 
     confirmDelete() {
         this.closeModal();
-        emitter.emit("deleteEdgeConfirm", this.state.id);
+        emitter.emit('deleteEdgeConfirm', this.state.id);
     }
 
     openModal(id) {
-        closeTooltip()
-        this.setState({ open: true,  id: id });
-    }
-
-    componentDidMount() {
-        emitter.on("deleteEdge", this.openModal.bind(this));
+        closeTooltip();
+        this.setState({ open: true, id: id });
     }
 
     render() {
         return (
-            <Modal
+            <BaseModal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby="DeleteEdgeModalHeader"
+                label='DeleteEdgeModalHeader'
             >
-                <Modal.Header closeButton={true}>
-                    <Modal.Title id="DeleteEdgeModalHeader">Delete Edge</Modal.Title>
+                <Modal.Header closeButton>
+                    <Modal.Title id='DeleteEdgeModalHeader'>
+                        Delete Edge
+                    </Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
@@ -44,21 +47,21 @@ export default class DeleteEdgeModal extends Component {
 
                 <Modal.Footer>
                     <button
-                        type="button"
-                        className="btn btn-danger"
+                        type='button'
+                        className='btn btn-danger'
                         onClick={this.confirmDelete.bind(this)}
                     >
                         Confirm
                     </button>
                     <button
-                        type="button"
-                        className="btn btn-primary"
+                        type='button'
+                        className='btn btn-primary'
                         onClick={this.closeModal.bind(this)}
                     >
                         Cancel
                     </button>
                 </Modal.Footer>
-            </Modal>
+            </BaseModal>
         );
     }
 }

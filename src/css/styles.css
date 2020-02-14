@@ -13,28 +13,28 @@
 }
 
 @font-face {
-    font-family: "Roboto";
+    font-family: 'Roboto';
     font-weight: 400;
     font-style: normal;
-    src: url("../fonts/roboto-v15-latin-regular.eot");
+    src: url('../fonts/roboto-v15-latin-regular.eot');
     /* IE9 Compat Modes */
-    src: local("Roboto"), local("Roboto-Regular"),
-        url("../fonts/roboto-v15-latin-regular.eot?#iefix")
-            format("embedded-opentype"),
-        /* IE6-IE8 */ url("../fonts/roboto-v15-latin-regular.woff2")
-            format("woff2"),
+    src: local('Roboto'), local('Roboto-Regular'),
+        url('../fonts/roboto-v15-latin-regular.eot?#iefix')
+            format('embedded-opentype'),
+        /* IE6-IE8 */ url('../fonts/roboto-v15-latin-regular.woff2')
+            format('woff2'),
         /* Super Modern Browsers */
-            url("../fonts/roboto-v15-latin-regular.woff") format("woff"),
-        /* Modern Browsers */ url("../fonts/roboto-v15-latin-regular.ttf")
-            format("truetype"),
+            url('../fonts/roboto-v15-latin-regular.woff') format('woff'),
+        /* Modern Browsers */ url('../fonts/roboto-v15-latin-regular.ttf')
+            format('truetype'),
         /* Safari, Android, iOS */
-            url("../fonts/roboto-v15-latin-regular.svg#Roboto") format("svg");
+            url('../fonts/roboto-v15-latin-regular.svg#Roboto') format('svg');
     /* Legacy iOS */
 }
 
 html,
 body {
-    font-family: "Roboto", sans-serif;
+    font-family: 'Roboto', sans-serif;
     height: 100%;
     overflow: hidden;
     overflow: hidden;
@@ -50,13 +50,6 @@ body {
 
 div.tooltip-inner-custom {
     max-width: 250px;
-}
-
-.aboutscroll {
-    width: 100%;
-    overflow: auto;
-    height: 150px;
-    white-space: pre-wrap;
 }
 
 .queryInput {
@@ -76,7 +69,7 @@ div.tooltip-inner-custom {
     pointer-events: none;
 }
 
-.bottomdiv-dark .slideupbutton{
+.bottomdiv-dark .slideupbutton {
     background-color: black;
     color: white;
 }
@@ -107,25 +100,25 @@ div.tooltip-inner-custom {
     overflow: hidden;
 }
 
-.graph-light{
+.graph-light {
     background-color: rgb(242, 245, 249);
 }
 
-.graph-dark{
+.graph-dark {
     background-color: rgb(79, 71, 61);
     background-color: rgb(56, 51, 50);
 }
 
-.menu-button-dark{
+.menu-button-dark {
     color: white;
     background-color: black;
 }
 
-.menu-button-dark:hover{
+.menu-button-dark:hover {
     color: white;
 }
 
-.menu-button-light{
+.menu-button-light {
     color: black;
     background-color: white;
 }
@@ -161,17 +154,17 @@ div.tooltip-inner-custom {
     display: none;
 }
 
-.edge-filter-heading > h4{
+.edge-filter-heading > h4 {
     display: inline;
     margin-right: 5px;
 }
 
-.edge-filter-heading > button{
+.edge-filter-heading > button {
     height: 20px;
     width: 30px;
 }
 
-.edgeFilter{
+.edgeFilter {
     position: absolute;
     left: 100%;
     display: inline-block;
@@ -179,123 +172,88 @@ div.tooltip-inner-custom {
     background-color: white;
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
     margin-left: 2px;
+    overflow: hidden;
 }
 
-.edgeFilter > h4{
-    display:inline-block;
+.edgeFilter > h4 {
+    display: inline-block;
     white-space: nowrap;
     margin-left: 8px;
     margin-right: 8px;
 }
 
-.edgeFilter > div > h3{
-    display:inline;
+.edgeFilter > div > h3 {
+    display: inline;
     white-space: nowrap;
     margin-right: 8px;
 }
 
-.edgeFilter > div{
+.edgeFilter > div {
     margin-left: 8px;
     margin-right: 8px;
     white-space: nowrap;
 }
 
-.edgeFilter > div > input{
+.edgeFilter > div > input {
     margin-top: 0;
     white-space: nowrap;
 }
 
-#help-tab-container > div div{
+#help-tab-container > div div {
     white-space: pre-line;
     margin-top: 5px;
     max-height: 300px;
     overflow-y: auto;
 }
 
-.nodeEditor{
-    position: absolute;
-    z-index: 20;
-    top: 1em;
-    right: 10em;
-    overflow: auto;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
-}
-
-.formButtonFix:focus{
+.formButtonFix:focus {
     border: 1px solid #ccc !important;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075) !important;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075) !important;
 }
 
-.heighthack{
+.heighthack {
     height: 1px;
 }
 
-.nodeEditor .panel-heading{
+.nodeEditor .panel-heading {
     cursor: move;
 }
 
-
-.nodeEditTableContainer{
+.nodeEditTableContainer {
     overflow: auto;
     max-height: 20em;
 }
 
-.nodeEditRow *[contenteditable="true"]{
+.nodeEditRow *[contenteditable='true'] {
     background-color: white;
     border: 1px solid lightgray;
 }
 
-.nodeEditRow > td{
+.nodeEditRow > td {
     padding: 5px !important;
 }
 
-.nodeEditString{
+.nodeEditString {
     resize: none;
     max-width: 400px;
 }
 
-.nodeEditNumber{
+.nodeEditNumber {
     resize: none;
 }
 
-.nodeEditArray{
+.nodeEditArray {
     resize: none;
     max-height: 200px;
     width: 100%;
-    height:100%;
+    height: 100%;
     max-width: 400px;
     overflow-y: scroll;
     white-space: pre-line;
 }
 
-.node-notes-textarea{
-    resize: none;
-    width: 98%;
-    height: 100px;
-    color:black;
-}
-
-.add-modal-check-style{
-    position: relative;
-    font-size: 24px;
-    margin-right: 5px;
-    top: 5px;
-}
-
-.notes-check-style{
-    position:relative;
-    font-size: 18px;
-    margin-left: 5px;
-}
-
-.tooltip-ul i{
-    width: 20px;
-    text-align: center;
-}
-
-.glyph-hover-style:hover{
-    background-color: #247BA0;
+.glyph-hover-style:hover {
+    background-color: #247ba0;
     color: white;
 }
 
@@ -351,72 +309,71 @@ div.tooltip-inner-custom {
     }
 }
 
-.searchdiv-light{
+.searchdiv-light {
     background-color: white;
     color: black;
 }
 
-.searchdiv-light .dbbuttons > button{
+.searchdiv-light .dbbuttons > button {
     color: white;
 }
 
-.searchdiv-dark .dbbuttons > button{
+.searchdiv-dark .dbbuttons > button {
     color: black;
 }
 
-.searchdiv-dark .edgeFilter{
+.searchdiv-dark .edgeFilter {
     background-color: black;
     color: white;
 }
 
-.searchdiv-dark .edge-filter-heading > button{
+.searchdiv-dark .edge-filter-heading > button {
     color: black;
 }
 
-
-.searchdiv-dark{
+.searchdiv-dark {
     background-color: black;
     color: white;
 }
 
-.searchdiv-dark #tab-style > ul > li > a{
+.searchdiv-dark #tab-style > ul > li > a {
     color: white;
 }
 
-.searchdiv-dark #tab-style > ul > li > a:hover{
+.searchdiv-dark #tab-style > ul > li > a:hover {
     color: black;
 }
 
-.searchdiv-dark .searchbox{
+.searchdiv-dark .searchbox {
     background-color: black;
     color: white;
 }
 
-.searchdiv-dark .spanfix{
+.searchdiv-dark .spanfix {
     background-color: black;
     color: white;
 }
 
-.searchdiv-dark h4{
+.searchdiv-dark h4 {
     color: white;
 }
 
-.searchdiv-light h4{
+.searchdiv-light h4 {
     color: blue;
 }
-.searchdiv-dark .query-box a{
+.searchdiv-dark .query-box a {
     color: white;
 }
 
-.searchdiv-dark .dl-horizontal a{
+.searchdiv-dark .dl-horizontal a {
     color: white;
 }
 
-.searchdiv-dark .dl-horizontal dd:hover{
+.searchdiv-dark .dl-horizontal dd:hover {
     background-color: gray;
 }
 
-.searchdiv-light .dl-horizontal dd:hover{
+.searchdiv-light .dl-horizontal dd:hover {
     background-color: #ecf0f1;
 }
 
@@ -424,7 +381,7 @@ div.tooltip-inner-custom {
     opacity: 0.01;
 }
 
-.inline{
+.inline {
     display: inline;
 }
 
@@ -746,7 +703,7 @@ div.tooltip-inner-custom {
     .modal:before {
         display: inline-block;
         height: 100%;
-        content: " ";
+        content: ' ';
         vertical-align: middle;
     }
 }
@@ -795,10 +752,12 @@ div.tooltip-inner-custom {
     .spotlight {
         position: absolute;
         z-index: 30;
-        top: 15%;
+        top: 10%;
         left: 50%;
         width: 60%;
+        max-height: calc(100vh - 20%);
         transform: translate(-50%, 0);
+        overflow-y: auto;
     }
 }
 
@@ -806,21 +765,17 @@ div.tooltip-inner-custom {
     .spotlight {
         position: absolute;
         z-index: 30;
-        top: 15%;
+        top: 10%;
         left: 50%;
         width: 45%;
+        max-height: calc(100vh - 20%);
         transform: translate(-50%, 0);
+        overflow-y: auto;
     }
 }
 
-.spotlight-nodelist {
-    overflow: auto;
-    height: 11em;
-    background-color: white;
-}
-
-.spotlight-nodelist table > thead {
-    text-align: center;
+.spotlight table {
+    margin-bottom: 0;
 }
 
 .no-border-radius span {
@@ -831,31 +786,31 @@ div.tooltip-inner-custom {
     border-radius: 0;
 }
 
-.react-photo-gallery--gallery{
+.react-photo-gallery--gallery {
     width: 99%;
 }
 
-.gallery-img i:first-child{
+.gallery-img i:first-child {
     visibility: hidden;
-    position:absolute;
-    top:8px;
+    position: absolute;
+    top: 8px;
     right: 18px;
     z-index: 2;
     font-size: 15px;
     color: blue;
 }
 
-.gallery-img i:nth-child(2){
+.gallery-img i:nth-child(2) {
     visibility: hidden;
-    position:absolute;
-    top:8px;
+    position: absolute;
+    top: 8px;
     right: 2px;
     z-index: 2;
     font-size: 15px;
-    color: rgb(244, 65, 104)
+    color: rgb(244, 65, 104);
 }
 
-.gallery-img:hover i{
+.gallery-img:hover i {
     visibility: visible;
 }
 
@@ -871,11 +826,11 @@ div.tooltip-inner-custom {
     font-weight: bold;
 }
 
-.loading-indicator-light div:first-child{
+.loading-indicator-light div:first-child {
     color: black;
 }
 
-.loading-indicator-dark div:first-child{
+.loading-indicator-dark div:first-child {
     color: white;
 }
 
@@ -895,29 +850,8 @@ div.tooltip-inner-custom {
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
-.settingsDiv .panel-heading{
+.settingsDiv .panel-heading {
     cursor: move;
-}
-
-.sliderinput {
-    float: left;
-    width: 3em;
-}
-
-.sliderfix .slideinline {
-    display: inline-block;
-}
-
-.sliderfix .slideinline > .track {
-    margin-top: -2.5px !important;
-}
-
-.sliderfix .slideinline > .dragger {
-    margin-top: -5px !important;
-}
-
-.sliderfix i {
-    margin-left: 5px;
 }
 
 .center-align {
@@ -960,7 +894,7 @@ div.tooltip-inner-custom {
     color: black;
 }
 
-#tab-style > ul > li > a[aria-selected="true"] {
+#tab-style > ul > li > a[aria-selected='true'] {
     border-right: 1px solid lightgray;
     border-left: 1px solid lightgray;
     color: black;
@@ -978,7 +912,7 @@ div.tooltip-inner-custom {
     width: 50%;
 }
 
-.dbbuttonslast{
+.dbbuttonslast {
     padding-bottom: 1em;
     width: 100%;
 }
@@ -987,9 +921,9 @@ div.tooltip-inner-custom {
     display: none;
 }
 
-.form-override:focus{
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    border: 1px solid rgb(204,204,204);
+.form-override:focus {
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    border: 1px solid rgb(204, 204, 204);
 }
 
 .menubutton {
@@ -1035,16 +969,6 @@ div.tooltip-inner-custom {
     overflow: hidden;
 }
 
-.floating-div {
-    position: absolute;
-    z-index: 20;
-    top: 1em;
-    right: 10em;
-    overflow: auto;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
-}
-
 .queryNodeSelect {
     position: absolute;
     z-index: 50;
@@ -1081,6 +1005,40 @@ div.tooltip-inner-custom {
     overflow-y: auto;
 }
 
-.help-modal-width > div{
+.tab-content > div:last-child > div {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.help-modal-width > div {
     width: 40%;
+}
+
+#alertContainer > div > div {
+    width: unset !important;
+}
+
+.modal-dark .modal-dialog .modal-content {
+    background-color: #383332;
+    color: white;
+}
+
+.modal-dark input {
+    background-color: black;
+    color: white;
+}
+
+.modal-dark select {
+    background-color: black;
+    color: white;
+}
+
+.modal-dark button {
+    background: black;
+    color: white;
+}
+
+.modal-dark button.close {
+    opacity: 1;
+    background-color: #383332;
 }

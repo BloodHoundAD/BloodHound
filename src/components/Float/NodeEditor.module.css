@@ -1,0 +1,46 @@
+.error {
+    border: 3px solid red;
+}
+
+.container :global {
+    position: absolute;
+    z-index: 20;
+    top: 1em;
+    right: 10em;
+    overflow: auto;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+.container :global .panel {
+    margin-bottom: 0;
+}
+
+.container :global .panel-heading {
+    cursor: move;
+}
+
+.dark :global .panel-heading {
+    background: black;
+    color: white;
+}
+
+.dark :global .panel-body {
+    background: black;
+    color: white;
+}
+
+.dark :global button {
+    background: black;
+    color: white;
+}
+
+.dark :global textarea {
+    color: black;
+}
+
+.dark :global button.close {
+    opacity: 1;
+    background-color: black;
+    color: white;
+}
