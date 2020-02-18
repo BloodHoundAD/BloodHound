@@ -63,6 +63,7 @@ const UserNodeData = () => {
         userpassword: 'User Password',
         admincount: 'AdminCount',
         owned: 'Compromised',
+        pwdneverexpires: 'Password Never Expires',
         sensitive: 'Cannot Be Delegated',
         dontreqpreauth: 'ASREP Roastable',
         serviceprincipalnames: 'Service Principal Names',
