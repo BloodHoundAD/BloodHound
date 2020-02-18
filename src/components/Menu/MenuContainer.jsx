@@ -88,12 +88,15 @@ class MenuContainer extends Component {
 
     _importClick() {
         closeTooltip();
-        var fname = dialog.showOpenDialog({
-            properties: ['openFile'],
-        });
-        if (typeof fname !== 'undefined') {
-            emitter.emit('import', fname[0]);
-        }
+        dialog
+            .showOpenDialog({
+                properties: ['openFile'],
+            })
+            .then(r => {
+                if (typeof r !== 'undefined') {
+                    emitter.emit('import', r.filePaths[0]);
+                }
+            });
     }
 
     _settingsClick() {
