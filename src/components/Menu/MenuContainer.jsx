@@ -17,7 +17,6 @@ import MenuButton from './MenuButton';
 import ProgressBarMenuButton from './ProgressBarMenuButton';
 const { dialog, app } = remote;
 
-
 class MenuContainer extends Component {
     constructor() {
         super();
@@ -150,19 +149,19 @@ class MenuContainer extends Component {
 
         await s.run(
             'MATCH (n:Group) WHERE n.objectid ENDS WITH "-513" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-1-0" MERGE (n)-[r:MemberOf]->(m)'
-        )
+        );
 
         await s.run(
             'MATCH (n:Group) WHERE n.objectid ENDS WITH "-515" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-1-0" MERGE (n)-[r:MemberOf]->(m)'
-        )
+        );
 
         await s.run(
             'MATCH (n:Group) WHERE n.objectid ENDS WITH "-513" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-5-11" MERGE (n)-[r:MemberOf]->(m)'
-        )
+        );
 
         await s.run(
             'MATCH (n:Group) WHERE n.objectid ENDS WITH "-515" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-5-11" MERGE (n)-[r:MemberOf]->(m)'
-        )
+        );
         s.close();
     }
 
@@ -234,9 +233,13 @@ class MenuContainer extends Component {
         });
 
         let size = statSync(file).size;
+        let start = size - 200;
+        if (start <= 0) {
+            start = 0;
+        }
         createReadStream(file, {
             encoding: 'utf8',
-            start: size - 200,
+            start: start,
             end: size,
         }).on('data', chunk => {
             let type, version;
@@ -246,12 +249,11 @@ class MenuContainer extends Component {
             } catch (e) {
                 type = null;
             }
-            try{
+            try {
                 version = /version.?:\s?(\d*)/g.exec(chunk)[1];
-            }catch (e){
+            } catch (e) {
                 version = null;
             }
-            
 
             if (!acceptableTypes.includes(type)) {
                 this.props.alert.error('Unrecognized File');
@@ -324,7 +326,7 @@ class MenuContainer extends Component {
     async uploadData(chunk, type, version) {
         let session = driver.session();
         let funcMap;
-        if (version == null){
+        if (version == null) {
             funcMap = {
                 computers: OldIngestion.buildComputerJson,
                 domains: OldIngestion.buildDomainJson,
@@ -335,14 +337,14 @@ class MenuContainer extends Component {
                 sessions: OldIngestion.buildSessionJson,
                 gpomembers: OldIngestion.buildGpoAdminJson,
             };
-        }else{
+        } else {
             funcMap = {
                 computers: NewIngestion.buildComputerJsonNew,
                 groups: NewIngestion.buildGroupJsonNew,
                 users: NewIngestion.buildUserJsonNew,
                 domains: NewIngestion.buildDomainJsonNew,
                 ous: NewIngestion.buildOuJsonNew,
-                gpos: NewIngestion.buildGpoJsonNew
+                gpos: NewIngestion.buildGpoJsonNew,
             };
         }
 
@@ -357,7 +359,7 @@ class MenuContainer extends Component {
                 await session
                     .run(statement, { props: arr[i] })
                     .catch(function(error) {
-                        console.log(statement)
+                        console.log(statement);
                         console.log(data[key].props);
                         console.log(error);
                     });
