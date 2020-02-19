@@ -8,21 +8,25 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
     const createValue = value => {
         let type = typeof value;
         if (type === 'number') {
-            return value.toLocaleString();
+            if (value === -1) {
+                return 'Never';
+            }
+
+            let currentDate = Math.round(new Date().getTime() / 1000);
+
+            //315536400 = January 1st, 1980. Seems like a safe bet
+            if (value > 315536400 && value < currentDate) {
+                return new Date(value * 1000).toUTCString();
+            } else {
+                return value.toLocaleString();
+            }
         }
 
         if (type === 'boolean') {
             return value.toString().toTitleCase();
         }
 
-        if (type === 'string') {
-            if (value.startsWith('TMSTMP')) {
-                let time = parseInt(value.substring(7));
-                return new Date(time * 1000).toUTCString();
-            } else {
-                return value;
-            }
-        }
+        return value;
     };
 
     const convertProperty = propName => {
