@@ -43,8 +43,12 @@ class MenuContainer extends Component {
             eachSeries(
                 results,
                 (file, callback) => {
+                    var msg = 'Processing file {}'.format(file.name);
+                    if (file.zip_name) {
+                        msg += " from {}".format(file.zip_name);
+                    }
                     this.props.alert.info(
-                        'Processing file {}'.format(file.name)
+                        msg
                     );
                     this.getFileMeta(file.path, callback);
                 },
@@ -119,8 +123,12 @@ class MenuContainer extends Component {
             eachSeries(
                 results,
                 (file, callback) => {
+                    var msg = 'Processing file {}'.format(file.name);
+                    if (file.zip_name) {
+                        msg += " from {}".format(file.zip_name);
+                    }
                     this.props.alert.info(
-                        'Processing file {}'.format(file.name)
+                        msg
                     );
                     this.getFileMeta(file.path, callback);
                 },
@@ -200,6 +208,7 @@ class MenuContainer extends Component {
                         processed.push({
                             path: output,
                             name: sanitized,
+                            zip_name: name,
                             delete: true,
                         });
                     })
