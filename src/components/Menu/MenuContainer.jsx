@@ -47,8 +47,8 @@ class MenuContainer extends Component {
                     if (file.zip_name) {
                         msg += " from {}".format(file.zip_name);
                     }
-                    this.props.alert.info(
-                        msg
+                    this.alert = this.props.alert.info(
+                        msg, { timeout: 0 }
                     );
                     this.getFileMeta(file.path, callback);
                 },
@@ -62,6 +62,7 @@ class MenuContainer extends Component {
                             unlinkSync(file.path);
                         }
                     });
+                    this.props.alert.info('Finished processing all files', { timeout: 0 });
                 }
             );
         });
@@ -127,8 +128,8 @@ class MenuContainer extends Component {
                     if (file.zip_name) {
                         msg += " from {}".format(file.zip_name);
                     }
-                    this.props.alert.info(
-                        msg
+                    this.alert = this.props.alert.info(
+                        msg, { timeout: 0 }
                     );
                     this.getFileMeta(file.path, callback);
                 },
@@ -142,6 +143,7 @@ class MenuContainer extends Component {
                             unlinkSync(file.path);
                         }
                     });
+                    this.props.alert.info('Finished processing all files', { timeout: 0 });
                 }
             );
 
@@ -185,11 +187,11 @@ class MenuContainer extends Component {
             var path = files[index].path;
             var name = files[index].name;
 
-            this.props.alert.info(
-                'Unzipping file {}'.format(name)
-            );
-            
             if (isZipSync(path)) {
+                var alert = this.props.alert.info(
+                    'Unzipping file {}'.format(name)
+                );
+                
                 await createReadStream(path)
                     .pipe(Parse())
                     .on('error', function(error) {
@@ -217,6 +219,7 @@ class MenuContainer extends Component {
                         });
                     })
                     .promise();
+                alert.close();
             } else {
                 processed.push({ path: path, name: name, delete: false });
             }
@@ -329,6 +332,9 @@ class MenuContainer extends Component {
                     this.setState({ progress: 100 });
                     emitter.emit('refreshDBData');
                     console.timeEnd('IngestTime');
+                    if (this.alert) { // close currently shown info alert
+                        this.alert.close();
+                    }
                     callback();
                 }.bind(this)
             );
