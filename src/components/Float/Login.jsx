@@ -233,7 +233,14 @@ const Login = () => {
 
         session
             .run('MATCH (n) RETURN n LIMIT 1')
-            .then(result => {})
+            .then(result => {
+                icon.removeClass();
+                icon.addClass(
+                    'fa fa-check-circle green-icon-color form-control-feedback'
+                );
+                setLoginEnabled(true);
+                setUrl(tempUrl);
+            })
             .catch(error => {
                 if (error.message.includes('WebSocket connection failure')) {
                     icon.removeClass();
@@ -253,7 +260,8 @@ const Login = () => {
                     setLoginEnabled(true);
                     setUrl(tempUrl);
                 }
-
+            })
+            .finally(() => {
                 session.close();
                 driver.close();
             });
