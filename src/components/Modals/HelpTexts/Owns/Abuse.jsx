@@ -1,4 +1,11 @@
-const Abuse = (sourceName, sourceType, targetName, targetType, targetId) => {
+const Abuse = (
+    sourceName,
+    sourceType,
+    targetName,
+    targetType,
+    targetId,
+    haslaps
+) => {
     let text = ``;
     if (targetType === 'Group') {
         text = `To abuse ownership of a group object, you may grant yourself the AddMember privilege. This can be accomplished using the Add-DomainObjectAcl function in PowerView.
@@ -106,7 +113,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType, targetId) => {
         
         <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity harmj0y -Rights All</code>`;
     } else if (targetType === 'Computer') {
-        if (target.haslaps) {
+        if (haslaps) {
             text = `To abuse ownership of a computer object, you may grant yourself the GenericAll privilege.
         
             You may need to authenticate to the Domain Controller as ${
@@ -157,7 +164,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType, targetId) => {
             Cleanup can be done using the Remove-DomainObjectAcl function:
 
             <code>Remove-DomainObjectAcl -Credential $Cred -TargetIdentity windows1 -Rights All</code>`;
-        } else if (targetType === 'Computer') {
+        } else {
             text = `To abuse ownership of a computer object, you may grant yourself the GenericAll privilege.
         
             You may need to authenticate to the Domain Controller as ${

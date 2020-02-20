@@ -35,6 +35,7 @@ const HelpModal = () => {
     const [sourceType, setSourceType] = useState('');
     const [targetName, setTargetName] = useState('');
     const [targetType, setTargetType] = useState('');
+    const [haslaps, setHaslaps] = useState(false);
     const [targetId, settargetId] = useState('');
     const [edge, setEdge] = useState('MemberOf');
     const [open, setOpen] = useState(false);
@@ -56,6 +57,7 @@ const HelpModal = () => {
         setTargetName(encode(target.label));
         setTargetType(target.type);
         settargetId(target.objectid);
+        setHaslaps(target.haslaps);
         setEdge(edge.etype);
         setOpen(true);
     };
@@ -109,6 +111,7 @@ const HelpModal = () => {
                     targetName={targetName}
                     targetType={targetType}
                     targetId={targetId}
+                    haslaps={haslaps}
                 />
             </Modal.Body>
 

@@ -1,4 +1,11 @@
-const Abuse = (sourceName, sourceType, targetName, targetType, targetId) => {
+const Abuse = (
+    sourceName,
+    sourceType,
+    targetName,
+    targetType,
+    targetId,
+    haslaps
+) => {
     let text = ``;
     if (targetType === 'Group') {
         text = `Full control of a group allows you to directly modify group membership of the group. 
@@ -70,7 +77,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType, targetId) => {
 
         Now that you know the target user's plain text password, you can either start a new agent as that user, or use that user's credentials in conjunction with PowerView's ACL abuse functions, or perhaps even RDP to a system the target user has access to. For more ideas and information, see the references tab.`;
     } else if (targetType === 'Computer') {
-        if (target.haslaps) {
+        if (haslaps) {
             text = `Full control of a computer object is abusable when the computer’s local admin account credential is controlled with LAPS. The clear-text password for the local administrator account is stored in an extended attribute on the computer object called ms-Mcs-AdmPwd. With full control of the computer object, you may have the ability to read this attribute, or grant yourself the ability to read the attribute by modifying the computer object’s security descriptor.
             
             Alternatively, Full control of a computer object can be used to perform a resource based constrained delegation attack. 
@@ -102,7 +109,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType, targetId) => {
             And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
             
             <code>Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:admin /msdsspn:cifs/TARGETCOMPUTER.testlab.local /ptt</code>`;
-        } else if (targetType === 'Computer') {
+        } else {
             text = `Full control of a computer object can be used to perform a resource based constrained delegation attack. 
             
             Abusing this primitive is currently only possible through the Rubeus project.

@@ -1,4 +1,4 @@
-const Abuse = (sourceName, sourceType, targetName, targetType) => {
+const Abuse = (sourceName, sourceType, targetName, targetType, haslaps) => {
     let text;
     if (targetType === 'User') {
         text = `The AllExtendedRights privilege grants ${sourceName} the ability to change the password of the user ${targetName} without knowing their current password. This is equivalent to the “ForceChangePassword” edge in BloodHound.
@@ -24,7 +24,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
 
         Now that you know the target user's plain text password, you can either start a new agent as that user, or use that user's credentials in conjunction with PowerView's ACL abuse functions, or perhaps even RDP to a system the target user has access to. For more ideas and information, see the references tab.`;
     } else if (targetType === 'Computer') {
-        if (target.haslaps) {
+        if (haslaps) {
             text = `The AllExtendedRights privilege grants ${sourceName} the ability to obtain the RID 500 administrator password of ${targetName}. ${sourceName} can do so by listing a computer object’s AD properties with PowerView using Get-DomainComputer ${targetName}.  The value of the ms-mcs-AdmPwd property will contain password of the administrative local account on ${targetName}.`;
         } else {
             text = `This ACE is not exploitable under current conditions. Please report this bug to the BloodHound developers`;
