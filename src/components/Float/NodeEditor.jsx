@@ -116,7 +116,7 @@ const NodeEditor = () => {
     return (
         <Draggable handle={'.panel-heading'}>
             <PoseContainer
-                pose={visible ? 'visible' : 'hidden'}
+                visible={visible}
                 className={clsx(
                     styles.container,
                     context.darkMode ? styles.dark : null
