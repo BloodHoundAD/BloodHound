@@ -410,7 +410,7 @@ const EdgeFilter = ({ open }) => {
                     className='checkbox-inline'
                     type='checkbox'
                     name='CanPSRemote'
-                    checked={edgeIncluded.CanRDP}
+                    checked={edgeIncluded.CanPSRemote}
                     onChange={e => handleEdgeChange(e)}
                 />
                 <label onClick={e => handleEdgeChange(e)} name='CanPSRemote'>
