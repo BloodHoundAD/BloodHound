@@ -206,7 +206,7 @@ class GraphContainer extends Component {
 
         let q = driver.session();
         q.run(
-            `MATCH (n:${node.type} {objectid:$objectid}) SET n.owned={status}`,
+            `MATCH (n:${node.type} {objectid:$objectid}) SET n.owned=$status`,
             {
                 objectid: node.objectid,
                 status: status,
@@ -246,7 +246,7 @@ class GraphContainer extends Component {
         let q = driver.session();
 
         q.run(
-            `MATCH (n:${node.type} {objectid: $objectid}) SET n.highvalue={status}`,
+            `MATCH (n:${node.type} {objectid: $objectid}) SET n.highvalue=$status`,
             { objectid: node.objectid, status: status }
         ).then(() => {
             q.close();
@@ -256,7 +256,7 @@ class GraphContainer extends Component {
     async addNode(name, type) {
         let guid = uuidv4();
 
-        let statement = `MERGE (n:${type} {objectid:{guid}}) SET n.name={name}`;
+        let statement = `MERGE (n:${type} {objectid: $guid}) SET n.name=$name`;
         if (type === 'Computer' || type === 'User') {
             statement = `${statement}, n.owned=false`;
         }
