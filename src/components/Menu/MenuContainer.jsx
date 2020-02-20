@@ -177,6 +177,10 @@ class MenuContainer extends Component {
             var path = files[index].path;
             var name = files[index].name;
 
+            this.props.alert.info(
+                'Unzipping file {}'.format(name)
+            );
+            
             if (isZipSync(path)) {
                 await createReadStream(path)
                     .pipe(Parse())
