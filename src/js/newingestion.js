@@ -215,7 +215,7 @@ export function buildOuJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:Computer ON CREATE SET n:Computer SET n += prop.map',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:OU ON CREATE SET n:OU SET n += prop.map',
         props: [],
     };
 
