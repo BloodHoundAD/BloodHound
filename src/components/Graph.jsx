@@ -884,11 +884,12 @@ class GraphContainer extends Component {
     }
 
     createNodeFromRow(data, params) {
-        var id = data.identity;
-        var type = data.labels[0];
-        var label = data.properties.name || data.properties.objectid;
+        let id = data.identity;
+        let fType = data.labels.filter(w => w !== 'Base');
+        let type = fType.length > 0 ? fType[0] : 'Unknown';
+        let label = data.properties.name || data.properties.objectid;
 
-        var node = {
+        let node = {
             id: id,
             type: type,
             label: label,
