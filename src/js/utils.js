@@ -213,22 +213,7 @@ function dropIndexes(indexes) {
 export async function addConstraints() {
     let session = driver.session();
     await session
-        .run('CREATE CONSTRAINT ON (c:User) ASSERT c.objectid IS UNIQUE')
-        .catch(_ => {});
-    await session
-        .run('CREATE CONSTRAINT ON (c:Group) ASSERT c.objectid IS UNIQUE')
-        .catch(_ => {});
-    await session
-        .run('CREATE CONSTRAINT ON (c:Computer) ASSERT c.objectid IS UNIQUE')
-        .catch(_ => {});
-    await session
-        .run('CREATE CONSTRAINT ON (c:GPO) ASSERT c.objectid IS UNIQUE')
-        .catch(_ => {});
-    await session
-        .run('CREATE CONSTRAINT ON (c:Domain) ASSERT c.objectid IS UNIQUE')
-        .catch(_ => {});
-    await session
-        .run('CREATE CONSTRAINT ON (c:OU) ASSERT c.objectid IS UNIQUE')
+        .run('CREATE CONSTRAINT ON (c:Base) ASSERT c.objectid IS UNIQUE')
         .catch(_ => {});
     await session.run('CREATE INDEX ON :User(name)').catch(_ => {});
     await session.run('CREATE INDEX ON :Group(name)').catch(_ => {});
@@ -236,6 +221,7 @@ export async function addConstraints() {
     await session.run('CREATE INDEX ON :GPO(name)').catch(_ => {});
     await session.run('CREATE INDEX ON :Domain(name)').catch(_ => {});
     await session.run('CREATE INDEX ON :OU(name)').catch(_ => {});
+    await session.run('CREATE INDEX ON :Base(name)').catch(_ => {});
     session.close();
 
     emitter.emit('hideDBClearModal');

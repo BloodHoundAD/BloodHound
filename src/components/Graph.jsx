@@ -256,7 +256,7 @@ class GraphContainer extends Component {
     async addNode(name, type) {
         let guid = uuidv4();
 
-        let statement = `MERGE (n:${type} {objectid: $guid}) SET n.name=$name`;
+        let statement = `MERGE (n:Base {objectid: $guid}) ON CREATE SET n:${type} SET n.name=$name`;
         if (type === 'Computer' || type === 'User') {
             statement = `${statement}, n.owned=false`;
         }
@@ -884,11 +884,12 @@ class GraphContainer extends Component {
     }
 
     createNodeFromRow(data, params) {
-        var id = data.identity;
-        var type = data.labels[0];
-        var label = data.properties.name || data.properties.objectid;
+        let id = data.identity;
+        let fType = data.labels.filter(w => w !== 'Base');
+        let type = fType.length > 0 ? fType[0] : 'Unknown';
+        let label = data.properties.name || data.properties.objectid;
 
-        var node = {
+        let node = {
             id: id,
             type: type,
             label: label,

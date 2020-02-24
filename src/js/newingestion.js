@@ -4,7 +4,7 @@ export function buildGroupJsonNew(chunk) {
     let queries = {};
     queries.properties = {};
     queries.properties.statement =
-        'UNWIND $props AS prop MERGE (n:Group {objectid: prop.source}) SET n += prop.map';
+        'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:Group ON CREATE SET n:Group SET n += prop.map';
     queries.properties.props = [];
 
     for (let group of chunk) {
@@ -39,7 +39,7 @@ export function buildComputerJsonNew(chunk) {
     let queries = {};
     queries.properties = {};
     queries.properties.statement =
-        'UNWIND $props AS prop MERGE (n:Computer {objectid:prop.source}) SET n += prop.map';
+        'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:Computer ON CREATE SET n:Computer SET n += prop.map';
     queries.properties.props = [];
 
     for (let computer of chunk) {
@@ -139,7 +139,7 @@ export function buildUserJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:User {objectid: prop.sourceid}) SET n += prop.map',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:User ON CREATE SET n:User SET n += prop.map',
         props: [],
     };
 
@@ -155,7 +155,7 @@ export function buildUserJsonNew(chunk) {
         processAceArrayNew(aces, identifier, 'User', queries);
 
         queries.properties.props.push({
-            sourceid: identifier,
+            source: identifier,
             map: properties,
         });
 
@@ -195,7 +195,7 @@ export function buildGpoJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:GPO {objectid: prop.source}) SET n+= prop.map',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:GPO ON CREATE SET n:GPO SET n += prop.map',
         props: [],
     };
 
@@ -215,7 +215,7 @@ export function buildOuJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:OU {objectid: prop.source}) SET n+= prop.map',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:OU ON CREATE SET n:OU SET n += prop.map',
         props: [],
     };
 
@@ -332,7 +332,7 @@ export function buildDomainJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Domain {objectid: prop.source}) SET n+= prop.map',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:Domain ON CREATE SET n:Domain SET n += prop.map',
         props: [],
     };
 
@@ -523,7 +523,7 @@ export function buildDomainJsonNew(chunk) {
 }
 
 const baseInsertStatement =
-    'UNWIND $props AS prop MERGE (n:{0} {objectid: prop.source}) MERGE (m:{1} {objectid: prop.target}) MERGE (n)-[r:{2} {3}]->(m)';
+    'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:{0} ON CREATE SET n:{0} MERGE (m:Base {objectid: prop.target}) ON MATCH SET m:{1} ON CREATE SET m:{1} MERGE (n)-[r:{2} {3}]->(m)';
 
 /**
  * Inserts a query into the queries table
@@ -539,6 +539,15 @@ function insertNew(queries, formatProps, queryProps) {
     if (queryProps.length == 0) {
         return;
     }
+
+    if (formatProps[0] === 'Unknown') {
+        formatProps[0] = 'Base';
+    }
+
+    if (formatProps[1] === 'Unknown') {
+        formatProps[1] = 'Base';
+    }
+
     let hash = `${formatProps[0]}-${formatProps[1]}-${formatProps[2]}`;
     if (queries[hash]) {
         queries[hash].props = queries[hash].props.concat(queryProps);
