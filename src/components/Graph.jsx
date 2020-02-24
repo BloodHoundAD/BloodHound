@@ -256,7 +256,7 @@ class GraphContainer extends Component {
     async addNode(name, type) {
         let guid = uuidv4();
 
-        let statement = `MERGE (n:${type} {objectid: $guid}) SET n.name=$name`;
+        let statement = `MERGE (n:Base {objectid: $guid}) ON CREATE SET n:${type} SET n.name=$name`;
         if (type === 'Computer' || type === 'User') {
             statement = `${statement}, n.owned=false`;
         }
