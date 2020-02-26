@@ -32,7 +32,6 @@ const DomainNodeData = () => {
         if (type === 'Domain') {
             setVisible(true);
             setObjectid(id);
-            setDomain(domain);
             let session = driver.session();
             session
                 .run(
@@ -45,6 +44,7 @@ const DomainNodeData = () => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
                     setLabel(props.name || objectid);
+                    setDomain(props.name || objectid);
                     session.close();
                 });
         } else {
