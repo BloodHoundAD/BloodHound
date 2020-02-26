@@ -132,7 +132,7 @@ const DomainNodeData = () => {
                         property='Foreign Admins'
                         target={domain}
                         countQuery={
-                            'MATCH (u:User) WHERE NOT u.domain = $objectid OPTIONAL MATCH (u)-[:AdminTo]->(c {domain:$objectid}) OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:$objectid}) RETURN COUNT(DISTINCT(u))'
+                            'OPTIONAL MATCH (u)-[:AdminTo]->(c {domain:$objectid}) WHERE NOT u.domain=$objectid OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:$objectid}) WHERE NOT u.domain=$objectid RETURN count(distinct(u))'
                         }
                         graphQuery={
                             'MATCH (u:User) WHERE NOT u.domain = $objectid OPTIONAL MATCH p1 = (u)-[:AdminTo]->(c {domain:$objectid}) OPTIONAL MATCH p2 = (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c {domain:$objectid}) RETURN p1,p2'
