@@ -175,12 +175,12 @@ export function buildUserJsonNew(chunk) {
         insertNew(queries, format, props);
 
         format = ['User', '', 'HasSIDHistory', '{isacl: false}'];
-        let grouped = groupBy(sidHistory, 'ObjectType');
+        let grouped = groupBy(sidHistory, 'MemberType');
         for (let x in grouped) {
             format[1] = x;
             format[2] = 'HasSIDHistory';
             props = grouped[x].map(history => {
-                return { source: identifier, target: history.ObjectIdentifier };
+                return { source: identifier, target: history.MemberId };
             });
 
             insertNew(queries, format, props);
