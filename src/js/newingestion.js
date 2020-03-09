@@ -50,7 +50,7 @@ export function buildComputerJsonNew(chunk) {
         let primaryGroup = computer.PrimaryGroupSid;
         let allowedToAct = computer.AllowedToAct;
         let dcom = computer.DcomUsers;
-        let psremote = computer.PsRemoteUsers;
+        let psremote = computer.PSRemoteUsers;
         let allowedToDelegate = computer.AllowedToDelegate;
         let sessions = computer.Sessions;
         let aces = computer.Aces;
