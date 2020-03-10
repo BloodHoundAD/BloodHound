@@ -25,6 +25,7 @@ import NodeEditor from './components/Float/NodeEditor';
 import WarmupModal from './components/Modals/WarmupModal.jsx';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { AppContext } from './AppContext';
+import GraphErrorModal from './components/Modals/GraphErrorModal';
 
 export default class AppContainer extends Component {
     constructor(props) {
@@ -153,6 +154,7 @@ export default class AppContainer extends Component {
                             <About />
                             <NodeEditor />
                             <HelpModal />
+                            <GraphErrorModal />
                         </div>
                     </AppContext.Provider>
                 </CSSTransition>

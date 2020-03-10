@@ -726,7 +726,7 @@ class GraphContainer extends Component {
             });
             emitter.emit('setRawQuery', temp);
         }
-        let promises = [];
+
         session.run(statement, params.props).subscribe({
             onNext: async function(result) {
                 $.each(
@@ -753,12 +753,16 @@ class GraphContainer extends Component {
                                             edges[edge.id] = edge;
                                         }
 
-                                        if (!nodes[end.id]) {
-                                            nodes[end.id] = end;
+                                        if (end != null) {
+                                            if (!nodes[end.id]) {
+                                                nodes[end.id] = end;
+                                            }
                                         }
 
-                                        if (!nodes[start.id]) {
-                                            nodes[start.id] = start;
+                                        if (start != null) {
+                                            if (!nodes[start.id]) {
+                                                nodes[start.id] = start;
+                                            }
                                         }
                                     }.bind(this)
                                 );
@@ -782,12 +786,13 @@ class GraphContainer extends Component {
                                                     !nodes.id &&
                                                     !('end' in value)
                                                 ) {
-                                                    nodes[
-                                                        id
-                                                    ] = this.createNodeFromRow(
+                                                    let node = this.createNodeFromRow(
                                                         value,
                                                         params
                                                     );
+                                                    if (node != null) {
+                                                        nodes[id] = node;
+                                                    }
                                                 }
                                             }
                                         }.bind(this)
@@ -805,10 +810,13 @@ class GraphContainer extends Component {
                                         !nodes.id &&
                                         !Object.hasOwnProperty(field, 'end')
                                     ) {
-                                        nodes[id] = this.createNodeFromRow(
+                                        let node = this.createNodeFromRow(
                                             field,
                                             params
                                         );
+                                        if (node != null) {
+                                            nodes[id] = node;
+                                        }
                                     }
                                 }
                             }
@@ -817,7 +825,7 @@ class GraphContainer extends Component {
                 );
             }.bind(this),
             onError: function(error) {
-                console.log(error);
+                emitter.emit('showGraphError', error.message);
             },
             onCompleted: function() {
                 var graph = { nodes: [], edges: [] };
@@ -884,6 +892,9 @@ class GraphContainer extends Component {
     }
 
     createNodeFromRow(data, params) {
+        if (!data.hasOwnProperty('identity')) {
+            return null;
+        }
         let id = data.identity;
         let fType = data.labels.filter(w => w !== 'Base');
         let type = fType.length > 0 ? fType[0] : 'Unknown';
