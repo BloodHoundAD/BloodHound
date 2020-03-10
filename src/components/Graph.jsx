@@ -826,6 +826,10 @@ class GraphContainer extends Component {
             }.bind(this),
             onError: function(error) {
                 emitter.emit('showGraphError', error.message);
+                emitter.emit('updateLoadingText', 'Done!');
+                setTimeout(function() {
+                    emitter.emit('showLoadingIndicator', false);
+                }, 1500);
             },
             onCompleted: function() {
                 var graph = { nodes: [], edges: [] };
