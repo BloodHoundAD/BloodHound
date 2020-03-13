@@ -11,6 +11,7 @@ const AllExtendedRights = ({
     sourceType,
     targetName,
     targetType,
+    haslaps,
 }) => {
     return (
         <Tabs defaultActiveKey={1} id='help-tab-container' justified>
@@ -31,7 +32,8 @@ const AllExtendedRights = ({
                     sourceName,
                     sourceType,
                     targetName,
-                    targetType
+                    targetType,
+                    haslaps
                 )}
             />
             <Tab
