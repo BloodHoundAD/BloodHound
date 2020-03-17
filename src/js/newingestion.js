@@ -224,9 +224,9 @@ export function buildOuJsonNew(chunk) {
         let users = ou.Users;
         let computers = ou.Computers;
         let childOus = ou.ChildOus;
-        let rdpUsers = ou.RemoteDestopUsers;
+        let rdpUsers = ou.RemoteDesktopUsers;
         let admins = ou.LocalAdmins;
-        let dcomUsers = ou.DcomUser;
+        let dcomUsers = ou.DcomUsers;
         let psRemoteUsers = ou.PSRemoteUsers;
         let links = ou.Links || [];
 
