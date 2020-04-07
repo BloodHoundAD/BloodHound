@@ -1,184 +1,150 @@
-import React, { Component } from 'react';
-import { Modal } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import BaseModal from './BaseModal';
+import {
+    Modal,
+    Button,
+    FormGroup,
+    ControlLabel,
+    FormControl,
+} from 'react-bootstrap';
+import styles from './AddNodeModal.module.css';
+import { motion } from 'framer-motion';
 
-export default class AddNodeModal extends Component {
-    constructor() {
-        super();
-        this.state = {
-            open: false,
+const AddNodeModal = () => {
+    const [open, setOpen] = useState(false);
+    const [showComplete, setShowComplete] = useState(false);
+    const [value, setValue] = useState('');
+    const [typeValue, setTypeValue] = useState('User');
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        emitter.on('addNode', handleOpen);
+        return () => {
+            emitter.removeListener('addNode', handleOpen);
         };
-    }
+    }, []);
 
-    componentDidMount() {
-        emitter.on('addNode', this.openModal.bind(this));
-    }
+    const handleOpen = () => {
+        setOpen(true);
+    };
 
-    closeModal() {
-        this.setState({ open: false });
-    }
+    const handleClose = () => {
+        setOpen(false);
+    };
 
-    validate() {
-        let name = jQuery(this.refs.name).val();
-        let type = jQuery(this.refs.type).val();
-        let validate = jQuery(this.refs.validate);
-        let error = jQuery(this.refs.error);
-        let complete = jQuery(this.refs.complete);
+    const handleChange = e => {
+        setValue(e.target.value);
+        setError('');
+    };
 
-        if (name === '') {
-            validate.addClass('has-error');
-            error.html('Name cannot be blank!');
-            error.show();
+    const validateAndSubmit = () => {
+        if (value === '') {
+            setError('Name cannot be blank');
             return;
         }
+        let name = value;
+        let type = typeValue;
 
         if (type === 'Computer') {
             if (!name.includes('.') || name.split('.').length < 3) {
-                validate.addClass('has-error');
-                error.html(
+                setError(
                     'Computer name must be similar to COMPUTER.DOMAIN.COM'
                 );
-                error.show();
                 return;
             }
         } else {
             if (!name.includes('@') || name.split('@').length > 2) {
-                validate.addClass('has-error');
-                error.html('Name must be similar to NAME@DOMAIN.COM');
-                error.show();
+                setError('Name must be similar to NAME@DOMAIN.COM');
                 return;
             }
 
             let dpart = name.split('@')[1];
             if (!dpart.includes('.')) {
-                validate.addClass('has-error');
-                error.html('Name must be similar to NAME@DOMAIN.COM');
-                error.show();
+                setError('Name must be similar to NAME@DOMAIN.COM');
                 return;
             }
         }
 
-        //initial validation done, check for duplicate
         name = name.toUpperCase();
-        if (type !== 'OU') {
-            let q = driver.session();
-            let statement = 'MATCH (n:{} {name:{name}}) RETURN n'.format(type);
-            q.run(statement, { name: name }).then(x => {
-                q.close();
-                if (x.records.length > 0) {
-                    validate.addClass('has-error');
-                    error.html('Node with name already exists!');
-                    error.show();
-                    return;
-                }
+        emitter.emit('addNodeFinal', name, type);
+        setShowComplete(true);
+        setTimeout(() => {
+            handleClose();
+            setShowComplete(false);
+        }, 500);
+    };
 
-                emitter.emit('addNodeFinal', name, type);
-                complete.show();
-                setTimeout(x => {
-                    this.closeModal();
-                }, 500);
-            });
-        } else {
-            complete.show();
-            emitter.emit('addNodeFinal', name, type);
-            setTimeout(x => {
-                this.closeModal();
-            }, 500);
-        }
-
-        //this.closeModal();
-    }
-
-    openModal() {
-        closeTooltip();
-        this.setState({ open: true });
-        jQuery(this.refs.name).focus();
-        jQuery(this.refs.error).hide();
-        jQuery(this.refs.complete).hide();
-    }
-
-    clearFocus() {
-        let validate = jQuery(this.refs.validate);
-        let error = jQuery(this.refs.error);
-
-        validate.removeClass('has-error');
-        error.hide();
-    }
-
-    render() {
-        return (
-            <Modal
-                show={this.state.open}
-                onHide={this.closeModal.bind(this)}
-                aria-labelledby='AddNodeModalHeader'
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title id='AddNodeModalHeader'>Add Node</Modal.Title>
-                </Modal.Header>
+    return (
+        <BaseModal
+            show={open}
+            onHide={handleClose}
+            label={'AddNodeModalHeader'}
+        >
+            <Modal.Header closeButton>
+                <Modal.Title id='AddNodeModalHeader'>Add Node</Modal.Title>
 
                 <Modal.Body>
                     <form
-                        onSubmit={x => {
-                            x.preventDefault();
-                            this.validate();
-                        }}
-                        className='needs-validation'
                         noValidate
+                        onSubmit={() => {
+                            return false;
+                        }}
                     >
-                        <div ref='validate' className={'form-group'}>
-                            <label htmlFor='addNodeName' required>
-                                Node Name
-                            </label>
-                            <input
-                                onFocus={this.clearFocus.bind(this)}
-                                ref='name'
+                        <FormGroup>
+                            <ControlLabel>Node Name</ControlLabel>
+                            <FormControl
                                 type='text'
-                                className={'form-control'}
-                                id='addNodeName'
+                                value={value}
+                                onChange={handleChange}
                             />
-                            <span className='help-block' ref='error'>
-                                Looks good!
-                            </span>
-                        </div>
-                        <div className={'form-group'}>
-                            <label htmlFor='addNodeType'>Node Type</label>
-                            <select
-                                onFocus={this.clearFocus.bind(this)}
-                                ref='type'
-                                className={'form-control'}
-                                id='addNodeType'
+                            {error.length > 0 && (
+                                <span className={styles.error}>{error}</span>
+                            )}
+                        </FormGroup>
+                        <FormGroup>
+                            <ControlLabel>Node Type</ControlLabel>
+                            <FormControl
+                                value={typeValue}
+                                componentClass='select'
+                                onChange={event => {
+                                    setTypeValue(event.target.value);
+                                }}
                             >
-                                <option>User</option>
-                                <option>Group</option>
-                                <option>Computer</option>
-                                <option>Domain</option>
-                                <option>OU</option>
-                                <option>GPO</option>
-                            </select>
-                        </div>
+                                <option value='User'>User</option>
+                                <option value='Group'>Group</option>
+                                <option value='Computer'>Computer</option>
+                                <option value='Domain'>Domain</option>
+                                <option value='OU'>OU</option>
+                                <option value='GPO'>GPO</option>
+                            </FormControl>
+                        </FormGroup>
                     </form>
                 </Modal.Body>
 
                 <Modal.Footer>
-                    <i
-                        ref='complete'
-                        className='fa fa-check-circle green-icon-color add-modal-check-style'
-                    />
-                    <button
-                        type='button'
-                        className='btn btn-primary'
-                        onClick={this.validate.bind(this)}
+                    <motion.div
+                        animate={showComplete ? 'visible' : 'hidden'}
+                        variants={{
+                            visible: {
+                                opacity: 1,
+                            },
+                            hidden: {
+                                opacity: 0,
+                            },
+                        }}
+                        initial={'hidden'}
+                        className={styles.checkbox}
                     >
-                        Confirm
-                    </button>
-                    <button
-                        type='button'
-                        className='btn btn-danger'
-                        onClick={this.closeModal.bind(this)}
-                    >
-                        Cancel
-                    </button>
+                        <i className='fa fa-check-circle green-icon-color' />
+                    </motion.div>
+                    <Button onClick={validateAndSubmit}>Confirm</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
                 </Modal.Footer>
-            </Modal>
-        );
-    }
-}
+            </Modal.Header>
+        </BaseModal>
+    );
+};
+
+AddNodeModal.propTypes = {};
+export default AddNodeModal;

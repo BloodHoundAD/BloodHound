@@ -1,0 +1,28 @@
+.dark {
+    background: #383332;
+    color: white;
+}
+
+.dark :global input {
+    background-color: black;
+    color: white;
+}
+
+.dark :global .input-group-addon {
+    background-color: black;
+    color: white;
+}
+
+.dark :global .table {
+    background-color: black;
+    color: white;
+}
+
+.nodelist {
+    overflow: auto;
+    background-color: white;
+}
+
+.nodelist :global table > thead {
+    text-align: center;
+}

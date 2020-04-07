@@ -1,427 +1,347 @@
-import React, { Component } from 'react';
-import { Modal } from 'react-bootstrap';
-import { buildSearchQuery } from 'utils';
+import React, { useEffect, useState, useRef } from 'react';
+import PropTypes from 'prop-types';
+import {
+    Modal,
+    FormGroup,
+    FormControl,
+    Button,
+    ControlLabel,
+} from 'react-bootstrap';
+import { AsyncTypeahead } from 'react-bootstrap-typeahead';
+import styles from './AddEdgeModal.module.css';
 import SearchRow from '../SearchContainer/SearchRow';
-import ReactDOMServer from 'react-dom/server';
+import { buildSearchQuery, buildSelectQuery } from 'utils';
+import BaseModal from './BaseModal';
+import { motion } from 'framer-motion';
 
-const SEPARATOR = '#BLOODHOUNDSEPARATOR#';
+const AddEdgeModal = () => {
+    const [open, setOpen] = useState(false);
+    const [showComplete, setShowComplete] = useState(false);
+    const [source, setSource] = useState(null);
+    const [target, setTarget] = useState(null);
+    const [edgeValue, setEdgeValue] = useState('MemberOf');
+    const defaultErrors = {
+        sourceErrors: '',
+        targetErrors: '',
+        edgeErrors: '',
+    };
+    const [errors, setErrors] = useState(defaultErrors);
 
-export default class AddEdgeModal extends Component {
-    constructor() {
-        super();
-        this.state = {
-            open: false,
-            source: null,
-            target: null,
+    const [sourceLoading, setSourceLoading] = useState(false);
+    const [targetLoading, setTargetLoading] = useState(false);
+    const [sourceSearchResults, setSourceSearchResults] = useState([]);
+    const [targetSearchResults, setTargetSearchResults] = useState([]);
+
+    useEffect(() => {
+        emitter.on('addEdge', handleOpen);
+        return () => {
+            emitter.removeListener('addEdge', handleOpen);
         };
-    }
+    }, []);
 
-    componentDidMount() {
-        emitter.on('addEdge', this.openModal.bind(this));
-    }
+    const handleOpen = () => {
+        setOpen(true);
+        setShowComplete(false);
+    };
 
-    closeModal() {
-        this.setState({ open: false });
-    }
+    const handleClose = () => {
+        setOpen(false);
+    };
 
-    openModal() {
-        closeTooltip();
-        this.setState({ open: true }, () => {
-            setTimeout(() => {
-                this.bindSearchBars(jQuery(this.refs.source), 'source');
-                this.bindSearchBars(jQuery(this.refs.target), 'target');
-            }, 500);
-        });
-        jQuery(this.refs.errora).hide();
-        jQuery(this.refs.errorb).hide();
-        jQuery(this.refs.edgeError).hide();
-        jQuery(this.refs.complete).hide();
-    }
-
-    bindSearchBars(element, which) {
-        element.typeahead({
-            autoSelect: false,
-            source: function(query, process) {
-                let session = driver.session();
-                let [statement, searchterm] = buildSearchQuery(query);
-
-                session.run(statement, { name: searchterm }).then(x => {
-                    let data = [];
-                    let map = {};
-                    $.each(x.records, (index, record) => {
-                        let props = record._fields[0].properties;
-                        Object.assign(props, {
-                            type: record._fields[0].labels[0],
-                        });
-                        map[index] = props;
-                        data.push(`${props.name}${SEPARATOR}${index}`);
-                    });
-
-                    this.map = map;
-                    session.close();
-                    return process(data);
-                });
-            },
-            updater: function(item) {
-                let [_, index] = item.split(SEPARATOR);
-                return this.map[index];
-            },
-            matcher: function(item) {
-                let [name, index] = item.split(SEPARATOR);
-                let obj = this.map[index];
-                let searchTerm = this.query.includes(':')
-                    ? this.query.split(':')[1]
-                    : this.query;
-
-                if (
-                    name.toLowerCase().indexOf(searchTerm.toLowerCase() !== -1)
-                ) {
-                    return true;
-                } else if (
-                    obj.guid &&
-                    obj.guid.toLowerCase().indexOf(searchTerm.toLowerCase()) !==
-                        -1
-                ) {
-                    return true;
-                } else {
-                    return false;
-                }
-            },
-            highlighter: function(item) {
-                let [name, index] = item.split(SEPARATOR);
-                let obj = this.map[index];
-                let searchTerm = this.query.includes(':')
-                    ? this.query.split(':')[1]
-                    : this.query;
-
-                return ReactDOMServer.renderToString(
-                    <SearchRow key={index} item={obj} search={searchTerm} />
-                );
-            },
-            afterSelect: item => {
-                let p = {};
-                p[which] = item;
-                this.setState(p);
-                if (which === 'source') {
-                    this.sourceFocus();
-                    this.sourceBlur();
-                } else {
-                    this.targetFocus();
-                    this.targetBlur();
-                }
-            },
-        });
-    }
-
-    validate() {
-        let source = this.state.source;
-        let target = this.state.target;
-        let edge = jQuery(this.refs.type).val();
-        let edgeError = jQuery(this.refs.edgeError);
-        let edgeValid = jQuery(this.refs.validateedge);
-        let sourceValid = jQuery(this.refs.validatea);
-        let targetValid = jQuery(this.refs.validateb);
-        let sourceError = jQuery(this.refs.errora);
-        let targetError = jQuery(this.refs.errorb);
-        let complete = jQuery(this.refs.complete);
-
-        edgeValid.removeClass('has-error');
-        edgeError.hide();
-
-        if (source === null) {
-            sourceValid.addClass('has-error');
-            sourceError.html('Source node not validated!');
-            sourceError.show();
+    const setSelection = (selection, source) => {
+        if (selection.length === 0) {
             return;
+        }
+
+        if (source === 'main') {
+            setSource(selection[0]);
+        }
+
+        if (source === 'target') {
+            setTarget(selection[0]);
+        }
+    };
+
+    const doSearch = async (query, source) => {
+        let session = driver.session();
+        let [statement, term] = buildSearchQuery(query);
+        if (source === 'main') {
+            setSourceLoading(true);
+        } else {
+            setTargetLoading(true);
+        }
+
+        let result = await session.run(statement, { name: term });
+
+        let data = [];
+        for (let record of result.records) {
+            let properties = record._fields[0].properties;
+            properties.type = record._fields[0].labels[0];
+            data.push(properties);
+        }
+
+        if (source === 'main') {
+            setSourceSearchResults(data);
+            setSourceLoading(false);
+        } else {
+            setTargetSearchResults(data);
+            setTargetLoading(false);
+        }
+        session.close();
+    };
+
+    const validateAndSubmit = async () => {
+        let errors = {
+            sourceErrors: '',
+            targetErrors: '',
+            edgeErrors: '',
+        };
+
+        let cont = true;
+        if (source === null) {
+            errors.sourceErrors = 'Select a source node';
+            cont = false;
         }
 
         if (target === null) {
-            targetValid.addClass('has-error');
-            targetError.html('Target node not validated!');
-            targetError.show();
+            errors.targetErrors = 'Select a target node';
+            cont = false;
+        }
+
+        if (cont === false) {
+            setErrors(errors);
             return;
         }
 
-        if (source.name === target.name) {
-            targetValid.addClass('has-error');
-            targetError.html('Source and target cannot be identical!');
-            targetError.show();
-            sourceValid.addClass('has-error');
-            sourceError.html('Source and target cannot be identical');
-            sourceError.show();
+        if (source.objectid === target.objectid) {
+            errors.sourceErrors = 'Source and target cannot be identical!';
+            errors.targetErrors = 'Source and target cannot be identical!';
+            setErrors(errors);
             return;
         }
 
-        let q = driver.session();
-        let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${target.type} {name:{target}}) MATCH (n)-[r:${edge}]->(m) RETURN r`;
-        q.run(statement, { source: source.name, target: target.name }).then(
-            x => {
-                q.close();
-                if (x.records.length > 0) {
-                    edgeValid.addClass('has-error');
-                    edgeError.html('Edge already exists');
-                    edgeError.show();
-                } else {
-                    let edgepart;
-                    if (
-                        edge === 'GenericAll' ||
-                        edge === 'GenericWrite' ||
-                        edge === 'AllExtendedRights' ||
-                        edge === 'AddMember' ||
-                        edge === 'ForceChangePassword' ||
-                        edge === 'Owns' ||
-                        edge === 'WriteDacl' ||
-                        edge === 'WriteOwner' ||
-                        edge === 'ReadLAPSPassword'
-                    ) {
-                        edgepart = `[r:${edge} {isacl:true}]`;
-                    } else {
-                        edgepart = `[r:${edge} {isacl:false}]`;
-                    }
-                    let s = driver.session();
-                    let statement = `MATCH (n:${source.type} {name: {source}}) MATCH (m:${target.type} {name:{target}}) MERGE (n)-${edgepart}->(m) RETURN r`;
-                    s.run(statement, {
-                        source: source.name,
-                        target: target.name,
-                    }).then(x => {
-                        s.close();
-                        complete.show();
-                        setTimeout(x => {
-                            this.closeModal();
-                        }, 500);
-                    });
-                }
-            }
-        );
-    }
+        let session = driver.session();
+        let statement = `MATCH (n:${source.type} {objectid: $sourceid}) MATCH (m:${target.type} {objectid: $targetid}) MATCH (n)-[r:${edgeValue}]->(m) RETURN r`;
+        let results = await session.run(statement, {
+            sourceid: source.objectid,
+            targetid: target.objectid,
+        });
+        session.close();
 
-    clearFocus() {
-        let validate = jQuery(this.refs.validate);
-        let error = jQuery(this.refs.error);
-
-        validate.removeClass('has-error');
-        error.hide();
-    }
-
-    targetBlur() {
-        if (this.state.target === null) {
-            let source = jQuery(this.refs.source).val();
-            let q = driver.session();
-            q.run('MATCH (n) WHERE n.name = {name} RETURN n', {
-                name: source,
-            }).then(x => {
-                if (x.records.length === 0) {
-                    let validate = jQuery(this.refs.validateb);
-                    let error = jQuery(this.refs.errorb);
-                    validate.addClass('has-error');
-                    error.html('Node not found');
-                    error.show();
-                } else if (x.records.length > 1) {
-                    let validate = jQuery(this.refs.validateb);
-                    let error = jQuery(this.refs.errorb);
-                    validate.addClass('has-error');
-                    error.html(
-                        'Multiple possible nodes found. Click on item from dropdown to set type'
-                    );
-                    error.show();
-                } else {
-                    let props = x.records[0]._fields[0].properties;
-                    Object.assign(props, {
-                        type: x.records[0]._fields[0].labels[0],
-                    });
-                    this.setState({ source: props });
-                }
-                q.close();
-            });
+        if (results.records.length > 0) {
+            errors.edgeErrors = 'Edge already exists';
+            setErrors(errors);
+            return;
         }
-    }
 
-    targetChanged() {
-        let target = jQuery(this.refs.target).val();
-        if (this.state.target && target !== this.state.target.name) {
-            this.setState({ target: null });
+        let edgepart;
+
+        if (
+            edgeValue === 'GenericAll' ||
+            edgeValue === 'GenericWrite' ||
+            edgeValue === 'AllExtendedRights' ||
+            edgeValue === 'AddMember' ||
+            edgeValue === 'ForceChangePassword' ||
+            edgeValue === 'Owns' ||
+            edgeValue === 'WriteDacl' ||
+            edgeValue === 'WriteOwner' ||
+            edgeValue === 'ReadLAPSPassword'
+        ) {
+            edgepart = `[r:${edgeValue} {isacl: true}]`;
+        } else if (edgeValue === 'SQLAdmin') {
+            edgepart = `[r:${edgeValue} {isacl: false, port: 1433}]`;
+        } else {
+            edgepart = `[r:${edgeValue} {isacl: false}]`;
         }
-    }
 
-    targetFocus() {
-        let validate = jQuery(this.refs.validateb);
-        let error = jQuery(this.refs.errorb);
-        validate.removeClass('has-error');
-        error.hide();
+        session = driver.session();
+        statement = `MATCH (n:${source.type} {objectid: $sourceid}) MATCH (m:${target.type} {objectid: $targetid}) MERGE (n)-${edgepart}->(m) RETURN r`;
 
-        if (this.state.source !== null) {
-            validate = jQuery(this.refs.validatea);
-            error = jQuery(this.refs.errora);
-            validate.removeClass('has-error');
-            error.hide();
-        }
-    }
+        results = await session.run(statement, {
+            sourceid: source.objectid,
+            targetid: target.objectid,
+        });
+        session.close();
+        setShowComplete(true);
+        setTimeout(() => {
+            handleClose();
+        }, 500);
+    };
 
-    sourceBlur() {
-        if (this.state.source === null) {
-            let source = jQuery(this.refs.source).val();
-            let q = driver.session();
-            q.run('MATCH (n) WHERE n.name = {name} RETURN n', {
-                name: source,
-            }).then(x => {
-                if (x.records.length === 0) {
-                    let validate = jQuery(this.refs.validatea);
-                    let error = jQuery(this.refs.errora);
-                    validate.addClass('has-error');
-                    error.html('Node not found');
-                    error.show();
-                } else if (x.records.length > 1) {
-                    let validate = jQuery(this.refs.validatea);
-                    let error = jQuery(this.refs.errora);
-                    validate.addClass('has-error');
-                    error.html(
-                        'Multiple possible nodes found. Click on item from dropdown to set type'
-                    );
-                    error.show();
-                } else {
-                    let props = x.records[0]._fields[0].properties;
-                    Object.assign(props, {
-                        type: x.records[0]._fields[0].labels[0],
-                    });
-                    this.setState({ source: props });
-                }
-                q.close();
-            });
-        }
-    }
+    return (
+        <BaseModal show={open} onHide={handleClose} label='AddEdgeModalHeader'>
+            <Modal.Header closeButton>
+                <Modal.Title id='AddEdgeModalHeader'>Add Edge</Modal.Title>
+            </Modal.Header>
 
-    sourceChanged() {
-        let source = jQuery(this.refs.source).val();
-        if (this.state.source && source !== this.state.source.name) {
-            this.setState({ source: null });
-        }
-    }
-
-    sourceFocus() {
-        let validate = jQuery(this.refs.validatea);
-        let error = jQuery(this.refs.errora);
-        validate.removeClass('has-error');
-        error.hide();
-
-        if (this.state.target !== null) {
-            validate = jQuery(this.refs.validateb);
-            error = jQuery(this.refs.errorb);
-            validate.removeClass('has-error');
-            error.hide();
-        }
-    }
-
-    render() {
-        return (
-            <Modal
-                show={this.state.open}
-                onHide={this.closeModal.bind(this)}
-                aria-labelledby='AddEdgeModalHeader'
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title id='AddEdgeModalHeader'>Add Edge</Modal.Title>
-                </Modal.Header>
-
-                <Modal.Body>
-                    <form
-                        onSubmit={x => {
-                            x.preventDefault();
-                            this.validate();
-                        }}
-                        className='needs-validation'
-                        noValidate
-                    >
-                        <div ref='validatea' className={'form-group'}>
-                            <label htmlFor='sourceNode' required>
-                                Source Node
-                            </label>
-                            <input
-                                onFocus={this.sourceFocus.bind(this)}
-                                onInput={this.sourceChanged.bind(this)}
-                                onBlur={this.sourceBlur.bind(this)}
-                                type='search'
-                                autoComplete='off'
-                                placeholder='Source Node'
-                                ref='source'
-                                className={'form-control'}
-                                id='sourceNode'
-                            />
-                            <span className='help-block' ref='errora'>
-                                Looks good!
+            <Modal.Body>
+                <form
+                    noValidate
+                    onSubmit={() => {
+                        return false;
+                    }}
+                >
+                    <FormGroup>
+                        <ControlLabel>Source Node</ControlLabel>
+                        <AsyncTypeahead
+                            id={'addEdgeSourceSearch'}
+                            isLoading={sourceLoading}
+                            onSearch={() => {}}
+                            placeholder={'Source Node'}
+                            delay={500}
+                            renderMenuItemChildren={SearchRow}
+                            labelKey={option => {
+                                return option.name || option.objectid;
+                            }}
+                            useCache={false}
+                            options={sourceSearchResults}
+                            filterBy={(option, props) => {
+                                let name = (
+                                    option.name || option.objectid
+                                ).toLowerCase();
+                                let id = option.objectid.toLowerCase();
+                                let search;
+                                if (props.text.includes(':')) {
+                                    search = props.text.split(':')[1];
+                                } else {
+                                    search = props.text.toLowerCase();
+                                }
+                                return (
+                                    name.includes(search) || id.includes(search)
+                                );
+                            }}
+                            onChange={selection =>
+                                setSelection(selection, 'main')
+                            }
+                            onSearch={query => doSearch(query, 'main')}
+                            onInputChange={() => {
+                                setSource(null);
+                                setErrors(defaultErrors);
+                            }}
+                        />
+                        {errors.sourceErrors.length > 0 && (
+                            <span className={styles.error}>
+                                {errors.sourceErrors}
                             </span>
-                        </div>
-                        <div className={'form-group'} ref='validateedge'>
-                            <label htmlFor='addEdgeType'>Edge Type</label>
-                            <select
-                                ref='type'
-                                className={'form-control'}
-                                id='addEdgeType'
-                            >
-                                <option>MemberOf</option>
-                                <option>HasSession</option>
-                                <option>AdminTo</option>
-                                <option>AllExtendedRights</option>
-                                <option>AddMember</option>
-                                <option>ForceChangePassword</option>
-                                <option>GenericAll</option>
-                                <option>GenericWrite</option>
-                                <option>Owns</option>
-                                <option>WriteDacl</option>
-                                <option>WriteOwner</option>
-                                <option>ReadLAPSPassword</option>
-                                <option>Contains</option>
-                                <option>GpLink</option>
-                                <option>CanRDP</option>
-                                <option>ExecuteDCOM</option>
-                                <option>AllowedToDelegate</option>
-                            </select>
-                            <span className='help-block' ref='edgeError'>
-                                Looks good!
+                        )}
+                    </FormGroup>
+                    <FormGroup>
+                        <ControlLabel>Edge Type</ControlLabel>
+                        <FormControl
+                            value={edgeValue}
+                            componentClass='select'
+                            onChange={event => {
+                                setEdgeValue(event.target.value);
+                            }}
+                        >
+                            <option value='MemberOf'>MemberOf</option>
+                            <option value='HasSession'>HasSession</option>
+                            <option value='AdminTo'>AdminTo</option>
+                            <option value='AllExtendedRights'>
+                                AllExtendedRights
+                            </option>
+                            <option value='AddMember'>AddMember</option>
+                            <option value='ForceChangePassword'>
+                                ForceChangePassword
+                            </option>
+                            <option value='GenericAll'>GenericAll</option>
+                            <option value='GenericWrite'>GenericWrite</option>
+                            <option value='Owns'>Owns</option>
+                            <option value='WriteDacl'>WriteDacl</option>
+                            <option value='WriteOwner'>WriteOwner</option>
+                            <option value='ReadLAPSPassword'>
+                                ReadLAPSPassword
+                            </option>
+                            <option value='Contains'>Contains</option>
+                            <option value='GpLink'>GpLink</option>
+                            <option value='CanRDP'>CanRDP</option>
+                            <option value='CanPSRemote'>CanPSRemote</option>
+                            <option value='ExecuteDCOM'>ExecuteDCOM</option>
+                            <option value='AllowedToDelegate'>
+                                AllowedToDelegate
+                            </option>
+                            <option value='AddAllowedToAct'>
+                                AddAllowedToAct
+                            </option>
+                            <option value='AllowedToAct'>AllowedToAct</option>
+                            <option value='SQLAdmin'>SQLAdmin</option>
+                            <option value='HasSIDHistory'>HasSIDHistory</option>
+                        </FormControl>
+                        {errors.edgeErrors.length > 0 && (
+                            <span className={styles.error}>
+                                {errors.edgeErrors}
                             </span>
-                        </div>
-                        <div ref='validateb' className={'form-group'}>
-                            <label htmlFor='targetNode' required>
-                                Target Node
-                            </label>
-                            <input
-                                onFocus={this.targetFocus.bind(this)}
-                                onInput={this.targetChanged.bind(this)}
-                                onBlur={this.targetBlur.bind(this)}
-                                type='search'
-                                autoComplete='off'
-                                placeholder='Target Node'
-                                ref='target'
-                                className={'form-control'}
-                                id='targetNode'
-                            />
-                            <span className='help-block' ref='errorb'>
-                                Looks good!
+                        )}
+                    </FormGroup>
+                    <FormGroup>
+                        <ControlLabel>Target Node</ControlLabel>
+                        <AsyncTypeahead
+                            id={'addEdgeTargetSearch'}
+                            isLoading={targetLoading}
+                            onSearch={() => {}}
+                            placeholder={'Target Node'}
+                            delay={500}
+                            renderMenuItemChildren={SearchRow}
+                            labelKey={option => {
+                                return option.name || option.objectid;
+                            }}
+                            useCache={false}
+                            options={targetSearchResults}
+                            filterBy={(option, props) => {
+                                let name = (
+                                    option.name || option.objectid
+                                ).toLowerCase();
+                                let id = option.objectid.toLowerCase();
+                                let search;
+                                if (props.text.includes(':')) {
+                                    search = props.text.split(':')[1];
+                                } else {
+                                    search = props.text.toLowerCase();
+                                }
+                                return (
+                                    name.includes(search) || id.includes(search)
+                                );
+                            }}
+                            onChange={selection =>
+                                setSelection(selection, 'target')
+                            }
+                            onSearch={query => doSearch(query, 'target')}
+                            onInputChange={() => {
+                                setTarget(null);
+                                setErrors(defaultErrors);
+                            }}
+                        />
+                        {errors.targetErrors.length > 0 && (
+                            <span className={styles.error}>
+                                {errors.targetErrors}
                             </span>
-                        </div>
-                    </form>
-                </Modal.Body>
+                        )}
+                    </FormGroup>
+                </form>
+            </Modal.Body>
 
-                <Modal.Footer>
-                    <i
-                        ref='complete'
-                        className='fa fa-check-circle green-icon-color add-modal-check-style'
-                    />
-                    <button
-                        type='button'
-                        className='btn btn-primary'
-                        onClick={this.validate.bind(this)}
-                    >
-                        Confirm
-                    </button>
-                    <button
-                        type='button'
-                        className='btn btn-danger'
-                        onClick={this.closeModal.bind(this)}
-                    >
-                        Cancel
-                    </button>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
-}
+            <Modal.Footer>
+                <motion.div
+                    animate={showComplete ? 'visible' : 'hidden'}
+                    variants={{
+                        visible: {
+                            opacity: 1,
+                        },
+                        hidden: {
+                            opacity: 0,
+                        },
+                    }}
+                    initial={'hidden'}
+                    className={styles.checkbox}
+                >
+                    <i className='fa fa-check-circle green-icon-color' />
+                </motion.div>
+                <Button onClick={validateAndSubmit}>Confirm</Button>
+                <Button onClick={handleClose}>Cancel</Button>
+            </Modal.Footer>
+        </BaseModal>
+    );
+};
+
+AddEdgeModal.propTypes = {};
+export default AddEdgeModal;

@@ -1,0 +1,11 @@
+.checkbox {
+    position: relative;
+    font-size: 24px;
+    margin-right: 5px;
+    top: 5px;
+    display: inline;
+}
+
+.error {
+    color: red;
+}

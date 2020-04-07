@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 
 import { Modal } from 'react-bootstrap';
+import BaseModal from './BaseModal';
 
 export default class CancelUploadModal extends Component {
     constructor(props) {
         super(props);
-        
+
         this.state = {
             open: false,
         };
@@ -30,10 +31,10 @@ export default class CancelUploadModal extends Component {
 
     render() {
         return (
-            <Modal
+            <BaseModal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby='CanceulUploadHeader'
+                label='CanceulUploadHeader'
             >
                 <Modal.Header closeButton>
                     <Modal.Title id='CancelUploadHeader'>
@@ -61,7 +62,7 @@ export default class CancelUploadModal extends Component {
                         Cancel
                     </button>
                 </Modal.Footer>
-            </Modal>
+            </BaseModal>
         );
     }
 }

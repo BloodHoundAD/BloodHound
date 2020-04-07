@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { clearDatabase } from 'utils';
 
 import { Modal } from 'react-bootstrap';
+import BaseModal from './BaseModal';
 
 export default class ClearConfirmModal extends Component {
     constructor() {
@@ -31,10 +32,10 @@ export default class ClearConfirmModal extends Component {
 
     render() {
         return (
-            <Modal
+            <BaseModal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby='ConfirmModalHeader'
+                label='ConfirmModalHeader'
             >
                 <Modal.Header closeButton>
                     <Modal.Title id='ConfirmModalHeader'>
@@ -64,7 +65,7 @@ export default class ClearConfirmModal extends Component {
                         Clear Database
                     </button>
                 </Modal.Footer>
-            </Modal>
+            </BaseModal>
         );
     }
 }

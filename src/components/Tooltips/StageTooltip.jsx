@@ -1,10 +1,43 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
+import { AppContext } from '../../AppContext';
+import styles from './Tooltips.module.css';
+import clsx from 'clsx';
 
 const StageTooltip = ({ x, y }) => {
+    const tooltipDiv = useRef(null);
+
+    const [realX, setRealX] = useState(0);
+    const [realY, setRealY] = useState(0);
+    const context = useContext(AppContext);
+
+    useEffect(() => {
+        let rect = tooltipDiv.current.getBoundingClientRect();
+        if (x + rect.width > window.innerWidth) {
+            x = window.innerWidth - rect.width - 10;
+        }
+
+        if (y + rect.height > window.innerHeight) {
+            y = window.innerHeight - rect.height - 10;
+        }
+
+        setRealX(x);
+        setRealY(y);
+    }, [x, y]);
+
     return (
-        <div className={'new-tooltip'} style={{ left: x, top: y }}>
-            <div className='header'>Graph Options</div>
-            <ul className='tooltip-ul'>
+        <div
+            ref={tooltipDiv}
+            className={clsx(
+                styles.tooltip,
+                context.darkMode ? styles.dark : null
+            )}
+            style={{
+                left: realX === 0 ? x : realX,
+                top: realY === 0 ? y : realY,
+            }}
+        >
+            <div>Graph Options</div>
+            <ul>
                 <li
                     onClick={() => {
                         emitter.emit('addNode');

@@ -1,0 +1,9 @@
+.error {
+    white-space: pre;
+    font-family: 'Roboto Mono', monospace;
+    padding-left: 5px;
+}
+
+.width :global .modal-dialog {
+    width: 75%;
+}

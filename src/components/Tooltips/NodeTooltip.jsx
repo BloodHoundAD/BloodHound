@@ -1,24 +1,55 @@
-import React, { useEffect, Fragment } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import { If, Then, Else } from 'react-if';
+import styles from './Tooltips.module.css';
+import clsx from 'clsx';
+import { AppContext } from '../../AppContext';
 
 const NodeTooltip = ({ node, x, y }) => {
-    //console.log(node);
     let type = node.type;
     let label = node.label;
-    let guid = node.guid;
     let id = node.id;
-    let targetSpec = type === 'OU' ? '{guid:{guid}}' : '{name:{name}}';
-    let target = type === 'OU' ? { guid: guid } : { name: label };
-    let targetProp = type === 'OU' ? guid : label;
+    let objectid = node.objectid;
+
+    const [realX, setRealX] = useState(0);
+    const [realY, setRealY] = useState(0);
+
+    const context = useContext(AppContext);
+
+    const tooltipDiv = useRef(null);
+
+    useEffect(() => {
+        let rect = tooltipDiv.current.getBoundingClientRect();
+        if (x + rect.width > window.innerWidth) {
+            x = window.innerWidth - rect.width - 10;
+        }
+
+        if (y + rect.height > window.innerHeight) {
+            y = window.innerHeight - rect.height - 10;
+        }
+
+        setRealX(x);
+        setRealY(y);
+    }, [x, y]);
+
     return (
-        <div className={'new-tooltip'} style={{ left: x, top: y }}>
-            <div className='header'>{label}</div>
-            <ul className='tooltip-ul'>
+        <div
+            ref={tooltipDiv}
+            className={clsx(
+                styles.tooltip,
+                context.darkMode ? styles.dark : null
+            )}
+            style={{
+                left: realX === 0 ? x : realX,
+                top: realY === 0 ? y : realY,
+            }}
+        >
+            <div>{label}</div>
+            <ul>
                 <If condition={type === 'OU'}>
                     <Then>
                         <li
                             onClick={() => {
-                                emitter.emit('setStart', `${type}:${guid}`);
+                                emitter.emit('setStart', `${type}:${objectid}`);
                             }}
                         >
                             <i className='fa fa-map-marker-alt' /> Set as
@@ -26,7 +57,7 @@ const NodeTooltip = ({ node, x, y }) => {
                         </li>
                         <li
                             onClick={() => {
-                                emitter.emit('setEnd', `${type}:${guid}`);
+                                emitter.emit('setEnd', `${type}:${objectid}`);
                             }}
                         >
                             <i className='fa fa-bullseye' /> Set as Ending Node
@@ -35,7 +66,7 @@ const NodeTooltip = ({ node, x, y }) => {
                     <Else>
                         <li
                             onClick={() => {
-                                emitter.emit('setStart', `${type}:${label}`);
+                                emitter.emit('setStart', node);
                             }}
                         >
                             <i className='fa fa-map-marker-alt' /> Set as
@@ -43,7 +74,7 @@ const NodeTooltip = ({ node, x, y }) => {
                         </li>
                         <li
                             onClick={() => {
-                                emitter.emit('setEnd', `${type}:${label}`);
+                                emitter.emit('setEnd', node);
                             }}
                         >
                             <i className='fa fa-bullseye' /> Set as Ending Node
@@ -54,8 +85,8 @@ const NodeTooltip = ({ node, x, y }) => {
                     onClick={() => {
                         emitter.emit(
                             'query',
-                            `MATCH (n:${type} ${targetSpec}), (m), p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p`,
-                            target,
+                            `MATCH (n:${type} {objectid: $objectid}), (m), p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p`,
+                            { objectid: objectid },
                             label
                         );
                     }}
@@ -66,8 +97,8 @@ const NodeTooltip = ({ node, x, y }) => {
                     onClick={() => {
                         emitter.emit(
                             'query',
-                            `MATCH (n:${type} ${targetSpec}), (m {owned: true}), p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p`,
-                            target,
+                            `MATCH (n:${type} {objectid: $objectid}), (m {owned: true}), p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p`,
+                            { objectid: objectid },
                             label
                         );
                     }}
@@ -77,7 +108,8 @@ const NodeTooltip = ({ node, x, y }) => {
                 </li>
                 <li
                     onClick={() => {
-                        emitter.emit('editnode', targetProp, type);
+                        emitter.emit('editnode', node);
+                        closeTooltip();
                     }}
                 >
                     <i className='fa fa-edit' />
@@ -134,25 +166,7 @@ const NodeTooltip = ({ node, x, y }) => {
                 >
                     <i className='fa fa-trash' /> Delete Node
                 </li>
-                {node.expand && (
-                    <li
-                        onClick={() => {
-                            emitter.emit('unfoldNode', id);
-                        }}
-                    >
-                        <i className='fa fa-object-ungroup' /> Expand
-                    </li>
-                )}
-                {node.collapse && (
-                    <li
-                        onClick={() => {
-                            emitter.emit('collapseNode', id);
-                        }}
-                    >
-                        <i className='fa fa-object-group' /> Collapse
-                    </li>
-                )}
-                {node.groupedNode && (
+                {node.isGrouped && (
                     <li
                         onClick={() => {
                             emitter.emit('ungroupNode', id);

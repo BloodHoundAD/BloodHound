@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import { Modal } from 'react-bootstrap';
+import BaseModal from './BaseModal';
 
 export default class LogoutModal extends Component {
     constructor() {
@@ -33,10 +34,10 @@ export default class LogoutModal extends Component {
 
     render() {
         return (
-            <Modal
+            <BaseModal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby='LogoutModalHeader'
+                label='LogoutModalHeader'
             >
                 <Modal.Header closeButton>
                     <Modal.Title id='LogoutModalHeader'>Logout</Modal.Title>
@@ -62,7 +63,7 @@ export default class LogoutModal extends Component {
                         Cancel
                     </button>
                 </Modal.Footer>
-            </Modal>
+            </BaseModal>
         );
     }
 }

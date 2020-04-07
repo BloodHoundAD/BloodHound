@@ -1,0 +1,21 @@
+/* #searcha {
+    border-top: 1px solid #ced4da;
+    border-right: 0;
+    border-left: 0;
+    border-bottom: 1px solid #ced4da;
+}
+
+#searchb {
+    border-top: 0;
+    border-bottom: 1px solid #ced4da;
+    border-left: 0;
+    border-right: 0;
+}
+
+#searcha:focus {
+    box-shadow: none;
+}
+
+#searchb:focus {
+    box-shadow: none;
+} */

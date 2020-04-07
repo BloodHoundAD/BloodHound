@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import { Modal } from 'react-bootstrap';
 import { withAlert } from 'react-alert';
+import BaseModal from './BaseModal';
 
 class WarmupModal extends Component {
     constructor() {
@@ -38,10 +39,10 @@ class WarmupModal extends Component {
 
     render() {
         return (
-            <Modal
+            <BaseModal
                 show={this.state.open}
                 onHide={this.closeModal.bind(this)}
-                aria-labelledby='WarmupModalHeader'
+                label='WarmupModalHeader'
             >
                 <Modal.Header closeButton>
                     <Modal.Title id='WarmupModalHeader'>
@@ -73,7 +74,7 @@ class WarmupModal extends Component {
                         Cancel
                     </button>
                 </Modal.Footer>
-            </Modal>
+            </BaseModal>
         );
     }
 }

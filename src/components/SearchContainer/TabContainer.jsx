@@ -6,8 +6,8 @@ import UserNodeData from './Tabs/UserNodeData';
 import GroupNodeData from './Tabs/GroupNodeData';
 import ComputerNodeData from './Tabs/ComputerNodeData';
 import DomainNodeData from './Tabs/DomainNodeData';
-import GpoNodeData from './Tabs/GpoNodeData';
-import OuNodeData from './Tabs/OuNodeData';
+import GpoNodeData from './Tabs/GPONodeData';
+import OuNodeData from './Tabs/OUNodeData';
 import { Tabs, Tab } from 'react-bootstrap';
 import { openSync, readSync, closeSync } from 'fs';
 import imageType from 'image-type';
@@ -28,13 +28,24 @@ class TabContainer extends Component {
         };
     }
 
+    nodeClickHandler(type) {
+        if (type === 'User') {
+            this._userNodeClicked();
+        } else if (type === 'Group') {
+            this._groupNodeClicked();
+        } else if (type === 'Computer') {
+            this._computerNodeClicked();
+        } else if (type === 'Domain') {
+            this._domainNodeClicked();
+        } else if (type === 'OU') {
+            this._ouNodeClicked();
+        } else if (type === 'GPO') {
+            this._gpoNodeClicked();
+        }
+    }
+
     componentDidMount() {
-        emitter.on('userNodeClicked', this._userNodeClicked.bind(this));
-        emitter.on('groupNodeClicked', this._groupNodeClicked.bind(this));
-        emitter.on('computerNodeClicked', this._computerNodeClicked.bind(this));
-        emitter.on('domainNodeClicked', this._domainNodeClicked.bind(this));
-        emitter.on('gpoNodeClicked', this._gpoNodeClicked.bind(this));
-        emitter.on('ouNodeClicked', this._ouNodeClicked.bind(this));
+        emitter.on('nodeClicked', this.nodeClickHandler.bind(this));
         emitter.on('imageupload', this.uploadImage.bind(this));
     }
 

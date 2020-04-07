@@ -1,85 +1,102 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import PropTypes from 'prop-types';
+import PoseContainer from '../PoseContainer';
 import GlyphiconSpan from '../GlyphiconSpan';
 import Icon from '../Icon';
 import SpotlightRow from './SpotlightRow';
+import { Table } from 'react-bootstrap';
+import { AppContext } from '../../AppContext';
+import clsx from 'clsx';
+import styles from './SpotlightContainer.module.css';
 
-export default class SpotlightContainer extends Component {
-    constructor(props) {
-        super(props);
+const SpotlightContainer = () => {
+    const [data, setData] = useState(appStore.spotlightData);
+    const [searchVal, setSearchVal] = useState('');
+    const [regex, setRegex] = useState(new RegExp('', 'i'));
+    const [visible, setVisible] = useState(false);
+    const context = useContext(AppContext);
 
-        this.state = {
-            data: appStore.spotlightData,
-            searchVal: '',
-            rex: new RegExp('', 'i'),
+    const updateSpotlight = () => {
+        setData(appStore.spotlightData);
+    };
+
+    const closeSpotlight = () => {
+        setVisible(false);
+    };
+
+    const resetSpotlight = () => {
+        setSearchVal('');
+        setRegex(new RegExp('', 'i'));
+    };
+
+    const handleSearch = event => {
+        setSearchVal(event.target.value);
+        setRegex(new RegExp(event.target.value, 'i'));
+    };
+
+    const handleSpace = event => {
+        var key = event.keyCode ? event.keyCode : event.which;
+
+        if (document.activeElement === document.body && key === 32) {
+            setVisible(v => !v);
+        }
+    };
+
+    useEffect(() => {
+        emitter.on('spotlightUpdate', updateSpotlight);
+        emitter.on('spotlightClick', closeSpotlight);
+        emitter.on('resetSpotlight', resetSpotlight);
+        window.addEventListener('keyup', handleSpace);
+
+        return () => {
+            emitter.removeListener('spotlightUpdate', updateSpotlight);
+            emitter.removeListener('spotlightClick', closeSpotlight);
+            emitter.removeListener('resetSpotlight', resetSpotlight);
+            window.removeEventListener('keyup', handleSpace);
         };
+    }, []);
 
-        emitter.on(
-            'spotlightUpdate',
-            function() {
-                this.setState({ data: appStore.spotlightData });
-            }.bind(this)
-        );
+    return (
+        <PoseContainer
+            visible={visible}
+            className={clsx('spotlight', context.darkMode ? styles.dark : null)}
+        >
+            <div
+                className={'input-group input-group-unstyled no-border-radius'}
+            >
+                <GlyphiconSpan
+                    tooltip={false}
+                    classes='input-group-addon spanfix'
+                >
+                    <Icon glyph='search' />
+                </GlyphiconSpan>
+                <input
+                    onChange={handleSearch}
+                    value={searchVal}
+                    type='search'
+                    className='form-control searchbox'
+                    autoComplete='off'
+                    placeholder='Explore Nodes'
+                    data-type='search'
+                />
+            </div>
 
-        emitter.on(
-            'spotlightClick',
-            function() {
-                $(this.refs.spotlight).fadeToggle(false);
-            }.bind(this)
-        );
-
-        emitter.on(
-            'resetSpotlight',
-            function() {
-                this.setState({
-                    searchVal: '',
-                    rex: new RegExp('', 'i'),
-                });
-            }.bind(this)
-        );
-    }
-
-    _searchChanged(event) {
-        this.setState({
-            searchVal: event.target.value,
-            rex: new RegExp(event.target.value, 'i'),
-        });
-    }
-
-    render() {
-        return (
-            <div ref='spotlight' className='spotlight'>
-                <div className='input-group input-group-unstyled no-border-radius'>
-                    <GlyphiconSpan
-                        tooltip={false}
-                        classes='input-group-addon spanfix'
-                    >
-                        <Icon glyph='search' />
-                    </GlyphiconSpan>
-                    <input
-                        onChange={this._searchChanged.bind(this)}
-                        value={this.state.searchVal}
-                        type='search'
-                        className='form-control searchbox'
-                        autoComplete='off'
-                        placeholder='Explore Nodes'
-                        data-type='search'
-                    />
-                </div>
-
-                <div className='spotlight-nodelist'>
-                    <table data-role='table' className='table table-striped'>
-                        <thead>
-                            <tr>
-                                <td>Node Label</td>
-                                <td>Collapsed Into</td>
-                            </tr>
-                        </thead>
-                        <tbody ref='spotlight-tbody' className='searchable'>
-                            {Object.keys(this.state.data).map(
+            <div className={styles.nodelist}>
+                <Table>
+                    <thead>
+                        <tr>
+                            <td>Node Label</td>
+                            <td>Collapsed Into</td>
+                        </tr>
+                    </thead>
+                    <tbody className='searchable'>
+                        {Object.keys(data)
+                            .sort()
+                            .map(
                                 function(key) {
-                                    var d = this.state.data[key];
+                                    var d = data[key];
                                     var nid = parseInt(key);
-                                    var x = this.state.rex.test(d[0]) ? (
+                                    var x = regex.test(d[0]) ? (
                                         <SpotlightRow
                                             key={key}
                                             nodeId={nid}
@@ -93,25 +110,12 @@ export default class SpotlightContainer extends Component {
                                     return x;
                                 }.bind(this)
                             )}
-                        </tbody>
-                    </table>
-                </div>
+                    </tbody>
+                </Table>
             </div>
-        );
-    }
+        </PoseContainer>
+    );
+};
 
-    componentDidMount() {
-        jQuery(this.refs.spotlight).fadeToggle(0);
-
-        $(window).on(
-            'keyup',
-            function(e) {
-                var key = e.keyCode ? e.keyCode : e.which;
-
-                if (document.activeElement === document.body && key === 32) {
-                    $(this.refs.spotlight).fadeToggle();
-                }
-            }.bind(this)
-        );
-    }
-}
+SpotlightContainer.propTypes = {};
+export default SpotlightContainer;

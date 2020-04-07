@@ -1,51 +1,43 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import PropTypes from 'prop-types';
+import { AppContext } from '../../AppContext';
+import PoseContainer from '../PoseContainer';
+import clsx from 'clsx';
 
-export default class LoadingContainer extends Component {
-    constructor() {
-        super();
+const LoadingContainer = () => {
+    const [text, setText] = useState('Loading');
+    const [visible, setVisible] = useState(false);
+    const context = useContext(AppContext);
 
-        this.state = {
-            text: 'Loading',
-            darkMode: false,
+    const updateLoadingText = newText => {
+        setText(newText);
+    };
+
+    const updateShowState = newState => {
+        setVisible(newState);
+    };
+
+    useEffect(() => {
+        emitter.on('updateLoadingText', updateLoadingText);
+        emitter.on('showLoadingIndicator', updateShowState);
+        return () => {
+            emitter.removeListener('updateLoadingText', setText);
         };
+    }, []);
 
-        emitter.on('updateLoadingText', payload => {
-            this.setState({ text: payload });
-        });
+    return (
+        <PoseContainer
+            visible={visible}
+            className={clsx(
+                'loadingIndicator',
+                `loading-indicator-${context.darkMode ? 'dark' : 'light'}`
+            )}
+        >
+            <div>{text}</div>
+            <img src='src/img/loading_new.gif' />
+        </PoseContainer>
+    );
+};
 
-        emitter.on('showLoadingIndicator', payload => {
-            if (payload) {
-                jQuery(this.refs.load).fadeIn();
-            } else {
-                jQuery(this.refs.load).fadeOut();
-            }
-        });
-    }
-
-    componentDidMount() {
-        jQuery(this.refs.load).fadeToggle(0);
-
-        emitter.on('toggleDarkMode', this.toggleDarkMode.bind(this));
-        this.toggleDarkMode(appStore.performance.darkMode);
-    }
-
-    toggleDarkMode(enabled) {
-        this.setState({ darkMode: enabled });
-    }
-
-    render() {
-        return (
-            <div
-                className={
-                    this.state.darkMode
-                        ? 'loadingIndicator loading-indicator-dark'
-                        : 'loadingIndicator loading-indicator-light'
-                }
-                ref='load'
-            >
-                <div>{this.state.text}</div>
-                <img src='src/img/loading_new.gif' />
-            </div>
-        );
-    }
-}
+LoadingContainer.propTypes = {};
+export default LoadingContainer;

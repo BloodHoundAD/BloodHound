@@ -1,30 +1,21 @@
-import React, { Component } from 'react';
-import MenuButton from './MenuButton';
-import ProgressBarMenuButton from './ProgressBarMenuButton';
-import {
-    buildGpoAdminJson,
-    buildSessionJson,
-    buildUserJson,
-    buildComputerJson,
-    buildDomainJson,
-    buildGpoJson,
-    buildGroupJson,
-    buildOuJson,
-} from 'utils';
-import { If, Then, Else } from 'react-if';
-import { remote } from 'electron';
-const { dialog, app } = remote;
-import { unlinkSync, createReadStream, createWriteStream, statSync } from 'fs';
 import { eachSeries } from 'async';
-import { Parse } from 'unzipper';
+import { remote } from 'electron';
+import { createReadStream, createWriteStream, statSync, unlinkSync } from 'fs';
+import { isZipSync } from 'is-zip-file';
 import { join } from 'path';
-
+import React, { Component } from 'react';
+import { withAlert } from 'react-alert';
+import { Else, If, Then } from 'react-if';
+import sanitize from 'sanitize-filename';
+import { chain } from 'stream-chain';
 import { withParser } from 'stream-json/filters/Pick';
 import { streamArray } from 'stream-json/streamers/StreamArray';
-import { chain } from 'stream-chain';
-import { isZipSync } from 'is-zip-file';
-import { withAlert } from 'react-alert';
-import sanitize from 'sanitize-filename';
+import { Parse } from 'unzipper';
+import * as OldIngestion from '../../js/oldingestion.js';
+import * as NewIngestion from '../../js/newingestion.js';
+import MenuButton from './MenuButton';
+import ProgressBarMenuButton from './ProgressBarMenuButton';
+const { dialog, app } = remote;
 
 class MenuContainer extends Component {
     constructor() {
@@ -52,8 +43,12 @@ class MenuContainer extends Component {
             eachSeries(
                 results,
                 (file, callback) => {
-                    this.props.alert.info(
-                        'Processing file {}'.format(file.name)
+                    var msg = 'Processing file {}'.format(file.name);
+                    if (file.zip_name) {
+                        msg += " from {}".format(file.zip_name);
+                    }
+                    this.alert = this.props.alert.info(
+                        msg, { timeout: 0 }
                     );
                     this.getFileMeta(file.path, callback);
                 },
@@ -67,6 +62,7 @@ class MenuContainer extends Component {
                             unlinkSync(file.path);
                         }
                     });
+                    this.props.alert.info('Finished processing all files', { timeout: 0 });
                 }
             );
         });
@@ -97,12 +93,15 @@ class MenuContainer extends Component {
 
     _importClick() {
         closeTooltip();
-        var fname = dialog.showOpenDialog({
-            properties: ['openFile'],
-        });
-        if (typeof fname !== 'undefined') {
-            emitter.emit('import', fname[0]);
-        }
+        dialog
+            .showOpenDialog({
+                properties: ['openFile'],
+            })
+            .then(r => {
+                if (typeof r !== 'undefined') {
+                    emitter.emit('import', r.filePaths[0]);
+                }
+            });
     }
 
     _settingsClick() {
@@ -125,8 +124,12 @@ class MenuContainer extends Component {
             eachSeries(
                 results,
                 (file, callback) => {
-                    this.props.alert.info(
-                        'Processing file {}'.format(file.name)
+                    var msg = 'Processing file {}'.format(file.name);
+                    if (file.zip_name) {
+                        msg += " from {}".format(file.zip_name);
+                    }
+                    this.alert = this.props.alert.info(
+                        msg, { timeout: 0 }
                     );
                     this.getFileMeta(file.path, callback);
                 },
@@ -140,6 +143,7 @@ class MenuContainer extends Component {
                             unlinkSync(file.path);
                         }
                     });
+                    this.props.alert.info('Finished processing all files', { timeout: 0 });
                 }
             );
 
@@ -155,11 +159,21 @@ class MenuContainer extends Component {
         await s.run(
             'MATCH (n:Computer) WHERE NOT EXISTS(n.owned) SET n.owned=false'
         );
+
         await s.run(
-            "MATCH (n:Group) WHERE n.name =~ 'EVERYONE@.*' SET n.objectsid='S-1-1-0'"
+            'MATCH (n:Group) WHERE n.objectid ENDS WITH "-513" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-1-0" MERGE (n)-[r:MemberOf]->(m)'
         );
+
         await s.run(
-            "MATCH (n:Group) WHERE n.name =~ 'AUTHENTICATED USERS@.*' SET n.objectsid='S-1-5-11'"
+            'MATCH (n:Group) WHERE n.objectid ENDS WITH "-515" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-1-0" MERGE (n)-[r:MemberOf]->(m)'
+        );
+
+        await s.run(
+            'MATCH (n:Group) WHERE n.objectid ENDS WITH "-513" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-5-11" MERGE (n)-[r:MemberOf]->(m)'
+        );
+
+        await s.run(
+            'MATCH (n:Group) WHERE n.objectid ENDS WITH "-515" MATCH (m:Group) WHERE m.domain=n.domain AND m.objectid ENDS WITH "S-1-5-11" MERGE (n)-[r:MemberOf]->(m)'
         );
         s.close();
     }
@@ -168,35 +182,50 @@ class MenuContainer extends Component {
         var index = 0;
         var processed = [];
         var tempPath = app.getPath('temp');
+        let promises = [];
         while (index < files.length) {
             var path = files[index].path;
             var name = files[index].name;
 
             if (isZipSync(path)) {
+                var alert = this.props.alert.info(
+                    'Unzipping file {}'.format(name)
+                );
+                
                 await createReadStream(path)
                     .pipe(Parse())
-                    .on('entry', function(entry) {
-                        let sanitized = sanitize(entry.path);
-                        var output = join(tempPath, sanitized);
-                        entry.pipe(createWriteStream(output));
-                        processed.push({
-                            path: output,
-                            name: sanitized,
-                            delete: true,
-                        });
-                    })
                     .on('error', function(error) {
                         this.props.alert.error(
                             '{} is corrupted or password protected'.format(name)
                         );
                     })
+                    .on('entry', function(entry) {
+                        let sanitized = sanitize(entry.path);
+                        let output = join(tempPath, sanitized);
+                        let write = entry.pipe(createWriteStream(output));
+
+                        let promise = new Promise(res => {
+                            write.on('finish', () => {
+                                res();
+                            });
+                        });
+
+                        promises.push(promise);
+                        processed.push({
+                            path: output,
+                            name: sanitized,
+                            zip_name: name,
+                            delete: true,
+                        });
+                    })
                     .promise();
+                alert.close();
             } else {
                 processed.push({ path: path, name: name, delete: false });
             }
             index++;
         }
-
+        await Promise.all(promises);
         return processed;
     }
 
@@ -223,17 +252,26 @@ class MenuContainer extends Component {
         });
 
         let size = statSync(file).size;
+        let start = size - 200;
+        if (start <= 0) {
+            start = 0;
+        }
         createReadStream(file, {
             encoding: 'utf8',
-            start: size - 100,
+            start: start,
             end: size,
         }).on('data', chunk => {
-            let type;
+            let type, version;
             try {
                 type = /type.?:\s?"(\w*)"/g.exec(chunk)[1];
                 count = /count.?:\s?(\d*)/g.exec(chunk)[1];
             } catch (e) {
                 type = null;
+            }
+            try {
+                version = /version.?:\s?(\d*)/g.exec(chunk)[1];
+            } catch (e) {
+                version = null;
             }
 
             if (!acceptableTypes.includes(type)) {
@@ -245,11 +283,11 @@ class MenuContainer extends Component {
                 return;
             }
 
-            this.processJson(file, callback, parseInt(count), type);
+            this.processJson(file, callback, parseInt(count), type, version);
         });
     }
 
-    processJson(file, callback, count, type) {
+    processJson(file, callback, count, type, version = null) {
         let pipeline = chain([
             createReadStream(file, { encoding: 'utf8' }),
             withParser({ filter: type }),
@@ -277,7 +315,7 @@ class MenuContainer extends Component {
 
                     if (localcount % 1000 === 0) {
                         pipeline.pause();
-                        await this.uploadData(chunk, type);
+                        await this.uploadData(chunk, type, version);
                         sent += chunk.length;
                         this.setState({
                             progress: Math.floor((sent / count) * 100),
@@ -290,10 +328,13 @@ class MenuContainer extends Component {
             .on(
                 'end',
                 async function() {
-                    await this.uploadData(chunk, type);
+                    await this.uploadData(chunk, type, version);
                     this.setState({ progress: 100 });
                     emitter.emit('refreshDBData');
                     console.timeEnd('IngestTime');
+                    if (this.alert) { // close currently shown info alert
+                        this.alert.close();
+                    }
                     callback();
                 }.bind(this)
             );
@@ -304,18 +345,31 @@ class MenuContainer extends Component {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    async uploadData(chunk, type) {
+    async uploadData(chunk, type, version) {
         let session = driver.session();
-        let funcMap = {
-            computers: buildComputerJson,
-            domains: buildDomainJson,
-            gpos: buildGpoJson,
-            users: buildUserJson,
-            groups: buildGroupJson,
-            ous: buildOuJson,
-            sessions: buildSessionJson,
-            gpomembers: buildGpoAdminJson,
-        };
+        let funcMap;
+        if (version == null) {
+            funcMap = {
+                computers: OldIngestion.buildComputerJson,
+                domains: OldIngestion.buildDomainJson,
+                gpos: OldIngestion.buildGpoJson,
+                users: OldIngestion.buildUserJson,
+                groups: OldIngestion.buildGroupJson,
+                ous: OldIngestion.buildOuJson,
+                sessions: OldIngestion.buildSessionJson,
+                gpomembers: OldIngestion.buildGpoAdminJson,
+            };
+        } else {
+            funcMap = {
+                computers: NewIngestion.buildComputerJsonNew,
+                groups: NewIngestion.buildGroupJsonNew,
+                users: NewIngestion.buildUserJsonNew,
+                domains: NewIngestion.buildDomainJsonNew,
+                ous: NewIngestion.buildOuJsonNew,
+                gpos: NewIngestion.buildGpoJsonNew,
+            };
+        }
+
         let data = funcMap[type](chunk);
         for (let key in data) {
             if (data[key].props.length === 0) {
@@ -324,10 +378,10 @@ class MenuContainer extends Component {
             let arr = data[key].props.chunk();
             let statement = data[key].statement;
             for (let i = 0; i < arr.length; i++) {
-                //console.log(arr[i]);
                 await session
                     .run(statement, { props: arr[i] })
                     .catch(function(error) {
+                        console.log(statement);
                         console.log(data[key].props);
                         console.log(error);
                     });
