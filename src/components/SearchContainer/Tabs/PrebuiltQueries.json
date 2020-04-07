@@ -5,7 +5,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query": "MATCH p=(n:Group)<-[:MemberOf*1..]-(m) WHERE n.objectsid =~ {name} RETURN p",
+                    "query": "MATCH p=(n:Group)<-[:MemberOf*1..]-(m) WHERE n.objectid =~ $name RETURN p",
                     "props": {
                         "name": "(?i)S-1-5-.*-512"
                     },
@@ -19,14 +19,14 @@
                 {
                     "final": false,
                     "title": "Select a Domain Admin group...",
-                    "query": "MATCH (n:Group) WHERE n.objectsid =~ {name} RETURN n.name ORDER BY n.name DESC",
+                    "query": "MATCH (n:Group) WHERE n.objectid =~ $name RETURN n.name ORDER BY n.name DESC",
                     "props": {
                         "name": "(?i)S-1-5-.*-512"
                     }
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((n)-[:{}*1..]->(m:Group {name:{result}})) RETURN p",
+                    "query": "MATCH p=shortestPath((n)-[:{}*1..]->(m:Group {name:$result})) RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
                 }
@@ -42,7 +42,7 @@
                 },
                 {
                     "final": true,
-                    "query": "MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: {result}}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN p",
+                    "query": "MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: $result}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
                 }
@@ -58,7 +58,7 @@
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=(n:User)-[:MemberOf]->(m:Group) WHERE n.domain={result} AND m.domain<>n.domain RETURN p",
+                    "query": "MATCH p=(n:User)-[:MemberOf]->(m:Group) WHERE n.domain=$result AND m.domain<>n.domain RETURN p",
                     "startNode": "{}",
                     "allowCollapse": false
                 }
@@ -74,7 +74,7 @@
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=(n:Group {domain:{result}})-[:MemberOf]->(m:Group) WHERE m.domain<>n.domain AND n.name<>m.name RETURN p",
+                    "query": "MATCH p=(n:Group {domain:$result})-[:MemberOf]->(m:Group) WHERE m.domain<>n.domain AND n.name<>m.name RETURN p",
                     "startNode": "{}",
                     "allowCollapse": false
                 }
@@ -110,11 +110,11 @@
                 {
                     "final": false,
                     "title": "Select a user",
-                    "query": "MATCH (n:User) WHERE n.domain={result} AND n.hasspn=true RETURN n.name, n.pwdlastset ORDER BY n.pwdlastset ASC"
+                    "query": "MATCH (n:User) WHERE n.domain=$result AND n.hasspn=true RETURN n.name, n.pwdlastset ORDER BY n.pwdlastset ASC"
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((a:User {name:{result}})-[:{}*1..]->(b:Computer)) RETURN p",
+                    "query": "MATCH p=shortestPath((a:User {name:$result})-[:{}*1..]->(b:Computer)) RETURN p",
                     "startNode": "{}",
                     "allowCollapse": true
                 }
@@ -126,14 +126,14 @@
                 {
                     "final": false,
                     "title": "Select a Domain Admin group...",
-                    "query": "MATCH (n:Group) WHERE n.objectsid =~ {name} RETURN n.name ORDER BY n.name DESC",
+                    "query": "MATCH (n:Group) WHERE n.objectid =~ $name RETURN n.name ORDER BY n.name DESC",
                     "props": {
                         "name": "(?i)S-1-5-.*-512"
                     }
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((n:User {hasspn:true})-[:{}*1..]->(m:Group {name:{result}})) RETURN p",
+                    "query": "MATCH p=shortestPath((n:User {hasspn:true})-[:{}*1..]->(m:Group {name:$result})) RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
                 }
@@ -150,11 +150,11 @@
                 {
                     "final": false,
                     "title": "Select a user",
-                    "query": "MATCH (n) WHERE n.domain={result} AND n.owned=true RETURN n.name, n.PwdLastSet ORDER BY n.PwdLastSet ASC"
+                    "query": "MATCH (n) WHERE n.domain=$result AND n.owned=true RETURN n.name, n.PwdLastSet ORDER BY n.PwdLastSet ASC"
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((a {name:{result}})-[:{}*1..]->(b:Computer)) RETURN p",
+                    "query": "MATCH p=shortestPath((a {name:$result})-[:{}*1..]->(b:Computer)) RETURN p",
                     "startNode": "{}",
                     "allowCollapse": true
                 }
@@ -166,14 +166,14 @@
                 {
                     "final": false,
                     "title": "Select a Domain Admin group...",
-                    "query": "MATCH (n:Group) WHERE n.objectsid =~ {name} RETURN n.name ORDER BY n.name DESC",
+                    "query": "MATCH (n:Group) WHERE n.objectid =~ $name RETURN n.name ORDER BY n.name DESC",
                     "props": {
                         "name": "(?i)S-1-5-.*-512"
                     }
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((n {owned:true})-[:{}*1..]->(m:Group {name:{result}})) RETURN p",
+                    "query": "MATCH p=shortestPath((n {owned:true})-[:{}*1..]->(m:Group {name:$result})) RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
                 }
@@ -189,7 +189,7 @@
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((n)-[*1..]->(m {highvalue:true})) WHERE m.domain={result} AND m<>n RETURN p",
+                    "query": "MATCH p=shortestPath((n)-[*1..]->(m {highvalue:true})) WHERE m.domain=$result AND m<>n RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
                 }
@@ -201,12 +201,11 @@
                 {
                     "final": false,
                     "title": "Select a Domain Users Group...",
-                    "query": "MATCH (n:Group) WHERE n.name STARTS WITH 'DOMAIN USERS' RETURN n.name ORDER BY n.name DESC"
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
                 },
                 {
                     "final": true,
-                    "query":
-                        "MATCH p=(m:Group {name:{result}})-[:AdminTo]->(n:Computer) RETURN p",
+                    "query": "MATCH p=(m:Group {name:$result})-[:AdminTo]->(n:Computer) RETURN p",
                     "allowCollapse": true
                 }
             ]
@@ -217,12 +216,11 @@
                 {
                     "final": false,
                     "title": "Select a Domain Users Group...",
-                    "query": "MATCH (n:Group) WHERE n.name STARTS WITH 'DOMAIN USERS' RETURN n.name ORDER BY n.name DESC"
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
                 },
                 {
                     "final": true,
-                    "query":
-                        "MATCH p=shortestPath((g:Group {name:{result}})-[*1..]->(n {highvalue:true})) WHERE g.name STARTS WITH 'DOMAIN USERS' return p",
+                    "query": "MATCH p=shortestPath((g:Group {name:$result})-[*1..]->(n {highvalue:true})) WHERE g.name STARTS WITH 'DOMAIN USERS' return p",
                     "allowCollapse": true
                 }
             ]
@@ -233,12 +231,11 @@
                 {
                     "final": false,
                     "title": "Select a Domain Users Group...",
-                    "query": "MATCH (n:Group) WHERE n.name STARTS WITH 'DOMAIN USERS' RETURN n.name ORDER BY n.name DESC"
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
                 },
                 {
                     "final": true,
-                    "query":
-                        "MATCH p=shortestPath((g:Group {name:{result}})-[*1..]->(n {highvalue:true})) return p",
+                    "query": "MATCH p=shortestPath((g:Group {name:$result})-[*1..]->(n {highvalue:true})) return p",
                     "allowCollapse": true
                 }
             ]
@@ -249,12 +246,11 @@
                 {
                     "final": false,
                     "title": "Select a Domain Users Group...",
-                    "query": "MATCH (n:Group) WHERE n.name STARTS WITH 'DOMAIN USERS' RETURN n.name ORDER BY n.name DESC"
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
                 },
                 {
                     "final": true,
-                    "query":
-                        "match p=(g:Group {name:{result}})-[:CanRDP]->(c:Computer) where NOT c.operatingsystem CONTAINS 'Server' return p",
+                    "query": "match p=(g:Group {name:$result})-[:CanRDP]->(c:Computer) where NOT c.operatingsystem CONTAINS 'Server' return p",
                     "allowCollapse": true
                 }
             ]
@@ -265,12 +261,11 @@
                 {
                     "final": false,
                     "title": "Select a Domain Users Group...",
-                    "query": "MATCH (n:Group) WHERE n.name STARTS WITH 'DOMAIN USERS' RETURN n.name ORDER BY n.name DESC"
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
                 },
                 {
                     "final": true,
-                    "query":
-                        "MATCH p=(g:Group {name:{result}})-[:CanRDP]->(c:Computer) WHERE c.operatingsystem CONTAINS 'Server' return p",
+                    "query": "MATCH p=(g:Group {name:$result})-[:CanRDP]->(c:Computer) WHERE c.operatingsystem CONTAINS 'Server' return p",
                     "allowCollapse": false
                 }
             ]
@@ -281,12 +276,11 @@
                 {
                     "final": false,
                     "title": "Select a Domain Users Group...",
-                    "query": "MATCH (n:Group) WHERE n.name STARTS WITH 'DOMAIN USERS' RETURN n.name ORDER BY n.name DESC"
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
                 },
                 {
                     "final": true,
-                    "query":
-                        "MATCH p=(m:Group)-[r:Owns|:WriteDacl|:GenericAll|:WriteOwner|:ExecuteDCOM|:GenericWrite|:AllowedToDelegate|:ForceChangePassword]->(n:Computer) WHERE m.name STARTS WITH 'DOMAIN USERS' RETURN p",
+                    "query": "MATCH p=(m:Group)-[r:Owns|:WriteDacl|:GenericAll|:WriteOwner|:ExecuteDCOM|:GenericWrite|:AllowedToDelegate|:ForceChangePassword]->(n:Computer) WHERE m.name STARTS WITH 'DOMAIN USERS' RETURN p",
                     "allowCollapse": true
                 }
             ]
@@ -296,8 +290,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query":
-                        "MATCH p=shortestPath((n:User)-[r:MemberOf]->(g:Group)) WHERE g.highvalue=true AND n.hasspn=true RETURN p",
+                    "query": "MATCH p=shortestPath((n:User)-[r:MemberOf]->(g:Group)) WHERE g.highvalue=true AND n.hasspn=true RETURN p",
                     "allowCollapse": true
                 }
             ]
@@ -307,8 +300,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query":
-                        "MATCH (n:User)WHERE n.hasspn=true RETURN n",
+                    "query": "MATCH (n:User)WHERE n.hasspn=true RETURN n",
                     "allowCollapse": true
                 }
             ]
@@ -318,19 +310,17 @@
             "queryList": [
                 {
                     "final": true,
-                    "query":
-                        "MATCH (u:User {hasspn:true}) OPTIONAL MATCH (u)-[:AdminTo]->(c1:Computer) OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c2:Computer) WITH u,COLLECT(c1) + COLLECT(c2) AS tempVar UNWIND tempVar AS comps RETURN u.name,COUNT(DISTINCT(comps)) ORDER BY COUNT(DISTINCT(comps)) DESC",
+                    "query": "MATCH (u:User {hasspn:true}) OPTIONAL MATCH (u)-[:AdminTo]->(c1:Computer) OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c2:Computer) WITH u,COLLECT(c1) + COLLECT(c2) AS tempVar UNWIND tempVar AS comps RETURN u.name,COUNT(DISTINCT(comps)) ORDER BY COUNT(DISTINCT(comps)) DESC",
                     "allowCollapse": true
                 }
             ]
-        },       
+        },
         {
             "name": "DA Account Sessions to NON DC",
             "queryList": [
                 {
                     "final": true,
-                    "query":
-                        "MATCH (c:Computer)-[:MemberOf]->(t:Group) WHERE NOT t.name STARTS WITH 'DOMAIN CONTROLLERS' WITH c as NonDC MATCH p=(NonDC)-[:HasSession]->(n:User)-[:MemberOf]-> (g:Group) WHERE g.name STARTS WITH 'DOMAIN ADMINS' RETURN p",
+                    "query": "MATCH (c:Computer)-[:MemberOf]->(t:Group) WHERE NOT t.name STARTS WITH 'DOMAIN CONTROLLERS' WITH c as NonDC MATCH p=(NonDC)-[:HasSession]->(n:User)-[:MemberOf]-> (g:Group) WHERE g.name STARTS WITH 'DOMAIN ADMINS' RETURN p",
                     "allowCollapse": true
                 }
             ]
@@ -340,8 +330,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query":
-                        "MATCH (n:Computer) WHERE n.operatingsystem =~ '(?i).(2000|2003|2008|xp|vista|7|me).' RETURN n",
+                    "query": "MATCH (n:Computer) WHERE n.operatingsystem =~ '(?i).(2000|2003|2008|xp|vista|7|me).' RETURN n",
                     "allowCollapse": true
                 }
             ]
@@ -351,8 +340,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query":
-                        "MATCH (u:User {dontreqpreauth: true}) RETURN u",
+                    "query": "MATCH (u:User {dontreqpreauth: true}) RETURN u",
                     "allowCollapse": true
                 }
             ]
