@@ -8,6 +8,7 @@ const { dialog } = remote;
 
 const ConfirmDrawModal = ({ promise }) => {
     const [data, setData] = useState(null);
+    const [params, setParams] = useState(null);
     const [show, setShow] = useState(false);
 
     const handleClose = () => {
@@ -16,13 +17,14 @@ const ConfirmDrawModal = ({ promise }) => {
         setShow(false);
     };
 
-    const handleOpen = data => {
+    const handleOpen = (data, params) => {
         setData(data);
+        setParams(params);
         setShow(true);
     };
 
     const handleConfirm = () => {
-        emitter.emit('confirmGraphDraw', true, data);
+        emitter.emit('confirmGraphDraw', true, data, params);
         setData(null);
         setShow(false);
     };
@@ -33,7 +35,7 @@ const ConfirmDrawModal = ({ promise }) => {
         });
 
         if (target !== undefined) {
-            writeFile(target, JSON.stringify(data, null, 2), err => {
+            writeFile(target, JSON.stringify(data, null, 2), (err) => {
                 if (err) console.log(err);
                 else console.log('Saved ' + target + ' successfully');
             });
