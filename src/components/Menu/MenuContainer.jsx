@@ -35,21 +35,19 @@ class MenuContainer extends Component {
 
     fileDrop(e) {
         let fileNames = [];
-        $.each(e.dataTransfer.files, function(_, file) {
+        $.each(e.dataTransfer.files, function (_, file) {
             fileNames.push({ path: file.path, name: file.name });
         });
 
-        this.unzipNecessary(fileNames).then(results => {
+        this.unzipNecessary(fileNames).then((results) => {
             eachSeries(
                 results,
                 (file, callback) => {
                     var msg = 'Processing file {}'.format(file.name);
                     if (file.zip_name) {
-                        msg += " from {}".format(file.zip_name);
+                        msg += ' from {}'.format(file.zip_name);
                     }
-                    this.alert = this.props.alert.info(
-                        msg, { timeout: 0 }
-                    );
+                    this.alert = this.props.alert.info(msg, { timeout: 0 });
                     this.getFileMeta(file.path, callback);
                 },
                 () => {
@@ -57,12 +55,14 @@ class MenuContainer extends Component {
                         this.setState({ uploading: false });
                     }, 3000);
                     this.addBaseProps();
-                    $.each(results, function(_, file) {
+                    $.each(results, function (_, file) {
                         if (file.delete) {
                             unlinkSync(file.path);
                         }
                     });
-                    this.props.alert.info('Finished processing all files', { timeout: 0 });
+                    this.props.alert.info('Finished processing all files', {
+                        timeout: 0,
+                    });
                 }
             );
         });
@@ -70,7 +70,7 @@ class MenuContainer extends Component {
 
     cancelUpload() {
         this.setState({ cancelled: true });
-        setTimeout(_ => {
+        setTimeout((_) => {
             this.setState({ uploading: false });
         }, 1000);
     }
@@ -97,7 +97,7 @@ class MenuContainer extends Component {
             .showOpenDialog({
                 properties: ['openFile'],
             })
-            .then(r => {
+            .then((r) => {
                 if (typeof r !== 'undefined') {
                     emitter.emit('import', r.filePaths[0]);
                 }
@@ -116,21 +116,19 @@ class MenuContainer extends Component {
         var input = jQuery(this.refs.fileInput);
         var fileNames = [];
 
-        $.each(input[0].files, function(_, file) {
+        $.each(input[0].files, function (_, file) {
             fileNames.push({ path: file.path, name: file.name });
         });
 
-        this.unzipNecessary(fileNames).then(results => {
+        this.unzipNecessary(fileNames).then((results) => {
             eachSeries(
                 results,
                 (file, callback) => {
                     var msg = 'Processing file {}'.format(file.name);
                     if (file.zip_name) {
-                        msg += " from {}".format(file.zip_name);
+                        msg += ' from {}'.format(file.zip_name);
                     }
-                    this.alert = this.props.alert.info(
-                        msg, { timeout: 0 }
-                    );
+                    this.alert = this.props.alert.info(msg, { timeout: 0 });
                     this.getFileMeta(file.path, callback);
                 },
                 () => {
@@ -138,12 +136,14 @@ class MenuContainer extends Component {
                         this.setState({ uploading: false });
                     }, 3000);
                     this.addBaseProps();
-                    $.each(results, function(_, file) {
+                    $.each(results, function (_, file) {
                         if (file.delete) {
                             unlinkSync(file.path);
                         }
                     });
-                    this.props.alert.info('Finished processing all files', { timeout: 0 });
+                    this.props.alert.info('Finished processing all files', {
+                        timeout: 0,
+                    });
                 }
             );
 
@@ -191,20 +191,20 @@ class MenuContainer extends Component {
                 var alert = this.props.alert.info(
                     'Unzipping file {}'.format(name)
                 );
-                
+
                 await createReadStream(path)
                     .pipe(Parse())
-                    .on('error', function(error) {
+                    .on('error', function (error) {
                         this.props.alert.error(
                             '{} is corrupted or password protected'.format(name)
                         );
                     })
-                    .on('entry', function(entry) {
+                    .on('entry', function (entry) {
                         let sanitized = sanitize(entry.path);
                         let output = join(tempPath, sanitized);
                         let write = entry.pipe(createWriteStream(output));
 
-                        let promise = new Promise(res => {
+                        let promise = new Promise((res) => {
                             write.on('finish', () => {
                                 res();
                             });
@@ -260,7 +260,7 @@ class MenuContainer extends Component {
             encoding: 'utf8',
             start: start,
             end: size,
-        }).on('data', chunk => {
+        }).on('data', (chunk) => {
             let type, version;
             try {
                 type = /type.?:\s?"(\w*)"/g.exec(chunk)[1];
@@ -272,6 +272,15 @@ class MenuContainer extends Component {
                 version = /version.?:\s?(\d*)/g.exec(chunk)[1];
             } catch (e) {
                 version = null;
+            }
+
+            if (version == null) {
+                this.props.alert.error(
+                    'Version 2 data is not compatible with BloodHound v3.'
+                );
+                this.setState({ uploading: false });
+                callback();
+                return;
             }
 
             if (!acceptableTypes.includes(type)) {
@@ -309,7 +318,7 @@ class MenuContainer extends Component {
         pipeline
             .on(
                 'data',
-                async function(data) {
+                async function (data) {
                     chunk.push(data.value);
                     localcount++;
 
@@ -327,12 +336,13 @@ class MenuContainer extends Component {
             )
             .on(
                 'end',
-                async function() {
+                async function () {
                     await this.uploadData(chunk, type, version);
                     this.setState({ progress: 100 });
                     emitter.emit('refreshDBData');
                     console.timeEnd('IngestTime');
-                    if (this.alert) { // close currently shown info alert
+                    if (this.alert) {
+                        // close currently shown info alert
                         this.alert.close();
                     }
                     callback();
@@ -342,7 +352,7 @@ class MenuContainer extends Component {
 
     //DO NOT USE THIS FUNCTION FOR ANYTHING, ITS ONLY FOR TESTING
     sleep_test(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
     async uploadData(chunk, type, version) {
@@ -380,7 +390,7 @@ class MenuContainer extends Component {
             for (let i = 0; i < arr.length; i++) {
                 await session
                     .run(statement, { props: arr[i] })
-                    .catch(function(error) {
+                    .catch(function (error) {
                         console.log(statement);
                         console.log(data[key].props);
                         console.log(error);
@@ -427,7 +437,7 @@ class MenuContainer extends Component {
                         <Else>
                             {() => (
                                 <MenuButton
-                                    click={function() {
+                                    click={function () {
                                         jQuery(this.refs.fileInput).click();
                                     }.bind(this)}
                                     hoverVal='Upload Data'
