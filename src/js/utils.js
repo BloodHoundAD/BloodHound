@@ -216,11 +216,17 @@ export async function addConstraints() {
         .run('CREATE CONSTRAINT ON (c:Base) ASSERT c.objectid IS UNIQUE')
         .catch(_ => {});
     await session.run('CREATE INDEX ON :User(name)').catch(_ => {});
+    await session.run('CREATE INDEX ON :User(objectid)').catch(_ => {});
     await session.run('CREATE INDEX ON :Group(name)').catch(_ => {});
+    await session.run('CREATE INDEX ON :Group(objectid)').catch(_ => {});
     await session.run('CREATE INDEX ON :Computer(name)').catch(_ => {});
+    await session.run('CREATE INDEX ON :Computer(objectid)').catch(_ => {});
     await session.run('CREATE INDEX ON :GPO(name)').catch(_ => {});
+    await session.run('CREATE INDEX ON :GPO(objectid)').catch(_ => {});
     await session.run('CREATE INDEX ON :Domain(name)').catch(_ => {});
+    await session.run('CREATE INDEX ON :Domain(objectid)').catch(_ => {});
     await session.run('CREATE INDEX ON :OU(name)').catch(_ => {});
+    await session.run('CREATE INDEX ON :OU(objectid)').catch(_ => {});
     await session.run('CREATE INDEX ON :Base(name)').catch(_ => {});
     session.close();
 
