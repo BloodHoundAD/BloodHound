@@ -235,7 +235,7 @@
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((g:Group {name:$result})-[*1..]->(n {highvalue:true})) AND g<>n return p",
+                    "query": "MATCH p=shortestPath((g:Group {name:$result})-[*1..]->(n {highvalue:true})) WHERE g<>n return p",
                     "allowCollapse": true
                 }
             ]
