@@ -182,7 +182,7 @@ const DomainNodeData = () => {
                         }
                     />
                 </CollapsibleSection>
-                <CollapsibleSection header='First Degree Controllers'>
+                <CollapsibleSection header='Inbound Object Control'>
                     <NodeCypherLink
                         property='First Degree Controllers'
                         target={objectid}
