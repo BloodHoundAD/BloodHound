@@ -9,7 +9,7 @@ const Abuse = (
 ) => {
     let text = '';
     if (targetType === 'Group') {
-        text = `To abuse WriteDacl to a user object, you may grant yourself the AddMember privilege. This can be accomplished using the Add-DomainObjectAcl function in PowerView.
+        text = `To abuse WriteDacl to a group object, you may grant yourself the AddMember privilege. This can be accomplished using the Add-DomainObjectAcl function in PowerView.
         
         You may need to authenticate to the Domain Controller as ${
             sourceType === 'User'
