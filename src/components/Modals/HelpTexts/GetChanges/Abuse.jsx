@@ -4,7 +4,7 @@ const Abuse = (sourceName, sourceType, targetName, targetType) => {
             
             <code>lsadump::dcsync /domain:testlab.local /user:Administrator</code>
             
-            You can also perform the more complicated ExtraSids attack to hop domain trusts. For information on this see the blod post by harmj0y in the references tab.`;
+            You can also perform the more complicated ExtraSids attack to hop domain trusts. For information on this see the blog post by harmj0y in the references tab.`;
     return { __html: text };
 };
 
