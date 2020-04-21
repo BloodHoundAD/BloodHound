@@ -25,7 +25,7 @@ download the BloodHound GUI. You can also build the BloodHound GUI from source.
 
 OS-specific instructions: 
 :doc:`Windows <installation/windows>` |
-:doc:`OSX <installation/osx>` |
+:doc:`macOS <installation/osx>` |
 :doc:`Linux <installation/linux>`
 
 Collect Your First Dataset
