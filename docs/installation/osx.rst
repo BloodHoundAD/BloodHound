@@ -1,14 +1,14 @@
-OSX
-===
+macOS
+=====
 
 Install neo4j
 ^^^^^^^^^^^^^
 
-1. Download the OSX version of neo4j Community Edition Server from https://neo4j.com/download-center/#community
+1. Download the macOS version of neo4j Community Edition Server from https://neo4j.com/download-center/#community
 
 2. Unzip the neo4j folder.
 
-3. In an OSX terminal, change directories to the neo4j folder.
+3. In a macOS terminal, change directories to the neo4j folder.
 
 4. Change to the `bin` directory, then type:
 
