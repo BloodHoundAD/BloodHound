@@ -58,5 +58,3 @@ Build BloodHound with `npm run macbuild`:
 ::
 
    $ npm run winbuild
-
-Words about installing on OSX
