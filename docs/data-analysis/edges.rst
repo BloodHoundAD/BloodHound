@@ -17,6 +17,12 @@ direction of escalating privileges. For example, because the David McGuire
 user belongs to the Domain Users and Domain Admins group, his user has the
 same privileges both of those groups have.
 
+|
+
+----
+
+|
+
 AdminTo
 ^^^^^^^
 
@@ -31,12 +37,6 @@ impersonation, and injecting into processes running as another user.
 
 Finally, administrators can often disable host-based security controls that
 would otherwise prevent the aforementioned techniques.
-
-|
-
-----
-
-|
 
 Abuse Info
 ----------
@@ -341,6 +341,12 @@ References
 * https://www.sixdub.net/?p=579
 * https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4724
 
+|
+
+----
+
+|
+
 AddMembers
 ^^^^^^^^^^
 
@@ -358,12 +364,6 @@ See this clip for an example of this edge being abused:
     <div style="text-align: center; margin-bottom: 2em;">
     <iframe width="100%" height="350" src="https://www.youtube.com/embed/z8thoG7gPd0?t=2123?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
-
-|
-
-----
-
-|
 
 Abuse Info
 ----------
