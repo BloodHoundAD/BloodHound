@@ -300,7 +300,7 @@ Then create a secure string object for the password you want to set on the targe
 
 ::
 
-  $UserPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force</code>
+  $UserPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
 
 Finally, use Set-DomainUserPassword, optionally specifying $Cred if you are not already
 running within a process as the user with the password reset privilege
@@ -388,7 +388,7 @@ PowerView help documentation):
 ::
 
   $SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-  $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
+  $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)
 
 Then, use Add-DomainGroupMember, optionally specifying $Cred if you are not already running
 within a process owned by the user with the AddMembers privilege
@@ -1012,7 +1012,7 @@ first create a PSCredential object (these examples comes from the PowerView help
 ::
 
   $SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
-  $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)</code>
+  $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)
 
 Then, use Set-DomainObject, optionally specifying $Cred if you are not already running a process as
 the user with full control over the target user.
@@ -1157,7 +1157,7 @@ Finally, we will apply this ACE to our target OU:
   $DsEntry = $OU.GetDirectoryEntry()
   $dsEntry.PsBase.Options.SecurityMasks = 'Dacl'
   $dsEntry.PsBase.ObjectSecurity.AddAccessRule($ACE)
-  $dsEntry.PsBase.CommitChanges()</code>
+  $dsEntry.PsBase.CommitChanges()
 
 Now, the "JKOHLER" user will have full control of all descendent objects of each type.
 
@@ -1511,7 +1511,7 @@ Finally, we will apply this ACE to our target OU:
   $DsEntry = $OU.GetDirectoryEntry()
   $dsEntry.PsBase.Options.SecurityMasks = 'Dacl'
   $dsEntry.PsBase.ObjectSecurity.AddAccessRule($ACE)
-  $dsEntry.PsBase.CommitChanges()</code>
+  $dsEntry.PsBase.CommitChanges()
 
 Now, the "JKOHLER" user will have full control of all descendent objects of each type.
 
