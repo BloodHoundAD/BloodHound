@@ -5,7 +5,7 @@ The rolling release will always be updated to the most recent source. Tagged rel
 
 # About BloodHound
 
-To get started with BloodHound, check out the [BloodHound Github Wiki.](https://github.com/BloodHoundAD/Bloodhound/wiki)
+To get started with BloodHound, check out the [BloodHound docs.] https://bloodhound.readthedocs.io/en/latest/index.html
 
 BloodHound is a single page Javascript web application, built on top of [Linkurious](http://linkurio.us/), compiled with [Electron](http://electron.atom.io/), with a [Neo4j](https://neo4j.com/) database fed by a C# data collector.
 
