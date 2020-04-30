@@ -74,7 +74,7 @@
         "image-size": "^0.6.3",
         "image-type": "^3.0.0",
         "is-zip-file": "^1.0.2",
-        "jquery": "^3.2.1",
+        "jquery": "^3.5.0",
         "linkurious": "^1.5.1",
         "md5-file": "^4.0.0",
         "mustache": "^2.3.0",
