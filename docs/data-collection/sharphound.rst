@@ -91,7 +91,7 @@ to perform looped session collection for 3 hours, 9 minutes and 41 seconds:
 
 ::
 
-   C:\> SharpHound.exe --CollectionMethod Session --Loop --Looptime 03:09:41
+   C:\> SharpHound.exe --CollectionMethod Session --Loop --Loopduration 03:09:41
 
 Running SharpHound from a Non Domain-Joined System
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
