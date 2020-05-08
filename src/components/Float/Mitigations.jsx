@@ -22,13 +22,33 @@ const Mitigations = () => {
     const context = useContext(AppContext);
 
     const radios = useRef(null);
-    const [mitigations, setMitigations] = useState([{id: 1, selected: false}]);
+
+    const intialMitiagtions = () => {
+        if (conf.get('mitigations')){
+            let initial = [];
+            for (let i = 1; i <= conf.get('mitigations'); i++){
+                initial.push({id: i, selected: false});
+            }
+            return initial;
+        } else {
+            return [{id: 1, selected: false}];
+        }
+
+    }
+
+    const [mitigations, setMitigations] = useState(intialMitiagtions());
     const addMitigation = () => {
+        if (conf.get('mitigations')){
+            conf.set('mitigations',conf.get('mitigations') + 1);
+        } else {
+            conf.set('mitigations', 1)
+        }
         setMitigations(mitigations => mitigations.concat({
             id : mitigations.length + 1,
             selected: false
         }))
     };
+
 
     const [currentMitigation, setCurrentMitigation] = useState(null);
 
