@@ -175,4 +175,5 @@ from source and apply your own obfuscation techniques to the source code itself 
 that build process. Several resources are available to help get started here:
 
 https://docs.microsoft.com/en-us/visualstudio/ide/dotfuscator/?view=vs-2019
+
 https://github.com/TheWover/donut
