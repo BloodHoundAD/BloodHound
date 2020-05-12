@@ -177,3 +177,5 @@ that build process. Several resources are available to help get started here:
 https://docs.microsoft.com/en-us/visualstudio/ide/dotfuscator/?view=vs-2019
 
 https://github.com/TheWover/donut
+
+https://blog.xpnsec.com/building-modifying-packing-devops/
