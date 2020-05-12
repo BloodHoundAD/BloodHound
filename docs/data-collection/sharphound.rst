@@ -159,8 +159,8 @@ vendors continue to flag SharpHound as malicious.
 If you are on the red team side, you can employ some av-bypass strategies to
 avoid getting caught by AV. One of the best things you can do is stay completely
 off-disk when running SharpHound. Many command-and-control tools have in-memory
-.net assembly execution capabilities, such as Cobalt Strike's execute-assembly and
-Covenant's loadassembly commands. Using these commands will keep SharpHound totally
+.net assembly execution capabilities, such as Cobalt Strike's **execute-assembly** and
+Covenant's **assembly** commands. Using these commands will keep SharpHound totally
 off-disk when run on your target, which will go a very long way toward evading basic
 AV signatures.
 
