@@ -15,7 +15,7 @@ see an authentication prompt:
 
 .. image:: /images/bloodhound-logon.png   
    :align: center
-   :width: 300px
+   :width: 900px
    :alt: BloodHound logon screen
 
 .. note:: Want to follow along? Connect to the example database
@@ -44,15 +44,15 @@ After successful authentiation, the BloodHound GUI will do three
 things:
 
 1. First, the GUI will perform a cypher query to ensure the graph
-  schema has the appropriate indices and constraints. These operations
-  prevent duplicate node creation and greatly speed up node lookup
+   schema has the appropriate indices and constraints. These operations
+   prevent duplicate node creation and greatly speed up node lookup
 2. Second, the GUI will collect stats about the database and display
-  those stats in the "Database Info" tab.
+   those stats in the "Database Info" tab.
 3. Finally, the GUI will query for all users that belong to any Domain
-  Admins group, then display those users and show how they belong to
-  the Domain Admins group.
+   Admins group, then display those users and show how they belong to
+   the Domain Admins group.
   
 .. image:: /images/bloodhound-initial-query.png   
    :align: center
-   :width: 300px
+   :width: 900px
    :alt: BloodHound displaying the members of the Domain Admins group
