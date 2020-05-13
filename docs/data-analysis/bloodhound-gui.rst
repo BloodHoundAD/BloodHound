@@ -133,8 +133,9 @@ You can also constrain your search to particular node types by prepending your
 search with the appropriate node label. For example, you can search for just
 groups with the word "Admin" in them with this search:
 
-.. code::
-  group:Admin
+::
+
+   group:Admin
   
 You can prepend your search with the following node types:
 
