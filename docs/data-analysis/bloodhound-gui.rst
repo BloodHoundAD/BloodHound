@@ -48,10 +48,7 @@ things:
 3. Finally, the GUI will query for all users that belong to any Domain
    Admins group, then display those users and show how they belong to
    the Domain Admins group.
-
-GUI Elements
-^^^^^^^^^^^^
-
+   
 Upon successful logon, BloodHound will draw any group(s) with the
 "Domain Admins" in their name, and show you the effective users that
 belong to the group(s):
@@ -60,6 +57,9 @@ belong to the group(s):
    :align: center
    :width: 900px
    :alt: BloodHound displaying the members of the Domain Admins group
+
+GUI Elements
+^^^^^^^^^^^^
 
 Graph Drawing Area
 ------------------
