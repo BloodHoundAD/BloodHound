@@ -120,8 +120,90 @@ focus:
 Search Bar
 ----------
 
+In the top left of the GUI is the search bar. Start typing the name of a node,
+and the GUI will automatically recommend nodes that match what you've typed so far.
+Click one of the suggestions, and the GUI will render that node:
+
+.. image:: /images/node-search.gif  
+   :align: center
+   :width: 900px
+   :alt: Search for nodes using the search bar
+   
+You can also constrain your search to particular node types by prepending your
+search with the appropriate node label. For example, you can search for just
+groups with the word "Admin" in them with this search:
+
+.. code::
+  group:Admin
+  
+You can prepend your search with the following node types:
+
+* Group
+* Domain
+* Computer
+* User
+* OU
+* GPO
+
+Pathfinding
+-----------
+
+One of the most powerful features of BloodHound is its ability to find attack
+paths between two given nodes, if an attack path exists. Within the search bar
+is the "pathfinding" button, which brings down a second text box where you can
+type in the name of a node you want to target.
+
+For example, if we wanted to find a path from the "Domain Users" group to the
+"Domain Admins" group, we can use the path finding feature like this:
+
+.. image:: /images/pathfinding.gif  
+   :align: center
+   :width: 900px
+   :alt: Search for an attack path
+   
+Depending on your opsec requirements or other factors, you may want to find
+attack paths that do not include particular attack primitives, such as AD object
+manipulation. Click the filter icon to bring up the edge filtering pane, and select
+or de-select the particular edges or class of edges as needed:
+
+
+.. image:: /images/edge-filtering.gif  
+   :align: center
+   :width: 900px
+   :alt: Edge filtering pane
+
 Raw Query Bar
 -------------
 
+With query debug mode enabled, any time the BloodHound GUI performs a cypher query
+where the results are shown in the graph rendering area, the cypher query itself
+will appear here. This can be helpful for learning cypher:
+
+.. image:: /images/raw-query.gif  
+   :align: center
+   :width: 900px
+   :alt: Raw query bar
+
+Additionally, you can execute your own cypher queries using the raw query bar.
+Your cypher query must return either paths or nodes, the BloodHound GUI cannot
+render list output. For example, to return all "user" type nodes in the database:
+
+.. image:: /images/run-raw-query.gif  
+   :align: center
+   :width: 900px
+   :alt: Run a raw cypher query
+
 Upper Right Menu
 ----------------
+
+In the upper right are several menu items for you to interact with. From the top
+going down:
+
+* **Refresh**: Re-run the last query and display the results
+* **Export Graph**: Export the currently rendered graph in JSON format
+* **Import Graph**: Select a JSON formatted graph for the GUI to render
+* **Upload Data**: Select your SharpHound data to upload to neo4j
+* **Change Layout Type**: Switch between hierarchial or force directed layout
+* **Settings**: Configure node and edge display settings, as well as query debug mode,
+  low detail mode, and dark mode here.
+* **About**: Displays author and version information
