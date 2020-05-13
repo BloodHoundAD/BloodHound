@@ -77,27 +77,27 @@ actions against those nodes:
    :alt: Right click menu on a group node
 
 * **Set as Starting Node:** Set this node as the starting point in the
-   pathfinding tool. Click this and you will see this node's name in the
-   search bar, then you can select another node to target after clicking
-   the pathfinding button.
+  pathfinding tool. Click this and you will see this node's name in the
+  search bar, then you can select another node to target after clicking
+  the pathfinding button.
 * **Set as Ending Node:** Set this node as the target node in the pathfinding
-   tool.
+  tool.
 * **Shortest Paths to Here:** This will perform a query to find all shortest
-   paths from any arbitrary node in the database to this node. This may cause
-   a very long query time in neo4j and an even longer render time in the
-   BloodHound GUI.
+  paths from any arbitrary node in the database to this node. This may cause
+  a very long query time in neo4j and an even longer render time in the
+  BloodHound GUI.
 * **Shortest Paths to Here from Owned:** Find attack paths to this node from
-   any node you have marked as owned.
+  any node you have marked as owned.
 * **Edit Node:** This brings up the node editing modal, where you can edit
-   current properties on the node or even add your own custom properties to
-   the node.
+  current properties on the node or even add your own custom properties to
+  the node.
 * **Mark Group as Owned:** This will internally set the node as owned in the
-   neo4j database, which you can then use in conjunction with other queries
-   such as "Shortest paths to here from Owned"
+  neo4j database, which you can then use in conjunction with other queries
+  such as "Shortest paths to here from Owned"
 * **Mark/Unmark Group as High Value:** Some nodes are marked as "high value"
-   by default, such as the domain admins group and enterprise admin group.
-   This can then be used with other queries such as "shortest paths to high
-   value assets"
+  by default, such as the domain admins group and enterprise admin group.
+  This can then be used with other queries such as "shortest paths to high
+  value assets"
 * **Delete Node:** Deletes the node from the neo4j database
 
 You can also right click edges, then click "help" to see information about
