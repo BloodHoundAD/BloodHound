@@ -40,7 +40,7 @@ next time with the same info.
 GUI Elements
 ^^^^^^^^^^^^
 
-After successful authentiation, the BloodHound GUI will do three
+After successful authentication, the BloodHound GUI will do three
 things:
 
 1. First, the GUI will perform a cypher query to ensure the graph
