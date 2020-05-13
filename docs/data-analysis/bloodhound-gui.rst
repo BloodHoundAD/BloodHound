@@ -107,6 +107,15 @@ any particular attack primitive:
    :align: center
    :width: 900px
    :alt: Right click edge and get help
+   
+Finally, there are two keyboard shortcuts when the graph rendering area has
+focus:
+
+* **CTRL**: Pressing CTRL will cycle through the three different node label
+  display settings - default, always show, always hide.
+* **Spacebar**: Pressing spacebar will bring up the spotlight window, which
+  lists all nodes that are currently drawn. Click an item in the list and the
+  GUI will zoom into and briefly highlight that node.
 
 Search Bar
 ----------
