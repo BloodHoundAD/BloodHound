@@ -2,7 +2,7 @@ The BloodHound GUI
 ==================
 
 The BloodHound GUI is where the vast majority of your data
-analysis will happen. Our primary objectives in desining the
+analysis will happen. Our primary objectives in designing the
 BloodHound GUI are intuitive design and operational focus. In
 other words, we want you to get access to the data you need
 as easily and quickly as possible.
