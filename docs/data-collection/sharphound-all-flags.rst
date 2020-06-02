@@ -31,6 +31,7 @@ common options you'll likely use:
 * **LoggedOn:** Does session collection using the privileged collection method. Use
   this if you are running as a user with local admin rights on lots of systems
   for the best user session data.
+* **All:** Performs all collection methods except for *GPOLocalGroup*.
 
 Here are the less common CollectionMethods and what they do:
 
