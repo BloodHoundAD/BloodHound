@@ -88,7 +88,11 @@ Download the BloodHound GUI
 
 1. Download the latest version of the BloodHound GUI from https://github.com/BloodHoundAD/BloodHound/releases
 
-2. Unzip the folder and double click BloodHound.bin
+2. Unzip the folder, then run BloodHound with the --no-sandbox flag:
+
+::
+
+  ./BloodHound.bin --no-sandbox
 
 3. Authenticate with the credentials you set up for neo4j
 

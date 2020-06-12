@@ -91,7 +91,7 @@ to perform looped session collection for 3 hours, 9 minutes and 41 seconds:
 
 ::
 
-   C:\> SharpHound.exe --CollectionMethod Session --Loop --Looptime 03:09:41
+   C:\> SharpHound.exe --CollectionMethod Session --Loop --Loopduration 03:09:41
 
 Running SharpHound from a Non Domain-Joined System
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -145,3 +145,37 @@ install the Microsoft.Net.Compilers nuget package.
 
 Building the project will generate an executable as well as a PowerShell
 script that encapsulates the executable. All dependencies are rolled into the binary.
+
+SharpHound vs. Antivirus
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Many anti-virus engines have signatures for SharpHound. You may even find that
+Chrome or other browsers will warn you against downloading SharpHound, saying
+the binary is malicious. This isn't completely unexpected, as BloodHound is primarily
+a tool used by penetration testers and red teamers to find attack paths in Active
+Directory. While BloodHound has plenty of defensive value, antivirus and browser
+vendors continue to flag SharpHound as malicious.
+
+If you are on the red team side, you can employ some av-bypass strategies to
+avoid getting caught by AV. One of the best things you can do is stay completely
+off-disk when running SharpHound. Many command-and-control tools have in-memory
+.net assembly execution capabilities, such as Cobalt Strike's **execute-assembly** and
+Covenant's **assembly** commands. Using these commands will keep SharpHound totally
+off-disk when run on your target, which will go a very long way toward evading basic
+AV signatures.
+
+If you are on the blue team side, you can use the same AV bypass techniques used by
+the red team, or you can request an exception for the SharpHound binary itself or
+possibly a folder that you run SharpHound out of. Be aware though that whitelisted
+folders and files can commonly be enumerated by low-privilege users running on the
+same system, so try to be as specific as possible with your white-list exceptions.
+
+Finally, remember that SharpHound is free and *open source*. You can build SharpHound
+from source and apply your own obfuscation techniques to the source code itself during
+that build process. Several resources are available to help get started here:
+
+https://docs.microsoft.com/en-us/visualstudio/ide/dotfuscator/?view=vs-2019
+
+https://github.com/TheWover/donut
+
+https://blog.xpnsec.com/building-modifying-packing-devops/

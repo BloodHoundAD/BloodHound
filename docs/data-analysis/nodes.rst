@@ -84,6 +84,12 @@ include:
   not require the user to have a password. Note that this does not
   necessarily mean the user does *not* have a password, just that the user
   is allowed to not have one
+* **userpassword**: Under certain conditions, you may have a clear-text
+  password show up in this property. Most commonly, we have seen that some
+  sort of Unix/Linux-based application will write a password to this property
+  for an AD account the application is running as. This is possibly the
+  current AD password for the user, but is not guaranteed to be the current
+  password.
 * **unconstraineddelegation**: Whether the user is allowed to perform
   unconstrained kerberos delegation. See more info about that here:
   https://www.harmj0y.net/blog/redteaming/another-word-on-delegation/

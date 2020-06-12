@@ -18,6 +18,7 @@ common options you'll likely use:
   Directory security group membership, domain trusts, abusable permissions on AD
   objects, OU tree structure, Group Policy links, the most relevant AD object
   properties, local groups from domain-joined Windows systems, and user sessions.
+* **All:** Performs all collection methods except for *GPOLocalGroup*.
 * **DCOnly:** Collects data ONLY from the domain controller, will not touch other
   domain-joined Windows systems. Collects AD security group memberships, domain
   trusts, abusable permissions on AD objects, OU tree structure, Group Policy

@@ -102,6 +102,7 @@ Need assistance? Join us in the `BloodHound Gang Slack`_
    :caption: Further Reading/Viewing
 
    further-reading/further-reading.rst
+   further-reading/json.rst
 
 .. toctree::
    :maxdepth: 2
