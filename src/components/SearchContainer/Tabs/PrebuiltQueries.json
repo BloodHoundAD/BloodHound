@@ -280,7 +280,7 @@
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=(m:Group)-[:Owns|:WriteDacl|:GenericAll|:WriteOwner|:ExecuteDCOM|:GenericWrite|:AllowedToDelegate|:ForceChangePassword]->(n:Computer) WHERE m.objectid ENDS WITH '-513' RETURN p",
+                    "query": "MATCH p=(m:Group)-[:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(n:Computer) WHERE m.objectid ENDS WITH '-513' RETURN p",
                     "allowCollapse": true
                 }
             ]
