@@ -50,7 +50,7 @@
         "concurrently": "^5.0.2",
         "cross-env": "^6.0.3",
         "css-loader": "^3.2.0",
-        "electron": "^6.0.11",
+        "electron": "^7.2.4",
         "electron-packager": "^14.1.1",
         "express": "^4.16.2",
         "style-loader": "^1.0.0",
