@@ -108,6 +108,11 @@ class MenuContainer extends Component {
         emitter.emit('openSettings');
     }
 
+
+    _mitigationsClick() {
+        emitter.emit('openMitigations');
+    }
+
     _cancelUploadClick() {
         emitter.emit('showCancelUpload');
     }
@@ -177,6 +182,7 @@ class MenuContainer extends Component {
         );
         s.close();
     }
+
 
     async unzipNecessary(files) {
         var index = 0;
@@ -459,6 +465,13 @@ class MenuContainer extends Component {
                         click={this._settingsClick.bind(this)}
                         hoverVal='Settings'
                         glyphicon='fa fa-cogs'
+                    />
+                </div>
+                <div>
+                    <MenuButton
+                        click={this._mitigationsClick.bind(this)}
+                        hoverVal='Mitigations'
+                        glyphicon='fas fa-tasks'
                     />
                 </div>
                 <div>

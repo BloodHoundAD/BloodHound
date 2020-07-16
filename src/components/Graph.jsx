@@ -25,6 +25,7 @@ class GraphContainer extends Component {
 
         this.state = {
             sigmaInstance: null,
+            currentMitigation: null,
             design: null,
             dragged: false,
             firstDraw: true,
@@ -108,6 +109,8 @@ class GraphContainer extends Component {
         emitter.on('toggleDarkMode', this.toggleDarkMode.bind(this));
         emitter.on('closeTooltip', this.hideTooltip.bind(this));
         emitter.on('confirmGraphDraw', this.sendToChild.bind(this));
+        emitter.on('addEdgeMitigation', this.addEdgeMitigation.bind(this));
+        emitter.on('changeCurrentMitigation', (value) => {this.state.currentMitigation = value});
     }
 
     componentDidMount() {
@@ -339,6 +342,43 @@ class GraphContainer extends Component {
         }).then(() => {
             q.close();
         });
+    }
+
+    addEdgeMitigation(id) {
+        if(!this.state.currentMitigation){
+            this.props.alert.error('No current mitigation set.');
+            closeTooltip();
+            return;
+        }
+        let instance = this.state.sigmaInstance;
+        let edge = instance.graph.edges(id);
+        let sourcenode = instance.graph.nodes(edge.source);
+        let targetnode = instance.graph.nodes(edge.target);
+
+        let sourcekey = sourcenode.type === 'OU' ? 'guid' : 'name';
+        let targetkey = targetnode.type === 'OU' ? 'guid' : 'name';
+
+
+        let statement = 'MATCH (n:{} {{}:\"{}\"}) MATCH (m:{} {{}:\"{}\"}) MATCH (n)-[r:{}]->(m) SET r.{}="true"'.format(
+            sourcenode.type,
+            sourcekey,
+            sourcenode.label,
+            targetnode.type,
+            targetkey,
+            targetnode.label,
+            edge.label,
+            this.state.currentMitigation
+        );
+
+        instance.refresh();
+
+        let q = driver.session();
+        q.run(statement, {}).then(x => {
+            q.close();
+        });
+
+        this.props.alert.success('Deleted edge in mitigation ' + this.state.currentMitigation.charAt(3));
+        closeTooltip();
     }
 
     reload() {
@@ -733,13 +773,25 @@ class GraphContainer extends Component {
         let finaledges = edgearr.join('|');
         let statement = params.statement.format(finaledges);
 
+        if (this.state.currentMitigation) {
+            params.props['mitigation'] = this.state.currentMitigation;
+        }
+
         if (appStore.performance.debug) {
             let temp = statement;
             $.each(Object.keys(params.props), function (_, key) {
-                let propKey = `$${key}`;
+                let propKey;
+
+                if (key === "mitigation") {
+                    propKey = `$mitigation`;
+                } else {
+                    propKey = `$${key}`;
+                }
                 let replace = escapeRegExp(propKey);
                 let regexp = new RegExp(replace, 'g');
                 let props = `"${params.props[key]}"`;
+
+
 
                 temp = temp.replace(regexp, props);
             });

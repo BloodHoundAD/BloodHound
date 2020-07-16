@@ -16,6 +16,7 @@ import RawQuery from './components/RawQuery';
 import MenuContainer from './components/Menu/MenuContainer';
 import ExportContainer from './components/Float/ExportContainer';
 import Settings from './components/Float/Settings';
+import Mitigations from './components/Float/Mitigations'
 import ZoomContainer from './components/Zoom/ZoomContainer';
 import QueryNodeSelect from './components/Float/QueryNodeSelect';
 import SessionClearModal from './components/Modals/SessionClearModal';
@@ -148,6 +149,7 @@ export default class AppContainer extends Component {
                             <WarmupModal />
                             <RawQuery />
                             <MenuContainer />
+                            <Mitigations />
                             <Settings />
                             <ZoomContainer />
                             <QueryNodeSelect />

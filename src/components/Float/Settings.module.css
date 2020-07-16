@@ -41,6 +41,14 @@
     color: white;
 }
 
+.dark button {
+    background-color: black;
+}
+
+.dark button:hover {
+    background-color: #333;
+}
+
 .dark :global select {
     background-color: black;
     color: white;

@@ -56,6 +56,13 @@ const EdgeTooltip = ({ edge, x, y }) => {
                 >
                     <i className='fa fa-trash' /> Delete Edge
                 </li>
+                <li
+                    onClick={() => {
+                        emitter.emit('addEdgeMitigation', id);
+                    }}
+                >
+                    <i className='fas fa-tasks' /> Delete in current mitigation
+                </li>
             </ul>
         </div>
     );

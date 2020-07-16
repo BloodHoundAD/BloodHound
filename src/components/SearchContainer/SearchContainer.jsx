@@ -22,12 +22,14 @@ const SearchContainer = () => {
 
     const [filterVisible, setFilterVisible] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
+    const [currentMitigation, setCurrentMitigation] = useState(null);
 
     const pathfinding = useRef(null);
     const tabs = useRef(null);
 
     const mainSearchRef = useRef(null);
     const pathSearchRef = useRef(null);
+
 
     useEffect(() => {
         jQuery(pathfinding.current).slideToggle(0);
@@ -36,6 +38,8 @@ const SearchContainer = () => {
         setDarkMode(appStore.performance.darkMode);
         emitter.on('nodeClicked', openNodeTab);
         emitter.on('toggleDarkMode', toggleDarkMode);
+
+        emitter.on('changeCurrentMitigation', (value) => {setCurrentMitigation(value)})
 
         emitter.on('setStart', node => {
             let temp = {
@@ -126,7 +130,8 @@ const SearchContainer = () => {
 
         let [query, props, startTarget, endTarget] = buildSelectQuery(
             mainSearchSelected,
-            pathSearchSelected
+            pathSearchSelected,
+            currentMitigation
         );
 
         mainSearchRef.current.getInstance().blur();

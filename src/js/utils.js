@@ -49,11 +49,18 @@ export function buildSearchQuery(searchterm) {
     }
 }
 
-export function buildSelectQuery(startNode, endNode) {
+export function buildSelectQuery(startNode, endNode, currentMitigation) {
     let apart = `MATCH (n:${startNode.type} {objectid: $sourceid})`;
     let bpart = `MATCH (m:${endNode.type} {objectid: $targetid})`;
 
-    let query = `${apart} ${bpart} MATCH p=allShortestPaths((n)-[r:{}*1..]->(m)) RETURN p`;
+    let query;
+
+    if (currentMitigation){
+        query = `${apart} ${bpart} MATCH p=allShortestPaths((n)-[r:{}*1..]->(m)) WHERE all(rel in relationships(p) WHERE NOT exists(rel.${currentMitigation})) RETURN p`;
+    } else {
+        query = `${apart} ${bpart} MATCH p=allShortestPaths((n)-[r:{}*1..]->(m)) RETURN p`;
+    }
+
     return [
         query,
         { sourceid: startNode.objectid, targetid: endNode.objectid },
