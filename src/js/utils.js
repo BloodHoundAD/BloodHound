@@ -157,7 +157,13 @@ function grabConstraints() {
     session.run('CALL db.constraints').then(function (results) {
         $.each(results.records, function (index, container) {
             let constraint = container._fields[0];
-            let query = 'DROP CONSTRAINT ' + constraint;
+            let query;
+            if (neoVersion.startsWith('3.')) {
+                query = 'DROP ' + constraint;
+            } else {
+                query = 'DROP CONSTRAINT ' + constraint;
+            }
+
             constraints.push(query);
         });
 
@@ -186,8 +192,15 @@ function grabIndexes() {
 
     session.run('CALL db.indexes').then(function (results) {
         $.each(results.records, function (index, container) {
-            let constraint = container._fields[1];
-            let query = 'DROP INDEX ' + constraint;
+            let query;
+            if (neoVersion.startsWith('3.')) {
+                let constraint = container._fields[0];
+                query = 'DROP ' + constraint;
+            } else {
+                let constraint = container._fields[1];
+                query = 'DROP INDEX ' + constraint;
+            }
+
             constraints.push(query);
         });
 
