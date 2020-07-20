@@ -452,16 +452,16 @@ class GraphContainer extends Component {
             }, 1500);
             return;
         }
-        if (!this.state.firstDraw) {
-            appStore.queryStack.push({
-                nodes: this.state.sigmaInstance.graph.nodes(),
-                edges: this.state.sigmaInstance.graph.edges(),
-                spotlight: appStore.spotlightData,
-                startNode: appStore.startNode,
-                endNode: appStore.endNode,
-                params: this.state.currentQuery,
-            });
-        }
+
+        appStore.queryStack.push({
+            nodes: this.state.sigmaInstance.graph.nodes(),
+            edges: this.state.sigmaInstance.graph.edges(),
+            spotlight: appStore.spotlightData,
+            startNode: appStore.startNode,
+            endNode: appStore.endNode,
+            params: this.state.currentQuery,
+        });
+
         $.each(graph.nodes, function (i, node) {
             if (node.start) {
                 appStore.startNode = node;
@@ -657,6 +657,20 @@ class GraphContainer extends Component {
                 edges: query.edges,
             });
             this.setState({ currentQuery: query.params });
+
+            if (appStore.performance.debug) {
+                let temp = query.params.statement;
+                $.each(Object.keys(query.params.props), function (_, key) {
+                    let propKey = `$${key}`;
+                    let replace = escapeRegExp(propKey);
+                    let regexp = new RegExp(replace, 'g');
+                    let props = `"${query.params.props[key]}"`;
+
+                    temp = temp.replace(regexp, props);
+                });
+                emitter.emit('setRawQuery', temp);
+            }
+
             this.applyDesign();
             this.lockScale();
             appStore.spotlightData = query.spotlight;
