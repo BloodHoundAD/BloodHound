@@ -24,29 +24,29 @@ import { EventEmitter2 as e } from 'eventemitter2';
 global.emitter = new e({});
 emitter.setMaxListeners(0);
 global.renderEmit = new e({});
-global.neo4j = require('neo4j-driver').v1;
+global.neo4j = require('neo4j-driver');
 global.Mustache = require('mustache');
 
 //open links externally by default
-$(document).on('click', 'a[href^="http"]', function(event) {
+$(document).on('click', 'a[href^="http"]', function (event) {
     event.preventDefault();
     shell.openExternal(this.href);
 });
 
-String.prototype.format = function() {
+String.prototype.format = function () {
     var i = 0,
         args = arguments;
-    return this.replace(/{}/g, function() {
+    return this.replace(/{}/g, function () {
         return typeof args[i] !== 'undefined' ? args[i++] : '';
     });
 };
 
-String.prototype.formatAll = function() {
+String.prototype.formatAll = function () {
     var args = arguments;
     return this.replace(/{}/g, args[0]);
 };
 
-String.prototype.formatn = function() {
+String.prototype.formatn = function () {
     var formatted = this;
     for (var i = 0; i < arguments.length; i++) {
         var regexp = new RegExp('\\{' + i + '\\}', 'gi');
@@ -55,13 +55,13 @@ String.prototype.formatn = function() {
     return formatted;
 };
 
-String.prototype.toTitleCase = function() {
-    return this.replace(/\w\S*/g, function(txt) {
+String.prototype.toTitleCase = function () {
+    return this.replace(/\w\S*/g, function (txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
 };
 
-Array.prototype.allEdgesSameType = function() {
+Array.prototype.allEdgesSameType = function () {
     for (var i = 1; i < this.length; i++) {
         if (this[i].neo4j_type !== this[0].neo4j_type) return false;
     }
@@ -69,7 +69,7 @@ Array.prototype.allEdgesSameType = function() {
     return true;
 };
 
-Array.prototype.chunk = function() {
+Array.prototype.chunk = function () {
     let i = 0;
     let len = this.length;
     let temp = [];
@@ -83,22 +83,22 @@ Array.prototype.chunk = function() {
 };
 
 if (!Array.prototype.last) {
-    Array.prototype.last = function() {
+    Array.prototype.last = function () {
         return this[this.length - 1];
     };
 }
 
 sigma.renderers.def = sigma.renderers.canvas;
 
-sigma.classes.graph.addMethod('outboundNodes', function(id) {
+sigma.classes.graph.addMethod('outboundNodes', function (id) {
     return this.outNeighborsIndex.get(id).keyList();
 });
 
-sigma.classes.graph.addMethod('inboundNodes', function(id) {
+sigma.classes.graph.addMethod('inboundNodes', function (id) {
     return this.inNeighborsIndex.get(id).keyList();
 });
 
-sigma.classes.graph.addMethod('outNeighbors', function(id) {
+sigma.classes.graph.addMethod('outNeighbors', function (id) {
     return this.outNeighborsIndex.get(id).keyList();
 });
 
@@ -394,11 +394,11 @@ if (!existsSync(imagepath)) {
     mkdirSync(imagepath);
 }
 
-global.closeTooltip = function() {
+global.closeTooltip = function () {
     emitter.emit('closeTooltip');
 };
 
-renderEmit.on('login', function() {
+renderEmit.on('login', function () {
     emitter.removeAllListeners();
     ReactDOM.unmountComponentAtNode(document.getElementById('root'));
     let Root = () => (
@@ -413,7 +413,7 @@ renderEmit.on('login', function() {
     ReactDOM.render(<Root />, document.getElementById('root'));
 });
 
-renderEmit.on('logout', function() {
+renderEmit.on('logout', function () {
     emitter.removeAllListeners();
     ReactDOM.unmountComponentAtNode(document.getElementById('root'));
     ReactDOM.render(<Login />, document.getElementById('root'));
