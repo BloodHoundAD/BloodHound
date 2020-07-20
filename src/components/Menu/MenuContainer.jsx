@@ -192,33 +192,22 @@ class MenuContainer extends Component {
                     'Unzipping file {}'.format(name)
                 );
 
-                await createReadStream(path)
-                    .pipe(Parse())
-                    .on('error', function (error) {
-                        this.props.alert.error(
-                            '{} is corrupted or password protected'.format(name)
-                        );
-                    })
-                    .on('entry', function (entry) {
-                        let sanitized = sanitize(entry.path);
-                        let output = join(tempPath, sanitized);
-                        let write = entry.pipe(createWriteStream(output));
+                const zip = createReadStream(path).pipe(
+                    Parse({ forceStream: true })
+                );
 
-                        let promise = new Promise((res) => {
-                            write.on('finish', () => {
-                                res();
-                            });
-                        });
+                for await (const entry of zip) {
+                    let sanitized = sanitize(entry.path);
+                    let output = join(tempPath, sanitized);
+                    entry.pipe(createWriteStream(output));
 
-                        promises.push(promise);
-                        processed.push({
-                            path: output,
-                            name: sanitized,
-                            zip_name: name,
-                            delete: true,
-                        });
-                    })
-                    .promise();
+                    processed.push({
+                        path: output,
+                        name: sanitized,
+                        zip_name: name,
+                        delete: true,
+                    });
+                }
                 alert.close();
             } else {
                 processed.push({ path: path, name: name, delete: false });
