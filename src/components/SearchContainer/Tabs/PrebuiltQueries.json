@@ -196,7 +196,7 @@
             ]
         },
         {
-            "name": "List Computers where Domain Users are Local Admin",
+            "name": "Find Computers where Domain Users are Local Admin",
             "queryList": [
                 {
                     "final": false,
@@ -241,7 +241,7 @@
             ]
         },
         {
-            "name": "Find Workstations where Domain Users can RDP to",
+            "name": "Find Workstations where Domain Users can RDP",
             "queryList": [
                 {
                     "final": false,
@@ -256,7 +256,7 @@
             ]
         },
         {
-            "name": "Find Servers where Domain Users can RDP to",
+            "name": "Find Servers where Domain Users can RDP",
             "queryList": [
                 {
                     "final": false,
@@ -271,7 +271,7 @@
             ]
         },
         {
-            "name": "Find all other Rights Domain Users shouldn’t have",
+            "name": "Find Dangerous Rights for Domain Users Groups",
             "queryList": [
                 {
                     "final": false,
@@ -286,7 +286,7 @@
             ]
         },
         {
-            "name": "Find Kerberoastable members of High Value Groups",
+            "name": "Find Kerberoastable Members of High Value Groups",
             "queryList": [
                 {
                     "final": true,
@@ -326,7 +326,7 @@
             ]
         },
         {
-            "name": "Find unsupported OSs",
+            "name": "Find Computers with Unsupported Operating Systems",
             "queryList": [
                 {
                     "final": true,
