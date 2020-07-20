@@ -73,8 +73,8 @@ export function findGraphPath(sigmaInstance, reverse, nodeid, traversed) {
             ? sigmaInstance.graph.inboundNodes(nodeid)
             : sigmaInstance.graph.outboundNodes(nodeid);
         //Loop over the nodes near us and the edges connecting to those nodes
-        $.each(nodes, function(index, node) {
-            $.each(edges, function(index, edge) {
+        $.each(nodes, function (index, node) {
+            $.each(edges, function (index, edge) {
                 var check = reverse ? edge.source : edge.target;
                 //If an edge is pointing in the right direction, set its color
                 //Push the edge into our store and then
@@ -102,7 +102,7 @@ function deleteSessions() {
         .run(
             'MATCH ()-[r:HasSession]-() WITH r LIMIT 100000 DELETE r RETURN count(r)'
         )
-        .then(function(results) {
+        .then(function (results) {
             session.close();
             emitter.emit('refreshDBData');
             var count = results.records[0]._fields[0];
@@ -123,7 +123,7 @@ function deleteEdges() {
     var session = driver.session();
     session
         .run('MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)')
-        .then(function(results) {
+        .then(function (results) {
             emitter.emit('refreshDBData');
             session.close();
             var count = results.records[0]._fields[0];
@@ -139,7 +139,7 @@ function deleteNodes() {
     var session = driver.session();
     session
         .run('MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)')
-        .then(function(results) {
+        .then(function (results) {
             emitter.emit('refreshDBData');
             session.close();
             var count = results.records[0]._fields[0];
@@ -154,10 +154,10 @@ function deleteNodes() {
 function grabConstraints() {
     var session = driver.session();
     let constraints = [];
-    session.run('CALL db.constraints').then(function(results) {
-        $.each(results.records, function(index, container) {
+    session.run('CALL db.constraints').then(function (results) {
+        $.each(results.records, function (index, container) {
             let constraint = container._fields[0];
-            let query = 'DROP ' + constraint;
+            let query = 'DROP CONSTRAINT ' + constraint;
             constraints.push(query);
         });
 
@@ -171,7 +171,7 @@ function dropConstraints(constraints) {
     if (constraints.length > 0) {
         let constraint = constraints.shift();
         let session = driver.session();
-        session.run(constraint).then(function() {
+        session.run(constraint).then(function () {
             dropConstraints(constraints);
             session.close();
         });
@@ -184,10 +184,10 @@ function grabIndexes() {
     var session = driver.session();
     let constraints = [];
 
-    session.run('CALL db.indexes').then(function(results) {
-        $.each(results.records, function(index, container) {
-            let constraint = container._fields[0];
-            let query = 'DROP ' + constraint;
+    session.run('CALL db.indexes').then(function (results) {
+        $.each(results.records, function (index, container) {
+            let constraint = container._fields[1];
+            let query = 'DROP INDEX ' + constraint;
             constraints.push(query);
         });
 
@@ -201,7 +201,7 @@ function dropIndexes(indexes) {
     if (indexes.length > 0) {
         let constraint = indexes.shift();
         let session = driver.session();
-        session.run(constraint).then(function() {
+        session.run(constraint).then(function () {
             dropConstraints(indexes);
             session.close();
         });
@@ -214,20 +214,20 @@ export async function addConstraints() {
     let session = driver.session();
     await session
         .run('CREATE CONSTRAINT ON (c:Base) ASSERT c.objectid IS UNIQUE')
-        .catch(_ => {});
-    await session.run('CREATE INDEX ON :User(name)').catch(_ => {});
-    await session.run('CREATE INDEX ON :User(objectid)').catch(_ => {});
-    await session.run('CREATE INDEX ON :Group(name)').catch(_ => {});
-    await session.run('CREATE INDEX ON :Group(objectid)').catch(_ => {});
-    await session.run('CREATE INDEX ON :Computer(name)').catch(_ => {});
-    await session.run('CREATE INDEX ON :Computer(objectid)').catch(_ => {});
-    await session.run('CREATE INDEX ON :GPO(name)').catch(_ => {});
-    await session.run('CREATE INDEX ON :GPO(objectid)').catch(_ => {});
-    await session.run('CREATE INDEX ON :Domain(name)').catch(_ => {});
-    await session.run('CREATE INDEX ON :Domain(objectid)').catch(_ => {});
-    await session.run('CREATE INDEX ON :OU(name)').catch(_ => {});
-    await session.run('CREATE INDEX ON :OU(objectid)').catch(_ => {});
-    await session.run('CREATE INDEX ON :Base(name)').catch(_ => {});
+        .catch((_) => {});
+    await session.run('CREATE INDEX ON :User(name)').catch((_) => {});
+    await session.run('CREATE INDEX ON :User(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :Group(name)').catch((_) => {});
+    await session.run('CREATE INDEX ON :Group(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :Computer(name)').catch((_) => {});
+    await session.run('CREATE INDEX ON :Computer(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :GPO(name)').catch((_) => {});
+    await session.run('CREATE INDEX ON :GPO(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :Domain(name)').catch((_) => {});
+    await session.run('CREATE INDEX ON :Domain(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :OU(name)').catch((_) => {});
+    await session.run('CREATE INDEX ON :OU(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :Base(name)').catch((_) => {});
     session.close();
 
     emitter.emit('hideDBClearModal');
