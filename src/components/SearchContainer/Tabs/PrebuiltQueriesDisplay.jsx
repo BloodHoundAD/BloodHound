@@ -21,11 +21,10 @@ export default class PrebuiltQueriesDisplay extends Component {
         $.ajax({
             url: join(app.getPath('userData'), '/customqueries.json'),
             type: 'GET',
-            success: function(response) {
-                var x = JSON.parse(response);
+            success: function (response) {
                 var y = [];
 
-                $.each(x.queries, function(_, el) {
+                $.each(response.queries, function (_, el) {
                     y.push(el);
                 });
 
@@ -36,11 +35,10 @@ export default class PrebuiltQueriesDisplay extends Component {
         $.ajax({
             url: 'src/components/SearchContainer/Tabs/PrebuiltQueries.json',
             type: 'GET',
-            success: function(response) {
-                var x = JSON.parse(response);
+            success: function (response) {
                 var y = [];
 
-                $.each(x.queries, function(_, el) {
+                $.each(response.queries, function (_, el) {
                     y.push(el);
                 });
 
@@ -75,11 +73,11 @@ export default class PrebuiltQueriesDisplay extends Component {
         $.ajax({
             url: join(app.getPath('userData'), '/customqueries.json'),
             type: 'GET',
-            success: function(response) {
+            success: function (response) {
                 var x = JSON.parse(response);
                 var y = [];
 
-                $.each(x.queries, function(index, el) {
+                $.each(x.queries, function (index, el) {
                     y.push(el);
                 });
 
@@ -93,7 +91,7 @@ export default class PrebuiltQueriesDisplay extends Component {
             <div>
                 <h3>Pre-Built Analytics Queries</h3>
                 <div className='query-box'>
-                    {this.state.queries.map(function(a) {
+                    {this.state.queries.map(function (a) {
                         return <PrebuiltQueryNode key={a.name} info={a} />;
                     })}
                 </div>
@@ -121,7 +119,7 @@ export default class PrebuiltQueriesDisplay extends Component {
                         <Else>
                             {() => (
                                 <div>
-                                    {this.state.custom.map(function(a) {
+                                    {this.state.custom.map(function (a) {
                                         return (
                                             <PrebuiltQueryNode
                                                 key={a.name}
