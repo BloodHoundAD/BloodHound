@@ -31,20 +31,15 @@ function getRealLabel(label) {
 export function buildSearchQuery(searchterm) {
     if (searchterm.includes(':')) {
         let [type, term] = searchterm.split(':');
-        term = escapeRegExp(term);
-        let t = '(?i).*' + term + '.*';
         type = getRealLabel(type);
 
-        let statement = `MATCH (n:${type}) WHERE n.name =~ $name OR n.objectid =~ $name RETURN n LIMIT 10`;
+        let statement = `MATCH (n:${type}) WHERE n.name CONTAINS $name OR n.objectid CONTAINS $name RETURN n LIMIT 10`;
 
-        return [statement, t];
+        return [statement, term.toUpperCase()];
     } else {
-        let q = escapeRegExp(searchterm);
-        let t = '(?i).*' + q + '.*';
-
         return [
-            'MATCH (n) WHERE n.name =~ $name OR n.objectid =~ $name RETURN n LIMIT 10',
-            t,
+            'MATCH (n) WHERE n.name CONTAINS $name OR n.objectid CONTAINS $name RETURN n LIMIT 10',
+            searchterm.toUpperCase(),
         ];
     }
 }
