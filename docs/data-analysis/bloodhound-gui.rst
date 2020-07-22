@@ -18,8 +18,11 @@ see an authentication prompt:
    :width: 900px
    :alt: BloodHound logon screen
 
-.. note:: Want to follow along? Connect to the example database
-  hosted at bolt://206.189.85.93:7687
+.. note:: Want to follow along? Connect to the example hosted database:
+* DBurl: `bolt://206.189.85.93:7687` 
+* DBusername: `neo4j` 
+* DBpassword: `BloodHound`
+  
 
 The "Database URL" is the IP address and port where your neo4j
 database is running, and should be formatted as bolt://ip:7687/
