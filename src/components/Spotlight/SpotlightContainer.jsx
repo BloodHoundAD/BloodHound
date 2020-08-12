@@ -76,13 +76,19 @@ const SpotlightContainer = () => {
                     type='search'
                     className='form-control searchbox'
                     autoComplete='off'
-                    placeholder='Explore Nodes'
+                    placeholder='Search for a node'
                     data-type='search'
                 />
+                <GlyphiconSpan
+                    tooltip={false}
+                    classes='input-group-addon spanfix'
+                >
+                    <Icon glyph='times' />
+                </GlyphiconSpan>
             </div>
 
             <div className={styles.nodelist}>
-                <Table>
+                <Table class="table table-hover table-striped table-borderless table-responsive">
                     <thead>
                         <tr>
                             <td>Node Label</td>
