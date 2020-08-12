@@ -105,13 +105,13 @@ div.tooltip-inner-custom {
 }
 
 .graph-dark {
-    background-color: rgb(79, 71, 61);
-    background-color: rgb(56, 51, 50);
+    background-color: #2e363e;
+    background-color: #2e363e;
 }
 
 .menu-button-dark {
     color: white;
-    background-color: black;
+    background-color: rgb(22, 29, 40);
 }
 
 .menu-button-dark:hover {
@@ -752,12 +752,17 @@ div.tooltip-inner-custom {
     .spotlight {
         position: absolute;
         z-index: 30;
-        top: 10%;
+        top: 15px;
         left: 50%;
         width: 60%;
         max-height: calc(100vh - 20%);
         transform: translate(-50%, 0);
-        overflow-y: auto;
+        overflow-y: hidden;
+        opacity: 0.5;
+        background: #151D29;
+        box-shadow: 0 4px 9px 0 rgba(0,0,0,0.68);
+        border-bottom-left-radius: 11px;
+        border-bottom-right-radius: 11px;
     }
 }
 
@@ -765,12 +770,17 @@ div.tooltip-inner-custom {
     .spotlight {
         position: absolute;
         z-index: 30;
-        top: 10%;
+        top: 15px;
         left: 50%;
         width: 45%;
         max-height: calc(100vh - 20%);
         transform: translate(-50%, 0);
-        overflow-y: auto;
+        overflow-y: hidden;
+        opacity: 0.5;
+        background: #151D29;
+        box-shadow: 0 4px 9px 0 rgba(0,0,0,0.68);
+        border-bottom-left-radius: 11px;
+        border-bottom-right-radius: 11px;
     }
 }
 
