@@ -309,6 +309,16 @@ div.tooltip-inner-custom {
     }
 }
 
+.searchdiv-dark .input-group-addon:first-child {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.searchdiv-dark .input-group-addon:last-child {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
 .searchdiv-light {
     background-color: white;
     color: black;
@@ -323,7 +333,7 @@ div.tooltip-inner-custom {
 }
 
 .searchdiv-dark .edgeFilter {
-    background-color: black;
+    background-color: #151D29;
     color: white;
 }
 
@@ -332,25 +342,32 @@ div.tooltip-inner-custom {
 }
 
 .searchdiv-dark {
-    background-color: black;
     color: white;
+    background-color: #151D29;
+    box-shadow: 0 4px 9px 0 rgba(0,0,0,0.68);
+    border-bottom-left-radius: 11px;
+    border-bottom-right-radius: 11px;
 }
 
 .searchdiv-dark #tab-style > ul > li > a {
-    color: white;
+    color: #727784;
+    font-family: "Helvetica";
+    font-weight: bold;
 }
 
 .searchdiv-dark #tab-style > ul > li > a:hover {
-    color: black;
-}
-
-.searchdiv-dark .searchbox {
-    background-color: black;
     color: white;
 }
 
+.searchdiv-dark .searchbox {
+    background-color: #444B55;
+    font-family: Helvetica;
+    font-size: 14px;
+    color: #FFFFFF;
+}
+
 .searchdiv-dark .spanfix {
-    background-color: black;
+    background-color: #444B55;
     color: white;
 }
 
@@ -868,14 +885,9 @@ div.tooltip-inner-custom {
     text-align: center;
 }
 
-#tab-style {
-    border-top: 0.5px solid lightgray;
-}
-
 #tab-style > ul {
     display: table;
     width: 100%;
-    border-bottom: 1px solid lightgray;
 }
 
 #tab-style > ul > li {
@@ -884,30 +896,30 @@ div.tooltip-inner-custom {
     white-space: nowrap;
     border-radius: 0;
     display: table-cell;
-    width: 33%;
+    width: 35%;
     text-align: center;
-    color: #337ab7;
+    background-color: #1D2735;
 }
 
 #tab-style > ul > li > a:focus {
-    background-color: #fff;
+    background-color: #151D29;
     color: black;
     outline: none;
 }
 
 #tab-style > ul > li > a:hover {
-    background-color: #fff;
+    background-color: #293545;
 }
 
 #tab-style > ul > li.active > a {
-    background-color: #fff;
-    color: black;
+    background-color: #151D29;
+    color: white;
 }
 
 #tab-style > ul > li > a[aria-selected='true'] {
-    border-right: 1px solid lightgray;
-    border-left: 1px solid lightgray;
-    color: black;
+    color: white;
+    font-family: "Helvetica";
+    font-weight: bold;
 }
 
 #tab-style > div {
