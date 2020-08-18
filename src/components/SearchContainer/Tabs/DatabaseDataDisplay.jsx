@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import styles from './DatabaseDataDisplay.module.css';
+import { Table } from 'react-bootstrap';
 
 export default class DatabaseDataDisplay extends Component {
     constructor() {
@@ -113,70 +115,120 @@ export default class DatabaseDataDisplay extends Component {
 
     render() {
         return (
-            <div>
-                <h3>Database Info</h3>
-                <dl className='dl-horizontal dl-horizontal-fix'>
-                    <dt>DB Address</dt>
-                    <dd>{this.state.url}</dd>
-                    <dt>DB User</dt>
-                    <dd>{this.state.user}</dd>
-                    <dt>Users</dt>
-                    <dd>{this.state.num_users}</dd>
-                    <dt>Computers</dt>
-                    <dd>{this.state.num_computers}</dd>
-                    <dt>Groups</dt>
-                    <dd>{this.state.num_groups}</dd>
-                    <dt>Sessions</dt>
-                    <dd>{this.state.num_sessions}</dd>
-                    <dt>ACLs</dt>
-                    <dd>{this.state.num_acls}</dd>
-                    <dt>Relationships</dt>
-                    <dd>{this.state.num_relationships}</dd>
-                </dl>
 
-                <div className='text-center'>
-                    <div className='btn-group-vertical btn-group-sm dbbuttons'>
+            <div className={styles.nodelist}>
+                <Table class="table table-hover table-striped table-borderless table-responsive">
+                    <thead>
+                    </thead>
+                    <tbody className='searchable'>
+                        <tr>
+                            <td>
+                                Address
+                            </td>
+                            <td align="right">
+                                {this.state.url}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                DB User
+                            </td>
+                            <td align="right">
+                                {this.state.user}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Users
+                            </td>
+                            <td align="right">
+                                {this.state.num_users}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Computers
+                            </td>
+                            <td align="right">
+                                {this.state.num_computers}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Groups
+                            </td>
+                            <td align="right">
+                                {this.state.num_groups}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Sessions
+                            </td>
+                            <td align="right">
+                                {this.state.num_sessions}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                ACEs
+                            </td>
+                            <td align="right">
+                                {this.state.num_acls}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Total Relationships
+                            </td>
+                            <td align="right">
+                                {this.state.num_relationships}
+                            </td>
+                        </tr>
+                    </tbody>
+                </Table>
+
+                <div className='text-center' class={styles.buttongroup}>
+                    <div className='btn-group' role='group' class={styles.buttongroup}>
                         <button
                             type='button'
-                            className='btn btn-success'
+                            class={styles.btnleft}
                             onClick={function() {
                                 this.refreshDBData();
                             }.bind(this)}
                         >
-                            Refresh DB Stats
+                            Refresh Database Stats
                         </button>
                         <button
                             type='button'
-                            className='btn btn-success'
+                            class={styles.btnright}
                             onClick={this.toggleWarmupModal}
                         >
                             Warm Up Database
                         </button>
                     </div>
-                    <div className='btn-group-vertical btn-group-sm dbbuttons'>
+                    <p></p>
+                    <div className='btn-group' role='group' class={styles.buttongroup}>
                         <button
                             type='button'
-                            className='btn btn-info'
+                            class={styles.btnleft}
                             onClick={this.toggleSessionClearModal}
                         >
                             Clear Sessions
                         </button>
                         <button
                             type='button'
-                            className='btn btn-danger'
+                            class={styles.btnright}
                             onClick={this.toggleDBWarnModal}
                         >
                             Clear Database
                         </button>
                     </div>
-                    <div className='btn-group-vertical btn-group-sm dbbuttonslast'>
-                        <button
-                            type='button'
-                            className='btn btn-warning'
-                            onClick={this.toggleLogoutModal}
-                        >
-                            Log Out/Switch DB
-                        </button>
+                    <p></p>
+                    <div className='text-center'>
+                        <a href="blah">
+                            Log Out / Switch Database
+                        </a>
                     </div>
                 </div>
             </div>
