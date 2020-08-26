@@ -19,9 +19,9 @@ const CollapsibleSection = ({ header, children }) => {
                                 <i
                                     className={clsx(
                                         open &&
-                                            'glyphicon glyphicon-chevron-down',
+                                            'fa fa-minus',
                                         !open &&
-                                            'glyphicon glyphicon-chevron-up'
+                                            'fa fa-plus'
                                     )}
                                 />
                             </span>
@@ -43,6 +43,7 @@ const CollapsibleSection = ({ header, children }) => {
                     },
                 }}
                 animate={open ? 'open' : 'closed'}
+                transition={{ duration: 0.0}}
             >
                 {children}
             </motion.div>
