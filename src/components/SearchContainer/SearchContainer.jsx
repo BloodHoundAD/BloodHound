@@ -30,8 +30,8 @@ const SearchContainer = () => {
     const pathSearchRef = useRef(null);
 
     useEffect(() => {
-        jQuery(pathfinding.current).slideToggle(0);
-        jQuery(tabs.current).slideToggle(0);
+        jQuery(pathfinding.current).slideToggle("fast");
+        jQuery(tabs.current).slideToggle("fast");
 
         setDarkMode(appStore.performance.darkMode);
         emitter.on('nodeClicked', openNodeTab);
@@ -60,7 +60,7 @@ const SearchContainer = () => {
             var elem = jQuery(pathfinding.current);
             if (!elem.is(':visible')) {
                 setPathfindingOpen(true);
-                elem.slideToggle();
+                elem.slideToggle("fast");
             }
             setPathSearchSelected(temp);
             let instance = pathSearchRef.current.getInstance();
@@ -106,13 +106,13 @@ const SearchContainer = () => {
     };
 
     const onPathfindClick = () => {
-        jQuery(pathfinding.current).slideToggle();
+        jQuery(pathfinding.current).slideToggle("fast");
         let open = !pathfindingOpen;
         setPathfindingOpen(open);
     };
 
     const onExpandClick = () => {
-        jQuery(tabs.current).slideToggle();
+        jQuery(tabs.current).slideToggle("fast");
     };
 
     const onPlayClick = () => {
@@ -210,7 +210,7 @@ const SearchContainer = () => {
     const openNodeTab = () => {
         let e = jQuery(tabs.current);
         if (!e.is(':visible')) {
-            e.slideToggle();
+            e.slideToggle("fast");
         }
     };
 
@@ -303,7 +303,7 @@ const SearchContainer = () => {
                     placeholder={
                         pathfindingOpen
                             ? 'Start Node'
-                            : 'Start typing to search for a node...'
+                            : 'Search for a node'
                     }
                     isLoading={mainSearchLoading}
                     delay={500}
