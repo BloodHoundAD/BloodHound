@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import CollapsibleSection from './CollapsibleSection';
+import styles from './MappedNodeProps.module.css'
+import { Table } from 'react-bootstrap';
 
 const MappedNodeProps = ({ label, properties, displayMap }) => {
     const [elements, setElements] = useState([]);
@@ -34,29 +36,24 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
         let type = typeof property;
         let temp = [];
         let displayProp = displayMap[propName];
-
         if (type === 'undefined') {
             return temp;
         }
-
         if (type === 'number') {
             temp.push(<dt key={`${propName}a`}>{displayProp}</dt>);
             temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
             return temp;
         }
-
         if (type === 'boolean') {
             temp.push(<dt key={`${propName}a`}>{displayProp}</dt>);
             temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
             return temp;
         }
-
         if (type === 'string') {
             temp.push(<dt key={`${propName}a`}>{displayProp}</dt>);
             temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
             return temp;
         }
-
         if (Array.isArray(property) && property.length > 0) {
             temp.push(<dt key={`${propName}k`}>{displayProp}</dt>);
             property.forEach((val, index) => {
@@ -66,8 +63,53 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
             });
             return temp;
         }
-
         return temp;
+        // let property = properties[propName];
+        // let type = typeof property;
+        // let temp = [];
+        // let displayProp = displayMap[propName];
+
+        // if (type === 'undefined') {
+        //     return temp;
+        // }
+
+        // if (type === 'number') {
+        //     temp.push('<tr><td>');
+        //     temp.push(<dt key={`${propName}a`}>{displayProp}</dt>);
+        //     temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
+        //     temp.push('</td></tr>');
+        //     return temp;
+        // }
+
+        // if (type === 'boolean') {
+        //     temp.push('<tr><td>');
+        //     temp.push(<dt key={`${propName}a`}>{displayProp}</dt>);
+        //     temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
+        //     temp.push('</td></tr>');
+        //     return temp;
+        // }
+
+        // if (type === 'string') {
+        //     let t;
+        //     t += (<dt key={`${propName}a`}>{displayProp}</dt>);
+        //     t += (<dd key={`${propName}b`}>{createValue(property)}</dd>);
+        //     temp.push(<tr><td>{t}</td></tr>);
+        //     return temp;
+        // }
+
+        // if (Array.isArray(property) && property.length > 0) {
+        //     temp.push('<tr><td>');
+        //     temp.push(<dt key={`${propName}k`}>{displayProp}</dt>);
+        //     property.forEach((val, index) => {
+        //         temp.push(
+        //             <dd key={`${propName}${index}`}>{createValue(val)}</dd>
+        //         );
+        //     });
+        //     temp.push('</td></tr>');
+        //     return temp;
+        // }
+
+        // return temp;
     };
 
     useEffect(() => {
@@ -82,8 +124,35 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
 
     return elements.length == 0 ? null : (
         <CollapsibleSection header={'Node Properties'}>
-            {elements}
+            <div className={styles.itemlist}>
+                <Table striped borderless hover responsive>
+                    <tbody>
+                    {elements.map((o, i) => {
+                        return (
+                            <tr><td>{o}</td></tr>
+                        )
+                    })}
+                    </tbody>
+                </Table>
+            </div>
         </CollapsibleSection>
+        // <CollapsibleSection header={'NODE PROPERTIES'}>
+        //     <div className={styles.itemlist}>
+        //         <Table className="table table-hover table-striped table-borderless table-responsive">
+        //             <thead></thead>
+        //             <tbody className='searchable'>
+        //                 {
+        //                     Object.keys(elements).map(
+        //                         function (key) {
+        //                             var d = elements[key];
+        //                             return (<tr><td><dt>{key}</dt><dd>{d}</dd></td></tr>);
+        //                         }
+        //                     )
+        //                 }
+        //             </tbody>
+        //         </Table>
+        //     </div>
+        // </CollapsibleSection>
     );
 };
 
