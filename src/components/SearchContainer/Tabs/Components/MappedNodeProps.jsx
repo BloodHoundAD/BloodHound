@@ -5,7 +5,7 @@ import styles from './MappedNodeProps.module.css'
 import { Table } from 'react-bootstrap';
 
 const MappedNodeProps = ({ label, properties, displayMap }) => {
-    const [elements, setElements] = useState([]);
+    const [elements, setElements] = useState({});
 
     const createValue = value => {
         let type = typeof value;
@@ -64,95 +64,33 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
             return temp;
         }
         return temp;
-        // let property = properties[propName];
-        // let type = typeof property;
-        // let temp = [];
-        // let displayProp = displayMap[propName];
-
-        // if (type === 'undefined') {
-        //     return temp;
-        // }
-
-        // if (type === 'number') {
-        //     temp.push('<tr><td>');
-        //     temp.push(<dt key={`${propName}a`}>{displayProp}</dt>);
-        //     temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
-        //     temp.push('</td></tr>');
-        //     return temp;
-        // }
-
-        // if (type === 'boolean') {
-        //     temp.push('<tr><td>');
-        //     temp.push(<dt key={`${propName}a`}>{displayProp}</dt>);
-        //     temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
-        //     temp.push('</td></tr>');
-        //     return temp;
-        // }
-
-        // if (type === 'string') {
-        //     let t;
-        //     t += (<dt key={`${propName}a`}>{displayProp}</dt>);
-        //     t += (<dd key={`${propName}b`}>{createValue(property)}</dd>);
-        //     temp.push(<tr><td>{t}</td></tr>);
-        //     return temp;
-        // }
-
-        // if (Array.isArray(property) && property.length > 0) {
-        //     temp.push('<tr><td>');
-        //     temp.push(<dt key={`${propName}k`}>{displayProp}</dt>);
-        //     property.forEach((val, index) => {
-        //         temp.push(
-        //             <dd key={`${propName}${index}`}>{createValue(val)}</dd>
-        //         );
-        //     });
-        //     temp.push('</td></tr>');
-        //     return temp;
-        // }
-
-        // return temp;
     };
 
     useEffect(() => {
-        let temp = [];
+        let temp = {};
         Object.keys(displayMap).forEach((val, index) => {
-            temp = temp.concat(convertProperty(val));
+            let c = convertProperty(val);
+            if (c.length !== 0) temp[val] = c;
         });
-        temp = temp.filter(s => s !== undefined);
-
         setElements(temp);
     }, [label]);
 
     return elements.length == 0 ? null : (
         <CollapsibleSection header={'Node Properties'}>
             <div className={styles.itemlist}>
-                <Table striped borderless hover responsive>
+                <Table bordered={false} hover responsive>
                     <tbody>
-                    {elements.map((o, i) => {
-                        return (
-                            <tr><td>{o}</td></tr>
-                        )
-                    })}
+                        {Object.keys(elements).map((key) => {
+                            return (
+                                <tr key={key}>
+                                    <td>{elements[key]}</td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </Table>
             </div>
         </CollapsibleSection>
-        // <CollapsibleSection header={'NODE PROPERTIES'}>
-        //     <div className={styles.itemlist}>
-        //         <Table className="table table-hover table-striped table-borderless table-responsive">
-        //             <thead></thead>
-        //             <tbody className='searchable'>
-        //                 {
-        //                     Object.keys(elements).map(
-        //                         function (key) {
-        //                             var d = elements[key];
-        //                             return (<tr><td><dt>{key}</dt><dd>{d}</dd></td></tr>);
-        //                         }
-        //                     )
-        //                 }
-        //             </tbody>
-        //         </Table>
-        //     </div>
-        // </CollapsibleSection>
     );
 };
 
