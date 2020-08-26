@@ -11,6 +11,8 @@ import NodePlayCypherLink from './Components/NodePlayCypherLink';
 import Notes from './Components/Notes';
 import { withAlert } from 'react-alert';
 import NodeGallery from './Components/NodeGallery';
+import { Table } from 'react-bootstrap';
+import styles from './NodeData.module.css';
 
 const AZGroupNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -60,140 +62,246 @@ const AZGroupNodeData = () => {
     ) : (
         <div className={clsx(!visible && 'displaynone')}>
             <dl className={'dl-horizontal'}>
-                <h4>{label || objectid}</h4>
+                <h5>{label || objectid}</h5>
                 
-                <NodeCypherLink
-                    property='Reachable High Value Targets'
-                    target={objectid}
-                    baseQuery={
-                        'MATCH (m:Group {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
-                    }
-                    start={label}
-                />
+                <CollapsibleSection header='OVERVIEW'>
+                <div className={styles.itemlist}>
+                    <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <thead></thead>
+                        <tbody className='searchable'>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Sessions'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH (m:Group {objectid: $objectid}),(n:Computer),p = ((n)-[r:HasSession*1..]->(u)-[:MemberOf*1..]->(m))'
+                                        }
+                                        start={label}
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Reachable High Value Targets'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH (m:Group {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                        }
+                                        start={label}
+                                    />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </Table>
+                </div>
+                </CollapsibleSection>
+                
+                <hr></hr>
+
                 <MappedNodeProps
                     displayMap={displayMap}
                     properties={nodeProps}
                     label={label}
                 />
+
+                <hr></hr>
+
                 <ExtraNodeProps
                     displayMap={displayMap}
                     properties={nodeProps}
                     label={label}
                 />
-                <CollapsibleSection header='Group Members'>
-                    <NodeCypherLink
-                        property='Direct Members'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p=(n)-[b:MemberOf]->(c:AZGroup {objectid: $objectid}) WHERE n:AZUser OR n:AZGroup'
-                        }
-                        end={label}
-                    />
 
-                    <NodeCypherLink
-                        property='Unrolled Members'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p =(n)-[r:MemberOf*1..]->(g:AZGroup {objectid: $objectid}) WHERE n:AZUser OR n:AZGroup'
-                        }
-                        end={label}
-                        distinct
-                    />
+                <hr></hr>
 
-                    <NodeCypherLink
-                        property='On-Prem Members'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n:User)-[r:MemberOf*1..]->(g:AZGroup {objectid: $objectid}) WHERE n:User OR n:Group OR n:Computer'
-                        }
-                        end={label}
-                        distinct
-                    />
+                <CollapsibleSection header='GROUP MEMBERS'>
+                <div className={styles.itemlist}>
+                    <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <thead></thead>
+                        <tbody className='searchable'>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Direct Members'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p=(n)-[b:MemberOf]->(c:AZGroup {objectid: $objectid}) WHERE n:AZUser OR n:AZGroup'
+                                        }
+                                    end={label}
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Unrolled Members'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p =(n)-[r:MemberOf*1..]->(g:AZGroup {objectid: $objectid}) WHERE n:AZUser OR n:AZGroup'
+                                        }
+                                        end={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='On-Prem Members'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (n:User)-[r:MemberOf*1..]->(g:AZGroup {objectid: $objectid}) WHERE n:User OR n:Group OR n:Computer'
+                                        }
+                                        end={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </Table>
+                </div>    
                 </CollapsibleSection>
 
-                <CollapsibleSection header='Group Membership'>
-                    <NodeCypherLink
-                        property='First Degree Group Membership'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p=(g1:AZGroup {objectid: $objectid})-[r:MemberOf]->(n)'
-                        }
-                        start={label}
-                        distinct
-                    />
+                <hr></hr>
 
-                    <NodeCypherLink
-                        property='Unrolled Member Of'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (g1:AZGroup {objectid: $objectid})-[r:MemberOf*1..]->(n)'
-                        }
-                        start={label}
-                        distinct
-                    />
+                <CollapsibleSection header='GROUP MEMBERSHIP'>
+                <div className={styles.itemlist}>
+                    <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <thead></thead>
+                        <tbody className='searchable'>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='First Degree Group Membership'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p=(g1:AZGroup {objectid: $objectid})-[r:MemberOf]->(n)'
+                                        }
+                                        start={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Unrolled Member Of'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (g1:AZGroup {objectid: $objectid})-[r:MemberOf*1..]->(n)'
+                                        }
+                                        start={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </Table>
+                </div>
                 </CollapsibleSection>
 
-                <CollapsibleSection header='Outbound Object Control'>
-                    <NodeCypherLink
-                        property='First Degree Object Control'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (g:AZGroup {objectid: $objectid})-[r:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor]->(n)'
-                        }
-                        start={label}
-                        distinct
-                    />
+                <hr></hr>
 
-                    <NodeCypherLink
-                        property='Group Delegated Object Control'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (g1:AZGroup {objectid: $objectid})-[r1:MemberOf*1..]->(g2:Group)-[r2:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor]->(n)'
-                        }
-                        start={label}
-                        distinct
-                    />
-
-                    <NodePlayCypherLink
-                        property='Transitive Object Control'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((g:AZGroup {objectid: $objectid})-[r:AZMemberOf|AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor*1..]->(n))'
-                        }
-                        start={label}
-                        distinct
-                    />
+                <CollapsibleSection header='OUTBOUND OBJECT CONTROL'>
+                <div className={styles.itemlist}>
+                    <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <thead></thead>
+                        <tbody className='searchable'>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='First Degree Object Control'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (g:AZGroup {objectid: $objectid})-[r:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor]->(n)'
+                                        }
+                                        start={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Group Delegated Object Control'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (g1:AZGroup {objectid: $objectid})-[r1:MemberOf*1..]->(g2:Group)-[r2:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor]->(n)'
+                                        }
+                                        start={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodePlayCypherLink
+                                        property='Transitive Object Control'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((g:AZGroup {objectid: $objectid})-[r:AZMemberOf|AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor*1..]->(n))'
+                                        }
+                                        start={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </Table>
+                </div>
                 </CollapsibleSection>
-                <CollapsibleSection header='Inbound Object Control'>
-                    <NodeCypherLink
-                        property='Explicit Object Controllers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n)-[r:AZOwns|AZAddMembers]->(g:AZGroup {objectid: $objectid})'
-                        }
-                        end={label}
-                        distinct
-                    />
 
-                    <NodeCypherLink
-                        property='Unrolled Object Controllers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AZOwns|AZAddMembers]->(g2:AZGroup {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
-                        }
-                        end={label}
-                        distinct
-                    />
+                <hr></hr>
 
-                    <NodePlayCypherLink
-                        property='Transitive Object Controllers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r:AZMemberOf|AZOwns|AZAddMembers*1..]->(g:AZGroup {objectid: $objectid}))'
-                        }
-                        end={label}
-                        distinct
-                    />
+                <CollapsibleSection header='INBOUND OBJECT CONTROL'>
+                <div className={styles.itemlist}>
+                    <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <thead></thead>
+                        <tbody className='searchable'>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Explicit Object Controllers'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (n)-[r:AZOwns|AZAddMembers]->(g:AZGroup {objectid: $objectid})'
+                                        }
+                                        end={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Unrolled Object Controllers'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AZOwns|AZAddMembers]->(g2:AZGroup {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                        }
+                                        end={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodePlayCypherLink
+                                        property='Transitive Object Controllers'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r:AZMemberOf|AZOwns|AZAddMembers*1..]->(g:AZGroup {objectid: $objectid}))'
+                                        }
+                                        end={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </Table>
+                </div>
                 </CollapsibleSection>
                 <Notes objectid={objectid} type='AZGroup' />
                 <NodeGallery
