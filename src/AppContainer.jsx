@@ -13,7 +13,6 @@ import ClearConfirmModal from './components/Modals/ClearConfirmModal';
 import ClearingModal from './components/Modals/ClearingModal';
 import LoadingContainer from './components/Float/LoadingContainer';
 import RawQuery from './components/RawQuery';
-import MenuContainer from './components/Menu/MenuContainer';
 import ExportContainer from './components/Float/ExportContainer';
 import Settings from './components/Float/Settings';
 import ZoomContainer from './components/Zoom/ZoomContainer';
@@ -26,6 +25,7 @@ import WarmupModal from './components/Modals/WarmupModal.jsx';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { AppContext } from './AppContext';
 import GraphErrorModal from './components/Modals/GraphErrorModal';
+import MenuContainer from './components/Menu/MenuContainer';
 
 export default class AppContainer extends Component {
     constructor(props) {
@@ -66,7 +66,7 @@ export default class AppContainer extends Component {
             emitter.emit('changeGraphicsMode', !lowDetail);
         };
 
-        this.setNodeLabels = val => {
+        this.setNodeLabels = (val) => {
             this.setState({
                 nodeLabels: val,
             });
@@ -74,7 +74,7 @@ export default class AppContainer extends Component {
             emitter.emit('changeNodeLabels');
         };
 
-        this.setEdgeLabels = val => {
+        this.setEdgeLabels = (val) => {
             this.setState({ edgeLabels: val });
             appStore.performance.edgeLabels = val;
             emitter.emit('changeEdgeLabels');
@@ -97,7 +97,7 @@ export default class AppContainer extends Component {
     componentDidMount() {
         document.addEventListener(
             'dragover',
-            function(event) {
+            function (event) {
                 event.preventDefault();
                 return false;
             },
@@ -106,7 +106,7 @@ export default class AppContainer extends Component {
 
         document.addEventListener(
             'drop',
-            function(event) {
+            function (event) {
                 event.preventDefault();
                 if (
                     jQuery('#tabcontainer').has(jQuery(event.target)).length ===

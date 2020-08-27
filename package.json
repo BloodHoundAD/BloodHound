@@ -54,7 +54,7 @@
         "electron-packager": "^15.0.0",
         "express": "^4.16.2",
         "style-loader": "^1.2.1",
-        "webpack": "^4.43.0",
+        "webpack": "^4.44.1",
         "webpack-cli": "^3.3.12",
         "webpack-dev-middleware": "^3.7.2",
         "webpack-hot-middleware": "^2.25.0"
@@ -64,7 +64,7 @@
         "async": "^2.6.3",
         "bootstrap": "^3.3.7",
         "clsx": "^1.1.1",
-        "dagre": "^0.7.4",
+        "dagre": "^0.8.5",
         "electron-store": "^1.3.0",
         "eventemitter2": "^6.4.3",
         "fontfaceobserver": "^2.0.13",
@@ -92,7 +92,8 @@
         "react-photo-gallery": "^8.0.0",
         "react-transition-group": "^4.4.1",
         "sanitize-filename": "^1.6.3",
-        "stream-json": "^1.7.0",
+        "stream-chain": "^2.2.3",
+        "stream-json": "^1.7.1",
         "unzipper": "^0.10.11",
         "uuid": "^3.4.0"
     }
