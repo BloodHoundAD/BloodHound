@@ -86,7 +86,6 @@ const MenuContainerNew = () => {
     const alert = useAlert();
     const input = useRef(null);
     const [uploading, setUploading] = useState(false);
-    const [timeoutHandle, setTimeoutHandle] = useState(null);
     const fileId = useRef(0);
 
     useEffect(() => {

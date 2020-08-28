@@ -29,16 +29,16 @@ const SpotlightContainer = () => {
         setRegex(new RegExp('', 'i'));
     };
 
-    const handleSearch = event => {
+    const handleSearch = (event) => {
         setSearchVal(event.target.value);
         setRegex(new RegExp(event.target.value, 'i'));
     };
 
-    const handleSpace = event => {
+    const handleSpace = (event) => {
         var key = event.keyCode ? event.keyCode : event.which;
 
         if (document.activeElement === document.body && key === 32) {
-            setVisible(v => !v);
+            setVisible((v) => !v);
         }
     };
 
@@ -60,6 +60,7 @@ const SpotlightContainer = () => {
         <PoseContainer
             visible={visible}
             className={clsx('spotlight', context.darkMode ? styles.dark : null)}
+            draggable={false}
         >
             <div
                 className={'input-group input-group-unstyled no-border-radius'}
@@ -88,7 +89,7 @@ const SpotlightContainer = () => {
             </div>
 
             <div className={styles.nodelist}>
-                <Table class="table table-hover table-striped table-borderless table-responsive">
+                <Table class='table table-hover table-striped table-borderless table-responsive'>
                     <thead>
                         <tr>
                             <td>Node Label</td>
@@ -99,7 +100,7 @@ const SpotlightContainer = () => {
                         {Object.keys(data)
                             .sort()
                             .map(
-                                function(key) {
+                                function (key) {
                                     var d = data[key];
                                     var nid = parseInt(key);
                                     var x = regex.test(d[0]) ? (
