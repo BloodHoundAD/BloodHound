@@ -4,7 +4,7 @@ BloodHound: Six Degrees of Domain Admin
 .. meta::
    description lang=en: Identify and execute attack paths in Active Directory
 
-.. image:: /images/bloodhound-logo.png   
+.. image:: /docs/images/bloodhound-logo.png   
    :align: center
    :width: 300px
    :alt: BloodHound logo
