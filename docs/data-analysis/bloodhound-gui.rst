@@ -13,7 +13,7 @@ Authentication
 When you open the BloodHound GUI for the first time, you will
 see an authentication prompt:
 
-.. image:: /images/bloodhound-logon.png   
+.. image:: /docs/images/bloodhound-logon.png   
    :align: center
    :width: 900px
    :alt: BloodHound logon screen
@@ -56,7 +56,7 @@ Upon successful logon, BloodHound will draw any group(s) with the
 "Domain Admins" in their name, and show you the effective users that
 belong to the group(s):
 
-.. image:: /images/bloodhound-initial-query.png   
+.. image:: /docs/images/bloodhound-initial-query.png   
    :align: center
    :width: 900px
    :alt: BloodHound displaying the members of the Domain Admins group
@@ -74,7 +74,7 @@ a node involved in a path, and click on nodes to see more information
 about those nodes. You can also right click nodes and perform several
 actions against those nodes:
 
-.. image:: /images/right-click-group-node.png   
+.. image:: /docs/images/right-click-group-node.png   
    :align: center
    :width: 900px
    :alt: Right click menu on a group node
@@ -106,7 +106,7 @@ actions against those nodes:
 You can also right click edges, then click "help" to see information about
 any particular attack primitive:
 
-.. image:: /images/right-click-edge-help.gif  
+.. image:: /docs/images/right-click-edge-help.gif  
    :align: center
    :width: 900px
    :alt: Right click edge and get help
@@ -127,7 +127,7 @@ In the top left of the GUI is the search bar. Start typing the name of a node,
 and the GUI will automatically recommend nodes that match what you've typed so far.
 Click one of the suggestions, and the GUI will render that node:
 
-.. image:: /images/node-search.gif  
+.. image:: /docs/images/node-search.gif  
    :align: center
    :width: 900px
    :alt: Search for nodes using the search bar
@@ -160,7 +160,7 @@ type in the name of a node you want to target.
 For example, if we wanted to find a path from the "Domain Users" group to the
 "Domain Admins" group, we can use the path finding feature like this:
 
-.. image:: /images/pathfinding.gif  
+.. image:: /docs/images/pathfinding.gif  
    :align: center
    :width: 900px
    :alt: Search for an attack path
@@ -171,7 +171,7 @@ manipulation. Click the filter icon to bring up the edge filtering pane, and sel
 or de-select the particular edges or class of edges as needed:
 
 
-.. image:: /images/edge-filtering.gif  
+.. image:: /docs/images/edge-filtering.gif  
    :align: center
    :width: 900px
    :alt: Edge filtering pane
@@ -183,7 +183,7 @@ With query debug mode enabled, any time the BloodHound GUI performs a cypher que
 where the results are shown in the graph rendering area, the cypher query itself
 will appear here. This can be helpful for learning cypher:
 
-.. image:: /images/raw-query.gif  
+.. image:: /docs/images/raw-query.gif  
    :align: center
    :width: 900px
    :alt: Raw query bar
@@ -192,7 +192,7 @@ Additionally, you can execute your own cypher queries using the raw query bar.
 Your cypher query must return either paths or nodes, the BloodHound GUI cannot
 render list output. For example, to return all "user" type nodes in the database:
 
-.. image:: /images/run-raw-query.gif  
+.. image:: /docs/images/run-raw-query.gif  
    :align: center
    :width: 900px
    :alt: Run a raw cypher query
