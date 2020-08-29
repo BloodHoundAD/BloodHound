@@ -54,16 +54,16 @@ const About = () => {
             onHide={handleClose}
             label='AboutHeader'
         >
-            <Modal.Header closeButton>
+            <Modal.Header closeButton className={styles.about}>
                 <Modal.Title id='AboutHeader'>About BloodHound</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
                 <h5>
-                    <b>Version:</b> {version}
+                    Version: {version}
                 </h5>
                 <h5>
-                    <b>GitHub:</b>{' '}
+                    GitHub:{' '}
                     <a
                         href='#'
                         onClick={() => { openLink('https://www.github.com/BloodHoundAD/BloodHound') }}
@@ -72,7 +72,7 @@ const About = () => {
                         </a>
                 </h5>
                 <h5>
-                    <b>BloodHound Slack:</b>{' '}
+                    BloodHound Slack:{' '}
                     <a
                         href='#'
                         onClick={() => { openLink('https://bloodhoundgang.herokuapp.com/') }}
@@ -81,14 +81,7 @@ const About = () => {
                         </a>
                 </h5>
                 <h5>
-                    <b>Authors:</b>{' '}
-                    <a
-                        href='#'
-                        onClick={() => { openLink('https://www.twitter.com/harmj0y') }}
-                    >
-                        @harmj0y
-                        </a>
-                    ,{' '}
+                    Authors:{' '}
                     <a
                         href='#'
                         onClick={() => { openLink('https://www.twitter.com/_wald0') }}
@@ -100,19 +93,26 @@ const About = () => {
                         href='#'
                         onClick={() => { openLink('https://www.twitter.com/cptjesus') }}
                     >
-                        @cptjesus
+                        @CptJesus
+                        </a>
+                    ,{' '}
+                    <a
+                        href='#'
+                        onClick={() => { openLink('https://www.twitter.com/harmj0y') }}
+                    >
+                        @harmj0y
                         </a>
                 </h5>
                 <br />
                 <h5>
-                    <b>License</b>
+                    LICENSE
                 </h5>
                 <div className={styles.scroll}>{data}</div>
             </Modal.Body>
 
-            <Modal.Footer>
-                <Button variant='primary' onClick={handleClose}>
-                    Close
+            <Modal.Footer className = {styles.footer}>
+                <Button variant='primary' onClick={handleClose} className={styles.btndone}>
+                    Done
                 </Button>
             </Modal.Footer>
         </BaseModal >
