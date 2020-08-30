@@ -62,21 +62,7 @@ export default class RawQuery extends Component {
                     onClick={this._toggle.bind(this)}
                     className='slideupbutton'
                 >
-                    <span
-                        className={
-                            this.state.open
-                                ? 'glyphicon glyphicon-chevron-down'
-                                : 'glyphicon glyphicon-chevron-up'
-                        }
-                    />
                     Raw Query
-                    <span
-                        className={
-                            this.state.open
-                                ? 'glyphicon glyphicon-chevron-down'
-                                : 'glyphicon glyphicon-chevron-up'
-                        }
-                    />
                 </button>
                 <input
                     ref='input'
@@ -86,7 +72,7 @@ export default class RawQuery extends Component {
                     onKeyUp={this._onKeyUp.bind(this)}
                     className='form-control queryInput'
                     autoComplete='off'
-                    placeholder='Enter a raw query...'
+                    placeholder='Enter a cypher query. Your query must return nodes or paths.'
                 />
             </div>
         );
