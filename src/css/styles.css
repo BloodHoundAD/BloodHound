@@ -13,28 +13,14 @@
 }
 
 @font-face {
-    font-family: 'Roboto';
+    font-family: Helvetica;
     font-weight: 400;
     font-style: normal;
-    src: url('../fonts/roboto-v15-latin-regular.eot');
-    /* IE9 Compat Modes */
-    src: local('Roboto'), local('Roboto-Regular'),
-        url('../fonts/roboto-v15-latin-regular.eot?#iefix')
-            format('embedded-opentype'),
-        /* IE6-IE8 */ url('../fonts/roboto-v15-latin-regular.woff2')
-            format('woff2'),
-        /* Super Modern Browsers */
-            url('../fonts/roboto-v15-latin-regular.woff') format('woff'),
-        /* Modern Browsers */ url('../fonts/roboto-v15-latin-regular.ttf')
-            format('truetype'),
-        /* Safari, Android, iOS */
-            url('../fonts/roboto-v15-latin-regular.svg#Roboto') format('svg');
-    /* Legacy iOS */
 }
 
 html,
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: Helvetica;
     height: 100%;
     overflow: hidden;
     overflow: hidden;
@@ -58,6 +44,13 @@ div.tooltip-inner-custom {
     width: 70%;
     transform: translateX(-50%);
     pointer-events: auto;
+    background-color: #444B55;
+    border: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    color: white;
 }
 
 .bottomdiv {
@@ -70,7 +63,7 @@ div.tooltip-inner-custom {
 }
 
 .bottomdiv-dark .slideupbutton {
-    background-color: black;
+    background-color: #151D29;
     color: white;
 }
 
@@ -82,6 +75,7 @@ div.tooltip-inner-custom {
     height: 2em;
     transform: translateX(-50%);
     border-radius: 20px 20px 0 0;
+    border: none;
     background-color: white;
     pointer-events: auto;
 }
@@ -372,7 +366,21 @@ div.tooltip-inner-custom {
 }
 
 .searchdiv-dark h4 {
+    color: #82B1C5;
+    font-family: "Helvetica";
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.searchdiv-dark h5 {
     color: white;
+    font-family: "Helvetica";
+    font-weight: bold;
+    font-size: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+    padding-left: 10px;
 }
 
 .searchdiv-light h4 {
@@ -387,7 +395,7 @@ div.tooltip-inner-custom {
 }
 
 .searchdiv-dark .dl-horizontal dd:hover {
-    background-color: gray;
+    background-color: #406F8E;
 }
 
 .searchdiv-light .dl-horizontal dd:hover {
@@ -414,10 +422,12 @@ div.tooltip-inner-custom {
 .dl-horizontal > h4 {
     margin-top: 10px;
     margin-bottom: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
 }
 
 .dl-horizontal {
-    margin-right: 10px;
+    margin-right: 0px;
 }
 
 .dl-horizontal dt {
@@ -425,6 +435,9 @@ div.tooltip-inner-custom {
     padding-right: 1em;
     text-align: left;
     pointer-events: none;
+    margin-left: 10px;
+    font-family: Helvetica;
+    font-size: 12px;
 }
 
 .dl-horizontal dd:hover {
@@ -432,9 +445,12 @@ div.tooltip-inner-custom {
 }
 
 .dl-horizontal dd {
-    margin-left: 0;
+    margin-left: 10px;
+    margin-right: 10px;
     text-align: right;
     border-bottom: 1px solid lightgray;
+    font-family: Helvetica;
+    font-size: 12px;
 }
 
 .dl-horizontal dd:last-child {
@@ -923,7 +939,7 @@ div.tooltip-inner-custom {
 }
 
 #tab-style > div {
-    padding: 0 10px 0 10px;
+    padding: 0 0 0 0;
 }
 
 #tab-style h3 {
@@ -1041,7 +1057,7 @@ div.tooltip-inner-custom {
 }
 
 .modal-dark .modal-dialog .modal-content {
-    background-color: #383332;
+    background-color: #1A2331;
     color: white;
 }
 
