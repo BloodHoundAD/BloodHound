@@ -162,6 +162,8 @@ const AZTenantNodeData = () => {
                 </div>
                 </CollapsibleSection>
 
+                <hr></hr>
+
                 <CollapsibleSection header='Inbound Control'>
                 <div className={styles.itemlist}>
                     <Table class="table table-hover table-striped table-borderless table-responsive">
