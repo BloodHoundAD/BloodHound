@@ -15,6 +15,7 @@ import { parser } from 'stream-json';
 import { streamValues } from 'stream-json/streamers/StreamValues';
 import unzipper from 'unzipper';
 import * as NewIngestion from '../../js/newingestion';
+import UploadStatusContainer from '../Float/UploadStatusContainer';
 
 const FileStatus = Object.freeze({
     ParseError: 0,
@@ -223,7 +224,9 @@ const MenuContainerNew = () => {
                 progress: 0,
             };
         }
-        setFileQueue({ ...fileQueue, ...filteredFiles });
+        setFileQueue((state) => {
+            return { ...state, ...filteredFiles };
+        });
     };
 
     const processJson = async (file) => {
@@ -254,6 +257,7 @@ const MenuContainerNew = () => {
                 count++;
 
                 if (count % 5 === 0) {
+                    pipeline.pause();
                     let data = processor(chunk);
                     for (let key in data) {
                         if (data[key].props.length === 0) continue;
@@ -262,13 +266,15 @@ const MenuContainerNew = () => {
 
                         for (let c of cData) {
                             await uploadData(statement, c);
-                            file.progress += c.length;
-                            setFileQueue((state) => {
-                                return { ...state, [file.id]: file };
-                            });
+                            await sleep_test(100);
                         }
                     }
+                    file.progress = count;
+                    setFileQueue((state) => {
+                        return { ...state, [file.id]: file };
+                    });
                     chunk = [];
+                    pipeline.resume();
                 }
             }
 
@@ -280,12 +286,9 @@ const MenuContainerNew = () => {
 
                 for (let c of cData) {
                     await uploadData(statement, c);
-                    file.progress += c.length;
-                    setFileQueue((state) => {
-                        return { ...state, [file.id]: file };
-                    });
                 }
             }
+            file.progress = count;
             file.status = FileStatus.Done;
             setUploading(false);
             setFileQueue((state) => {
@@ -299,6 +302,10 @@ const MenuContainerNew = () => {
         }
     };
 
+    const sleep_test = (ms) => {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    };
+
     const uploadData = async (statement, props) => {
         let session = driver.session();
         await session.run(statement, { props: props }).catch((err) => {
@@ -309,7 +316,6 @@ const MenuContainerNew = () => {
     };
 
     useEffect(() => {
-        //console.log(fileQueue);
         if (!uploading) {
             let f;
             for (let file of Object.values(fileQueue)) {
@@ -424,6 +430,7 @@ const MenuContainerNew = () => {
                 type='file'
                 onChange={inputUsed}
             />
+            <UploadStatusContainer files={fileQueue} />
         </div>
     );
 };

@@ -1,0 +1,41 @@
+.panel {
+    width: 25%;
+    height: 50%;
+    position: fixed;
+    z-index: 30;
+    top: 10%;
+    left: 50%;
+    max-height: calc(100vh - 20%);
+    transform: translate(-50%, 0);
+    overflow-y: hidden;
+}
+
+.header {
+    width: 100%;
+    height: 10%;
+    background: #b9babd;
+    border-radius: 13px 13px 0 0;
+    font-family: Helvetica;
+    font-size: 36px;
+    color: #1d2735;
+    padding: 5px 5px 0px 10px;
+    cursor: move;
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    opacity: 0.96;
+    background: #f1f1f1;
+    box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.68);
+    border-radius: 13px 13px 11px 11px;
+}
+
+.close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    transform: rotate(-90deg);
+    border: 2px solid #1d2735;
+}

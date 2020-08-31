@@ -1,0 +1,24 @@
+.panel {
+    height: 100px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.fileName {
+    font-family: Helvetica-Bold;
+    font-size: 27px;
+    color: #1d2735;
+    line-height: 32px;
+}
+
+.status {
+    font-family: Helvetica;
+    font-size: 21px;
+    color: #1c0000;
+    line-height: 32px;
+}
+
+.progressBar {
+    color: #406f8e;
+    height: 5px;
+}
