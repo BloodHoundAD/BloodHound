@@ -16,6 +16,7 @@ import { streamValues } from 'stream-json/streamers/StreamValues';
 import unzipper from 'unzipper';
 import * as NewIngestion from '../../js/newingestion';
 import UploadStatusContainer from '../Float/UploadStatusContainer';
+import clsx from 'clsx';
 
 const FileStatus = Object.freeze({
     ParseError: 0,
@@ -82,12 +83,13 @@ const IngestFuncMap = {
     azprivroleadminrights: NewIngestion.buildAzurePrivRileAdminRights,
 };
 
-const MenuContainerNew = () => {
+const MenuContainer = () => {
     const [fileQueue, setFileQueue] = useState({});
     const alert = useAlert();
     const input = useRef(null);
     const [uploading, setUploading] = useState(false);
     const fileId = useRef(0);
+    const [uploadVisible, setUploadVisible] = useState(false);
 
     useEffect(() => {
         emitter.on('cancelUpload', cancelUpload);
@@ -224,6 +226,7 @@ const MenuContainerNew = () => {
                 progress: 0,
             };
         }
+        setUploadVisible(true);
         setFileQueue((state) => {
             return { ...state, ...filteredFiles };
         });
@@ -266,7 +269,7 @@ const MenuContainerNew = () => {
 
                         for (let c of cData) {
                             await uploadData(statement, c);
-                            await sleep_test(100);
+                            //await sleep_test(100);
                         }
                     }
                     file.progress = count;
@@ -313,6 +316,24 @@ const MenuContainerNew = () => {
             console.log(err);
         });
         session.close();
+    };
+
+    const clearFinished = () => {
+        let temp = { ...fileQueue };
+        for (let key of Object.keys(temp)) {
+            if (
+                temp[key].status !== FileStatus.Processing &&
+                temp[key].status !== FileStatus.Waiting
+            ) {
+                delete temp[key];
+            }
+        }
+
+        setFileQueue(temp);
+    };
+
+    const closeUpload = () => {
+        setUploadVisible(false);
     };
 
     useEffect(() => {
@@ -370,6 +391,14 @@ const MenuContainerNew = () => {
         }
     };
 
+    const getUploadClass = () => {
+        if (uploading) {
+            return 'fas fa-spinner fa-spin';
+        } else {
+            return 'fas fa-tasks';
+        }
+    };
+
     return (
         <div className='menudiv'>
             <div>
@@ -399,7 +428,16 @@ const MenuContainerNew = () => {
                         input.current.click();
                     }}
                     hoverVal='Upload Data'
-                    glyphicon='glyphicon glyphicon-upload'
+                    glyphicon={'glyphicon glyphicon-upload'}
+                />
+            </div>
+            <div>
+                <MenuButton
+                    click={() => {
+                        setUploadVisible(true);
+                    }}
+                    hoverVal='View Upload Status'
+                    glyphicon={getUploadClass()}
                 />
             </div>
             <div>
@@ -430,10 +468,15 @@ const MenuContainerNew = () => {
                 type='file'
                 onChange={inputUsed}
             />
-            <UploadStatusContainer files={fileQueue} />
+            <UploadStatusContainer
+                files={fileQueue}
+                clearFinished={clearFinished}
+                open={uploadVisible}
+                close={closeUpload}
+            />
         </div>
     );
 };
 
-MenuContainerNew.propTypes = {};
-export default MenuContainerNew;
+MenuContainer.propTypes = {};
+export default MenuContainer;
