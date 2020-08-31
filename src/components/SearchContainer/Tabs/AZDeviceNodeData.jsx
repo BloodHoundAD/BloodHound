@@ -68,6 +68,8 @@ const AZDeviceNodeData = () => {
                     label={label}
                 />
 
+                <hr></hr>
+
                 <CollapsibleSection header='Inbound Execution Privileges'>
                 <div className={styles.itemlist}>
                     <Table class="table table-hover table-striped table-borderless table-responsive">
