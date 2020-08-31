@@ -78,13 +78,16 @@ const NodePlayCypherLink = ({
     };
 
     return (
-        <tr onClick={onClick}>
-            <td>
-                <dt>{property}</dt>
-                <dd>
-                    {!played && <Icon glyph='play' extraClass={styles.icon} />}
-                    {played && <NodeALink ready={ready} value={value} />}
-                </dd>
+        <tr
+            onClick={onClick}
+            style={{ cursor: 'pointer' }}
+        >
+            <td align='left'>
+                {property}
+            </td>
+            <td align='right'>
+                {!played && <Icon glyph='play' extraClass={styles.icon} />}
+                {played && <NodeALink ready={ready} value={value} />}
             </td>
         </tr>
     );
