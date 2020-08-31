@@ -11,6 +11,8 @@ import NodePlayCypherLink from './Components/NodePlayCypherLink';
 import Notes from './Components/Notes';
 import { withAlert } from 'react-alert';
 import NodeGallery from './Components/NodeGallery';
+import { Table } from 'react-bootstrap';
+import styles from './NodeData.module.css';
 
 const AZDeviceNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -58,7 +60,7 @@ const AZDeviceNodeData = () => {
     ) : (
         <div className={clsx(!visible && 'displaynone')}>
             <dl className={'dl-horizontal'}>
-                <h4>{label || objectid}</h4>
+                <h5>{label || objectid}</h5>
                 
                 <MappedNodeProps
                     displayMap={displayMap}
@@ -67,33 +69,46 @@ const AZDeviceNodeData = () => {
                 />
 
                 <CollapsibleSection header='Inbound Execution Privileges'>
-                    <NodeCypherLink
-                        property='Owners'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
-                        }
-                        end={label}
-                    />
-
-                    <NodeCypherLink
-                        property='InTune Admins'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
-                        }
-                        end={label}
-                        distinct
-                    />
-
+                <div className={styles.itemlist}>
+                    <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <thead></thead>
+                        <tbody className='searchable'>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Owners'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
+                                        }
+                                        end={label}
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='InTune Admins'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
+                                        }
+                                        end={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </Table>
+                </div>
                 </CollapsibleSection>
 
-                <Notes objectid={objectid} type='AZResourceGroup' />
+                {/* <Notes objectid={objectid} type='AZResourceGroup' />
                 <NodeGallery
                     objectid={objectid}
                     type='AZDevice'
                     visible={visible}
-                />
+                /> */}
             </dl>
         </div>
     );
