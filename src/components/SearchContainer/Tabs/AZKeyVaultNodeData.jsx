@@ -68,6 +68,8 @@ const AZKeyVaultNodeData = () => {
                     label={label}
                 />
 
+                <hr></hr>
+
                 <CollapsibleSection header='Vault Readers'>
                 <div className={styles.itemlist}>
                     <Table class="table table-hover table-striped table-borderless table-responsive">
@@ -128,6 +130,8 @@ const AZKeyVaultNodeData = () => {
                     </Table>
                 </div>                     
                 </CollapsibleSection>
+
+                <hr></hr>
 
                 <CollapsibleSection header='Inbound Object Control'>
                 <div className={styles.itemlist}>
