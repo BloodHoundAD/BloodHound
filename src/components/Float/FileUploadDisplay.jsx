@@ -72,7 +72,6 @@ const FileUploadDisplay = ({ file }) => {
                 </Row>
                 <Row>
                     <Col xsOffset={1} xs={10}>
-                        {}
                         <ProgressBar
                             className={styles.progressBar}
                             active={progress < 100}

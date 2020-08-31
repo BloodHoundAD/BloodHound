@@ -5,12 +5,11 @@ import styles from './UploadStatusContainer.module.css';
 import clsx from 'clsx';
 import { useContext } from 'react';
 import { AppContext } from '../../AppContext';
-import { Button, Panel, Table } from 'react-bootstrap';
+import { Button, Panel, Table, Grid, Row, Col } from 'react-bootstrap';
 import FileUploadDisplay from './FileUploadDisplay';
 import { AnimatePresence, useDragControls } from 'framer-motion';
 
-const UploadStatusContainer = ({ files }) => {
-    const [open, setOpen] = useState(true);
+const UploadStatusContainer = ({ files, clearFinished, open, close }) => {
     const dragControl = useDragControls();
     var context = useContext(AppContext);
     return (
@@ -27,21 +26,33 @@ const UploadStatusContainer = ({ files }) => {
                     className={styles.header}
                     onMouseDown={(e) => dragControl.start(e)}
                 >
-                    Upload Status
-                    <Button
-                        onClick={() => setOpen(false)}
-                        className={styles.close}
-                        aria-label='Close'
-                    >
-                        <span aria-hidden='true'>&times;</span>
-                    </Button>
+                    <Grid fluid className={styles.cheight}>
+                        <Row>
+                            <Col xs={8}>Upload Status</Col>
+                            <Col xs={3}>
+                                <Button onClick={clearFinished}>
+                                    Clear Finished
+                                </Button>
+                            </Col>
+                            <Col xs={1}>
+                                <Button onClick={close} aria-label='Close'>
+                                    <span aria-hidden='true'>&times;</span>
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Grid>
                 </div>
                 <AnimatePresence>
-                    {Object.keys(files).map((key) => {
-                        return (
-                            <FileUploadDisplay key={key} file={files[key]} />
-                        );
-                    })}
+                    <div className={styles.uploads}>
+                        {Object.keys(files).map((key) => {
+                            return (
+                                <FileUploadDisplay
+                                    key={key}
+                                    file={files[key]}
+                                />
+                            );
+                        })}
+                    </div>
                 </AnimatePresence>
             </div>
         </PoseContainer>

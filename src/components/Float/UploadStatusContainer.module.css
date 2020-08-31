@@ -16,7 +16,7 @@
     background: #b9babd;
     border-radius: 13px 13px 0 0;
     font-family: Helvetica;
-    font-size: 36px;
+    font-size: 25px;
     color: #1d2735;
     padding: 5px 5px 0px 10px;
     cursor: move;
@@ -25,17 +25,16 @@
 .content {
     width: 100%;
     height: 100%;
-    overflow-y: auto;
     opacity: 0.96;
     background: #f1f1f1;
     box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.68);
     border-radius: 13px 13px 11px 11px;
 }
 
-.close {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    transform: rotate(-90deg);
-    border: 2px solid #1d2735;
+.uploads {
+    overflow-y: auto;
+}
+
+.cheight {
+    height: 100%;
 }
