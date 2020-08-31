@@ -11,6 +11,8 @@ import NodePlayCypherLink from './Components/NodePlayCypherLink';
 import Notes from './Components/Notes';
 import { withAlert } from 'react-alert';
 import NodeGallery from './Components/NodeGallery';
+import { Table } from 'react-bootstrap';
+import styles from './NodeData.module.css';
 
 const AZKeyVaultNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -58,7 +60,7 @@ const AZKeyVaultNodeData = () => {
     ) : (
         <div className={clsx(!visible && 'displaynone')}>
             <dl className={'dl-horizontal'}>
-                <h4>{label || objectid}</h4>
+                <h5>{label || objectid}</h5>
                 
                 <MappedNodeProps
                     displayMap={displayMap}
@@ -67,82 +69,120 @@ const AZKeyVaultNodeData = () => {
                 />
 
                 <CollapsibleSection header='Vault Readers'>
-                    <NodeCypherLink
-                        property='Key Readers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n)-[r:AZGetKeys|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
-                        }
-                        end={label}
-                    />
-
-                    <NodeCypherLink
-                        property='Certificate Readers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n)-[r:AZGetCertificates|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
-                        }
-                        end={label}
-                        distinct
-                    />
-
-                    <NodeCypherLink
-                        property='Secret Readers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n)-[r:AZGetSecrets|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
-                        }
-                        end={label}
-                        distinct
-                    />
-                     <NodeCypherLink
-                        property='All Readers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n)-[r:AZGetKeys|AZGetCertificates|AZGetSecrets|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
-                        }
-                        end={label}
-                        distinct
-                    />
+                <div className={styles.itemlist}>
+                    <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <thead></thead>
+                        <tbody className='searchable'>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Key Readers'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (n)-[r:AZGetKeys|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
+                                        }
+                                        end={label}
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Certificate Readers'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (n)-[r:AZGetCertificates|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
+                                        }
+                                        end={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Secret Readers'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (n)-[r:AZGetSecrets|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
+                                        }
+                                        end={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='All Readers'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (n)-[r:AZGetKeys|AZGetCertificates|AZGetSecrets|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
+                                        }
+                                        end={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </Table>
+                </div>                     
                 </CollapsibleSection>
 
                 <CollapsibleSection header='Inbound Object Control'>
-                    <NodeCypherLink
-                        property='Explicit Object Controllers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n)-[r:AZOwns|AZUserAccessAdministrator|AZContributor]->(g:AZKeyVault {objectid: $objectid})'
-                        }
-                        end={label}
-                        distinct
-                    />
-
-                    <NodeCypherLink
-                        property='Unrolled Object Controllers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AZOwns|AZUserAccessAdministrator|AZContributor]->(g2:AZKeyVault {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
-                        }
-                        end={label}
-                        distinct
-                    />
-
-                    <NodePlayCypherLink
-                        property='Transitive Object Controllers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZKeyVault {objectid: $objectid}))'
-                        }
-                        end={label}
-                        distinct
-                    />
+                <div className={styles.itemlist}>
+                    <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <thead></thead>
+                        <tbody className='searchable'>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Explicit Object Controllers'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (n)-[r:AZOwns|AZUserAccessAdministrator|AZContributor]->(g:AZKeyVault {objectid: $objectid})'
+                                        }
+                                        end={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodeCypherLink
+                                        property='Unrolled Object Controllers'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AZOwns|AZUserAccessAdministrator|AZContributor]->(g2:AZKeyVault {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                        }
+                                        end={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <NodePlayCypherLink
+                                        property='Transitive Object Controllers'
+                                        target={objectid}
+                                        baseQuery={
+                                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZKeyVault {objectid: $objectid}))'
+                                        }
+                                        end={label}
+                                        distinct
+                                    />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </Table>
+                </div>
                 </CollapsibleSection>
-                <Notes objectid={objectid} type='AZKeyVault' />
+                {/* <Notes objectid={objectid} type='AZKeyVault' />
                 <NodeGallery
                     objectid={objectid}
                     type='AZKeyVault'
                     visible={visible}
-                />
+                /> */}
             </dl>
         </div>
     );
