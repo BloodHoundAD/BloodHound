@@ -33,6 +33,7 @@
 
 .uploads {
     overflow-y: auto;
+    height: 90%;
 }
 
 .cheight {
