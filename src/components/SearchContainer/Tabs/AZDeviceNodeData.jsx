@@ -75,31 +75,23 @@ const AZDeviceNodeData = () => {
                     <Table class="table table-hover table-striped table-borderless table-responsive">
                         <thead></thead>
                         <tbody className='searchable'>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Owners'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
-                                        }
-                                        end={label}
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='InTune Admins'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
-                                        }
-                                        end={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
+                            <NodeCypherLink
+                                property='Owners'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
+                                }
+                                end={label}
+                            />
+                            <NodeCypherLink
+                                property='InTune Admins'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
+                                }
+                                end={label}
+                                distinct
+                            />
                         </tbody>
                     </Table>
                 </div>
