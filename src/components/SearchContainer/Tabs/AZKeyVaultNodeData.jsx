@@ -75,57 +75,41 @@ const AZKeyVaultNodeData = () => {
                     <Table class="table table-hover table-striped table-borderless table-responsive">
                         <thead></thead>
                         <tbody className='searchable'>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Key Readers'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (n)-[r:AZGetKeys|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
+                            <NodeCypherLink
+                                property='Key Readers'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (n)-[r:AZGetKeys|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
+                                }
+                                end={label}
+                            />
+                            <NodeCypherLink
+                                property='Certificate Readers'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (n)-[r:AZGetCertificates|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
+                                }
+                                end={label}
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Secret Readers'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (n)-[r:AZGetSecrets|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
                                         }
-                                        end={label}
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Certificate Readers'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (n)-[r:AZGetCertificates|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
-                                        }
-                                        end={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Secret Readers'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (n)-[r:AZGetSecrets|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
-                                        }
-                                        end={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='All Readers'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (n)-[r:AZGetKeys|AZGetCertificates|AZGetSecrets|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
-                                        }
-                                        end={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
+                                end={label}
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='All Readers'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (n)-[r:AZGetKeys|AZGetCertificates|AZGetSecrets|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
+                                }
+                                end={label}
+                                distinct
+                            />
                         </tbody>
                     </Table>
                 </div>                     
@@ -138,45 +122,33 @@ const AZKeyVaultNodeData = () => {
                     <Table class="table table-hover table-striped table-borderless table-responsive">
                         <thead></thead>
                         <tbody className='searchable'>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Explicit Object Controllers'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (n)-[r:AZOwns|AZUserAccessAdministrator|AZContributor]->(g:AZKeyVault {objectid: $objectid})'
-                                        }
-                                        end={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Unrolled Object Controllers'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AZOwns|AZUserAccessAdministrator|AZContributor]->(g2:AZKeyVault {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
-                                        }
-                                        end={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodePlayCypherLink
-                                        property='Transitive Object Controllers'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZKeyVault {objectid: $objectid}))'
-                                        }
-                                        end={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
+                            <NodeCypherLink
+                                property='Explicit Object Controllers'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (n)-[r:AZOwns|AZUserAccessAdministrator|AZContributor]->(g:AZKeyVault {objectid: $objectid})'
+                                }
+                                end={label}
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Unrolled Object Controllers'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AZOwns|AZUserAccessAdministrator|AZContributor]->(g2:AZKeyVault {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                }
+                                end={label}
+                                distinct
+                            />
+                            <NodePlayCypherLink
+                                property='Transitive Object Controllers'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZKeyVault {objectid: $objectid}))'
+                                }
+                                end={label}
+                                distinct
+                            />
                         </tbody>
                     </Table>
                 </div>
