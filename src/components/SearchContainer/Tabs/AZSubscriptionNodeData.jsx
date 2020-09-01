@@ -69,15 +69,11 @@ const AZSubscriptionNodeData = () => {
                     <Table class="table table-hover table-striped table-borderless table-responsive">
                         <thead></thead>
                         <tbody className='searchable'>
-                            <tr>
-                                <td>
-                                    <NodeCypherNoNumberLink
-                                        query='MATCH p = (d:AZTenant)-[r:AZContains*1..]->(o:AZSubscription {objectid: $objectid}) RETURN p'
-                                        target={objectid}
-                                        property='See Subscription Under Tenant'
-                                    />
-                                </td>
-                            </tr>
+                            <NodeCypherNoNumberLink
+                                query='MATCH p = (d:AZTenant)-[r:AZContains*1..]->(o:AZSubscription {objectid: $objectid}) RETURN p'
+                                target={objectid}
+                                property='See Subscription Under Tenant'
+                            />
                         </tbody>
                     </Table>
                 </div>
@@ -106,42 +102,30 @@ const AZSubscriptionNodeData = () => {
                     <Table class="table table-hover table-striped table-borderless table-responsive">
                         <thead></thead>
                         <tbody className='searchable'>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Total VM Objects'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p=(o:AZSubscription {objectid: $objectid})-[r:AZContains*1..]->(n:AZVM)'
-                                        }
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Total Resource Group Objects'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p=(o:AZSubscription {objectid: $objectid})-[r:AZContains*1..]->(n:AZResourceGroup)'
-                                        }
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Total Key Vault Objects'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p=(o:AZSubscription {objectid: $objectid})-[r:AZContains*1..]->(n:AZKeyVault)'
-                                        }
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
+                            <NodeCypherLink
+                                property='Total VM Objects'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(o:AZSubscription {objectid: $objectid})-[r:AZContains*1..]->(n:AZVM)'
+                                }
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Total Resource Group Objects'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(o:AZSubscription {objectid: $objectid})-[r:AZContains*1..]->(n:AZResourceGroup)'
+                                }
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Total Key Vault Objects'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(o:AZSubscription {objectid: $objectid})-[r:AZContains*1..]->(n:AZKeyVault)'
+                                }
+                                distinct
+                            />
                         </tbody>
                     </Table>
                 </div>
