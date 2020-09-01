@@ -102,9 +102,9 @@ const MenuContainer = () => {
         };
     }, []);
 
-    const inputUsed = () => {
+    const inputUsed = (e) => {
         let fileNames = [];
-        $.each(input[0].files, function (_, file) {
+        $.each(e.target.files, function (_, file) {
             fileNames.push({ path: file.path, name: file.name });
         });
         unzipFiles(fileNames);
