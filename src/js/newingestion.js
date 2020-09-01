@@ -1129,7 +1129,7 @@ export function buildAzureRGPermissions(chunk) {
         let source;
 
         if (controllerType === 'UNKNOWN' || role === 'CONTRIBUTOR') continue;
-
+        if (role !== 'OWNER' && role !== 'USER ACCESS ADMINISTRATOR') continue;
         if (role === 'OWNER') {
             format[2] = 'AZOwns';
         } else if (role === 'USER ACCESS ADMINISTRATOR') {
