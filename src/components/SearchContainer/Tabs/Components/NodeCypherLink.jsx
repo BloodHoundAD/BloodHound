@@ -57,24 +57,26 @@ const NodeCypherLink = ({
     }, [target]);
 
     return (
-        <>
-            <dt>{property}</dt>
-            <dd>
-                <NodeALink
-                    ready={ready}
-                    value={value}
-                    click={() => {
-                        emitter.emit(
-                            'query',
-                            `${baseQuery} RETURN p`,
-                            { objectid: target, domain: domain },
-                            start,
-                            end
-                        );
-                    }}
-                />
-            </dd>
-        </>
+            <tr
+                ready={ready}
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                    emitter.emit(
+                        'query',
+                        `${baseQuery} RETURN p`,
+                        { objectid: target, domain: domain },
+                        start,
+                        end
+                    );
+                }}
+            >
+                <td align='left'>
+                    {property}
+                </td>
+                <td align='right'>
+                    {value}
+                </td>
+            </tr>
     );
 };
 
