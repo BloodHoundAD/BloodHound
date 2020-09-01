@@ -18,14 +18,14 @@ export default class NodeCypherNoNumberLink extends Component {
         }.bind(this);
 
         return (
-            <Fragment>
-                <dt onClick={c}>
-                    <a href='#' onClick={c}>
-                        {this.props.property}
-                    </a>
-                </dt>
-                <dd onClick={c} style={{ cursor: 'pointer' }} />
-            </Fragment>
+            <tr
+                style={{ cursor: 'pointer' }}
+                onClick={c}
+            >
+            <td align='left'>
+                {this.props.property}
+            </td>
+            </tr>
         );
     }
 }
