@@ -68,30 +68,22 @@ const AZUserNodeData = () => {
                     <Table class="table table-hover table-striped table-borderless table-responsive">
                         <thead></thead>
                         <tbody className='searchable'>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Sessions'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH (m:AZUser {objectid: $objectid}),(n:Computer),p = ((n)-[r:HasSession*1..]->(u)-[:MemberOf*1..]->(m))'
-                                        }
-                                        start={label}
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Reachable High Value Targets'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH (m:AZUser {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
-                                        }
-                                        start={label}
-                                    />
-                                </td>
-                            </tr>
+                            <NodeCypherLink
+                                property='Sessions'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH (m:AZUser {objectid: $objectid}),(n:Computer),p = ((n)-[r:HasSession*1..]->(u)-[:MemberOf*1..]->(m))'
+                                }
+                                start={label}
+                            />
+                            <NodeCypherLink
+                                property='Reachable High Value Targets'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH (m:AZUser {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                }
+                                start={label}
+                            />
                         </tbody>
                     </Table>
                 </div>
@@ -120,32 +112,24 @@ const AZUserNodeData = () => {
                     <Table class="table table-hover table-striped table-borderless table-responsive">
                         <thead></thead>
                         <tbody className='searchable'>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='First Degree Group Membership'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p=(m:AZUser {objectid: $objectid})-[r:MemberOf]->(n)'
-                                        }
-                                        start={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Unrolled Member Of'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (m:AZUser {objectid: $objectid})-[r:MemberOf*1..]->(n)'
-                                        }
-                                        start={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
+                            <NodeCypherLink
+                                property='First Degree Group Membership'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(m:AZUser {objectid: $objectid})-[r:MemberOf]->(n)'
+                                }
+                                start={label}
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Unrolled Member Of'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (m:AZUser {objectid: $objectid})-[r:MemberOf*1..]->(n)'
+                                }
+                                start={label}
+                                distinct
+                            />
                         </tbody>
                     </Table>
                 </div>
@@ -158,45 +142,33 @@ const AZUserNodeData = () => {
                     <Table class="table table-hover table-striped table-borderless table-responsive">
                         <thead></thead>
                         <tbody className='searchable'>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='First Degree Object Control'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (g:AZUser {objectid: $objectid})-[r:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor]->(n)'
-                                        }
-                                        start={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Group Delegated Object Control'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (g1:AZUser {objectid: $objectid})-[r1:MemberOf*1..]->(g2:Group)-[r2:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor]->(n)'
-                                        }
-                                        start={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodePlayCypherLink
-                                        property='Transitive Object Control'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((g:AZUser {objectid: $objectid})-[r:AZMemberOf|AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor*1..]->(n))'
-                                        }
-                                        start={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
+                            <NodeCypherLink
+                                property='First Degree Object Control'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (g:AZUser {objectid: $objectid})-[r:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor]->(n)'
+                                }
+                                start={label}
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Group Delegated Object Control'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (g1:AZUser {objectid: $objectid})-[r1:MemberOf*1..]->(g2:Group)-[r2:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor]->(n)'
+                                }
+                                start={label}
+                                distinct
+                            />
+                            <NodePlayCypherLink
+                                property='Transitive Object Control'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((g:AZUser {objectid: $objectid})-[r:AZMemberOf|AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor*1..]->(n))'
+                                }
+                                start={label}
+                                distinct
+                            />
                         </tbody>
                     </Table>
                 </div>
@@ -209,45 +181,33 @@ const AZUserNodeData = () => {
                     <Table class="table table-hover table-striped table-borderless table-responsive">
                         <thead></thead>
                         <tbody className='searchable'>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Explicit Object Controllers'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (n)-[r:AZOwns|AZAddMembers]->(g:AZUser {objectid: $objectid})'
-                                        }
-                                        end={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Unrolled Object Controllers'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AZOwns|AZAddMembers]->(g2:AZUser {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
-                                        }
-                                        end={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodePlayCypherLink
-                                        property='Transitive Object Controllers'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r:AZMemberOf|AZOwns|AZAddMembers*1..]->(g:AZUser {objectid: $objectid}))'
-                                        }
-                                        end={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
+                            <NodeCypherLink
+                                property='Explicit Object Controllers'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (n)-[r:AZOwns|AZAddMembers]->(g:AZUser {objectid: $objectid})'
+                                }
+                                end={label}
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Unrolled Object Controllers'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AZOwns|AZAddMembers]->(g2:AZUser {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                }
+                                end={label}
+                                distinct
+                            />
+                            <NodePlayCypherLink
+                                property='Transitive Object Controllers'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r:AZMemberOf|AZOwns|AZAddMembers*1..]->(g:AZUser {objectid: $objectid}))'
+                                }
+                                end={label}
+                                distinct
+                            />
                         </tbody>
                     </Table>
                 </div>
