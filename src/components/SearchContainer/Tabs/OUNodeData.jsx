@@ -11,6 +11,8 @@ import NodePlayCypherLink from './Components/NodePlayCypherLink';
 import Notes from './Components/Notes';
 import { withAlert } from 'react-alert';
 import NodeGallery from './Components/NodeGallery';
+import { Table } from 'react-bootstrap';
+import styles from './NodeData.module.css';
 
 const OUNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -62,77 +64,112 @@ const OUNodeData = () => {
     ) : (
         <div className={clsx(!visible && 'displaynone')}>
             <dl className={'dl-horizontal'}>
-                <h4>{label || objectid}</h4>
-                <NodeCypherNoNumberLink
-                    query='MATCH p = (d)-[r:Contains*1..]->(o:OU {objectid: $objectid}) RETURN p'
-                    target={objectid}
-                    property='See OU Within Domain Tree'
-                />
+                <h5>{label || objectid}</h5>
+
+                <CollapsibleSection header='OVERVIEW'>
+                <div className={styles.itemlist}>
+                    <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <thead></thead>
+                        <tbody className='searchable'>
+                            <NodeCypherNoNumberLink
+                                query='MATCH p = (d)-[r:Contains*1..]->(o:OU {objectid: $objectid}) RETURN p'
+                                target={objectid}
+                                property='See OU Within Domain Tree'
+                            />
+                        </tbody>
+                    </Table>
+                </div>
+                </CollapsibleSection>
+
+                <hr></hr>
+
                 <MappedNodeProps
                     displayMap={displayMap}
                     properties={nodeProps}
                     label={label}
                 />
+
+                <hr></hr>
+
                 <ExtraNodeProps
                     displayMap={displayMap}
                     properties={nodeProps}
                     label={label}
                 />
+
+                <hr></hr>
+
                 <CollapsibleSection header='Affecting GPOs'>
-                    <NodeCypherLink
-                        property='GPOs Directly Affecting This OU'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p=(n:GPO)-[r:GpLink]->(o:OU {objectid: $objectid})'
-                        }
-                    />
-                    <NodeCypherLink
-                        property='GPOs Affecting This OU'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p=(n:GPO)-[r:GpLink|Contains*1..]->(o:OU {objectid: $objectid})'
-                        }
-                    />
+                <div className={styles.itemlist}>
+                    <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <thead></thead>
+                        <tbody className='searchable'>
+                            <NodeCypherLink
+                                property='GPOs Directly Affecting This OU'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(n:GPO)-[r:GpLink]->(o:OU {objectid: $objectid})'
+                                }
+                            />
+                            <NodeCypherLink
+                                property='GPOs Affecting This OU'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(n:GPO)-[r:GpLink|Contains*1..]->(o:OU {objectid: $objectid})'
+                                }
+                            />
+                        </tbody>
+                    </Table>
+                </div>
                 </CollapsibleSection>
+
+                <hr></hr>
+
                 <CollapsibleSection header='Descendant Objects'>
-                    <NodeCypherLink
-                        property='Total User Objects'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p=(o:OU {objectid: $objectid})-[r:Contains*1..]->(n:User)'
-                        }
-                        distinct
-                    />
-
-                    <NodeCypherLink
-                        property='Total Group Objects'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p=(o:OU {objectid: $objectid})-[r:Contains*1..]->(n:Group)'
-                        }
-                        distinct
-                    />
-
-                    <NodeCypherLink
-                        property='Total Computer Objects'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p=(o:OU {objectid: $objectid})-[r:Contains*1..]->(n:Computer)'
-                        }
-                        distinct
-                    />
-
-                    <NodeCypherLink
-                        property='Sibling Objects within OU'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH (o1)-[r1:Contains]->(o2:OU {objectid: $objectid}) WITH o1 MATCH p=(d)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)'
-                        }
-                        distinct
-                    />
+                <div className={styles.itemlist}>
+                    <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <thead></thead>
+                        <tbody className='searchable'>
+                            <NodeCypherLink
+                                property='Total User Objects'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(o:OU {objectid: $objectid})-[r:Contains*1..]->(n:User)'
+                                }
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Total Group Objects'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(o:OU {objectid: $objectid})-[r:Contains*1..]->(n:Group)'
+                                }
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Total Computer Objects'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(o:OU {objectid: $objectid})-[r:Contains*1..]->(n:Computer)'
+                                }
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Sibling Objects within OU'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH (o1)-[r1:Contains]->(o2:OU {objectid: $objectid}) WITH o1 MATCH p=(d)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)'
+                                }
+                                distinct
+                            />
+                        </tbody>
+                    </Table>
+                </div>
                 </CollapsibleSection>
-                <Notes objectid={objectid} type='OU' />
-                <NodeGallery objectid={objectid} type='OU' visible={visible} />
+
+                {/* <Notes objectid={objectid} type='OU' />
+                <NodeGallery objectid={objectid} type='OU' visible={visible} /> */}
+
             </dl>
         </div>
     );
