@@ -13,10 +13,6 @@
     background: transparent;
 }
 
-.container :global .panel-heading {
-    cursor: move;
-}
-
 .centerButton {
     text-align: center;
 }
