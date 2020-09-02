@@ -7,6 +7,7 @@ import { Panel, Button, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { AppContext } from '../../AppContext';
 import clsx from 'clsx';
 import { useDragControls } from 'framer-motion';
+import { Table } from 'react-bootstrap';
 
 const ExportContainer = () => {
     const [jsonActive, setJsonActive] = useState(true);
@@ -25,18 +26,12 @@ const ExportContainer = () => {
         setVisible(false);
     };
 
-    const jsonClicked = () => {
-        setJsonActive(true);
-        setImageActive(false);
+    const startPNGExport = () => {
+        emitter.emit('export', 'image');
     };
 
-    const imageClicked = () => {
-        setJsonActive(false);
-        setImageActive(true);
-    };
-
-    const startExport = () => {
-        emitter.emit('export', jsonActive ? 'json' : 'image');
+    const startJSONExport = () => {
+        emitter.emit('export', 'json');
     };
 
     useEffect(() => {
@@ -63,33 +58,33 @@ const ExportContainer = () => {
                         className='close'
                         aria-label='Close'
                     >
-                        <span aria-hidden='true'>&times;</span>
+                        <span aria-hidden='true'>x</span>
                     </Button>
                 </Panel.Heading>
 
                 <Panel.Body>
-                    <ListGroup>
-                        <ListGroupItem
-                            header={'Export to JSON'}
-                            onClick={jsonClicked}
-                            active={jsonActive}
-                        >
-                            Use this format to export data and re-import it
-                            later
-                        </ListGroupItem>
-                        <ListGroupItem
-                            header={'Export to Image'}
-                            onClick={imageClicked}
-                            active={imageActive}
-                        >
-                            Use this format to export data and view it as an
-                            image
-                        </ListGroupItem>
-                    </ListGroup>
-                    <div className={styles.centerButton}>
-                        <Button onClick={startExport} size={'lg'}>
-                            Export Data
-                        </Button>
+                    <div className={styles.itemlist}>
+                        <Table class="table table-hover table-striped table-borderless table-responsive">
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <tr
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={startJSONExport}
+                                >
+                                    <td width='200px' align='center'>
+                                        Export to JSON
+                                    </td>
+                                </tr>
+                                <tr
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={startPNGExport}
+                                >
+                                    <td width='200px' align='center'>
+                                        Export to PNG
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </Table>
                     </div>
                 </Panel.Body>
             </Panel>
