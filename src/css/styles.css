@@ -938,6 +938,12 @@ div.tooltip-inner-custom {
     font-weight: bold;
 }
 
+#tab-style > ul > li > a[aria-selected='false'] {
+    color: white;
+    font-family: "Helvetica";
+    font-weight: bold;
+}
+
 #tab-style > div {
     padding: 0 0 0 0;
 }
@@ -1048,8 +1054,16 @@ div.tooltip-inner-custom {
     overflow-y: auto;
 }
 
+.help-modal-width .tab-content {
+    padding: 15px !important;
+}
+
 .help-modal-width > div {
     width: 40%;
+}
+
+.help-modal-width .modal-body {
+    padding: 0px;
 }
 
 #alertContainer > div > div {
@@ -1069,13 +1083,17 @@ div.tooltip-inner-custom {
 }
 
 .modal-dark .modal-body {
-    background-color: #1A2331;
+    background-color: #141C27;
     border: none;
 }
 
 .modal-dark .modal-footer {
-    background-color: #1A2331;
+    background-color: #141C27;
     border: none;
+}
+
+.modal-dark a {
+    color: white;
 }
 
 .modal-dark input {
