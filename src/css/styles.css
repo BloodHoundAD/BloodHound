@@ -1056,9 +1056,26 @@ div.tooltip-inner-custom {
     width: unset !important;
 }
 
+.modal-dark .modal-header {
+    background-color: #444B55;
+    border-top-right-radius: 14px;
+    border-top-left-radius: 14px;
+    border: none;
+}
+
 .modal-dark .modal-dialog .modal-content {
-    background-color: #1A2331;
+    background: transparent;
     color: white;
+}
+
+.modal-dark .modal-body {
+    background-color: #1A2331;
+    border: none;
+}
+
+.modal-dark .modal-footer {
+    background-color: #1A2331;
+    border: none;
 }
 
 .modal-dark input {
@@ -1072,8 +1089,14 @@ div.tooltip-inner-custom {
 }
 
 .modal-dark button {
-    background: black;
+    background: #406F8E;
     color: white;
+    border: none;
+}
+
+.close {
+    background: transparent;
+    font-weight: 400;
 }
 
 .modal-dark button.close {
