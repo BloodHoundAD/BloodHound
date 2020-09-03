@@ -112,7 +112,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: false,
             azSubscriptionVisible: false,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -132,7 +132,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: false,
             azSubscriptionVisible: false,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -152,7 +152,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: false,
             azSubscriptionVisible: false,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -172,7 +172,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: false,
             azSubscriptionVisible: false,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -192,7 +192,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: false,
             azSubscriptionVisible: false,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -212,7 +212,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: false,
             azSubscriptionVisible: false,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -232,7 +232,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: false,
             azSubscriptionVisible: false,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -252,7 +252,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: false,
             azSubscriptionVisible: false,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -273,7 +273,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: false,
             azSubscriptionVisible: false,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -294,7 +294,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: true,
             azDeviceVisible: false,
             azSubscriptionVisible: false,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -315,7 +315,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: true,
             azSubscriptionVisible: false,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -336,7 +336,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: false,
             azSubscriptionVisible: true,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -357,7 +357,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: false,
             azSubscriptionVisible: false,
-            azTenantVisivble: true,
+            azTenantVisible: true,
             azVMVisible: false,
         });
         this.setState({ selected: 2 });
@@ -378,7 +378,7 @@ class TabContainer extends Component {
             azResourceGroupVisible: false,
             azDeviceVisible: false,
             azSubscriptionVisible: false,
-            azTenantVisivble: false,
+            azTenantVisible: false,
             azVMVisible: true,
         });
         this.setState({ selected: 2 });
@@ -394,7 +394,7 @@ class TabContainer extends Component {
             <div>
                 <Tabs
                     id='tab-style'
-                    bsStyle='pills'
+                    bsStyle='rectangles'
                     activeKey={this.state.selected}
                     onSelect={this._handleSelect.bind(this)}
                 >
@@ -439,7 +439,7 @@ class TabContainer extends Component {
                         <AZVMNodeData visible={this.state.azVMVisible} />
                     </Tab>
 
-                    <Tab eventKey={3} title='Queries'>
+                    <Tab eventKey={3} title='Analysis'>
                         <PrebuiltQueriesDisplay />
                     </Tab>
                 </Tabs>
