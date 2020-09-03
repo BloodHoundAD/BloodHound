@@ -42,7 +42,7 @@ const OUNodeData = () => {
                 .then(r => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
-                    setLabel(props.name || objectid);
+                    setLabel([...props.name] || objectid);
                     session.close();
                 });
         } else {
