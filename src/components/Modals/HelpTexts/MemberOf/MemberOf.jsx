@@ -8,10 +8,15 @@ import References from './References';
 
 const MemberOf = ({ sourceName, sourceType, targetName, targetType }) => {
     return (
-        <Tabs defaultActiveKey={1} id='help-tab-container' justified>
+        <Tabs
+            defaultActiveKey={1}
+            id='tab-style'
+            bsStyle='rectangles'
+            justified
+        >
             <Tab
                 eventKey={1}
-                title='Info'
+                title='GENERAL'
                 dangerouslySetInnerHTML={General(
                     sourceName,
                     sourceType,
@@ -21,17 +26,17 @@ const MemberOf = ({ sourceName, sourceType, targetName, targetType }) => {
             />
             <Tab
                 eventKey={2}
-                title='Abuse Info'
+                title='ABUSE'
                 dangerouslySetInnerHTML={Abuse()}
             />
             <Tab
                 eventKey={3}
-                title='Opsec Considerations'
+                title='OPSEC'
                 dangerouslySetInnerHTML={Opsec()}
             />
             <Tab
                 eventKey={4}
-                title='References'
+                title='REFERENCES'
                 dangerouslySetInnerHTML={References()}
             />
         </Tabs>
