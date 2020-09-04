@@ -112,7 +112,7 @@ const Login = () => {
 
         session
             .run('MATCH (n) RETURN n LIMIT 1')
-            .then((_) => {
+            .then(_ => {
                 setLoginRunning(false);
                 setLoginSuccess(true);
 
@@ -143,18 +143,6 @@ const Login = () => {
                     }
                 );
 
-                session = global.driver.session();
-                session
-                    .run(
-                        'CALL dbms.components() YIELD versions RETURN versions[0] AS version'
-                    )
-                    .then((result) => {
-                        let record = result.records[0];
-                        let version = record.get('version');
-                        global.neoVersion = version;
-                        session.close();
-                    });
-
                 setTimeout(() => {
                     setVisible(false);
                     setTimeout(() => {
@@ -162,7 +150,7 @@ const Login = () => {
                     }, 400);
                 }, 1500);
             })
-            .catch((error) => {
+            .catch(error => {
                 console.log(error);
                 if (error.message.includes('authentication failure')) {
                     setLoginEnabled(true);
@@ -246,7 +234,7 @@ const Login = () => {
 
         session
             .run('MATCH (n) RETURN n LIMIT 1')
-            .then((result) => {
+            .then(result => {
                 icon.removeClass();
                 icon.addClass(
                     'fa fa-check-circle green-icon-color form-control-feedback'
@@ -254,7 +242,7 @@ const Login = () => {
                 setLoginEnabled(true);
                 setUrl(tempUrl);
             })
-            .catch((error) => {
+            .catch(error => {
                 if (error.message.includes('WebSocket connection failure')) {
                     icon.removeClass();
                     icon.addClass(
@@ -280,7 +268,7 @@ const Login = () => {
             });
     };
 
-    const triggerLogin = (event) => {
+    const triggerLogin = event => {
         let key = event.keyCode ? event.KeyCode : event.which;
 
         if (key === 13) {
@@ -295,28 +283,26 @@ const Login = () => {
                 animate={visible ? 'visible' : 'hidden'}
                 initial={'hidden'}
             >
-                <img src='src/img/logo-white-transparent-full.png' />
+                <img src='src/img/logo-white-on-transparent.png' />
                 <div className='text-center'>
                     <span>Log in to Neo4j Database</span>
                 </div>
+                <br></br>
                 <form>
                     <div className='form-group has-feedback'>
                         <div className='input-group'>
-                            <span className='input-group-addon' id='dburladdon'>
-                                Database URL
-                            </span>
                             <input
-                                onFocus={function () {
+                                onFocus={function() {
                                     icon.tooltip('hide');
                                 }}
                                 onBlur={checkDatabaseExists}
-                                onChange={(event) => {
+                                onChange={event => {
                                     setUrl(event.target.value);
                                 }}
                                 type='text'
-                                className='form-control'
+                                className='form-control login-text'
                                 value={url}
-                                placeholder='bolt://localhost:7687'
+                                placeholder='Neo4j URL'
                                 aria-describedby='dburladdon'
                             />
                             <i
@@ -325,38 +311,29 @@ const Login = () => {
                             />
                         </div>
                         <div className='input-group spacing'>
-                            <span
-                                className='input-group-addon'
-                                id='dbuseraddon'
-                            >
-                                DB Username
-                            </span>
                             <input
                                 type='text'
                                 value={user}
                                 onKeyDown={triggerLogin}
-                                onChange={(event) => {
+                                onChange={event => {
                                     setUser(event.target.value);
                                 }}
-                                className='form-control'
-                                placeholder='neo4j'
+                                className='form-control login-text'
+                                placeholder='Neo4j Username'
                                 aria-describedby='dbuseraddon'
                             />
                         </div>
                         <div className='input-group spacing'>
-                            <span className='input-group-addon' id='dbpwaddon'>
-                                DB Password
-                            </span>
                             <input
                                 ref={passwordRef}
                                 value={password}
                                 onKeyDown={triggerLogin}
-                                onChange={(event) => {
+                                onChange={event => {
                                     setPassword(event.target.value);
                                 }}
                                 type='password'
-                                className='form-control'
-                                placeholder='neo4j'
+                                className='form-control login-text'
+                                placeholder='Neo4j Password'
                                 aria-describedby='dbpwaddon'
                             />
                         </div>
@@ -365,12 +342,16 @@ const Login = () => {
                                 <label>
                                     <input
                                         checked={save}
-                                        onChange={(event) =>
+                                        onChange={event =>
                                             setSave(event.target.checked)
                                         }
                                         type='checkbox'
                                     />
-                                    Save Password
+                                    <font
+                                        color='white'
+                                    >
+                                        Save Password
+                                    </font>
                                 </label>
                             </div>
                             <div className='buttoncontainer'>
