@@ -555,10 +555,10 @@ div.tooltip-inner-custom {
         left: 50%;
         overflow: auto;
         max-width: 70%;
+        min-width: 70%;
         transform: translate(-50%, -50%);
-        border: 5px solid rgba(0, 0, 0, 0.5);
-        border-radius: 10px;
-        background-color: rgba(255, 255, 255, 0.9);
+        border: none;
+        background-color: #151D29;
         box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
     }
 }
@@ -570,10 +570,11 @@ div.tooltip-inner-custom {
         left: 50%;
         overflow: auto;
         max-width: 40%;
+        min-width: 40%;
         transform: translate(-50%, -50%);
         border: 5px solid rgba(0, 0, 0, 0.5);
-        border-radius: 10px;
-        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: none;
+        background-color: #151D29;
         box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
     }
 }
@@ -585,12 +586,24 @@ div.tooltip-inner-custom {
         left: 50%;
         overflow: auto;
         max-width: 25%;
+        min-width: 25%;
         transform: translate(-50%, -50%);
-        border: 5px solid rgba(0, 0, 0, 0.5);
-        border-radius: 10px;
-        background-color: rgba(255, 255, 255, 0.9);
+        border: none;
+        background-color: #151D29;
         box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
     }
+}
+
+.text-center {
+    color: white;
+    font-weight: 400;
+}
+
+.login-text {
+    background-color: #2B333E;
+    color: white;
+    border: none !important;
+    width: 100%;
 }
 
 .loginwindow > div img {
@@ -605,8 +618,12 @@ div.tooltip-inner-custom {
 }
 
 .loginwindow .input-group-addon {
-    min-width: 115px;
+    width: 115px;
     text-align: left;
+}
+
+.loginwindow .input-group {
+    width: 100%;
 }
 
 .loginwindow > #checkconnectionpanel {
