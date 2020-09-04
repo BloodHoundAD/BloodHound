@@ -23,21 +23,25 @@ const HasSession = ({ sourceName, sourceType, targetName, targetType }) => {
                     targetName,
                     targetType
                 )}
+                className = 'helptab'
             />
             <Tab
                 eventKey={2}
                 title='ABUSE'
                 dangerouslySetInnerHTML={Abuse()}
+                className = 'helptab'
             />
             <Tab
                 eventKey={3}
                 title='OPSEC'
                 dangerouslySetInnerHTML={Opsec()}
+                className = 'helptab'
             />
             <Tab
                 eventKey={4}
                 title='REFERENCES'
                 dangerouslySetInnerHTML={References()}
+                className = 'helptab'
             />
         </Tabs>
     );
