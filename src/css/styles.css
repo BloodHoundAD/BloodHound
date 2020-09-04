@@ -1089,8 +1089,8 @@ div.tooltip-inner-custom {
     padding: 15px !important;
 }
 
-.help-modal-width > div {
-    width: 40%;
+.help-modal-width #tab-style > ul > li {
+    width: 25%;
 }
 
 .help-modal-width .modal-body {
