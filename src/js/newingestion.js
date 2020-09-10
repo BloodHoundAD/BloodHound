@@ -826,8 +826,8 @@ export function buildAzureGroups(chunk) {
             });
 
             insertNew(queries, format, {
-                source: row.ObjectID.toUpperCase(),
-                target: row.TenantID.toUpperCase(),
+                source: row.TenantID.toUpperCase(),
+                target: row.ObjectID.toUpperCase(),
             });
         }
     }
