@@ -716,7 +716,7 @@ export function buildAzureGlobalAdminRights(chunk) {
 
     let format = [
         '',
-        'Tenant',
+        'AZTenant',
         'AZGlobalAdmin',
         '{isacl: false, isazure: true}',
     ];
@@ -755,7 +755,7 @@ export function buildAzureUsers(chunk) {
 
     let format = [
         'AzureUser',
-        'Tenant',
+        'AZTenant',
         'AZGlobalAdmin',
         '{isacl: false, isazure: true}',
     ];
@@ -1310,7 +1310,7 @@ export function buildAzurePrivRileAdminRights(chunk) {
 
     let format = [
         '',
-        'Tenant',
+        'AZTenant',
         'AZPrivilegedRoleAdmin',
         '{isacl: false, isazure: true}',
     ];
