@@ -76,7 +76,7 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
     }, [label]);
 
     return elements.length == 0 ? null : (
-        <CollapsibleSection header={'Node Properties'}>
+        <CollapsibleSection header={'NODE PROPERTIES'}>
             <div className={styles.itemlist}>
                 <Table bordered={false} hover responsive>
                     <tbody>
