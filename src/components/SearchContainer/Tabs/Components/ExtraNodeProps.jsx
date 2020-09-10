@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import CollapsibleSection from './CollapsibleSection';
+import styles from './ExtraNodeProps.module.css'
+import { Table } from 'react-bootstrap';
 
 const ExtraNodeProps = ({ label, properties, displayMap }) => {
     const [elements, setElements] = useState([]);
@@ -72,23 +74,29 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
     };
 
     useEffect(() => {
-        let temp = [];
-        let mapped = Object.keys(displayMap);
-        Object.keys(properties)
-            .sort()
-            .forEach(val => {
-                if (!mapped.includes(val) && !blacklist.includes(val)) {
-                    temp = temp.concat(convertProperty(val));
-                }
-            });
-        temp = temp.filter(s => s !== undefined);
-
+        let temp = {};
+        Object.keys(displayMap).forEach((val, index) => {
+            let c = convertProperty(val);
+            if (c.length !== 0) temp[val] = c;
+        });
         setElements(temp);
     }, [label]);
 
     return elements.length == 0 ? null : (
-        <CollapsibleSection header={'Extra Properties'}>
-            {elements}
+        <CollapsibleSection header={'EXTRA PROPERTIES'}>
+            <div className={styles.itemlist}>
+                <Table bordered={false} hover responsive>
+                    <tbody>
+                        {Object.keys(elements).map((key) => {
+                            return (
+                                <tr key={key}>
+                                    <td>{elements[key]}</td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </Table>
+            </div>
         </CollapsibleSection>
     );
 };
