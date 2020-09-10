@@ -141,6 +141,7 @@ const AddEdgeModal = () => {
             edgeValue === 'GenericWrite' ||
             edgeValue === 'AllExtendedRights' ||
             edgeValue === 'AddMember' ||
+            edgeValue === 'AddSelf' ||
             edgeValue === 'ForceChangePassword' ||
             edgeValue === 'Owns' ||
             edgeValue === 'WriteDacl' ||
@@ -241,6 +242,7 @@ const AddEdgeModal = () => {
                                 AllExtendedRights
                             </option>
                             <option value='AddMember'>AddMember</option>
+                            <option value='AddSelf'>AddSelf</option>
                             <option value='ForceChangePassword'>
                                 ForceChangePassword
                             </option>

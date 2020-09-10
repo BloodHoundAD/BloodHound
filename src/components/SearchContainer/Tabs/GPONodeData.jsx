@@ -125,7 +125,7 @@ const GPONodeData = () => {
                         property='Explicit Object Controllers'
                         target={objectid}
                         baseQuery={
-                            'MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:GPO {objectid: $objectid})'
+                            'MATCH p = (n)-[r:AddMember|AddSelf|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:GPO {objectid: $objectid})'
                         }
                         end={label}
                         distinct
@@ -145,7 +145,7 @@ const GPONodeData = () => {
                         property='Transitive Object Controllers'
                         target={objectid}
                         baseQuery={
-                            'MATCH (n) WHERE NOT n.objectid= $objectid WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:GPO {objectid: $objectid}))'
+                            'MATCH (n) WHERE NOT n.objectid= $objectid WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AddSelf|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:GPO {objectid: $objectid}))'
                         }
                         end={label}
                         distinct

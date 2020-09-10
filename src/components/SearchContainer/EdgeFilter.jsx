@@ -14,6 +14,7 @@ const EdgeFilter = ({ open }) => {
         } else if (section === 'acl') {
             current.AllExtendedRights = false;
             current.AddMember = false;
+            current.AddSelf = false;
             current.ForceChangePassword = false;
             current.GenericAll = false;
             current.GenericWrite = false;
@@ -50,6 +51,7 @@ const EdgeFilter = ({ open }) => {
         } else if (section === 'acl') {
             current.AllExtendedRights = true;
             current.AddMember = true;
+            current.AddSelf = true;
             current.ForceChangePassword = true;
             current.GenericAll = true;
             current.GenericWrite = true;
@@ -217,6 +219,19 @@ const EdgeFilter = ({ open }) => {
                 <label onClick={e => handleEdgeChange(e)} name='AddMember'>
                     {' '}
                     AddMember
+                </label>
+            </div>
+            <div>
+                <input
+                    className='checkbox-inline'
+                    type='checkbox'
+                    name='AddSelf'
+                    checked={edgeIncluded.AddSelf}
+                    onChange={e => handleEdgeChange(e)}
+                />
+                <label onClick={e => handleEdgeChange(e)} name='AddSelf'>
+                    {' '}
+                    AddSelf
                 </label>
             </div>
             <div>

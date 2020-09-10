@@ -580,6 +580,8 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
             rights.push('AllExtendedRights');
         } else if (aceType === 'User-Force-Change-Password') {
             rights.push('ForceChangePassword');
+        } else if (aceType === 'AddSelf') {
+            rights.push('AddSelf');
         } else if (aceType === 'AddMember') {
             rights.push('AddMember');
         } else if (aceType === 'AllowedToAct') {

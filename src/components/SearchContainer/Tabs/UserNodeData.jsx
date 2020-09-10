@@ -283,7 +283,7 @@ const UserNodeData = () => {
                         property='Transitive Object Control'
                         target={objectId}
                         baseQuery={
-                            'MATCH (n) WHERE NOT n.objectid=$objectid MATCH p=shortestPath((u:User {objectid: $objectid})-[r1:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))'
+                            'MATCH (n) WHERE NOT n.objectid=$objectid MATCH p=shortestPath((u:User {objectid: $objectid})-[r1:MemberOf|AddMember|AddSelf|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))'
                         }
                         start={label}
                         distinct
@@ -305,7 +305,7 @@ const UserNodeData = () => {
                         property='Unrolled Object Controllers'
                         target={objectId}
                         baseQuery={
-                            'MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1:AddMember|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(u:User {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = u.objectid) AND NOT n.objectid = u.objectid'
+                            'MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1:AddMember|AddSelf|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(u:User {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = u.objectid) AND NOT n.objectid = u.objectid'
                         }
                         end={label}
                         distinct

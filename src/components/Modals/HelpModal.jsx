@@ -9,6 +9,7 @@ import AllExtendedRights from './HelpTexts/AllExtendedRights/AllExtendedRights';
 import AdminTo from './HelpTexts/AdminTo/AdminTo';
 import HasSession from './HelpTexts/HasSession/HasSession';
 import AddMember from './HelpTexts/AddMember/AddMember';
+import AddSelf from './HelpTexts/AddSelf/AddSelf';
 import ForceChangePassword from './HelpTexts/ForceChangePassword/ForceChangePassword';
 import GenericWrite from './HelpTexts/GenericWrite/GenericWrite';
 import Owns from './HelpTexts/Owns/Owns';
@@ -69,6 +70,7 @@ const HelpModal = () => {
         AdminTo: AdminTo,
         HasSession: HasSession,
         AddMember: AddMember,
+        AddSelf: AddSelf,
         ForceChangePassword: ForceChangePassword,
         GenericWrite: GenericWrite,
         Owns: Owns,
