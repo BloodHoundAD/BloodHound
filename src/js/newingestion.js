@@ -1170,7 +1170,7 @@ export function buildAzureKVPermissions(chunk) {
             'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.name = prop.name',
         props: [],
     };
-    let format = ['', 'AZVM', '', '{isacl: false, isazure: true}'];
+    let format = ['', 'AZKeyVault', '', '{isacl: false, isazure: true}'];
 
     for (let row of chunk) {
         let role = row.RoleName.toUpperCase();
