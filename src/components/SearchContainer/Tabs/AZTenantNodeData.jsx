@@ -20,7 +20,6 @@ const AZTenantNodeData = () => {
     const [label, setLabel] = useState(null);
     const [domain, setDomain] = useState(null);
     const [nodeProps, setNodeProps] = useState({});
-    const [blocksInheritance, setBlocksInheritance] = useState(false);
 
     useEffect(() => {
         emitter.on('nodeClicked', nodeClickEvent);
@@ -35,7 +34,6 @@ const AZTenantNodeData = () => {
             setVisible(true);
             setObjectid(id);
             setDomain(domain);
-            setBlocksInheritance(blocksinheritance);
             let session = driver.session();
             session
                 .run(`MATCH (n:AZTenant {objectid: $objectid}) RETURN n AS node`, {
@@ -80,83 +78,59 @@ const AZTenantNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header='Descendant Objects'>
+                <CollapsibleSection header='DESCENDANT OBJECTS'>
                 <div className={styles.itemlist}>
                     <Table class="table table-hover table-striped table-borderless table-responsive">
                         <thead></thead>
                         <tbody className='searchable'>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Subscriptions'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p=(o:AZTenant {objectid: $objectid})-[r:AZContains*1..]->(n:AZSubscription)'
-                                        }
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Total VM Objects'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p=(o:AZTenant {objectid: $objectid})-[r:AZContains*1..]->(n:AZVM)'
-                                        }
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Total Resource Group Objects'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p=(o:AZTenant {objectid: $objectid})-[r:AZContains*1..]->(n:AZResourceGroup)'
-                                        }
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Total Key Vault Objects'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p=(o:AZTenant {objectid: $objectid})-[r:AZContains*1..]->(n:AZKeyVault)'
-                                        }
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Total User Objects'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p=(o:AZTenant {objectid: $objectid})-[r:AZContains*1..]->(n:AZUser)'
-                                        }
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Total Group Objects'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p=(o:AZTenant {objectid: $objectid})-[r:AZContains*1..]->(n:AZGroup)'
-                                        }
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
+                            <NodeCypherLink
+                                property='Subscriptions'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(o:AZTenant {objectid: $objectid})-[r:AZContains*1..]->(n:AZSubscription)'
+                                }
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Total VM Objects'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(o:AZTenant {objectid: $objectid})-[r:AZContains*1..]->(n:AZVM)'
+                                }
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Total Resource Group Objects'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(o:AZTenant {objectid: $objectid})-[r:AZContains*1..]->(n:AZResourceGroup)'
+                                }
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Total Key Vault Objects'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(o:AZTenant {objectid: $objectid})-[r:AZContains*1..]->(n:AZKeyVault)'
+                                }
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Total User Objects'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(o:AZTenant {objectid: $objectid})-[r:AZContains*1..]->(n:AZUser)'
+                                }
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Total Group Objects'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(o:AZTenant {objectid: $objectid})-[r:AZContains*1..]->(n:AZGroup)'
+                                }
+                                distinct
+                            />
                         </tbody>
                     </Table>
                 </div>
@@ -164,48 +138,36 @@ const AZTenantNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header='Inbound Control'>
+                <CollapsibleSection header='INBOUND CONTROL'>
                 <div className={styles.itemlist}>
                     <Table class="table table-hover table-striped table-borderless table-responsive">
                         <thead></thead>
                         <tbody className='searchable'>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Global Admins'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p=(n)-[r:AZGlobalAdmin]->(o:AZTenant {objectid: $objectid})'
-                                        }
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodeCypherLink
-                                        property='Privileged Role Admins'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH p=(n)-[r:AZPrivilegedRoleAdmin]->(o:AZTenant {objectid: $objectid})'
-                                        }
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <NodePlayCypherLink
-                                        property='Transitive Object Controllers'
-                                        target={objectid}
-                                        baseQuery={
-                                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZTenant {objectid: $objectid}))'
-                                        }
-                                        end={label}
-                                        distinct
-                                    />
-                                </td>
-                            </tr>
+                            <NodeCypherLink
+                                property='Global Admins'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(n)-[r:AZGlobalAdmin]->(o:AZTenant {objectid: $objectid})'
+                                }
+                                distinct
+                            />
+                            <NodeCypherLink
+                                property='Privileged Role Admins'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH p=(n)-[r:AZPrivilegedRoleAdmin]->(o:AZTenant {objectid: $objectid})'
+                                }
+                                distinct
+                            />
+                            <NodePlayCypherLink
+                                property='Transitive Object Controllers'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZTenant {objectid: $objectid}))'
+                                }
+                                end={label}
+                                distinct
+                            />
                         </tbody>
                     </Table>
                 </div>
