@@ -13,7 +13,12 @@ const AZAddMembers = ({
     targetType,
 }) => {
     return (
-        <Tabs defaultActiveKey={1} id='help-tab-container' justified>
+        <Tabs
+            defaultActiveKey={1}
+            id='tab-style'
+            bsStyle='rectangles'
+            justified
+        >
             <Tab
                 eventKey={1}
                 title='INFO'
