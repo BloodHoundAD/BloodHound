@@ -29,6 +29,7 @@ import ReadGMSAPassword from './HelpTexts/ReadGMSAPassword/ReadGMSAPassword';
 import HasSIDHistory from './HelpTexts/HasSIDHistory/HasSIDHistory';
 import TrustedBy from './HelpTexts/TrustedBy/TrustedBy';
 import CanPSRemote from './HelpTexts/CanPSRemote/CanPSRemote';
+import AZAddMembers from './HelpTexts/AZAddMembers/AZAddMembers';
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -89,6 +90,7 @@ const HelpModal = () => {
         HasSIDHistory: HasSIDHistory,
         TrustedBy: TrustedBy,
         CanPSRemote: CanPSRemote,
+        AZAddMembers: AZAddMembers,
     };
 
     const Component = components[edge];
