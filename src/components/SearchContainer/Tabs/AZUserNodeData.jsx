@@ -155,7 +155,7 @@ const AZUserNodeData = () => {
                                 property='Group Delegated Object Control'
                                 target={objectid}
                                 baseQuery={
-                                    'MATCH p = (g1:AZUser {objectid: $objectid})-[r1:MemberOf*1..]->(g2:Group)-[r2:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor]->(n)'
+                                    'MATCH p = (g1:AZUser {objectid: $objectid})-[r1:MemberOf*1..]->(g2)-[r2:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor]->(n)'
                                 }
                                 start={label}
                                 distinct
@@ -185,7 +185,7 @@ const AZUserNodeData = () => {
                                 property='Explicit Object Controllers'
                                 target={objectid}
                                 baseQuery={
-                                    'MATCH p = (n)-[r:AZOwns|AZAddMembers]->(g:AZUser {objectid: $objectid})'
+                                    'MATCH p = (n)-[r:AZOwns|AZResetPassword]->(g:AZUser {objectid: $objectid})'
                                 }
                                 end={label}
                                 distinct
@@ -194,7 +194,7 @@ const AZUserNodeData = () => {
                                 property='Unrolled Object Controllers'
                                 target={objectid}
                                 baseQuery={
-                                    'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AZOwns|AZAddMembers]->(g2:AZUser {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                    'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns|AZResetPassword]->(g2:AZUser {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
                                 }
                                 end={label}
                                 distinct
@@ -203,7 +203,7 @@ const AZUserNodeData = () => {
                                 property='Transitive Object Controllers'
                                 target={objectid}
                                 baseQuery={
-                                    'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r:AZMemberOf|AZOwns|AZAddMembers*1..]->(g:AZUser {objectid: $objectid}))'
+                                    'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[*1..]->(g:AZUser {objectid: $objectid}))'
                                 }
                                 end={label}
                                 distinct
