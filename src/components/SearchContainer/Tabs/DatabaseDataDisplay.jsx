@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styles from './DatabaseDataDisplay.module.css';
 import { Table } from 'react-bootstrap';
+import clsx from 'clsx';
 
 export default class DatabaseDataDisplay extends Component {
     constructor() {
@@ -68,28 +69,28 @@ export default class DatabaseDataDisplay extends Component {
 
         s1.run(
             "MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)"
-        ).then(result => {
+        ).then((result) => {
             this.setState({
                 num_users: result.records[0]._fields[0].toLocaleString(),
             });
             s1.close();
         });
 
-        s2.run('MATCH (n:Group) RETURN count(n)').then(result => {
+        s2.run('MATCH (n:Group) RETURN count(n)').then((result) => {
             this.setState({
                 num_groups: result.records[0]._fields[0].toLocaleString(),
             });
             s2.close();
         });
 
-        s3.run('MATCH (n:Computer) RETURN count(n)').then(result => {
+        s3.run('MATCH (n:Computer) RETURN count(n)').then((result) => {
             this.setState({
                 num_computers: result.records[0]._fields[0].toLocaleString(),
             });
             s3.close();
         });
 
-        s4.run('MATCH ()-[r:HasSession]->() RETURN count(r)').then(result => {
+        s4.run('MATCH ()-[r:HasSession]->() RETURN count(r)').then((result) => {
             this.setState({
                 num_sessions: result.records[0]._fields[0].toLocaleString(),
             });
@@ -97,7 +98,7 @@ export default class DatabaseDataDisplay extends Component {
         });
 
         s6.run('MATCH ()-[r {isacl: true}]->() RETURN count(r)').then(
-            result => {
+            (result) => {
                 this.setState({
                     num_acls: result.records[0]._fields[0].toLocaleString(),
                 });
@@ -105,7 +106,7 @@ export default class DatabaseDataDisplay extends Component {
             }
         );
 
-        s5.run('MATCH ()-[r]->() RETURN count(r)').then(result => {
+        s5.run('MATCH ()-[r]->() RETURN count(r)').then((result) => {
             this.setState({
                 num_relationships: result.records[0]._fields[0].toLocaleString(),
             });
@@ -115,85 +116,53 @@ export default class DatabaseDataDisplay extends Component {
 
     render() {
         return (
-
             <div className={styles.nodelist}>
-                <Table class="table table-hover table-striped table-borderless table-responsive">
-                    <thead>
-                    </thead>
+                <Table hover striped responsive>
+                    <thead></thead>
                     <tbody className='searchable'>
                         <tr>
-                            <td>
-                                Address
-                            </td>
-                            <td align="right">
-                                {this.state.url}
-                            </td>
+                            <td>Address</td>
+                            <td align='right'>{this.state.url}</td>
                         </tr>
                         <tr>
-                            <td>
-                                DB User
-                            </td>
-                            <td align="right">
-                                {this.state.user}
-                            </td>
+                            <td>DB User</td>
+                            <td align='right'>{this.state.user}</td>
                         </tr>
                         <tr>
-                            <td>
-                                Users
-                            </td>
-                            <td align="right">
-                                {this.state.num_users}
-                            </td>
+                            <td>Users</td>
+                            <td align='right'>{this.state.num_users}</td>
                         </tr>
                         <tr>
-                            <td>
-                                Computers
-                            </td>
-                            <td align="right">
-                                {this.state.num_computers}
-                            </td>
+                            <td>Computers</td>
+                            <td align='right'>{this.state.num_computers}</td>
                         </tr>
                         <tr>
-                            <td>
-                                Groups
-                            </td>
-                            <td align="right">
-                                {this.state.num_groups}
-                            </td>
+                            <td>Groups</td>
+                            <td align='right'>{this.state.num_groups}</td>
                         </tr>
                         <tr>
-                            <td>
-                                Sessions
-                            </td>
-                            <td align="right">
-                                {this.state.num_sessions}
-                            </td>
+                            <td>Sessions</td>
+                            <td align='right'>{this.state.num_sessions}</td>
                         </tr>
                         <tr>
-                            <td>
-                                ACEs
-                            </td>
-                            <td align="right">
-                                {this.state.num_acls}
-                            </td>
+                            <td>ACEs</td>
+                            <td align='right'>{this.state.num_acls}</td>
                         </tr>
                         <tr>
-                            <td>
-                                Total Relationships
-                            </td>
-                            <td align="right">
+                            <td>Total Relationships</td>
+                            <td align='right'>
                                 {this.state.num_relationships}
                             </td>
                         </tr>
                     </tbody>
                 </Table>
 
-                <div className='text-center' class={styles.buttongroup}>
-                    <div className='btn-group' role='group' class={styles.buttongroup}>
+                <div className={clsx('text-center', styles.buttongroup)}>
+                    <div role='group' className={styles.buttongroup}>
                         <button
                             type='button'
-                            class={styles.btnleft}
-                            onClick={function() {
+                            className={styles.btnleft}
+                            onClick={function () {
                                 this.refreshDBData();
                             }.bind(this)}
                         >
@@ -201,24 +170,24 @@ export default class DatabaseDataDisplay extends Component {
                         </button>
                         <button
                             type='button'
-                            class={styles.btnright}
+                            className={styles.btnright}
                             onClick={this.toggleWarmupModal}
                         >
                             Warm Up Database
                         </button>
                     </div>
                     <p></p>
-                    <div className='btn-group' role='group' class={styles.buttongroup}>
+                    <div role='group' className={styles.buttongroup}>
                         <button
                             type='button'
-                            class={styles.btnleft}
+                            className={styles.btnleft}
                             onClick={this.toggleSessionClearModal}
                         >
                             Clear Sessions
                         </button>
                         <button
                             type='button'
-                            class={styles.btnright}
+                            className={styles.btnright}
                             onClick={this.toggleDBWarnModal}
                         >
                             Clear Database
@@ -226,7 +195,7 @@ export default class DatabaseDataDisplay extends Component {
                     </div>
                     <p></p>
                     <div className='text-center'>
-                        <a href="blah">
+                        <a href='#' onClick={this.toggleLogoutModal}>
                             Log Out / Switch Database
                         </a>
                     </div>

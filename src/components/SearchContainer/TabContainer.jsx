@@ -22,6 +22,7 @@ import { Tabs, Tab } from 'react-bootstrap';
 import { openSync, readSync, closeSync } from 'fs';
 import imageType from 'image-type';
 import { withAlert } from 'react-alert';
+import styles from './TabContainer.module.css';
 
 class TabContainer extends Component {
     constructor(props) {
@@ -280,7 +281,6 @@ class TabContainer extends Component {
             azAppVisible: false,
         });
         this.setState({ selected: 2 });
-        
     }
 
     _azKeyVaultNodeClicked() {
@@ -303,7 +303,6 @@ class TabContainer extends Component {
             azAppVisible: false,
         });
         this.setState({ selected: 2 });
-        
     }
 
     _azResourceGroupNodeClicked() {
@@ -326,7 +325,6 @@ class TabContainer extends Component {
             azAppVisible: false,
         });
         this.setState({ selected: 2 });
-        
     }
 
     _azDeviceNodeClicked() {
@@ -349,7 +347,6 @@ class TabContainer extends Component {
             azAppVisible: false,
         });
         this.setState({ selected: 2 });
-        
     }
 
     _azSubscriptionNodeClicked() {
@@ -372,7 +369,6 @@ class TabContainer extends Component {
             azAppVisible: false,
         });
         this.setState({ selected: 2 });
-        
     }
 
     _azTenantNodeClicked() {
@@ -395,7 +391,6 @@ class TabContainer extends Component {
             azAppVisible: false,
         });
         this.setState({ selected: 2 });
-        
     }
 
     _azVMNodeClicked() {
@@ -418,7 +413,6 @@ class TabContainer extends Component {
             azAppVisible: false,
         });
         this.setState({ selected: 2 });
-        
     }
 
     _azServicePrincipalNodeClicked() {
@@ -441,7 +435,6 @@ class TabContainer extends Component {
             azAppVisible: false,
         });
         this.setState({ selected: 2 });
-        
     }
 
     _azAppNodeClicked() {
@@ -464,7 +457,6 @@ class TabContainer extends Component {
             azAppVisible: true,
         });
         this.setState({ selected: 2 });
-        
     }
 
     _handleSelect(index, last) {
@@ -476,9 +468,10 @@ class TabContainer extends Component {
             <div>
                 <Tabs
                     id='tab-style'
-                    bsStyle='rectangles'
+                    bsStyle='pills'
                     activeKey={this.state.selected}
                     onSelect={this._handleSelect.bind(this)}
+                    className={styles.tc}
                 >
                     <Tab eventKey={1} title='Database Info'>
                         <DatabaseDataDisplay />
@@ -515,13 +508,25 @@ class TabContainer extends Component {
                         <OuNodeData visible={this.state.ouVisible} />
                         <AZGroupNodeData visible={this.state.azGroupVisible} />
                         <AZUserNodeData visible={this.state.azUserVisible} />
-                        <AZKeyVaultNodeData visible={this.state.azKeyVaultVisible} />
-                        <AZResourceGroupNodeData visible={this.state.azResourceGroupVisible} />
-                        <AZDeviceNodeData visible={this.state.azDeviceVisible} />
-                        <AZSubscriptionNodeData visible={this.state.azSubscriptionVisible} />
-                        <AZTenantNodeData visible={this.state.azTenantVisible} />
+                        <AZKeyVaultNodeData
+                            visible={this.state.azKeyVaultVisible}
+                        />
+                        <AZResourceGroupNodeData
+                            visible={this.state.azResourceGroupVisible}
+                        />
+                        <AZDeviceNodeData
+                            visible={this.state.azDeviceVisible}
+                        />
+                        <AZSubscriptionNodeData
+                            visible={this.state.azSubscriptionVisible}
+                        />
+                        <AZTenantNodeData
+                            visible={this.state.azTenantVisible}
+                        />
                         <AZVMNodeData visible={this.state.azVMVisible} />
-                        <AZServicePrincipalNodeData visible={this.state.azServicePrincipalVisible} />
+                        <AZServicePrincipalNodeData
+                            visible={this.state.azServicePrincipalVisible}
+                        />
                         <AZAppNodeData visible={this.state.azAppVisible} />
                     </Tab>
 

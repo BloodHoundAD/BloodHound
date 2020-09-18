@@ -1341,9 +1341,9 @@ export function buildAzureApplicationAdmins(chunk) {
 
     for (let row of chunk) {
         let source;
-        let controllerType = row.AppAdminType;
-        source = row.AppAdminID.toUpperCase();
-        if (row.AppOnPremID === null) {
+        let controllerType = row.AppAdminType.toUpperCase();
+        if (row.AppAdminOnPremID === null) {
+            source = row.AppAdminID.toUpperCase();
             if (controllerType === 'USER') {
                 format[0] = 'AZUser';
             } else if (controllerType === 'GROUP') {
@@ -1352,6 +1352,7 @@ export function buildAzureApplicationAdmins(chunk) {
                 format[0] = 'AZServicePrincipal';
             }
         } else {
+            source = row.AppAdminOnPremID.toUpperCase();
             if (controllerType === 'USER') {
                 format[0] = 'User';
             } else if (controllerType === 'GROUP') {
@@ -1361,7 +1362,7 @@ export function buildAzureApplicationAdmins(chunk) {
 
         insertNew(queries, format, {
             source: source,
-            target: row.TargetAppID,
+            target: row.TargetAppID.toUpperCase(),
         });
     }
 
@@ -1380,9 +1381,9 @@ export function buildAzureCloudApplicationAdmins(chunk) {
 
     for (let row of chunk) {
         let source;
-        let controllerType = row.AppAdminType;
-        source = row.AppAdminID.toUpperCase();
-        if (row.AppOnPremID === null) {
+        let controllerType = row.AppAdminType.toUpperCase();
+        if (row.AppAdminOnPremID === null) {
+            source = row.AppAdminID.toUpperCase();
             if (controllerType === 'USER') {
                 format[0] = 'AZUser';
             } else if (controllerType === 'GROUP') {
@@ -1391,6 +1392,7 @@ export function buildAzureCloudApplicationAdmins(chunk) {
                 format[0] = 'AZServicePrincipal';
             }
         } else {
+            source = row.AppAdminOnPremID.toUpperCase();
             if (controllerType === 'USER') {
                 format[0] = 'User';
             } else if (controllerType === 'GROUP') {
@@ -1400,7 +1402,7 @@ export function buildAzureCloudApplicationAdmins(chunk) {
 
         insertNew(queries, format, {
             source: source,
-            target: row.TargetAppID,
+            target: row.TargetAppID.toUpperCase(),
         });
     }
 

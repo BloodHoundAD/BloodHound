@@ -112,7 +112,7 @@ const Login = () => {
 
         session
             .run('MATCH (n) RETURN n LIMIT 1')
-            .then(_ => {
+            .then((_) => {
                 setLoginRunning(false);
                 setLoginSuccess(true);
 
@@ -143,6 +143,18 @@ const Login = () => {
                     }
                 );
 
+                session = global.driver.session();
+                session
+                    .run(
+                        'CALL dbms.components() YIELD versions RETURN versions[0] AS version'
+                    )
+                    .then((result) => {
+                        let record = result.records[0];
+                        let version = record.get('version');
+                        global.neoVersion = version;
+                        session.close();
+                    });
+
                 setTimeout(() => {
                     setVisible(false);
                     setTimeout(() => {
@@ -150,7 +162,7 @@ const Login = () => {
                     }, 400);
                 }, 1500);
             })
-            .catch(error => {
+            .catch((error) => {
                 console.log(error);
                 if (error.message.includes('authentication failure')) {
                     setLoginEnabled(true);
@@ -234,7 +246,7 @@ const Login = () => {
 
         session
             .run('MATCH (n) RETURN n LIMIT 1')
-            .then(result => {
+            .then((result) => {
                 icon.removeClass();
                 icon.addClass(
                     'fa fa-check-circle green-icon-color form-control-feedback'
@@ -242,7 +254,7 @@ const Login = () => {
                 setLoginEnabled(true);
                 setUrl(tempUrl);
             })
-            .catch(error => {
+            .catch((error) => {
                 if (error.message.includes('WebSocket connection failure')) {
                     icon.removeClass();
                     icon.addClass(
@@ -268,7 +280,7 @@ const Login = () => {
             });
     };
 
-    const triggerLogin = event => {
+    const triggerLogin = (event) => {
         let key = event.keyCode ? event.KeyCode : event.which;
 
         if (key === 13) {
@@ -292,11 +304,11 @@ const Login = () => {
                     <div className='form-group has-feedback'>
                         <div className='input-group'>
                             <input
-                                onFocus={function() {
+                                onFocus={function () {
                                     icon.tooltip('hide');
                                 }}
                                 onBlur={checkDatabaseExists}
-                                onChange={event => {
+                                onChange={(event) => {
                                     setUrl(event.target.value);
                                 }}
                                 type='text'
@@ -315,7 +327,7 @@ const Login = () => {
                                 type='text'
                                 value={user}
                                 onKeyDown={triggerLogin}
-                                onChange={event => {
+                                onChange={(event) => {
                                     setUser(event.target.value);
                                 }}
                                 className='form-control login-text'
@@ -328,7 +340,7 @@ const Login = () => {
                                 ref={passwordRef}
                                 value={password}
                                 onKeyDown={triggerLogin}
-                                onChange={event => {
+                                onChange={(event) => {
                                     setPassword(event.target.value);
                                 }}
                                 type='password'
@@ -342,16 +354,12 @@ const Login = () => {
                                 <label>
                                     <input
                                         checked={save}
-                                        onChange={event =>
+                                        onChange={(event) =>
                                             setSave(event.target.checked)
                                         }
                                         type='checkbox'
                                     />
-                                    <font
-                                        color='white'
-                                    >
-                                        Save Password
-                                    </font>
+                                    <font color='white'>Save Password</font>
                                 </label>
                             </div>
                             <div className='buttoncontainer'>

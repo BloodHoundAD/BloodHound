@@ -89,7 +89,7 @@ const SpotlightContainer = () => {
             </div>
 
             <div className={styles.nodelist}>
-                <Table class='table table-hover table-striped table-borderless table-responsive'>
+                <Table>
                     <thead>
                         <tr>
                             <td>Node Label</td>

@@ -64,7 +64,7 @@ const ExportContainer = () => {
 
                 <Panel.Body>
                     <div className={styles.itemlist}>
-                        <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <Table>
                             <thead></thead>
                             <tbody className='searchable'>
                                 <tr
