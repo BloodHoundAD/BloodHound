@@ -1337,16 +1337,30 @@ export function buildAzurePrivRileAdminRights(chunk) {
 export function buildAzureApplicationAdmins(chunk) {
     let queries = {};
 
-    let format = [
-        'AZUser',
-        'AZApp',
-        'AZAppAdmin',
-        '{isacl: false, isazure: true}',
-    ];
+    let format = ['', 'AZApp', 'AZAppAdmin', '{isacl: false, isazure: true}'];
 
     for (let row of chunk) {
+        let source;
+        let controllerType = row.AppAdminType;
+        source = row.AppAdminID.toUpperCase();
+        if (row.AppOnPremID === null) {
+            if (controllerType === 'USER') {
+                format[0] = 'AZUser';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'AZGroup';
+            } else if (controllerType === 'SERVICEPRINCIPAL') {
+                format[0] = 'AZServicePrincipal';
+            }
+        } else {
+            if (controllerType === 'USER') {
+                format[0] = 'User';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'Group';
+            }
+        }
+
         insertNew(queries, format, {
-            source: row.AppAdminID,
+            source: source,
             target: row.TargetAppID,
         });
     }
@@ -1358,15 +1372,34 @@ export function buildAzureCloudApplicationAdmins(chunk) {
     let queries = {};
 
     let format = [
-        'AZUser',
+        '',
         'AZApp',
         'AZCloudAppAdmin',
         '{isacl: false, isazure: true}',
     ];
 
     for (let row of chunk) {
+        let source;
+        let controllerType = row.AppAdminType;
+        source = row.AppAdminID.toUpperCase();
+        if (row.AppOnPremID === null) {
+            if (controllerType === 'USER') {
+                format[0] = 'AZUser';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'AZGroup';
+            } else if (controllerType === 'SERVICEPRINCIPAL') {
+                format[0] = 'AZServicePrincipal';
+            }
+        } else {
+            if (controllerType === 'USER') {
+                format[0] = 'User';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'Group';
+            }
+        }
+
         insertNew(queries, format, {
-            source: row.AppAdminID,
+            source: source,
             target: row.TargetAppID,
         });
     }
