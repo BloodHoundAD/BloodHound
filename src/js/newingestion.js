@@ -1338,8 +1338,8 @@ export function buildAzureApplicationAdmins(chunk) {
     let queries = {};
 
     let format = [
-        'AZApp',
         'AZUser',
+        'AZApp',
         'AZAppAdmin',
         '{isacl: false, isazure: true}',
     ];
@@ -1358,8 +1358,8 @@ export function buildAzureCloudApplicationAdmins(chunk) {
     let queries = {};
 
     let format = [
-        'AZApp',
         'AZUser',
+        'AZApp',
         'AZCloudAppAdmin',
         '{isacl: false, isazure: true}',
     ];
