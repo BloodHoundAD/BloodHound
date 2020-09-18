@@ -1333,3 +1333,43 @@ export function buildAzurePrivRileAdminRights(chunk) {
 
     return queries;
 }
+
+export function buildAzureApplicationAdmins(chunk) {
+    let queries = {};
+
+    let format = [
+        'AZApp',
+        'AZUser',
+        'AZAppAdmin',
+        '{isacl: false, isazure: true}',
+    ];
+
+    for (let row of chunk) {
+        insertNew(queries, format, {
+            source: row.TargetAppID,
+            target: row.AppAdminID,
+        });
+    }
+
+    return queries;
+}
+
+export function buildAzureCloudApplicationAdmins(chunk) {
+    let queries = {};
+
+    let format = [
+        'AZApp',
+        'AZUser',
+        'AZCloudAppAdmin',
+        '{isacl: false, isazure: true}',
+    ];
+
+    for (let row of chunk) {
+        insertNew(queries, format, {
+            source: row.TargetAppID,
+            target: row.AppAdminID,
+        });
+    }
+
+    return queries;
+}

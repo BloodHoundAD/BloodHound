@@ -81,6 +81,8 @@ const IngestFuncMap = {
     azgroupsrights: NewIngestion.buildAzureGroupRights,
     azglobaladminrights: NewIngestion.buildAzureGlobalAdminRights,
     azprivroleadminrights: NewIngestion.buildAzurePrivRileAdminRights,
+    azapplicationadmins: NewIngestion.buildAzureApplicationAdmins,
+    azcloudappadmins: NewIngestion.buildAzureCloudApplicationAdmins,
 };
 
 const MenuContainer = () => {

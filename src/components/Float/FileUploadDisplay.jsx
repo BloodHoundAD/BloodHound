@@ -63,10 +63,10 @@ const FileUploadDisplay = ({ file }) => {
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={3} xsOffset={1} className={styles.status}>
+                    <Col xs={6} xsOffset={1} className={styles.status}>
                         {getStatusText()}
                     </Col>
-                    <Col xs={2} xsOffset={6} className={styles.status}>
+                    <Col xs={2} xsOffset={3} className={styles.status}>
                         {`${progress}%`}
                     </Col>
                 </Row>
