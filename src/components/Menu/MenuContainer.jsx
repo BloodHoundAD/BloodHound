@@ -27,35 +27,6 @@ const FileStatus = Object.freeze({
     Done: 5,
 });
 
-const AllowedTypes = [
-    'sessions',
-    'ous',
-    'groups',
-    'gpomembers',
-    'gpos',
-    'computers',
-    'users',
-    'domains',
-    'azusers',
-    'azgroups',
-    'aztenants',
-    'azsubscriptions',
-    'azresourcegroups',
-    'azvms',
-    'azkeyvaults',
-    'azdevices',
-    'azgroupowners',
-    'azgroupmembers',
-    'azvmpermissions',
-    'azrgpermissions',
-    'azkvpermissions',
-    'azkvaccesspolicies',
-    'azpwresetrights',
-    'azgroupsrights',
-    'azglobaladminrights',
-    'azprivroleadminrights',
-];
-
 const IngestFuncMap = {
     computers: NewIngestion.buildComputerJsonNew,
     groups: NewIngestion.buildGroupJsonNew,
@@ -213,7 +184,8 @@ const MenuContainer = () => {
                 continue;
             }
 
-            if (!AllowedTypes.includes(meta.type)) {
+            if (!Object.keys(IngestFuncMap).includes(meta.type)) {
+                console.log(meta.type);
                 filteredFiles[file.id] = {
                     ...file,
                     status: FileStatus.BadType,

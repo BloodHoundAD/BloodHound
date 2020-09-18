@@ -1346,8 +1346,8 @@ export function buildAzureApplicationAdmins(chunk) {
 
     for (let row of chunk) {
         insertNew(queries, format, {
-            source: row.TargetAppID,
-            target: row.AppAdminID,
+            source: row.AppAdminID,
+            target: row.TargetAppID,
         });
     }
 
@@ -1366,8 +1366,8 @@ export function buildAzureCloudApplicationAdmins(chunk) {
 
     for (let row of chunk) {
         insertNew(queries, format, {
-            source: row.TargetAppID,
-            target: row.AppAdminID,
+            source: row.AppAdminID,
+            target: row.TargetAppID,
         });
     }
 
