@@ -721,18 +721,27 @@ export function buildAzureGlobalAdminRights(chunk) {
         '{isacl: false, isazure: true}',
     ];
     for (let row of chunk) {
-        if (row.UserOnPremID === null) {
-            format[0] = 'AZUser';
-            insertNew(queries, format, {
-                source: row.UserID.toUpperCase(),
-                target: row.TenantID.toUpperCase(),
-            });
-        } else {
-            format[0] = 'User';
-            insertNew(queries, format, {
-                source: row.UserOnPremID.toUpperCase(),
-                target: row.TenantID.toUpperCase(),
-            });
+        let type = row.UserType.toUpperCase();
+        if (type === 'USER') {
+            if (row.UserOnPremID === null) {
+                format[0] = 'AZUser';
+                insertNew(queries, format, {
+                    source: row.UserID.toUpperCase(),
+                    target: row.TenantID.toUpperCase(),
+                });
+            } else {
+                format[0] = 'User';
+                insertNew(queries, format, {
+                    source: row.UserOnPremID.toUpperCase(),
+                    target: row.TenantID.toUpperCase(),
+                });
+            }
+        } else if (type === 'GROUP') {
+            format[0] = 'AZGroup';
+                insertNew(queries, format, {
+                    source: row.UserID.toUpperCase(),
+                    target: row.TenantID.toUpperCase(),
+                });
         }
     }
 
