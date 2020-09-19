@@ -1009,6 +1009,39 @@ export function buildAzureGroupOwners(chunk) {
     return queries;
 }
 
+export function buildAzureAppOwners(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZApp SET n.name = prop.name',
+        props: [],
+    };
+    let format = ['', 'AZApp', 'AZOwns', '{isacl: false, isazure: true}'];
+
+    for (let row of chunk) {
+        queries.properties.props.push({
+            source: row.AppId.toUpperCase(),
+            name: row.AppName.toUpperCase(),
+        });
+
+        if (row.OwnerOnPremID === null) {
+            format[0] = 'AZUser';
+            insertNew(queries, format, {
+                source: row.OwnerID.toUpperCase(),
+                target: row.AppId.toUpperCase(),
+            });
+        } else {
+            format[0] = 'User';
+            insertNew(queries, format, {
+                source: row.OwnerOnPremID.toUpperCase(),
+                target: row.AppId.toUpperCase(),
+            });
+        }
+    }
+
+    return queries;
+}
+
 export function buildAzureGroupMembers(chunk) {
     let queries = {};
     let format = ['', '', 'MemberOf', '{isacl: false, isazure: false}'];
