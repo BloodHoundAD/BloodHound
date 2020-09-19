@@ -785,7 +785,7 @@ export function buildAzureUsers(chunk) {
             });
         } else if (row.OnPremisesSecurityIdentifier !== null) {
             queries.opproperties.props.push({
-                source: row.ObjectID.toUpperCase(),
+                source: row.OnPremisesSecurityIdentifier.toUpperCase(),
                 name: row.UserPrincipalName.toUpperCase(),
             });
         }
