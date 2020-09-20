@@ -1334,20 +1334,20 @@ export function buildAzureGroupRights(chunk) {
                 format[0] = 'AZUser';
                 insertNew(queries, format, {
                     source: row.UserID.toUpperCase(),
-                    target: row.TenantID.toUpperCase(),
+                    target: row.TargetGroupID.toUpperCase(),
                 });
             } else {
                 format[0] = 'User';
                 insertNew(queries, format, {
                     source: row.UserOnPremID.toUpperCase(),
-                    target: row.TenantID.toUpperCase(),
+                    target: row.TargetGroupID.toUpperCase(),
                 });
             }
         } else if (type === 'GROUP') {
             format[0] = 'AZGroup';
                 insertNew(queries, format, {
                     source: row.UserID.toUpperCase(),
-                    target: row.TenantID.toUpperCase(),
+                    target: row.TargetGroupID.toUpperCase(),
                 });
         }
     }
