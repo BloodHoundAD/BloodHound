@@ -58,7 +58,7 @@ div.tooltip-inner-custom {
     width: 70%;
     transform: translateX(-50%);
     pointer-events: auto;
-    background-color: #444B55;
+    background-color: #444b55;
     border: none;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
@@ -77,7 +77,7 @@ div.tooltip-inner-custom {
 }
 
 .bottomdiv-dark .slideupbutton {
-    background-color: #151D29;
+    background-color: #151d29;
     color: white;
 }
 
@@ -341,7 +341,7 @@ div.tooltip-inner-custom {
 }
 
 .searchdiv-dark .edgeFilter {
-    background-color: #151D29;
+    background-color: #151d29;
     color: white;
 }
 
@@ -351,15 +351,15 @@ div.tooltip-inner-custom {
 
 .searchdiv-dark {
     color: white;
-    background-color: #1A2331;
-    box-shadow: 0 4px 9px 0 rgba(0,0,0,0.68);
+    background-color: #1a2331;
+    box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.68);
     border-bottom-left-radius: 11px;
     border-bottom-right-radius: 11px;
 }
 
 .searchdiv-dark #tab-style > ul > li > a {
     color: #727784;
-    font-family: "Helvetica";
+    font-family: 'Helvetica';
     font-weight: bold;
 }
 
@@ -368,27 +368,27 @@ div.tooltip-inner-custom {
 }
 
 .searchdiv-dark .searchbox {
-    background-color: #444B55;
+    background-color: #444b55;
     font-family: Helvetica;
     font-size: 14px;
-    color: #FFFFFF;
+    color: #ffffff;
 }
 
 .searchdiv-dark .spanfix {
-    background-color: #444B55;
+    background-color: #444b55;
     color: white;
 }
 
 .searchdiv-dark h4 {
-    color: #82B1C5;
-    font-family: "Helvetica";
+    color: #82b1c5;
+    font-family: 'Helvetica';
     font-weight: bold;
     font-size: 15px;
 }
 
 .searchdiv-dark h5 {
     color: white;
-    font-family: "Helvetica";
+    font-family: 'Helvetica';
     font-weight: bold;
     font-size: 15px;
     padding-top: 10px;
@@ -409,7 +409,7 @@ div.tooltip-inner-custom {
 }
 
 .searchdiv-dark .dl-horizontal dd:hover {
-    background-color: #406F8E;
+    background-color: #406f8e;
 }
 
 .searchdiv-light .dl-horizontal dd:hover {
@@ -558,7 +558,7 @@ div.tooltip-inner-custom {
         min-width: 70%;
         transform: translate(-50%, -50%);
         border: none;
-        background-color: #151D29;
+        background-color: #151d29;
         box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
     }
 }
@@ -574,7 +574,7 @@ div.tooltip-inner-custom {
         transform: translate(-50%, -50%);
         border: 5px solid rgba(0, 0, 0, 0.5);
         border-radius: none;
-        background-color: #151D29;
+        background-color: #151d29;
         box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
     }
 }
@@ -589,7 +589,7 @@ div.tooltip-inner-custom {
         min-width: 25%;
         transform: translate(-50%, -50%);
         border: none;
-        background-color: #151D29;
+        background-color: #151d29;
         box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
     }
 }
@@ -600,7 +600,7 @@ div.tooltip-inner-custom {
 }
 
 .login-text {
-    background-color: #2B333E;
+    background-color: #2b333e;
     color: white;
     border: none !important;
     width: 100%;
@@ -823,8 +823,8 @@ div.tooltip-inner-custom {
         transform: translate(-50%, 0);
         overflow-y: hidden;
         opacity: 0.5;
-        background: #151D29;
-        box-shadow: 0 4px 9px 0 rgba(0,0,0,0.68);
+        background: #151d29;
+        box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.68);
         border-bottom-left-radius: 11px;
         border-bottom-right-radius: 11px;
     }
@@ -841,8 +841,8 @@ div.tooltip-inner-custom {
         transform: translate(-50%, 0);
         overflow-y: hidden;
         opacity: 0.5;
-        background: #151D29;
-        box-shadow: 0 4px 9px 0 rgba(0,0,0,0.68);
+        background: #151d29;
+        box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.68);
         border-bottom-left-radius: 11px;
         border-bottom-right-radius: 11px;
     }
@@ -945,11 +945,11 @@ div.tooltip-inner-custom {
     display: table-cell;
     width: 35%;
     text-align: center;
-    background-color: #1D2735;
+    background-color: #1d2735;
 }
 
 #tab-style > ul > li > a:focus {
-    background-color: #151D29;
+    background-color: #151d29;
     color: black;
     outline: none;
 }
@@ -959,19 +959,19 @@ div.tooltip-inner-custom {
 }
 
 #tab-style > ul > li.active > a {
-    background-color: #151D29;
+    background-color: #151d29;
     color: white;
 }
 
 #tab-style > ul > li > a[aria-selected='true'] {
     color: white;
-    font-family: "Helvetica";
+    font-family: 'Helvetica';
     font-weight: bold;
 }
 
 #tab-style > ul > li > a[aria-selected='false'] {
     color: white;
-    font-family: "Helvetica";
+    font-family: 'Helvetica';
     font-weight: bold;
 }
 
@@ -1102,7 +1102,7 @@ div.tooltip-inner-custom {
 }
 
 .modal-dark .modal-header {
-    background-color: #444B55;
+    background-color: #444b55;
     border-top-right-radius: 14px;
     border-top-left-radius: 14px;
     border: none;
@@ -1114,12 +1114,12 @@ div.tooltip-inner-custom {
 }
 
 .modal-dark .modal-body {
-    background-color: #141C27;
+    background-color: #141c27;
     border: none;
 }
 
 .modal-dark .modal-footer {
-    background-color: #141C27;
+    background-color: #141c27;
     border: none;
 }
 
@@ -1138,7 +1138,7 @@ div.tooltip-inner-custom {
 }
 
 .modal-dark button {
-    background: #406F8E;
+    background: #406f8e;
     color: white;
     border: none;
 }

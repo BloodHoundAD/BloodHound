@@ -1,6 +1,23 @@
 import { groupBy } from 'lodash/collection';
 
-var labels = ['OU', 'GPO', 'User', 'Computer', 'Group', 'Domain'];
+var labels = [
+    'OU',
+    'GPO',
+    'User',
+    'Computer',
+    'Group',
+    'Domain',
+    'AZApp',
+    'AZDevice',
+    'AZGroup',
+    'AZKeyVault',
+    'AZResourceGroup',
+    'AZServicePrincipal',
+    'AZSubscription',
+    'AZTenant',
+    'AZUser',
+    'AZVM',
+];
 
 export function generateUniqueId(sigmaInstance, isNode) {
     var i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;

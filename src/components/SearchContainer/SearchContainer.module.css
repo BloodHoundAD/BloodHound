@@ -19,3 +19,21 @@
 #searchb:focus {
     box-shadow: none;
 } */
+
+.darkmenu {
+    background-color: #2b333e;
+}
+
+.darkmenu :global mark {
+    color: white;
+}
+
+.darkmenu :global .dropdown-item {
+    color: white;
+}
+
+.darkmenu :global li :global a:hover {
+    background: none;
+    background-color: #406f8e;
+    color: white;
+}

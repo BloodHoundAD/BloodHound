@@ -84,7 +84,7 @@
         "react-alert": "^5.5.0",
         "react-alert-template-basic": "^1.0.0",
         "react-bootstrap": "^0.33.1",
-        "react-bootstrap-typeahead": "^3.4.7",
+        "react-bootstrap-typeahead": "^4.2.3",
         "react-dom": "^16.13.1",
         "react-draggable": "^4.4.3",
         "react-if": "^3.4.3",
