@@ -1042,6 +1042,31 @@ export function buildAzureAppOwners(chunk) {
     return queries;
 }
 
+export function buildAzureAppToSP(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZApp SET n.name = prop.AppName',
+        props: [],
+    };
+    let format = ['', 'AZServicePrincipal', 'AZRunsAs', '{isacl: false, isazure: true}'];
+
+    for (let row of chunk) {
+        queries.properties.props.push({
+            source: row.AppId.toUpperCase(),
+            name: row.AppName.toUpperCase(),
+        });
+
+        format[0] = 'AZApp';
+        insertNew(queries, format, {
+            source: row.AppId.toUpperCase(),
+            target: row.ServicePrincipalId.toUpperCase(),
+        });
+    }
+
+    return queries;
+}
+
 export function buildAzureGroupMembers(chunk) {
     let queries = {};
     let format = ['', '', 'MemberOf', '{isacl: false, isazure: false}'];

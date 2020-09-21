@@ -55,6 +55,7 @@ const IngestFuncMap = {
     azapplicationadmins: NewIngestion.buildAzureApplicationAdmins,
     azcloudappadmins: NewIngestion.buildAzureCloudApplicationAdmins,
     azapplicationowners: NewIngestion.buildAzureAppOwners,
+    azapplicationtosp: NewIngestion.buildAzureAppToSP,
 };
 
 const MenuContainer = () => {
