@@ -6,7 +6,9 @@ export default class NoNodeData extends Component {
         return (
             <div className={this.props.visible ? '' : 'hidden'}>
                 <h3>Node Properties</h3>
-                <p>Select a node for more information</p>
+                <p style={{ marginLeft: 10 }}>
+                    Select a node for more information
+                </p>
             </div>
         );
     }
