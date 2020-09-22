@@ -55,7 +55,7 @@ export function buildSearchQuery(searchterm) {
         return [statement, term.toUpperCase()];
     } else {
         return [
-            'MATCH (n) WHERE n.name CONTAINS $name OR n.objectid CONTAINS $name RETURN n LIMIT 10',
+            'MATCH (n:Base) WHERE n.name CONTAINS $name OR n.objectid CONTAINS $name RETURN n LIMIT 10',
             searchterm.toUpperCase(),
         ];
     }
