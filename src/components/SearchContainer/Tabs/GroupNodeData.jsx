@@ -39,7 +39,7 @@ const GroupNodeData = () => {
                 .run(`MATCH (n:Group {objectid: $objectid}) RETURN n AS node`, {
                     objectid: id,
                 })
-                .then(r => {
+                .then((r) => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
                     setLabel(props.name || objectid);
@@ -67,29 +67,29 @@ const GroupNodeData = () => {
                 <hr></hr>
 
                 <CollapsibleSection header='OVERVIEW'>
-                <div className={styles.itemlist}>
-                    <Table class="table table-hover table-striped table-borderless table-responsive">
-                        <thead></thead>
-                        <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Sessions'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (c:Computer)-[n:HasSession]->(u:User)-[r2:MemberOf*1..]->(g:Group {objectid: $objectid})'
-                                }
-                                end={label}
-                            />
-                            <NodeCypherLink
-                                property='Reachable High Value Targets'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH (m:Group {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
-                                }
-                                start={label}
-                            />
-                        </tbody>
-                    </Table>
-                </div>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherLink
+                                    property='Sessions'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p = (c:Computer)-[n:HasSession]->(u:User)-[r2:MemberOf*1..]->(g:Group {objectid: $objectid})'
+                                    }
+                                    end={label}
+                                />
+                                <NodeCypherLink
+                                    property='Reachable High Value Targets'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH (m:Group {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                    }
+                                    start={label}
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
                 </CollapsibleSection>
 
                 <hr></hr>
@@ -111,46 +111,46 @@ const GroupNodeData = () => {
                 <hr></hr>
 
                 <CollapsibleSection header='GROUP MEMBERS'>
-                <div className={styles.itemlist}>
-                    <Table class="table table-hover table-striped table-borderless table-responsive">
-                        <thead></thead>
-                        <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Direct Members'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p=(n)-[b:MemberOf]->(c:Group {objectid: $objectid})'
-                                }
-                                end={label}
-                            />
-                            <NodeCypherLink
-                                property='Unrolled Members'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p =(n)-[r:MemberOf*1..]->(g:Group {objectid: $objectid})'
-                                }
-                                end={label}
-                                distinct
-                            />
-                            <NodeCypherLink
-                                property='Foreign Members'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (n)-[r:MemberOf*1..]->(g:Group {objectid: $objectid}) WHERE NOT g.domain = n.domain'
-                                }
-                                end={label}
-                                distinct
-                            />
-                        </tbody>
-                    </Table>
-                </div>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherLink
+                                    property='Direct Members'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(n)-[b:MemberOf]->(c:Group {objectid: $objectid})'
+                                    }
+                                    end={label}
+                                />
+                                <NodeCypherLink
+                                    property='Unrolled Members'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p =(n)-[r:MemberOf*1..]->(g:Group {objectid: $objectid})'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Foreign Members'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p = (n)-[r:MemberOf*1..]->(g:Group {objectid: $objectid}) WHERE NOT g.domain = n.domain'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
                 </CollapsibleSection>
 
                 <hr></hr>
 
                 <CollapsibleSection header='Group Membership'>
                     <div className={styles.itemlist}>
-                        <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <Table>
                             <thead></thead>
                             <tbody className='searchable'>
                                 <NodeCypherLink
@@ -188,7 +188,7 @@ const GroupNodeData = () => {
 
                 <CollapsibleSection header='LOCAL ADMIN RIGHTS'>
                     <div className={styles.itemlist}>
-                        <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <Table>
                             <thead></thead>
                             <tbody className='searchable'>
                                 <NodeCypherLink
@@ -229,7 +229,7 @@ const GroupNodeData = () => {
 
                 <CollapsibleSection header='EXECUTION RIGHTS'>
                     <div className={styles.itemlist}>
-                        <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <Table>
                             <thead></thead>
                             <tbody className='searchable'>
                                 <NodeCypherLink
@@ -277,7 +277,7 @@ const GroupNodeData = () => {
 
                 <CollapsibleSection header='OUTBOUND COTROL RIGHTS'>
                     <div className={styles.itemlist}>
-                        <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <Table>
                             <thead></thead>
                             <tbody className='searchable'>
                                 <NodeCypherLink
@@ -316,7 +316,7 @@ const GroupNodeData = () => {
 
                 <CollapsibleSection header='INBOUND CONTROL RIGHTS'>
                     <div className={styles.itemlist}>
-                        <Table class="table table-hover table-striped table-borderless table-responsive">
+                        <Table>
                             <thead></thead>
                             <tbody className='searchable'>
                                 <NodeCypherLink
@@ -357,7 +357,6 @@ const GroupNodeData = () => {
                      type='Group'
                      visible={visible}
                 /> */}
-
             </dl>
         </div>
     );

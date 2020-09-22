@@ -38,10 +38,13 @@ const AZSubscriptionNodeData = () => {
             setBlocksInheritance(blocksinheritance);
             let session = driver.session();
             session
-                .run(`MATCH (n:AZSubscription {objectid: $objectid}) RETURN n AS node`, {
-                    objectid: id,
-                })
-                .then(r => {
+                .run(
+                    `MATCH (n:AZSubscription {objectid: $objectid}) RETURN n AS node`,
+                    {
+                        objectid: id,
+                    }
+                )
+                .then((r) => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
                     setLabel(props.name || objectid);
@@ -65,18 +68,18 @@ const AZSubscriptionNodeData = () => {
                 <h5>{label || objectid}</h5>
 
                 <CollapsibleSection header='OVERVIEW'>
-                <div className={styles.itemlist}>
-                    <Table class="table table-hover table-striped table-borderless table-responsive">
-                        <thead></thead>
-                        <tbody className='searchable'>
-                            <NodeCypherNoNumberLink
-                                query='MATCH p = (d:AZTenant)-[r:AZContains*1..]->(o:AZSubscription {objectid: $objectid}) RETURN p'
-                                target={objectid}
-                                property='See Subscription Under Tenant'
-                            />
-                        </tbody>
-                    </Table>
-                </div>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherNoNumberLink
+                                    query='MATCH p = (d:AZTenant)-[r:AZContains*1..]->(o:AZSubscription {objectid: $objectid}) RETURN p'
+                                    target={objectid}
+                                    property='See Subscription Under Tenant'
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
                 </CollapsibleSection>
 
                 <hr></hr>
@@ -98,42 +101,41 @@ const AZSubscriptionNodeData = () => {
                 <hr></hr>
 
                 <CollapsibleSection header='DESCENDENT OBJECTS'>
-                <div className={styles.itemlist}>
-                    <Table class="table table-hover table-striped table-borderless table-responsive">
-                        <thead></thead>
-                        <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Total VM Objects'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p=(o:AZSubscription {objectid: $objectid})-[r:AZContains*1..]->(n:AZVM)'
-                                }
-                                distinct
-                            />
-                            <NodeCypherLink
-                                property='Total Resource Group Objects'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p=(o:AZSubscription {objectid: $objectid})-[r:AZContains*1..]->(n:AZResourceGroup)'
-                                }
-                                distinct
-                            />
-                            <NodeCypherLink
-                                property='Total Key Vault Objects'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p=(o:AZSubscription {objectid: $objectid})-[r:AZContains*1..]->(n:AZKeyVault)'
-                                }
-                                distinct
-                            />
-                        </tbody>
-                    </Table>
-                </div>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherLink
+                                    property='Total VM Objects'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:AZSubscription {objectid: $objectid})-[r:AZContains*1..]->(n:AZVM)'
+                                    }
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Total Resource Group Objects'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:AZSubscription {objectid: $objectid})-[r:AZContains*1..]->(n:AZResourceGroup)'
+                                    }
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Total Key Vault Objects'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:AZSubscription {objectid: $objectid})-[r:AZContains*1..]->(n:AZKeyVault)'
+                                    }
+                                    distinct
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
                 </CollapsibleSection>
 
                 {/* <Notes objectid={objectid} type='AZSubscription' />
                 <NodeGallery objectid={objectid} type='AZSubscription' visible={visible} /> */}
-
             </dl>
         </div>
     );

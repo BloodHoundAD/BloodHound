@@ -39,7 +39,7 @@ const AZAppNodeData = () => {
                 .run(`MATCH (n:AZApp {objectid: $objectid}) RETURN n AS node`, {
                     objectid: id,
                 })
-                .then(r => {
+                .then((r) => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
                     setLabel(props.name || objectid);
@@ -64,23 +64,23 @@ const AZAppNodeData = () => {
                 <h5>{label || objectid}</h5>
 
                 <CollapsibleSection header='OVERVIEW'>
-                <div className={styles.itemlist}>
-                    <Table class="table table-hover table-striped table-borderless table-responsive">
-                        <thead></thead>
-                        <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Reachable High Value Targets'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH (m:AZApp {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
-                                }
-                                start={label}
-                            />
-                        </tbody>
-                    </Table>
-                </div>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherLink
+                                    property='Reachable High Value Targets'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH (m:AZApp {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                    }
+                                    start={label}
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
                 </CollapsibleSection>
-                
+
                 <hr></hr>
 
                 <MappedNodeProps
@@ -100,40 +100,40 @@ const AZAppNodeData = () => {
                 <hr></hr>
 
                 <CollapsibleSection header='INBOUND OBJECT CONTROL'>
-                <div className={styles.itemlist}>
-                    <Table class="table table-hover table-striped table-borderless table-responsive">
-                        <thead></thead>
-                        <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Explicit Object Controllers'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (n)-[r:AZOwns]->(g:AZApp {objectid: $objectid})'
-                                }
-                                end={label}
-                                distinct
-                            />
-                            <NodeCypherLink
-                                property='Unrolled Object Controllers'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns]->(g2:AZApp {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
-                                }
-                                end={label}
-                                distinct
-                            />
-                            <NodePlayCypherLink
-                                property='Transitive Object Controllers'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r:AZMemberOf|AZOwns*1..]->(g:AZApp {objectid: $objectid}))'
-                                }
-                                end={label}
-                                distinct
-                            />
-                        </tbody>
-                    </Table>
-                </div>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherLink
+                                    property='Explicit Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p = (n)-[r:AZOwns]->(g:AZApp {objectid: $objectid})'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Unrolled Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns]->(g2:AZApp {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                                <NodePlayCypherLink
+                                    property='Transitive Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r:AZMemberOf|AZOwns*1..]->(g:AZApp {objectid: $objectid}))'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
                 </CollapsibleSection>
 
                 {/* <Notes objectid={objectid} type={'AZUser'} />

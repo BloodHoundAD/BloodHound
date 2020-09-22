@@ -36,10 +36,13 @@ const AZResourceGroupNodeData = () => {
             setDomain(domain);
             let session = driver.session();
             session
-                .run(`MATCH (n:AZResourceGroup {objectid: $objectid}) RETURN n AS node`, {
-                    objectid: id,
-                })
-                .then(r => {
+                .run(
+                    `MATCH (n:AZResourceGroup {objectid: $objectid}) RETURN n AS node`,
+                    {
+                        objectid: id,
+                    }
+                )
+                .then((r) => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
                     setLabel(props.name || objectid);
@@ -61,7 +64,7 @@ const AZResourceGroupNodeData = () => {
         <div className={clsx(!visible && 'displaynone')}>
             <dl className={'dl-horizontal'}>
                 <h5>{label || objectid}</h5>
-                
+
                 <MappedNodeProps
                     displayMap={displayMap}
                     properties={nodeProps}
@@ -71,69 +74,69 @@ const AZResourceGroupNodeData = () => {
                 <hr></hr>
 
                 <CollapsibleSection header='Descendent Objects'>
-                <div className={styles.itemlist}>
-                    <Table class="table table-hover table-striped table-borderless table-responsive">
-                        <thead></thead>
-                        <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Descendent VMs'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (g:AZResourceGroup {objectid: $objectid})-[r:AZContains]->(n:AZVM)'
-                                }
-                                end={label}
-                            />
-                            <NodeCypherLink
-                                property='Descendent KeyVaults'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (g:AZResourceGroup {objectid: $objectid})-[r:AZContains]->(n:AZKeyVault)'
-                                }
-                                end={label}
-                                distinct
-                            />
-                        </tbody>
-                    </Table>
-                </div>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherLink
+                                    property='Descendent VMs'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p = (g:AZResourceGroup {objectid: $objectid})-[r:AZContains]->(n:AZVM)'
+                                    }
+                                    end={label}
+                                />
+                                <NodeCypherLink
+                                    property='Descendent KeyVaults'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p = (g:AZResourceGroup {objectid: $objectid})-[r:AZContains]->(n:AZKeyVault)'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
                 </CollapsibleSection>
 
                 <hr></hr>
 
                 <CollapsibleSection header='Inbound Object Control'>
-                <div className={styles.itemlist}>
-                    <Table class="table table-hover table-striped table-borderless table-responsive">
-                        <thead></thead>
-                        <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Explicit Object Controllers'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (n)-[r:AZOwns|AZUserAccessAdministrator]->(g:AZResourceGroup {objectid: $objectid})'
-                                }
-                                end={label}
-                                distinct
-                            />
-                            <NodeCypherLink
-                                property='Unrolled Object Controllers'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AZOwns|AZUserAccessAdministrator]->(g2:AZResourceGroup {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
-                                }
-                                end={label}
-                                distinct
-                            />
-                            <NodePlayCypherLink
-                                property='Transitive Object Controllers'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZResourceGroup {objectid: $objectid}))'
-                                }
-                                end={label}
-                                distinct
-                            />
-                        </tbody>
-                    </Table>
-                </div> 
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherLink
+                                    property='Explicit Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p = (n)-[r:AZOwns|AZUserAccessAdministrator]->(g:AZResourceGroup {objectid: $objectid})'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Unrolled Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AZOwns|AZUserAccessAdministrator]->(g2:AZResourceGroup {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                                <NodePlayCypherLink
+                                    property='Transitive Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZResourceGroup {objectid: $objectid}))'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
                 </CollapsibleSection>
                 {/* <Notes objectid={objectid} type='AZResourceGroup' />
                 <NodeGallery

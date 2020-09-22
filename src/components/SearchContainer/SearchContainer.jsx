@@ -47,7 +47,7 @@ const SearchContainer = () => {
             };
             closeTooltip();
             setMainSearchSelected(temp);
-            let instance = mainSearchRef.current.getInstance();
+            let instance = mainSearchRef.current;
             instance.clear();
             instance.setState({ text: temp.name });
         });
@@ -65,7 +65,7 @@ const SearchContainer = () => {
                 elem.slideToggle('fast');
             }
             setPathSearchSelected(temp);
-            let instance = pathSearchRef.current.getInstance();
+            let instance = pathSearchRef.current;
             instance.clear();
             instance.setState({ text: temp.name });
         });
@@ -127,8 +127,8 @@ const SearchContainer = () => {
             pathSearchSelected
         );
 
-        mainSearchRef.current.getInstance().blur();
-        pathSearchRef.current.getInstance().blur();
+        mainSearchRef.current.blur();
+        pathSearchRef.current.blur();
         emitter.emit('query', query, props, startTarget, endTarget);
     };
 
@@ -240,8 +240,8 @@ const SearchContainer = () => {
             return;
         }
 
-        mainSearchRef.current.getInstance().blur();
-        pathSearchRef.current.getInstance().blur();
+        mainSearchRef.current.blur();
+        pathSearchRef.current.blur();
 
         if (!pathfindingOpen) {
             if (mainSearchSelected === null) {
@@ -392,7 +392,33 @@ const SearchContainer = () => {
                         placeholder={'Target Node'}
                         isLoading={pathSearchLoading}
                         delay={500}
-                        renderMenuItemChildren={SearchRow}
+                        renderMenu={(results, menuProps, props) => {
+                            return (
+                                <Menu
+                                    {...menuProps}
+                                    className={clsx(
+                                        context.darkMode
+                                            ? styles.darkmenu
+                                            : null
+                                    )}
+                                >
+                                    {results.map((result, index) => {
+                                        return (
+                                            <MenuItem
+                                                option={result}
+                                                position={index}
+                                                key={index}
+                                            >
+                                                <SearchRow
+                                                    item={result}
+                                                    search={pathSearchValue}
+                                                />
+                                            </MenuItem>
+                                        );
+                                    })}
+                                </Menu>
+                            );
+                        }}
                         labelKey={(option) => {
                             return option.name || option.objectid;
                         }}

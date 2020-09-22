@@ -36,10 +36,13 @@ const AZDeviceNodeData = () => {
             setDomain(domain);
             let session = driver.session();
             session
-                .run(`MATCH (n:AZDevice {objectid: $objectid}) RETURN n AS node`, {
-                    objectid: id,
-                })
-                .then(r => {
+                .run(
+                    `MATCH (n:AZDevice {objectid: $objectid}) RETURN n AS node`,
+                    {
+                        objectid: id,
+                    }
+                )
+                .then((r) => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
                     setLabel(props.name || objectid);
@@ -61,7 +64,7 @@ const AZDeviceNodeData = () => {
         <div className={clsx(!visible && 'displaynone')}>
             <dl className={'dl-horizontal'}>
                 <h5>{label || objectid}</h5>
-                
+
                 <MappedNodeProps
                     displayMap={displayMap}
                     properties={nodeProps}
@@ -71,30 +74,30 @@ const AZDeviceNodeData = () => {
                 <hr></hr>
 
                 <CollapsibleSection header='Inbound Execution Privileges'>
-                <div className={styles.itemlist}>
-                    <Table class="table table-hover table-striped table-borderless table-responsive">
-                        <thead></thead>
-                        <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Owners'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
-                                }
-                                end={label}
-                            />
-                            <NodeCypherLink
-                                property='InTune Admins'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
-                                }
-                                end={label}
-                                distinct
-                            />
-                        </tbody>
-                    </Table>
-                </div>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherLink
+                                    property='Owners'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
+                                    }
+                                    end={label}
+                                />
+                                <NodeCypherLink
+                                    property='InTune Admins'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
                 </CollapsibleSection>
 
                 {/* <Notes objectid={objectid} type='AZResourceGroup' />
