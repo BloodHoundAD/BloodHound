@@ -7,7 +7,7 @@ export default class NodeCypherNoNumberLink extends Component {
     }
 
     render() {
-        let c = function() {
+        let c = function () {
             emitter.emit(
                 'query',
                 this.props.query,
@@ -18,13 +18,9 @@ export default class NodeCypherNoNumberLink extends Component {
         }.bind(this);
 
         return (
-            <tr
-                style={{ cursor: 'pointer' }}
-                onClick={c}
-            >
-            <td align='left'>
-                {this.props.property}
-            </td>
+            <tr style={{ cursor: 'pointer' }} onClick={c}>
+                <td align='left'>{this.props.property}</td>
+                <td align='right'></td>
             </tr>
         );
     }

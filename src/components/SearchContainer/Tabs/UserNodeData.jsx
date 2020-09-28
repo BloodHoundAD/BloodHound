@@ -13,6 +13,8 @@ import { withAlert } from 'react-alert';
 import NodeGallery from './Components/NodeGallery';
 import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
+import { useContext } from 'react';
+import { AppContext } from '../../../AppContext';
 
 const UserNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -20,6 +22,7 @@ const UserNodeData = () => {
     const [label, setLabel] = useState(null);
     const [domain, setDomain] = useState(null);
     const [nodeProps, setNodeProps] = useState({});
+    const context = useContext(AppContext);
 
     useEffect(() => {
         emitter.on('nodeClicked', nodeClickEvent);
@@ -76,8 +79,13 @@ const UserNodeData = () => {
     return objectId === null ? (
         <div></div>
     ) : (
-        <div className={clsx(!visible && 'displaynone')}>
-            <dl className={'dl-horizontal'}>
+        <div
+            className={clsx(
+                !visible && 'displaynone',
+                context.darkMode ? styles.dark : styles.light
+            )}
+        >
+            <div className={clsx(styles.dl)}>
                 <h5>{label || objectId}</h5>
 
                 <hr></hr>
@@ -376,7 +384,7 @@ const UserNodeData = () => {
                     type={'User'}
                     visible={visible}
                 /> */}
-            </dl>
+            </div>
         </div>
     );
 };

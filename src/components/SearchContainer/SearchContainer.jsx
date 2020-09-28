@@ -262,11 +262,10 @@ const SearchContainer = () => {
 
     return (
         <div
-            id='searchdiv'
             className={
                 context.darkMode
-                    ? 'searchdiv searchdiv-dark'
-                    : 'searchdiv searchdiv-light'
+                    ? clsx(styles.container, styles.dark)
+                    : clsx(styles.container, styles.light)
             }
         >
             <EdgeFilter open={filterVisible} />

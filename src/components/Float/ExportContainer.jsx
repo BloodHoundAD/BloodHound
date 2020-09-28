@@ -63,7 +63,11 @@ const ExportContainer = () => {
                 </Panel.Heading>
 
                 <Panel.Body>
-                    <div className={styles.itemlist}>
+                    <div
+                        className={
+                            context.darkMode ? styles.itemlistdark : null
+                        }
+                    >
                         <Table>
                             <thead></thead>
                             <tbody className='searchable'>

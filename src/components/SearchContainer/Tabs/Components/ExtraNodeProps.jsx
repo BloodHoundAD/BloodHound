@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import CollapsibleSection from './CollapsibleSection';
-import styles from './ExtraNodeProps.module.css'
+import styles from '../NodeData.module.css';
 import { Table } from 'react-bootstrap';
 
 const ExtraNodeProps = ({ label, properties, displayMap }) => {
@@ -9,7 +9,7 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
 
     const blacklist = ['highvalue', 'hasspn', 'primarygroupid'];
 
-    const createValue = value => {
+    const createValue = (value) => {
         let type = typeof value;
         if (type === 'number') {
             if (value === -1) {
@@ -33,43 +33,70 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
         return value;
     };
 
-    const convertProperty = propName => {
+    const convertProperty = (propName) => {
         let property = properties[propName];
         let type = typeof property;
         let temp = [];
-
+        let displayProp = displayMap[propName];
         if (type === 'undefined') {
             return temp;
         }
-
         if (type === 'number') {
-            temp.push(<dt key={`${propName}a`}>{propName}</dt>);
-            temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
+            temp.push(
+                <td align='left' key={`${propName}a`}>
+                    {displayProp}
+                </td>
+            );
+            temp.push(
+                <td align='right' key={`${propName}b`}>
+                    {createValue(property)}
+                </td>
+            );
             return temp;
         }
-
         if (type === 'boolean') {
-            temp.push(<dt key={`${propName}a`}>{propName}</dt>);
-            temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
+            temp.push(
+                <td align='left' key={`${propName}a`}>
+                    {displayProp}
+                </td>
+            );
+            temp.push(
+                <td align='right' key={`${propName}b`}>
+                    {createValue(property)}
+                </td>
+            );
             return temp;
         }
-
         if (type === 'string') {
-            temp.push(<dt key={`${propName}a`}>{propName}</dt>);
-            temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
+            temp.push(
+                <td align='left' key={`${propName}a`}>
+                    {displayProp}
+                </td>
+            );
+            temp.push(
+                <td align='right' key={`${propName}b`}>
+                    {createValue(property)}
+                </td>
+            );
             return temp;
         }
-
         if (Array.isArray(property) && property.length > 0) {
-            temp.push(<dt key={`${propName}k`}>{propName}</dt>);
+            temp.push(
+                <td align='left' key={`${propName}k`}>
+                    {displayProp}
+                </td>
+            );
+            let d = '';
             property.forEach((val, index) => {
-                temp.push(
-                    <dd key={`${propName}${index}`}>{createValue(val)}</dd>
-                );
+                d += `${createValue(val)}\n`;
             });
+            temp.push(
+                <td align='right' style={{ whiteSpace: 'pre' }}>
+                    {d}
+                </td>
+            );
             return temp;
         }
-
         return temp;
     };
 
@@ -88,11 +115,7 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
                 <Table bordered={false} hover responsive>
                     <tbody>
                         {Object.keys(elements).map((key) => {
-                            return (
-                                <tr key={key}>
-                                    <td>{elements[key]}</td>
-                                </tr>
-                            );
+                            return <tr key={key}>{elements[key]}</tr>;
                         })}
                     </tbody>
                 </Table>

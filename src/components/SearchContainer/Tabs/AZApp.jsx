@@ -13,6 +13,8 @@ import { withAlert } from 'react-alert';
 import NodeGallery from './Components/NodeGallery';
 import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
+import { useContext } from 'react';
+import { AppContext } from '../../../AppContext';
 
 const AZAppNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -20,6 +22,7 @@ const AZAppNodeData = () => {
     const [label, setLabel] = useState(null);
     const [domain, setDomain] = useState(null);
     const [nodeProps, setNodeProps] = useState({});
+    const context = useContext(AppContext);
 
     useEffect(() => {
         emitter.on('nodeClicked', nodeClickEvent);
@@ -60,7 +63,12 @@ const AZAppNodeData = () => {
         <div></div>
     ) : (
         <div className={clsx(!visible && 'displaynone')}>
-            <dl className={'dl-horizontal'}>
+            <dl
+                className={clsx(
+                    styles.dl,
+                    context.darkMode ? styles.dark : styles.light
+                )}
+            >
                 <h5>{label || objectid}</h5>
 
                 <CollapsibleSection header='OVERVIEW'>

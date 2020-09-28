@@ -64,7 +64,12 @@ const AZSubscriptionNodeData = () => {
         <div></div>
     ) : (
         <div className={clsx(!visible && 'displaynone')}>
-            <dl className={'dl-horizontal'}>
+            <dl
+                className={clsx(
+                    styles.dl,
+                    context.darkMode ? styles.dark : styles.light
+                )}
+            >
                 <h5>{label || objectid}</h5>
 
                 <CollapsibleSection header='OVERVIEW'>

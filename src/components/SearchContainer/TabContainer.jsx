@@ -467,7 +467,7 @@ class TabContainer extends Component {
         return (
             <div>
                 <Tabs
-                    id='tab-style'
+                    id='tabcontainer'
                     bsStyle='pills'
                     activeKey={this.state.selected}
                     onSelect={this._handleSelect.bind(this)}
