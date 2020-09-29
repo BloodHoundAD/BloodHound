@@ -1,206 +1,255 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import styles from './DatabaseDataDisplay.module.css';
 import { Table } from 'react-bootstrap';
+import DatabaseDataLabel from './Components/DatabaseDataLabel';
+import { useContext } from 'react';
+import { AppContext } from '../../../AppContext';
 import clsx from 'clsx';
+import CollapsibleSection from './Components/CollapsibleSection';
 
-export default class DatabaseDataDisplay extends Component {
-    constructor() {
-        super();
-        this.state = {
-            url: appStore.databaseInfo.url,
-            user: appStore.databaseInfo.user,
-            num_users: 'Refreshing',
-            num_computers: 'Refreshing',
-            num_groups: 'Refreshing',
-            num_relationships: 'Refreshing',
-            num_sessions: 'Refreshing',
-            num_acls: 'Refreshing',
-            interval: null,
+const DatabaseDataDisplay = () => {
+    const [url, setUrl] = useState(appStore.databaseInfo.url);
+    const [user, setUser] = useState(appStore.databaseInfo.user);
+    const [index, setIndex] = useState(0);
+    const context = useContext(AppContext);
+
+    useEffect(() => {
+        emitter.on('refreshDBData', refresh);
+        return () => {
+            emitter.removeListener('refreshDBData', refresh);
         };
-    }
+    }, []);
 
-    componentDidMount() {
-        this.refreshDBData();
-        emitter.on('hideDBClearModal', this.refreshDBData.bind(this));
-        emitter.on('refreshDBData', this.refreshDBData.bind(this));
-        this.createInterval();
-    }
+    const refresh = () => {
+        setIndex(index + 1);
+    };
 
-    componentWillUnmount() {
-        clearInterval(this.state.interval);
-        this.setState({
-            interval: null,
-            session: null,
-        });
-    }
-
-    createInterval() {
-        var x = setInterval(() => {
-            this.refreshDBData();
-        }, 60000);
-        this.setState({
-            interval: x,
-        });
-    }
-
-    toggleLogoutModal() {
+    const toggleLogoutModal = () => {
         emitter.emit('showLogout');
-    }
+    };
 
-    toggleDBWarnModal() {
+    const toggleDBWarnModal = () => {
         emitter.emit('openDBWarnModal');
-    }
+    };
 
-    toggleSessionClearModal() {
+    const toggleSessionClearModal = () => {
         emitter.emit('openSessionClearModal');
-    }
+    };
 
-    toggleWarmupModal() {
+    const toggleWarmupModal = () => {
         emitter.emit('openWarmupModal');
-    }
+    };
 
-    refreshDBData() {
-        var s1 = driver.session();
-        var s2 = driver.session();
-        var s3 = driver.session();
-        var s4 = driver.session();
-        var s5 = driver.session();
-        var s6 = driver.session();
-
-        s1.run(
-            "MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n)"
-        ).then((result) => {
-            this.setState({
-                num_users: result.records[0]._fields[0].toLocaleString(),
-            });
-            s1.close();
-        });
-
-        s2.run('MATCH (n:Group) RETURN count(n)').then((result) => {
-            this.setState({
-                num_groups: result.records[0]._fields[0].toLocaleString(),
-            });
-            s2.close();
-        });
-
-        s3.run('MATCH (n:Computer) RETURN count(n)').then((result) => {
-            this.setState({
-                num_computers: result.records[0]._fields[0].toLocaleString(),
-            });
-            s3.close();
-        });
-
-        s4.run('MATCH ()-[r:HasSession]->() RETURN count(r)').then((result) => {
-            this.setState({
-                num_sessions: result.records[0]._fields[0].toLocaleString(),
-            });
-            s4.close();
-        });
-
-        s6.run('MATCH ()-[r {isacl: true}]->() RETURN count(r)').then(
-            (result) => {
-                this.setState({
-                    num_acls: result.records[0]._fields[0].toLocaleString(),
-                });
-                s6.close();
-            }
-        );
-
-        s5.run('MATCH ()-[r]->() RETURN count(r)').then((result) => {
-            this.setState({
-                num_relationships: result.records[0]._fields[0].toLocaleString(),
-            });
-            s5.close();
-        });
-    }
-
-    render() {
-        return (
-            <div className={styles.nodelist}>
+    return (
+        <div
+            className={clsx(
+                styles.nodelist,
+                context.darkMode ? styles.dark : styles.light
+            )}
+        >
+            <CollapsibleSection header='DATABASE INFO'>
                 <Table hover striped responsive>
                     <thead></thead>
-                    <tbody className='searchable'>
+                    <tbody>
                         <tr>
                             <td>Address</td>
-                            <td align='right'>{this.state.url}</td>
+                            <td align='right'>{url}</td>
                         </tr>
                         <tr>
                             <td>DB User</td>
-                            <td align='right'>{this.state.user}</td>
+                            <td align='right'>{user}</td>
                         </tr>
-                        <tr>
-                            <td>Users</td>
-                            <td align='right'>{this.state.num_users}</td>
-                        </tr>
-                        <tr>
-                            <td>Computers</td>
-                            <td align='right'>{this.state.num_computers}</td>
-                        </tr>
-                        <tr>
-                            <td>Groups</td>
-                            <td align='right'>{this.state.num_groups}</td>
-                        </tr>
-                        <tr>
-                            <td>Sessions</td>
-                            <td align='right'>{this.state.num_sessions}</td>
-                        </tr>
-                        <tr>
-                            <td>ACEs</td>
-                            <td align='right'>{this.state.num_acls}</td>
-                        </tr>
-                        <tr>
-                            <td>Total Relationships</td>
-                            <td align='right'>
-                                {this.state.num_relationships}
-                            </td>
-                        </tr>
+                        <DatabaseDataLabel
+                            query={
+                                'MATCH ()-[r:HasSession]->() RETURN count(r) AS count'
+                            }
+                            index={index}
+                            label={'Sessions'}
+                        />
+                        <DatabaseDataLabel
+                            query={'MATCH ()-[r]->() RETURN count(r) AS count'}
+                            index={index}
+                            label={'Relationships'}
+                        />
+                        <DatabaseDataLabel
+                            query={
+                                'MATCH ()-[r {isacl: true}]->() RETURN count(r) AS count'
+                            }
+                            index={index}
+                            label={'ACLs'}
+                        />
+                        <DatabaseDataLabel
+                            query={
+                                'MATCH ()-[r {isazure: true}]->() RETURN count(r) AS count'
+                            }
+                            index={index}
+                            label={'Azure Relationships'}
+                        />
                     </tbody>
                 </Table>
+            </CollapsibleSection>
 
-                <div className={clsx('text-center', styles.buttongroup)}>
-                    <div role='group' className={styles.buttongroup}>
-                        <button
-                            type='button'
-                            className={styles.btnleft}
-                            onClick={function () {
-                                this.refreshDBData();
-                            }.bind(this)}
-                        >
-                            Refresh Database Stats
-                        </button>
-                        <button
-                            type='button'
-                            className={styles.btnright}
-                            onClick={this.toggleWarmupModal}
-                        >
-                            Warm Up Database
-                        </button>
-                    </div>
-                    <p></p>
-                    <div role='group' className={styles.buttongroup}>
-                        <button
-                            type='button'
-                            className={styles.btnleft}
-                            onClick={this.toggleSessionClearModal}
-                        >
-                            Clear Sessions
-                        </button>
-                        <button
-                            type='button'
-                            className={styles.btnright}
-                            onClick={this.toggleDBWarnModal}
-                        >
-                            Clear Database
-                        </button>
-                    </div>
-                    <p></p>
-                    <div className='text-center'>
-                        <a href='#' onClick={this.toggleLogoutModal}>
-                            Log Out / Switch Database
-                        </a>
-                    </div>
+            <CollapsibleSection header='ON PREM'>
+                <Table hover striped responsive>
+                    <thead></thead>
+                    <tbody>
+                        <DatabaseDataLabel
+                            query={
+                                "MATCH (n:User) WHERE NOT n.name ENDS WITH '$' RETURN count(n) AS count"
+                            }
+                            index={index}
+                            label={'Users'}
+                        />
+                        <DatabaseDataLabel
+                            query={'MATCH (n:Group) RETURN count(n) AS count'}
+                            index={index}
+                            label={'Groups'}
+                        />
+                        <DatabaseDataLabel
+                            query={
+                                'MATCH (n:Computer) RETURN count(n) AS count'
+                            }
+                            index={index}
+                            label={'Computers'}
+                        />
+                        <DatabaseDataLabel
+                            query={'MATCH (n:OU) RETURN count(n) AS count'}
+                            index={index}
+                            label={'OUS'}
+                        />
+                        <DatabaseDataLabel
+                            query={'MATCH (n:GPO) RETURN count(n) AS count'}
+                            index={index}
+                            label={'GPOs'}
+                        />
+                        <DatabaseDataLabel
+                            query={'MATCH (n:Domain) RETURN count(n) AS count'}
+                            index={index}
+                            label={'Domains'}
+                        />
+                    </tbody>
+                </Table>
+            </CollapsibleSection>
+
+            <CollapsibleSection header='AZURE'>
+                <Table hover striped responsive>
+                    <thead></thead>
+                    <tbody>
+                        <DatabaseDataLabel
+                            query={'MATCH (n:AZApp)RETURN count(n) AS count'}
+                            index={index}
+                            label={'AZApp'}
+                        />
+                        <DatabaseDataLabel
+                            query={
+                                'MATCH (n:AZDevice) RETURN count(n) AS count'
+                            }
+                            index={index}
+                            label={'AZDevice'}
+                        />
+
+                        <DatabaseDataLabel
+                            query={'MATCH (n:AZGroup) RETURN count(n) AS count'}
+                            index={index}
+                            label={'AZGroup'}
+                        />
+                        <DatabaseDataLabel
+                            query={
+                                'MATCH (n:AZKeyVault) RETURN count(n) AS count'
+                            }
+                            index={index}
+                            label={'AZKeyVault'}
+                        />
+                        <DatabaseDataLabel
+                            query={
+                                'MATCH (n:AZResourceGroup) RETURN count(n) AS count'
+                            }
+                            index={index}
+                            label={'AZResourceGroup'}
+                        />
+                        <DatabaseDataLabel
+                            query={
+                                'MATCH (n:AZServicePrincipal) RETURN count(n) AS count'
+                            }
+                            index={index}
+                            label={'AZServicePrincipal'}
+                        />
+                        <DatabaseDataLabel
+                            query={
+                                'MATCH (n:AZSubscription) RETURN count(n) AS count'
+                            }
+                            index={index}
+                            label={'AZSubscription'}
+                        />
+
+                        <DatabaseDataLabel
+                            query={
+                                'MATCH (n:AZTenant) RETURN count(n) AS count'
+                            }
+                            index={index}
+                            label={'AZTenant'}
+                        />
+                        <DatabaseDataLabel
+                            query={'MATCH (n:AZUser) RETURN count(n) AS count'}
+                            index={index}
+                            label={'AZUser'}
+                        />
+                        <DatabaseDataLabel
+                            query={'MATCH (n:AZVM) RETURN count(n) AS count'}
+                            index={index}
+                            label={'AZVM'}
+                        />
+                    </tbody>
+                </Table>
+            </CollapsibleSection>
+
+            <div className={clsx('text-center', styles.buttongroup)}>
+                <div role='group' className={styles.buttongroup}>
+                    <button
+                        type='button'
+                        className={styles.btnleft}
+                        onClick={(x) => {
+                            setIndex(index + 1);
+                        }}
+                    >
+                        Refresh Database Stats
+                    </button>
+                    <button
+                        type='button'
+                        className={styles.btnright}
+                        onClick={toggleWarmupModal}
+                    >
+                        Warm Up Database
+                    </button>
+                </div>
+                <p></p>
+                <div role='group' className={styles.buttongroup}>
+                    <button
+                        type='button'
+                        className={styles.btnleft}
+                        onClick={toggleSessionClearModal}
+                    >
+                        Clear Sessions
+                    </button>
+                    <button
+                        type='button'
+                        className={styles.btnright}
+                        onClick={toggleDBWarnModal}
+                    >
+                        Clear Database
+                    </button>
+                </div>
+                <p></p>
+                <div className='text-center'>
+                    <a href='#' onClick={toggleLogoutModal}>
+                        Log Out / Switch Database
+                    </a>
                 </div>
             </div>
-        );
-    }
-}
+        </div>
+    );
+};
+
+DatabaseDataDisplay.propTypes = {};
+export default DatabaseDataDisplay;
