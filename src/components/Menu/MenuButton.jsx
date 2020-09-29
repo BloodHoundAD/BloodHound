@@ -21,7 +21,7 @@ const MenuButton = ({ glyphicon, click, hoverVal }) => {
     };
 
     const clickHandler = (e) => {
-        click();
+        click(e);
         e.target.blur();
     };
 
