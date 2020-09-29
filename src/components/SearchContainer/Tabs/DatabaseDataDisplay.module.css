@@ -71,7 +71,7 @@
     background-color: #406f8e;
 }
 
-.dark :global table > tbody > tr:nth-of-type(odd) {
+.light :global table > tbody > tr:nth-of-type(odd) {
     background-color: #e7e7e7;
 }
 
