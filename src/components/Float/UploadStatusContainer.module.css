@@ -12,12 +12,11 @@
 
 .header {
     width: 100%;
-    height: 10%;
+    height: 15%;
     background: #b9babd;
     border-radius: 13px 13px 0 0;
     font-family: Helvetica;
-    font-size: 25px;
-    color: #1d2735;
+    font-size: 23px;
     padding: 5px 5px 0px 10px;
     cursor: move;
 }
@@ -26,17 +25,36 @@
     width: 100%;
     height: 100%;
     opacity: 0.96;
-    background: #f1f1f1;
     box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.68);
     border-radius: 13px 13px 11px 11px;
 }
 
 .uploads {
     overflow-y: auto;
-    height: 90%;
+    height: 85%;
     width: 100%;
 }
 
 .cheight {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     height: 100%;
+}
+
+.light .header {
+    color: #1d2735;
+}
+
+.light .content {
+    background: #f1f1f1;
+}
+
+.dark .header {
+    color: white;
+    background: #444b55;
+}
+
+.dark .content {
+    background: #1a2331;
 }

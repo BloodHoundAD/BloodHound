@@ -17,7 +17,7 @@ const UploadStatusContainer = ({ files, clearFinished, open, close }) => {
             visible={open}
             className={clsx(
                 styles.panel,
-                context.darkMode ? styles.dark : null
+                context.darkMode ? styles.dark : styles.light
             )}
             dragHandle={dragControl}
         >
@@ -28,7 +28,7 @@ const UploadStatusContainer = ({ files, clearFinished, open, close }) => {
                 >
                     <Grid fluid className={styles.cheight}>
                         <Row>
-                            <Col xs={8}>Upload Status</Col>
+                            <Col xs={8}>Upload Progress</Col>
                             <Col xs={3}>
                                 <Button onClick={clearFinished}>
                                     Clear Finished

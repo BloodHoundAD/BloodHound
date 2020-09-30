@@ -11,6 +11,9 @@ import {
     ProgressBar,
 } from 'react-bootstrap';
 import { motion } from 'framer-motion';
+import { useContext } from 'react';
+import { AppContext } from '../../AppContext';
+import clsx from 'clsx';
 
 const FileStatus = Object.freeze({
     ParseError: 0,
@@ -23,6 +26,9 @@ const FileStatus = Object.freeze({
 
 const FileUploadDisplay = ({ file }) => {
     const [progress, setProgress] = useState(0);
+
+    const context = useContext(AppContext);
+
     const getStatusText = () => {
         let status = file.status;
         if (status === FileStatus.BadType) {
@@ -51,27 +57,30 @@ const FileUploadDisplay = ({ file }) => {
 
     return (
         <motion.div
-            className={styles.panel}
+            className={clsx(
+                styles.panel,
+                context.darkMode ? styles.dark : styles.light
+            )}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
         >
-            <Grid fluid>
+            <Grid>
                 <Row>
-                    <Col xs={3} xsOffset={1} className={styles.fileName}>
+                    <Col xs={12} className={styles.fileName}>
                         {file.name}
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={6} xsOffset={1} className={styles.status}>
+                    <Col xs={6} className={styles.status}>
                         {getStatusText()}
                     </Col>
-                    <Col xs={2} xsOffset={3} className={styles.status}>
+                    <Col xs={2} xsOffset={4} className={styles.status}>
                         {`${progress}%`}
                     </Col>
                 </Row>
                 <Row>
-                    <Col xsOffset={1} xs={10}>
+                    <Col xs={12}>
                         <ProgressBar
                             className={styles.progressBar}
                             active={progress < 100}
