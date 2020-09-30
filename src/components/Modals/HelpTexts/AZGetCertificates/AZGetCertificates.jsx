@@ -13,12 +13,7 @@ const AZGetCertificates = ({
     targetType,
 }) => {
     return (
-        <Tabs
-            defaultActiveKey={1}
-            id='tab-style'
-            bsStyle='rectangles'
-            justified
-        >
+        <Tabs defaultActiveKey={1} id='tab-style' bsStyle='pills' justified>
             <Tab
                 eventKey={1}
                 title='INFO'
@@ -39,11 +34,7 @@ const AZGetCertificates = ({
                     targetType
                 )}
             />
-            <Tab
-                eventKey={3}
-                title='OPSEC'
-                dangerouslySetInnerHTML={Opsec()}
-            />
+            <Tab eventKey={3} title='OPSEC' dangerouslySetInnerHTML={Opsec()} />
             <Tab
                 eventKey={4}
                 title='REFERENCES'

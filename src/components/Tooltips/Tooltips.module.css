@@ -17,7 +17,6 @@
     font-weight: bold;
     font-size: 20px;
     padding: 5px 20px;
-    background-color: #2B333E;
 }
 
 .tooltip :global ul {
@@ -34,7 +33,7 @@
 }
 
 .tooltip :global ul li:hover {
-    background-color: #406F8E;
+    background-color: #406f8e;
     cursor: pointer;
 }
 
@@ -49,10 +48,14 @@
 }
 
 .dark {
-    background: #151D29;
+    background: #151d29;
     color: white;
 }
 
 .dark :global li:hover {
     color: white;
+}
+
+.dark div:first-child {
+    background-color: #2b333e;
 }

@@ -826,7 +826,7 @@ div.tooltip-inner-custom {
 }
 
 .help-modal-width #tab-style > ul > li {
-    width: 25%;
+    width: 27%;
 }
 
 .help-modal-width .modal-body {
@@ -859,8 +859,28 @@ div.tooltip-inner-custom {
     border: none;
 }
 
-.modal-dark a {
+.modal-dark ul li {
+    background-color: #1d2735;
+}
+
+.modal-dark ul li a {
     color: white;
+}
+
+.modal-dark ul li a:hover {
+    background-color: #406f8e;
+}
+
+.modal-dark ul li.active a {
+    background-color: #141c27;
+}
+
+.modal-dark ul li.active a:hover {
+    background-color: #141c27;
+}
+
+.modal-dark ul li.active a:focus {
+    background-color: #141c27;
 }
 
 .modal-dark input {

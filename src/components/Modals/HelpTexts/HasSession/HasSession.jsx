@@ -8,12 +8,7 @@ import References from './References';
 
 const HasSession = ({ sourceName, sourceType, targetName, targetType }) => {
     return (
-        <Tabs
-            defaultActiveKey={1}
-            id='tab-style'
-            bsStyle='rectangles'
-            justified
-        >
+        <Tabs defaultActiveKey={1} id='tab-style' bsStyle='pills' justified>
             <Tab
                 eventKey={1}
                 title='GENERAL'
@@ -23,25 +18,25 @@ const HasSession = ({ sourceName, sourceType, targetName, targetType }) => {
                     targetName,
                     targetType
                 )}
-                className = 'helptab'
+                className='helptab'
             />
             <Tab
                 eventKey={2}
                 title='ABUSE'
                 dangerouslySetInnerHTML={Abuse()}
-                className = 'helptab'
+                className='helptab'
             />
             <Tab
                 eventKey={3}
                 title='OPSEC'
                 dangerouslySetInnerHTML={Opsec()}
-                className = 'helptab'
+                className='helptab'
             />
             <Tab
                 eventKey={4}
                 title='REFERENCES'
                 dangerouslySetInnerHTML={References()}
-                className = 'helptab'
+                className='helptab'
             />
         </Tabs>
     );

@@ -126,6 +126,10 @@
     background-color: #1d2735;
 }
 
+.dark :global #tabcontainer > ul > li.active > a {
+    background-color: #141c27;
+}
+
 .light :global #tabcontainer > ul > li {
     border-top: 0;
     overflow: hidden;
