@@ -1065,7 +1065,7 @@ PowerView can be used to then retrieve the security identifier (SID) of the newl
 
   $ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid
 
-We now need to build a generic ACE with the attacker-added computer SID as the pricipal, and get the
+We now need to build a generic ACE with the attacker-added computer SID as the principal, and get the
 binary bytes for the new DACL/ACE:
 
 ::
@@ -1631,7 +1631,7 @@ ticket "as" this user.
 
 One caveat is that impersonated users can not be in the "Protected Users" security group
 or otherwise have delegation privileges revoked. Another caveat is that the principal
-added to the msDS-AllowedToActOnBehalfOfOtherIdentity DACL *must* have a service pricipal
+added to the msDS-AllowedToActOnBehalfOfOtherIdentity DACL *must* have a service principal
 name (SPN) set in order to successfully abuse the S4U2self/S4U2proxy process. If an
 attacker does not currently control an account with a SPN set, an attacker can abuse the
 default domain MachineAccountQuota settings to add a computer account that the attacker
