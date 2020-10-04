@@ -48,7 +48,7 @@ const DatabaseDataDisplay = () => {
                 context.darkMode ? styles.dark : styles.light
             )}
         >
-            <CollapsibleSection header='DATABASE INFO'>
+            <CollapsibleSection header='DB STATS'>
                 <Table hover striped responsive>
                     <thead></thead>
                     <tbody>
@@ -90,7 +90,9 @@ const DatabaseDataDisplay = () => {
                 </Table>
             </CollapsibleSection>
 
-            <CollapsibleSection header='ON PREM'>
+            <hr></hr>
+
+            <CollapsibleSection header='ON-PREM OBJECTS'>
                 <Table hover striped responsive>
                     <thead></thead>
                     <tbody>
@@ -132,7 +134,9 @@ const DatabaseDataDisplay = () => {
                 </Table>
             </CollapsibleSection>
 
-            <CollapsibleSection header='AZURE'>
+            <hr></hr>
+
+            <CollapsibleSection header='AZURE OBJECTS'>
                 <Table hover striped responsive>
                     <thead></thead>
                     <tbody>
@@ -204,7 +208,9 @@ const DatabaseDataDisplay = () => {
                 </Table>
             </CollapsibleSection>
 
-            <div className={clsx('text-center', styles.buttongroup)}>
+            <hr></hr>
+
+            <div className={clsx('text-center', styles.buttongroup)} width="90%">
                 <div role='group' className={styles.buttongroup}>
                     <button
                         type='button'
@@ -246,6 +252,7 @@ const DatabaseDataDisplay = () => {
                         Log Out / Switch Database
                     </a>
                 </div>
+                <p></p>
             </div>
         </div>
     );

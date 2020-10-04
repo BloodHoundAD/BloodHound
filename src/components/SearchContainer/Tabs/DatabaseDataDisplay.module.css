@@ -3,11 +3,15 @@
     border-left: solid #151d29 15px;
     border-right: solid #151d29 15px;
     border-top: solid #151d29 15px;
-    margin-left: 0px;
-    margin-right: 0px;
-    margin-top: 0px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
     margin-bottom: 0px;
-    width: 100%;
+    width: 95%;
+}
+
+h4 {
+    color: #82b1c5 !important;
 }
 
 .nodelist {
@@ -18,9 +22,9 @@
 
 .dark {
     background-color: #151d29;
-    border-top: solid #151d29 12px;
-    border-left: solid #151d29 15px;
-    border-right: solid #151d29 15px;
+    border-top: solid #151d29 0px;
+    border-left: solid #151d29 0px;
+    border-right: solid #151d29 0px;
 }
 
 .dark :global table > tbody > tr:hover > td {
@@ -119,12 +123,14 @@
 }
 
 .buttongroup {
-    width: 100%;
-}
-
-.buttongroup {
     position: relative;
     display: inline-block;
     vertical-align: middle;
-    width: 100%;
+    width: 95%;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+hr {
+    border-color: #94989d;
 }
