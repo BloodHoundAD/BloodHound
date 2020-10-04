@@ -859,8 +859,12 @@ div.tooltip-inner-custom {
     border: none;
 }
 
+.nav-pills li a {
+    border-radius: 0px;
+}
+
 .modal-dark ul li {
-    background-color: #1d2735;
+    background-color: #293545;
 }
 
 .modal-dark ul li a {

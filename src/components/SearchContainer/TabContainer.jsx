@@ -23,8 +23,12 @@ import { openSync, readSync, closeSync } from 'fs';
 import imageType from 'image-type';
 import { withAlert } from 'react-alert';
 import styles from './TabContainer.module.css';
+import clsx from 'clsx';
+import { useContext } from 'react';
+import { AppContext } from '../../AppContext';
 
 class TabContainer extends Component {
+
     constructor(props) {
         super(props);
 
@@ -462,7 +466,6 @@ class TabContainer extends Component {
     _handleSelect(index, last) {
         this.setState({ selected: index });
     }
-
     render() {
         return (
             <div>
