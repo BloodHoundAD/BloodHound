@@ -3,6 +3,11 @@
     border-left: solid #151d29 15px;
     border-right: solid #151d29 15px;
     border-top: solid #151d29 15px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    width: 100%;
 }
 
 .nodelist {
