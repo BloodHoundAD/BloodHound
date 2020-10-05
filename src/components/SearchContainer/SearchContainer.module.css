@@ -123,11 +123,30 @@
     display: table-cell;
     width: 35%;
     text-align: center;
-    background-color: #1d2735;
+    background-color: #1D2735;
+}
+
+.dark :global #tabcontainer > ul > li > a {
+    color: #787e87 !important;
+    font-weight: 800;
+}
+
+.dark :global #tabcontainer > ul > li.active > a {
+    color: white !important;
+    font-weight: 800;
 }
 
 .dark :global #tabcontainer > ul > li.active > a {
     background-color: #141c27;
+}
+
+.dark :global #tabcontainer > ul > li > a:hover {
+    color: white !important;
+    background-color: #293545;
+}
+
+.light :global #tabcontainer > ul > li > a:hover {
+    background-color: #e7e7e7;
 }
 
 .light :global #tabcontainer > ul > li {
