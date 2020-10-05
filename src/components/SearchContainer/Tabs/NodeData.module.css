@@ -114,11 +114,11 @@ hr {
     font-weight: bold;
 }
 
-.dark > h5 {
-    color: white;
+.dark > .dl > h5 {
+    color: white !important;
 }
 
-.light > h5 {
+.light > .dl > h5 {
     color: black;
 }
 

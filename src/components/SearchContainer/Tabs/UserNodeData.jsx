@@ -88,8 +88,6 @@ const UserNodeData = () => {
             <div className={clsx(styles.dl)}>
                 <h5>{label || objectId}</h5>
 
-                <hr></hr>
-
                 <CollapsibleSection header='OVERVIEW'>
                     <div className={styles.itemlist}>
                         <Table>

@@ -72,8 +72,6 @@ const GroupNodeData = () => {
             >
                 <h5>{label || objectid}</h5>
 
-                <hr></hr>
-
                 <CollapsibleSection header='OVERVIEW'>
                     <div className={styles.itemlist}>
                         <Table>
