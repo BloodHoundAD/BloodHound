@@ -155,15 +155,26 @@
     white-space: nowrap;
     border-radius: 0;
     display: table-cell;
-    width: 35%;
+    width: 33.4%;
     text-align: center;
     background-color: #dfdfdf;
 }
 
+.light :global #tabcontainer > ul > li > a {
+    color: #a5a7ab !important;
+    font-weight: 800;
+}
+
 .light :global #tabcontainer > ul > li > a:focus {
     background-color: white;
-    color: black;
+    color: #1f2734;
     outline: none;
+}
+
+.light :global #tabcontainer > ul > li > a:hover {
+    color: #1f2734 !important;
+    background-color: #E7E7E7;
+    font-weight: 800;
 }
 
 .light :global #tabcontainer > ul > li > a:hover {
@@ -172,7 +183,8 @@
 
 .light :global #tabcontainer > ul > li.active > a {
     background-color: white;
-    color: black;
+    color: #1f2734 !important;
+    font-weight: 800;
 }
 
 .dark :global .searchSelectorS > span {
