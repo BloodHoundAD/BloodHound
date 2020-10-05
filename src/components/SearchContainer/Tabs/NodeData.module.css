@@ -1,8 +1,8 @@
 .dark :global .table {
     background-color: #151d29;
-    border-left: solid #151d29 15px;
-    border-right: solid #151d29 15px;
-    border-top: solid #151d29 15px;
+    border-left: solid #151d29 0px;
+    border-right: solid #151d29 0px;
+    border-top: solid #151d29 0px;
 }
 
 .dark {
