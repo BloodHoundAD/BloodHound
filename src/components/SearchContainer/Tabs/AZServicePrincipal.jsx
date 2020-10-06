@@ -65,13 +65,13 @@ const AZServicePrincipalNodeData = () => {
     return objectid === null ? (
         <div></div>
     ) : (
-        <div className={clsx(!visible && 'displaynone')}>
-            <dl
-                className={clsx(
-                    styles.dl,
-                    context.darkMode ? styles.dark : styles.light
-                )}
-            >
+        <div
+            className={clsx(
+                !visible && 'displaynone',
+                context.darkMode ? styles.dark : styles.light
+            )}
+        >
+            <div className={clsx(styles.dl)}>
                 <h5>{label || objectid}</h5>
 
                 <CollapsibleSection header='OVERVIEW'>
@@ -222,7 +222,7 @@ const AZServicePrincipalNodeData = () => {
                     type={'AZUser'}
                     visible={visible}
                 /> */}
-            </dl>
+            </div>
         </div>
     );
 };

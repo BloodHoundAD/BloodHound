@@ -65,13 +65,13 @@ const OUNodeData = () => {
     return objectid === null ? (
         <div></div>
     ) : (
-        <div className={clsx(!visible && 'displaynone')}>
-            <dl
-                className={clsx(
-                    styles.dl,
-                    context.darkMode ? styles.dark : styles.light
-                )}
-            >
+        <div
+            className={clsx(
+                !visible && 'displaynone',
+                context.darkMode ? styles.dark : styles.light
+            )}
+        >
+            <div className={clsx(styles.dl)}>
                 <h5>{label || objectid}</h5>
 
                 <CollapsibleSection header='OVERVIEW'>
@@ -177,7 +177,7 @@ const OUNodeData = () => {
 
                 {/* <Notes objectid={objectid} type='OU' />
                 <NodeGallery objectid={objectid} type='OU' visible={visible} /> */}
-            </dl>
+            </div>
         </div>
     );
 };
