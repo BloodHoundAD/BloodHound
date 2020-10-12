@@ -721,7 +721,7 @@ export function buildAzureGlobalAdminRights(chunk) {
         '{isacl: false, isazure: true}',
     ];
     for (let row of chunk) {
-        let type = row.UserType.toUpperCase();
+        let type = row.ObjectType.toUpperCase();
         if (type === 'USER') {
             if (row.UserOnPremID === null) {
                 format[0] = 'AZUser';
@@ -738,6 +738,12 @@ export function buildAzureGlobalAdminRights(chunk) {
             }
         } else if (type === 'GROUP') {
             format[0] = 'AZGroup';
+                insertNew(queries, format, {
+                    source: row.UserID.toUpperCase(),
+                    target: row.TenantID.toUpperCase(),
+                });
+        } else if (type === 'SERVICEPRINCIPAL') {
+            format[0] = 'AZServicePrincipal';
                 insertNew(queries, format, {
                     source: row.UserID.toUpperCase(),
                     target: row.TenantID.toUpperCase(),
