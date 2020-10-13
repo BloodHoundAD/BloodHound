@@ -860,7 +860,7 @@ export function buildAzureTenants(chunk) {
 
     for (let row of chunk) {
         queries.properties.props.push({
-            source: row.ObjectId.toUpperCase(),
+            source: row.ObjectID.toUpperCase(),
             name: row.DisplayName.toUpperCase(),
         });
     }
