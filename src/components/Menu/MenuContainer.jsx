@@ -149,6 +149,8 @@ const MenuContainer = () => {
         checkFileValidity(finalFiles);
     };
 
+    const getMetaTagQuick = async (file) => {};
+
     const checkFileValidity = async (files) => {
         let filteredFiles = {};
         for (let file of files) {
@@ -215,10 +217,16 @@ const MenuContainer = () => {
         });
         console.log(`Processing ${file.name}`);
         console.time('IngestTime');
+        let tag;
+        if (file.type.startsWith('az')) {
+            tag = 'data';
+        } else {
+            tag = file.type;
+        }
         const pipeline = chain([
             fs.createReadStream(file.path, { encoding: 'utf8' }),
             parser(),
-            pick({ filter: 'data' }),
+            pick({ filter: tag }),
             ignore({ filter: 'meta' }),
             streamValues(),
             (data) => {

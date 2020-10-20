@@ -738,16 +738,16 @@ export function buildAzureGlobalAdminRights(chunk) {
             }
         } else if (type === 'GROUP') {
             format[0] = 'AZGroup';
-                insertNew(queries, format, {
-                    source: row.UserID.toUpperCase(),
-                    target: row.TenantID.toUpperCase(),
-                });
+            insertNew(queries, format, {
+                source: row.UserID.toUpperCase(),
+                target: row.TenantID.toUpperCase(),
+            });
         } else if (type === 'SERVICEPRINCIPAL') {
             format[0] = 'AZServicePrincipal';
-                insertNew(queries, format, {
-                    source: row.UserID.toUpperCase(),
-                    target: row.TenantID.toUpperCase(),
-                });
+            insertNew(queries, format, {
+                source: row.UserID.toUpperCase(),
+                target: row.TenantID.toUpperCase(),
+            });
         }
     }
 
@@ -1055,7 +1055,12 @@ export function buildAzureAppToSP(chunk) {
             'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZApp SET n.name = prop.AppName',
         props: [],
     };
-    let format = ['', 'AZServicePrincipal', 'AZRunsAs', '{isacl: false, isazure: true}'];
+    let format = [
+        '',
+        'AZServicePrincipal',
+        'AZRunsAs',
+        '{isacl: false, isazure: true}',
+    ];
 
     for (let row of chunk) {
         queries.properties.props.push({
@@ -1376,16 +1381,16 @@ export function buildAzureGroupRights(chunk) {
             }
         } else if (type === 'GROUP') {
             format[0] = 'AZGroup';
-                insertNew(queries, format, {
-                    source: row.UserID.toUpperCase(),
-                    target: row.TargetGroupID.toUpperCase(),
-                });
+            insertNew(queries, format, {
+                source: row.UserID.toUpperCase(),
+                target: row.TargetGroupID.toUpperCase(),
+            });
         } else if (type === 'SERVICEPRINCIPAL') {
             format[0] = 'AZServicePrincipal';
-                insertNew(queries, format, {
-                    source: row.UserID.toUpperCase(),
-                    target: row.TargetGroupID.toUpperCase(),
-                });
+            insertNew(queries, format, {
+                source: row.UserID.toUpperCase(),
+                target: row.TargetGroupID.toUpperCase(),
+            });
         }
     }
 
