@@ -55,7 +55,7 @@ Node Properties
 * **AdminCount**: Whether the user object in Active Directory currently,
   or possibly ever has belonged to a certain set of highly privileged
   groups. This property is related to the AdminSDHolder object and the
-  SDProp process. Read about that here: https://adsecurity.org/?p=2053
+  SDProp process. Read about that here: https://adsecurity.org/?p=1906
 * **Compromised**: Whether the user is marked as Owned. You can mark any
   user in the BloodHound GUI as Owned by right-clicking it and clicking
   "Mark User as Owned".
