@@ -19,7 +19,7 @@
     position: absolute;
     z-index: 10;
     bottom: 0;
-    overflow: auto;
+    overflow: hidden;
     width: 100%;
     pointer-events: none;
 }
