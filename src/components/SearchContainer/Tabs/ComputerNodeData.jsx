@@ -363,7 +363,7 @@ const ComputerNodeData = () => {
                                     property='Constrained Delegation Privileges'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(m:User {objectid: $objectid})-[r:AllowedToDelegate]->(n:Computer)'
+                                        'MATCH p=(m:Computer {objectid: $objectid})-[r:AllowedToDelegate]->(n:Computer)'
                                     }
                                     start={label}
                                     distinct
