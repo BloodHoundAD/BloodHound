@@ -127,20 +127,20 @@ const DomainNodeData = () => {
                                     property='Map OU Structure'
                                     query='MATCH p = (d:Domain {objectid: $objectid})-[r:Contains*1..]->(n) RETURN p'
                                 />
-                                <MappedNodeProps
-                                    displayMap={displayMap}
-                                    properties={nodeProps}
-                                    label={label}
-                                />
-                                <ExtraNodeProps
-                                    displayMap={displayMap}
-                                    properties={nodeProps}
-                                    label={label}
-                                />
                             </tbody>
                         </Table>
                     </div>
                 </CollapsibleSection>
+                <MappedNodeProps
+                    displayMap={displayMap}
+                    properties={nodeProps}
+                    label={label}
+                />
+                <ExtraNodeProps
+                    displayMap={displayMap}
+                    properties={nodeProps}
+                    label={label}
+                />
 
                 <hr></hr>
 

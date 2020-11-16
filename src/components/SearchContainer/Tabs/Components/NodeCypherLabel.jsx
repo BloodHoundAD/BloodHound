@@ -29,14 +29,14 @@ const NodeCypherLabel = ({ property, target, baseQuery, domain }) => {
             objectid: target,
             domain: domain,
         })
-            .then(r => {
+            .then((r) => {
                 sess.close();
                 setSession(null);
                 let v = r.records[0].get('count');
                 setValue(v.toLocaleString());
                 setReady(true);
             })
-            .catch(error => {
+            .catch((error) => {
                 if (
                     !error.message.includes(
                         'The transaction has been terminated'
@@ -50,21 +50,21 @@ const NodeCypherLabel = ({ property, target, baseQuery, domain }) => {
     }, [target, domain]);
 
     return ready ? (
-        <>
-            <dt>{property}</dt>
-            <dd>{value}</dd>
-        </>
+        <tr>
+            <td>{property}</td>
+            <td align='right'>{value}</td>
+        </tr>
     ) : (
-        <>
-            <dt>{property}</dt>
-            <dd>
+        <tr>
+            <td>{property}</td>
+            <td align='right'>
                 <div className='spinner'>
                     <div className='bounce1' />
                     <div className='bounce2' />
                     <div className='bounce3' />
                 </div>
-            </dd>
-        </>
+            </td>
+        </tr>
     );
 };
 
