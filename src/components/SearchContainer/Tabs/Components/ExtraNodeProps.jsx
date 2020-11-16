@@ -37,7 +37,7 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
         let property = properties[propName];
         let type = typeof property;
         let temp = [];
-        let displayProp = displayMap[propName];
+        let displayProp = propName;
         if (type === 'undefined') {
             return temp;
         }
@@ -102,10 +102,15 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
 
     useEffect(() => {
         let temp = {};
-        Object.keys(displayMap).forEach((val, index) => {
-            let c = convertProperty(val);
-            if (c.length !== 0) temp[val] = c;
-        });
+        let mapped = Object.keys(displayMap);
+        Object.keys(properties)
+            .sort()
+            .forEach((val, index) => {
+                if (!mapped.includes(val) && !blacklist.includes(val)) {
+                    let c = convertProperty(val);
+                    if (c.length !== 0) temp[val] = c;
+                }
+            });
         setElements(temp);
     }, [label]);
 
