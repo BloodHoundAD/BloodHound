@@ -150,38 +150,110 @@ const MenuContainer = () => {
         checkFileValidity(finalFiles);
     };
 
-    const getMetaTagQuick = async (file) => {};
+    const getMetaTagQuick = async (file) => {
+        let size = fs.statSync(file.path).size;
+        let start = size - 300;
+        if (start <= 0) {
+            start = 0;
+        }
+
+        //Try end of file first
+        let prom = new Promise((resolve, reject) => {
+            fs.createReadStream(file.path, {
+                encoding: 'utf8',
+                start: start,
+                end: size,
+            }).on('data', (chunk) => {
+                let type, version, count;
+                try {
+                    type = /type.?:\s?"(\w*)"/g.exec(chunk)[1];
+                    count = parseInt(/count.?:\s?(\d*)/g.exec(chunk)[1]);
+                } catch (e) {
+                    type = null;
+                    count = null;
+                }
+                try {
+                    version = parseInt(/version.?:\s?(\d*)/g.exec(chunk)[1]);
+                } catch (e) {
+                    version = null;
+                }
+
+                resolve({
+                    count: count,
+                    type: type,
+                    version: version,
+                });
+            });
+        });
+
+        let meta = await prom;
+        if (meta.type !== null && meta.count !== null) {
+            return meta;
+        }
+
+        prom = new Promise((resolve, reject) => {
+            fs.createReadStream(file.path, {
+                encoding: 'utf8',
+                start: 0,
+                end: 300,
+            }).on('data', (chunk) => {
+                let type, version, count;
+                try {
+                    type = /type.?:\s+"(\w*)"/g.exec(chunk)[1];
+                    count = parseInt(/count.?:\s+(\d*)/g.exec(chunk)[1]);
+                } catch (e) {
+                    type = null;
+                    count = null;
+                }
+                try {
+                    version = parseInt(/version.?:\s+(\d*)/g.exec(chunk)[1]);
+                } catch (e) {
+                    version = null;
+                }
+
+                resolve({
+                    count: count,
+                    type: type,
+                    version: version,
+                });
+            });
+        });
+
+        meta = await prom;
+        return meta;
+    };
 
     const checkFileValidity = async (files) => {
         let filteredFiles = {};
         for (let file of files) {
-            const pipeline = chain([
-                fs.createReadStream(file.path, { encoding: 'utf8' }),
-                parser(),
-                pick({ filter: 'meta' }),
-                ignore({ filter: 'data' }),
-                streamValues(),
-                (data) => {
-                    const value = data.value;
-                    return value;
-                },
-            ]);
+            let meta = await getMetaTagQuick(file);
+            // const pipeline = chain([
+            //     fs.createReadStream(file.path, { encoding: 'utf8' }),
+            //     parser(),
+            //     pick({ filter: 'meta' }),
+            //     ignore({ filter: 'data' }),
+            //     streamValues(),
+            //     (data) => {
+            //         const value = data.value;
+            //         return value;
+            //     },
+            // ]);
 
-            alert.info(`Validating file ${file.name}`);
+            // alert.info(`Validating file ${file.name}`);
 
-            let meta;
-            try {
-                for await (let data of pipeline) {
-                    meta = data;
-                }
-            } catch (e) {
-                console.log(e);
-                filteredFiles[file.id] = {
-                    ...file,
-                    status: FileStatus.ParseError,
-                };
-                continue;
-            }
+            // let meta;
+            // try {
+            //     for await (let data of pipeline) {
+            //         meta = data;
+            //     }
+            // } catch (e) {
+            //     console.log(e);
+            //     filteredFiles[file.id] = {
+            //         ...file,
+            //         status: FileStatus.ParseError,
+            //     };
+            //     continue;
+            // }
 
             if (!('version' in meta) || meta.version < 3) {
                 filteredFiles[file.id] = {
