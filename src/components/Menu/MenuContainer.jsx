@@ -191,6 +191,7 @@ const MenuContainer = () => {
             return meta;
         }
 
+        //Try the beginning of the file next
         prom = new Promise((resolve, reject) => {
             fs.createReadStream(file.path, {
                 encoding: 'utf8',

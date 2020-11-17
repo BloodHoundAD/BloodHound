@@ -1167,6 +1167,8 @@ export function buildAzureVmPerms(chunk) {
             format[2] = 'AZAvereContributor';
         } else if (role === 'USER ACCESS ADMINISTRATOR') {
             format[2] = 'AZUserAccessAdministrator';
+        } else {
+            continue;
         }
 
         if (row.ControllerOnPremID === null) {
@@ -1207,11 +1209,13 @@ export function buildAzureRGPermissions(chunk) {
         let source;
 
         if (controllerType === 'UNKNOWN' || role === 'CONTRIBUTOR') continue;
-        if (role !== 'OWNER' && role !== 'USER ACCESS ADMINISTRATOR') continue;
+
         if (role === 'OWNER') {
             format[2] = 'AZOwns';
         } else if (role === 'USER ACCESS ADMINISTRATOR') {
             format[2] = 'AZUserAccessAdministrator';
+        } else {
+            continue;
         }
 
         if (row.ControllerOnPremID === null) {
@@ -1263,6 +1267,10 @@ export function buildAzureKVPermissions(chunk) {
             format[2] = 'AZContributor';
         } else if (role === 'USER ACCESS ADMINISTRATOR') {
             format[2] = 'AZUserAccessAdministrator';
+        } else if (role === 'KEY VAULT CONTRIBUTOR') {
+            format[2] = 'AZKeyVaultContributor';
+        } else {
+            continue;
         }
 
         if (row.ControllerOnPremID === null) {

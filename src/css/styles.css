@@ -205,6 +205,7 @@ div.tooltip-inner-custom {
 .edgeFilter > div > input {
     margin-top: 0;
     white-space: nowrap;
+    margin-right: 2px;
 }
 
 #help-tab-container > div div {
