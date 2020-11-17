@@ -1,0 +1,47 @@
+.edgeFilter {
+    position: absolute;
+    left: 100%;
+    display: inline-block;
+    width: auto;
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+    margin-left: 2px;
+    overflow: hidden;
+}
+
+.edgeFilter > h4 {
+    display: inline-block;
+    white-space: nowrap;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.edgeFilter > div > h3 {
+    display: inline;
+    white-space: nowrap;
+    margin-right: 8px;
+}
+
+.edgeFilter > div {
+    margin-left: 8px;
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+.edgeFilter > div > input {
+    margin-top: 0;
+    white-space: nowrap;
+    margin-right: 2px;
+}
+
+.dark {
+    background-color: #444b55;
+    color: white;
+}
+
+.dark button {
+    background-color: #444b55;
+}
+
+.light {
+    background-color: white;
+}

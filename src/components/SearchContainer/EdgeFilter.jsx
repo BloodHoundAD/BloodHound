@@ -1,11 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { motion } from 'framer-motion';
+import { useContext } from 'react';
+import { AppContext } from '../../AppContext';
+import styles from './EdgeFilter.module.css';
+import clsx from 'clsx';
 
 const EdgeFilter = ({ open }) => {
     const [edgeIncluded, setEdgeIncluded] = useState(appStore.edgeincluded);
+    const context = useContext(AppContext);
 
-    const clearSection = section => {
+    const clearSection = (section) => {
         let current = edgeIncluded;
         if (section === 'default') {
             current.MemberOf = false;
@@ -41,7 +46,7 @@ const EdgeFilter = ({ open }) => {
         conf.set('edgeincluded', current);
     };
 
-    const setSection = section => {
+    const setSection = (section) => {
         let current = edgeIncluded;
         if (section === 'default') {
             current.MemberOf = true;
@@ -77,7 +82,7 @@ const EdgeFilter = ({ open }) => {
         conf.set('edgeincluded', current);
     };
 
-    const handleEdgeChange = e => {
+    const handleEdgeChange = (e) => {
         let current = edgeIncluded;
         let edgeName = e.target.getAttribute('name');
         current[edgeName] = !current[edgeName];
@@ -102,7 +107,10 @@ const EdgeFilter = ({ open }) => {
             }}
             initial={'hidden'}
             animate={open ? 'visible' : 'hidden'}
-            className={'edgeFilter'}
+            className={clsx(
+                styles.edgeFilter,
+                context.darkMode ? styles.dark : styles.light
+            )}
         >
             <div>
                 <h3>Edge Filtering</h3>
@@ -139,10 +147,10 @@ const EdgeFilter = ({ open }) => {
                     className='checkbox-inline'
                     type='checkbox'
                     checked={edgeIncluded.MemberOf}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                     name='MemberOf'
                 />
-                <label onClick={e => handleEdgeChange(e)} name='MemberOf'>
+                <label onClick={(e) => handleEdgeChange(e)} name='MemberOf'>
                     {' '}
                     MemberOf
                 </label>
@@ -153,9 +161,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='HasSession'
                     checked={edgeIncluded.HasSession}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='HasSession'>
+                <label onClick={(e) => handleEdgeChange(e)} name='HasSession'>
                     {' '}
                     HasSession
                 </label>
@@ -166,9 +174,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='AdminTo'
                     checked={edgeIncluded.AdminTo}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='AdminTo'>
+                <label onClick={(e) => handleEdgeChange(e)} name='AdminTo'>
                     {' '}
                     AdminTo
                 </label>
@@ -196,10 +204,10 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='AllExtendedRights'
                     checked={edgeIncluded.AllExtendedRights}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
                 <label
-                    onClick={e => handleEdgeChange(e)}
+                    onClick={(e) => handleEdgeChange(e)}
                     name='AllExtendedRights'
                 >
                     {' '}
@@ -212,9 +220,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='AddMember'
                     checked={edgeIncluded.AddMember}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='AddMember'>
+                <label onClick={(e) => handleEdgeChange(e)} name='AddMember'>
                     {' '}
                     AddMember
                 </label>
@@ -225,10 +233,10 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='ForceChangePassword'
                     checked={edgeIncluded.ForceChangePassword}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
                 <label
-                    onClick={e => handleEdgeChange(e)}
+                    onClick={(e) => handleEdgeChange(e)}
                     name='ForceChangePassword'
                 >
                     {' '}
@@ -241,9 +249,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='GenericAll'
                     checked={edgeIncluded.GenericAll}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='GenericAll'>
+                <label onClick={(e) => handleEdgeChange(e)} name='GenericAll'>
                     {' '}
                     GenericAll
                 </label>
@@ -254,9 +262,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='GenericWrite'
                     checked={edgeIncluded.GenericWrite}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='GenericWrite'>
+                <label onClick={(e) => handleEdgeChange(e)} name='GenericWrite'>
                     {' '}
                     GenericWrite
                 </label>
@@ -267,9 +275,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='Owns'
                     checked={edgeIncluded.Owns}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='Owns'>
+                <label onClick={(e) => handleEdgeChange(e)} name='Owns'>
                     {' '}
                     Owns
                 </label>
@@ -280,9 +288,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='WriteDacl'
                     checked={edgeIncluded.WriteDacl}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='WriteDacl'>
+                <label onClick={(e) => handleEdgeChange(e)} name='WriteDacl'>
                     {' '}
                     WriteDacl
                 </label>
@@ -293,9 +301,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='WriteOwner'
                     checked={edgeIncluded.WriteOwner}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='WriteOwner'>
+                <label onClick={(e) => handleEdgeChange(e)} name='WriteOwner'>
                     {' '}
                     WriteOwner
                 </label>
@@ -306,10 +314,10 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='ReadLAPSPassword'
                     checked={edgeIncluded.ReadLAPSPassword}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
                 <label
-                    onClick={e => handleEdgeChange(e)}
+                    onClick={(e) => handleEdgeChange(e)}
                     name='ReadLAPSPassword'
                 >
                     {' '}
@@ -322,10 +330,10 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='ReadGMSAPassword'
                     checked={edgeIncluded.ReadGMSAPassword}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
                 <label
-                    onClick={e => handleEdgeChange(e)}
+                    onClick={(e) => handleEdgeChange(e)}
                     name='ReadGMSAPassword'
                 >
                     {' '}
@@ -335,14 +343,14 @@ const EdgeFilter = ({ open }) => {
             <div className={'edge-filter-heading'}>
                 <h4>Containers</h4>
                 <button
-                    onClick={x => setSection('containers')}
+                    onClick={(x) => setSection('containers')}
                     className={'fa fa-check-double'}
                     data-toggle='tooltip'
                     data-placement='top'
                     title='Check all Containers edges'
                 />
                 <button
-                    onClick={x => clearSection('containers')}
+                    onClick={(x) => clearSection('containers')}
                     className={'fa fa-eraser'}
                     data-toggle='tooltip'
                     data-placement='top'
@@ -355,9 +363,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='Contains'
                     checked={edgeIncluded.Contains}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='Contains'>
+                <label onClick={(e) => handleEdgeChange(e)} name='Contains'>
                     {' '}
                     Contains
                 </label>
@@ -368,9 +376,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='GpLink'
                     checked={edgeIncluded.GpLink}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='GpLink'>
+                <label onClick={(e) => handleEdgeChange(e)} name='GpLink'>
                     {' '}
                     GpLink
                 </label>
@@ -378,14 +386,14 @@ const EdgeFilter = ({ open }) => {
             <div className={'edge-filter-heading'}>
                 <h4>Special</h4>
                 <button
-                    onClick={x => setSection('special')}
+                    onClick={(x) => setSection('special')}
                     className={'fa fa-check-double'}
                     data-toggle='tooltip'
                     data-placement='top'
                     title='Check all special edges'
                 />
                 <button
-                    onClick={x => clearSection('special')}
+                    onClick={(x) => clearSection('special')}
                     className={'fa fa-eraser'}
                     data-toggle='tooltip'
                     data-placement='top'
@@ -398,9 +406,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='CanRDP'
                     checked={edgeIncluded.CanRDP}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='CanRDP'>
+                <label onClick={(e) => handleEdgeChange(e)} name='CanRDP'>
                     {' '}
                     CanRDP
                 </label>
@@ -411,9 +419,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='CanPSRemote'
                     checked={edgeIncluded.CanPSRemote}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='CanPSRemote'>
+                <label onClick={(e) => handleEdgeChange(e)} name='CanPSRemote'>
                     {' '}
                     CanPSRemote
                 </label>
@@ -424,9 +432,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='ExecuteDCOM'
                     checked={edgeIncluded.ExecuteDCOM}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='ExecuteDCOM'>
+                <label onClick={(e) => handleEdgeChange(e)} name='ExecuteDCOM'>
                     {' '}
                     ExecuteDCOM
                 </label>
@@ -437,10 +445,10 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='AllowedToDelegate'
                     checked={edgeIncluded.AllowedToDelegate}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
                 <label
-                    onClick={e => handleEdgeChange(e)}
+                    onClick={(e) => handleEdgeChange(e)}
                     name='AllowedToDelegate'
                 >
                     {' '}
@@ -453,10 +461,10 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='AddAllowedToAct'
                     checked={edgeIncluded.AddAllowedToAct}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
                 <label
-                    onClick={e => handleEdgeChange(e)}
+                    onClick={(e) => handleEdgeChange(e)}
                     name='AddAllowedToAct'
                 >
                     {' '}
@@ -469,9 +477,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='AllowedToAct'
                     checked={edgeIncluded.AllowedToAct}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='AllowedToAct'>
+                <label onClick={(e) => handleEdgeChange(e)} name='AllowedToAct'>
                     {' '}
                     AllowedToAct
                 </label>
@@ -482,9 +490,9 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='SQLAdmin'
                     checked={edgeIncluded.SQLAdmin}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='SQLAdmin'>
+                <label onClick={(e) => handleEdgeChange(e)} name='SQLAdmin'>
                     {' '}
                     SQLAdmin
                 </label>
@@ -495,9 +503,12 @@ const EdgeFilter = ({ open }) => {
                     type='checkbox'
                     name='HasSIDHistory'
                     checked={edgeIncluded.HasSIDHistory}
-                    onChange={e => handleEdgeChange(e)}
+                    onChange={(e) => handleEdgeChange(e)}
                 />
-                <label onClick={e => handleEdgeChange(e)} name='HasSIDHistory'>
+                <label
+                    onClick={(e) => handleEdgeChange(e)}
+                    name='HasSIDHistory'
+                >
                     {' '}
                     HasSIDHistory
                 </label>
