@@ -22,6 +22,7 @@ const FileStatus = Object.freeze({
     Waiting: 3,
     Processing: 4,
     Done: 5,
+    NoData: 6,
 });
 
 const FileUploadDisplay = ({ file }) => {
@@ -43,14 +44,18 @@ const FileUploadDisplay = ({ file }) => {
             return 'Waiting for upload';
         } else if (status === FileStatus.Processing) {
             return 'Uploading Data';
+        } else if (status === FileStatus.NoData) {
+            return 'No Data In File';
         }
     };
 
     useEffect(() => {
         if (file.count === 0) {
             setProgress(100);
+            return;
         } else if (file.progress > file.count) {
             setProgress(100);
+            return;
         }
         setProgress(Math.floor((file.progress / file.count) * 100));
     }, [file.progress]);

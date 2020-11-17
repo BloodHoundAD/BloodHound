@@ -25,6 +25,7 @@ const FileStatus = Object.freeze({
     Waiting: 3,
     Processing: 4,
     Done: 5,
+    NoData: 6,
 });
 
 const IngestFuncMap = {
@@ -166,6 +167,8 @@ const MenuContainer = () => {
                 },
             ]);
 
+            alert.info(`Validating file ${file.name}`);
+
             let meta;
             try {
                 for await (let data of pipeline) {
@@ -196,9 +199,10 @@ const MenuContainer = () => {
                 };
                 continue;
             }
+
             filteredFiles[file.id] = {
                 ...file,
-                status: FileStatus.Waiting,
+                status: meta.count > 0 ? FileStatus.Waiting : FileStatus.NoData,
                 count: meta.count,
                 type: meta.type,
                 progress: 0,
