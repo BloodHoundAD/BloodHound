@@ -13,6 +13,8 @@ import { withAlert } from 'react-alert';
 import NodeGallery from './Components/NodeGallery';
 import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
+import { useContext } from 'react';
+import { AppContext } from '../../../AppContext';
 
 const AZSubscriptionNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -21,6 +23,7 @@ const AZSubscriptionNodeData = () => {
     const [domain, setDomain] = useState(null);
     const [nodeProps, setNodeProps] = useState({});
     const [blocksInheritance, setBlocksInheritance] = useState(false);
+    const context = useContext(AppContext);
 
     useEffect(() => {
         emitter.on('nodeClicked', nodeClickEvent);
