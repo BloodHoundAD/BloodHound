@@ -162,16 +162,6 @@ div.tooltip-inner-custom {
     display: none;
 }
 
-.edge-filter-heading > h4 {
-    display: inline;
-    margin-right: 5px;
-}
-
-.edge-filter-heading > button {
-    height: 20px;
-    width: 30px;
-}
-
 #help-tab-container > div div {
     white-space: pre-line;
     margin-top: 5px;

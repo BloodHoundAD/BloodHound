@@ -7,10 +7,10 @@ import TabContainer from './TabContainer';
 import { buildSearchQuery, buildSelectQuery } from 'utils';
 import SearchRow from './SearchRow';
 import styles from './SearchContainer.module.css';
-import EdgeFilter from './EdgeFilter';
 import { useContext } from 'react';
 import { AppContext } from '../../AppContext';
 import clsx from 'clsx';
+import EdgeFilter from './EdgeFilter/EdgeFilter';
 
 const SearchContainer = () => {
     const [pathfindingOpen, setPathfindingOpen] = useState(false);

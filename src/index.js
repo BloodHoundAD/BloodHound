@@ -395,42 +395,6 @@ const alertOptions = {
 };
 
 appStore.edgeincluded = conf.get('edgeincluded');
-//Code to add new edges to filter
-if (!appStore.edgeincluded.hasOwnProperty('AddAllowedToAct')) {
-    appStore.edgeincluded.AddAllowedToAct = true;
-    conf.set('edgeincluded', appStore.edgeincluded);
-}
-
-if (!appStore.edgeincluded.hasOwnProperty('AllowedToAct')) {
-    appStore.edgeincluded.AllowedToAct = true;
-    conf.set('edgeincluded', appStore.edgeincluded);
-}
-
-if (!appStore.edgeincluded.hasOwnProperty('SQLAdmin')) {
-    appStore.edgeincluded.SQLAdmin = true;
-    conf.set('edgeincluded', appStore.edgeincluded);
-}
-
-if (!appStore.edgeincluded.hasOwnProperty('ReadGMSAPassword')) {
-    appStore.edgeincluded.ReadGMSAPassword = true;
-    conf.set('edgeincluded', appStore.edgeincluded);
-}
-
-if (!appStore.edgeincluded.hasOwnProperty('HasSIDHistory')) {
-    appStore.edgeincluded.HasSIDHistory = true;
-    conf.set('edgeincluded', appStore.edgeincluded);
-}
-
-if (!appStore.edgeincluded.hasOwnProperty('CanPSRemote')) {
-    appStore.edgeincluded.HasSIDHistory = true;
-    conf.set('edgeincluded', appStore.edgeincluded);
-}
-
-// if (!appStore.edgeincluded.hasOwnProperty("ReadLAPSPassword")) {
-//     appStore.edgeincluded.ReadLAPSPassword = true;
-//     conf.set("edgeincluded", appStore.edgeincluded)
-// }
-
 appStore.performance = conf.get('performance');
 
 if (typeof appStore.performance.edgeLabels === 'undefined') {

@@ -27,6 +27,47 @@ import { AppContext } from './AppContext';
 import GraphErrorModal from './components/Modals/GraphErrorModal';
 import MenuContainer from './components/Menu/MenuContainer';
 
+const fullEdgeList = [
+    'CanRDP',
+    'CanPSRemote',
+    'ExecuteDCOM',
+    'AllowedToDelegate',
+    'AddAllowedToAct',
+    'AllowedToAct',
+    'SQLAdmin',
+    'HasSIDHistory',
+    'AZAddMembers',
+    'AZContains',
+    'AZContributor',
+    'AZGetCertificates',
+    'AZGetKeys',
+    'AZGetSecrets',
+    'AZGlobalAdmin',
+    'AZOwns',
+    'AZPrivilegedRoleAdmin',
+    'AZResetPassword',
+    'AZUserAccessAdministrator',
+    'AZAppAdmin',
+    'AZCloudAppAdmin',
+    'AZRunsAs',
+    'AZKeyVaultContributor',
+    'Contains',
+    'GpLink',
+    'AllExtendedRights',
+    'AddMember',
+    'ForceChangePassword',
+    'GenericAll',
+    'GenericWrite',
+    'Owns',
+    'WriteDacl',
+    'WriteOwner',
+    'ReadLAPSPassword',
+    'ReadGMSAPassword',
+    'MemberOf',
+    'HasSession',
+    'AdminTo',
+];
+
 export default class AppContainer extends Component {
     constructor(props) {
         super(props);
@@ -80,6 +121,16 @@ export default class AppContainer extends Component {
             emitter.emit('changeEdgeLabels');
         };
 
+        this.setEdgeIncluded = (name, included) => {
+            let { edgeIncluded } = this.state;
+            edgeIncluded[name] = included;
+            this.setState({
+                edgeIncluded: edgeIncluded,
+            });
+            appStore.edgeincluded = edgeIncluded;
+            conf.set('edgeincluded', edgeIncluded);
+        };
+
         this.state = {
             darkMode: appStore.performance.darkMode,
             toggleDarkMode: this.toggleDarkMode,
@@ -91,6 +142,8 @@ export default class AppContainer extends Component {
             setNodeLabels: this.setNodeLabels,
             edgeLabels: appStore.performance.edgeLabels,
             setEdgeLabels: this.setEdgeLabels,
+            edgeIncluded: appStore.edgeincluded,
+            setEdgeIncluded: this.setEdgeIncluded,
         };
     }
 
@@ -121,6 +174,14 @@ export default class AppContainer extends Component {
             },
             false
         );
+
+        let { edgeIncluded } = this.state;
+
+        for (let edge of fullEdgeList) {
+            if (!(edge in edgeIncluded)) {
+                this.setEdgeIncluded(edge, true);
+            }
+        }
     }
 
     render() {
