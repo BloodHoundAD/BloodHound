@@ -6,7 +6,6 @@
 }
 
 .about {
-    background-color: #444B55;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     border-bottom: none;
@@ -14,8 +13,6 @@
 }
 
 .btndone {
-    background-color: #406F8E !important;
-    border-color: #406F8E;
     border-top-right-radius: 25px;
     border-bottom-right-radius: 25px;
     border-top-left-radius: 25px;
@@ -27,7 +24,6 @@
     font-weight: 400;
     text-shadow: none;
     width: 150px;
-    color: white !important;
 }
 
 .btndone :hover {
@@ -36,4 +32,22 @@
 
 .footer {
     border-top: none;
+}
+
+.light {
+    background-color: #e7e7e7;
+}
+
+.dark {
+    background-color: #444b55;
+}
+
+.dark .btndone {
+    background-color: #406f8e !important;
+    border-color: #406f8e;
+    color: white !important;
+}
+
+.light :global .modal-header {
+    background-color: #e7e7e7;
 }
