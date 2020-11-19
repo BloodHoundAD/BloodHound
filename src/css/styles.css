@@ -589,7 +589,6 @@ div.tooltip-inner-custom {
         transform: translate(-50%, 0);
         overflow-y: hidden;
         opacity: 0.5;
-        background: #151d29;
         box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.68);
         border-bottom-left-radius: 11px;
         border-bottom-right-radius: 11px;
@@ -607,7 +606,6 @@ div.tooltip-inner-custom {
         transform: translate(-50%, 0);
         overflow-y: hidden;
         opacity: 0.5;
-        background: #151d29;
         box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.68);
         border-bottom-left-radius: 11px;
         border-bottom-right-radius: 11px;

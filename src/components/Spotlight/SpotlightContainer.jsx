@@ -59,7 +59,10 @@ const SpotlightContainer = () => {
     return (
         <PoseContainer
             visible={visible}
-            className={clsx('spotlight', context.darkMode ? styles.dark : null)}
+            className={clsx(
+                'spotlight',
+                context.darkMode ? styles.dark : styles.light
+            )}
             draggable={false}
         >
             <div
@@ -89,7 +92,7 @@ const SpotlightContainer = () => {
             </div>
 
             <div className={styles.nodelist}>
-                <Table>
+                <Table striped>
                     <thead>
                         <tr>
                             <td>Node Label</td>
