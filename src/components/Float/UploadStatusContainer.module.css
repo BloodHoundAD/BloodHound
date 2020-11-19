@@ -27,6 +27,7 @@
     opacity: 0.96;
     box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.68);
     border-radius: 13px 13px 11px 11px;
+    overflow-y: hidden;
 }
 
 .uploads {
