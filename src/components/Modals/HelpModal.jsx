@@ -39,6 +39,10 @@ import AZOwns from './HelpTexts/AZOwns/AZOwns';
 import AZPrivilegedRoleAdmin from './HelpTexts/AZPrivilegedRoleAdmin/AZPrivilegedRoleAdmin';
 import AZResetPassword from './HelpTexts/AZResetPassword/AZResetPassword';
 import AZUserAccessAdministrator from './HelpTexts/AZUserAccessAdministrator/AZUserAccessAdministrator';
+import AZGlobalAdmin from './HelpTexts/AZGlobalAdmin/AZGlobalAdmin';
+import AZAppAdmin from './HelpTexts/AZAppAdmin/AZAppAdmin';
+import AZCloudAppAdmin from './HelpTexts/AZCloudAppAdmin/AZCloudAppAdmin';
+import AZRunsAs from './HelpTexts/AZRunsAs/AZRunsAs';
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -109,6 +113,11 @@ const HelpModal = () => {
         AZPrivilegedRoleAdmin: AZPrivilegedRoleAdmin,
         AZResetPassword: AZResetPassword,
         AZUserAccessAdministrator: AZUserAccessAdministrator,
+        AZGlobalAdmin: AZGlobalAdmin,
+        AZUserAccessAdministrator: AZUserAccessAdministrator,
+        AZAppAdmin: AZAppAdmin,
+        AZCloudAppAdmin: AZCloudAppAdmin,
+        AZRunsAs: AZRunsAs,
     };
 
     const Component = components[edge];

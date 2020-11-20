@@ -1,5 +1,5 @@
 const Opsec = () => {
-    let text = `This depends on which abuse you perform`;
+    let text = ``;
     return { __html: text };
 };
 

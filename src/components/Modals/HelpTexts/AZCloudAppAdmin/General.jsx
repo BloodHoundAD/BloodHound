@@ -1,7 +1,7 @@
 import { groupSpecialFormat, typeFormat } from '../Formatter';
 
 const General = (sourceName, sourceType, targetName, targetType) => {
-    let text = `This indicates that the parent object contains the child object, such as a resource group containing a virtual machine, or a tenant “containing” a subscription.`;
+    let text = `Principals with the Cloud App Admin role can control tenant-resident apps`;
     return { __html: text };
 };
 

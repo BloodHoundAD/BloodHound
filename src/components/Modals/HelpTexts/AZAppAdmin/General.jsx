@@ -1,7 +1,7 @@
 import { groupSpecialFormat, typeFormat } from '../Formatter';
 
 const General = (sourceName, sourceType, targetName, targetType) => {
-    let text = `The ability to read secrets from key vaults`;
+    let text = `General text goes here.`;
     return { __html: text };
 };
 

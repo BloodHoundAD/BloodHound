@@ -1,7 +1,7 @@
 import { groupSpecialFormat, typeFormat } from '../Formatter';
 
 const General = (sourceName, sourceType, targetName, targetType) => {
-    let text = `This indicates that the parent object contains the child object, such as a resource group containing a virtual machine, or a tenant “containing” a subscription.`;
+    let text = `The Azure App runs as the Service Principal when it needs to authenticate to the tenant`;
     return { __html: text };
 };
 
