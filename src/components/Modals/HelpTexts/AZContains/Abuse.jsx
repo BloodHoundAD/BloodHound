@@ -1,6 +1,6 @@
 import { typeFormat } from '../Formatter';
 const Abuse = (sourceName, sourceType, targetName, targetType) => {
-    let text = `Create a new credential for the app, then authenticate to the tenant as the app’s service principal, then abuse whatever privilege it is that the service principal has.`;
+    let text = `There is no abuse necessary, but any roles scoped on a parent object will descend down to all child objects.`;
     return { __html: text };
 };
 

@@ -85,7 +85,7 @@ const NodeTooltip = ({ node, x, y }) => {
                     onClick={() => {
                         emitter.emit(
                             'query',
-                            `MATCH (n:${type} {objectid: $objectid}), (m), p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p`,
+                            `MATCH (n:${type} {objectid: $objectid}), (m), p=shortestPath((m)-[r*1..]->(n)) WHERE NOT m=n RETURN p`,
                             { objectid: objectid },
                             label
                         );

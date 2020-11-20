@@ -1,5 +1,5 @@
 const Opsec = () => {
-    let text = `Opsec text goes here.`;
+    let text = `Azure will log any role activation event for any object type.`;
     return { __html: text };
 };
 

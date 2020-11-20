@@ -1,5 +1,5 @@
 const Opsec = () => {
-    let text = `Opsec text goes here.`;
+    let text = `No opsec considerations for this edge.`;
     return { __html: text };
 };
 
