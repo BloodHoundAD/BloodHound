@@ -9,11 +9,11 @@ const LoadingContainer = () => {
     const [visible, setVisible] = useState(false);
     const context = useContext(AppContext);
 
-    const updateLoadingText = newText => {
+    const updateLoadingText = (newText) => {
         setText(newText);
     };
 
-    const updateShowState = newState => {
+    const updateShowState = (newState) => {
         setVisible(newState);
     };
 
@@ -32,6 +32,7 @@ const LoadingContainer = () => {
                 'loadingIndicator',
                 `loading-indicator-${context.darkMode ? 'dark' : 'light'}`
             )}
+            draggable={false}
         >
             <div>{text}</div>
             <img src='src/img/loading_new.gif' />

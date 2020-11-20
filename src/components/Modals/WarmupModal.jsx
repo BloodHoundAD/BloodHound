@@ -46,7 +46,7 @@ class WarmupModal extends Component {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id='WarmupModalHeader'>
-                        Warmup Database
+                        Warm Up Database
                     </Modal.Title>
                 </Modal.Header>
 
@@ -61,14 +61,14 @@ class WarmupModal extends Component {
                 <Modal.Footer>
                     <button
                         type='button'
-                        className='btn btn-success'
+                        className='btn'
                         onClick={this.closeAndWarmup.bind(this)}
                     >
                         Do it!
                     </button>
                     <button
                         type='button'
-                        className='btn btn-primary'
+                        className='btn'
                         onClick={this.closeModal.bind(this)}
                     >
                         Cancel

@@ -1,0 +1,136 @@
+.dark :global .table {
+    background-color: #151d29;
+    border-left: solid #151d29 15px;
+    border-right: solid #151d29 15px;
+    border-top: solid #151d29 15px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 0px;
+    width: 95%;
+}
+
+h4 {
+    color: #82b1c5 !important;
+}
+
+.nodelist {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 600px;
+}
+
+.dark {
+    background-color: #151d29;
+    border-top: solid #151d29 0px;
+    border-left: solid #151d29 0px;
+    border-right: solid #151d29 0px;
+}
+
+.dark :global table > tbody > tr:hover > td {
+    background-color: #406f8e;
+    color: white;
+}
+
+.dark table td {
+    color: white;
+}
+
+.dark h4 {
+    color: white;
+}
+
+.dark table td:nth-of-type(2) {
+    color: white;
+    font-weight: bold;
+}
+
+.nodelist table {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+}
+
+.nodelist :global table > thead {
+    text-align: left;
+    position: -webkit-sticky;
+    position: sticky;
+}
+
+.nodelist :global table > tbody > tr {
+    font-family: Helvetica;
+    font-size: 12px;
+    border-style: hidden;
+}
+
+.nodelist :global table > tbody > tr:hover {
+    background-color: #406f8e;
+}
+
+.dark :global table > tbody > tr:hover:nth-of-type(odd) {
+    background-color: #406f8e;
+}
+
+.dark :global table > tbody > tr:nth-of-type(odd) {
+    background-color: #2b333e;
+}
+
+.dark :global table > tbody > tr:hover:nth-of-type(odd) {
+    background-color: #406f8e;
+}
+
+.light :global table > tbody > tr:nth-of-type(odd) {
+    background-color: #e7e7e7;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px #151d29;
+}
+::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 24px rgba(140, 197, 201);
+}
+
+.btnright {
+    background-color: #406f8e;
+    border-color: #406f8e;
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border: 1px solid transparent;
+    padding: 8px;
+    font-family: Helvetica;
+    font-size: 12px;
+    width: 50%;
+}
+
+.btnleft {
+    background-color: #23395b;
+    border-color: #23395b;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 25px;
+    border-bottom-left-radius: 25px;
+    border: 1px solid transparent;
+    padding: 8px;
+    font-family: Helvetica;
+    font-size: 12px;
+    width: 50%;
+}
+
+.buttongroup {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    width: 95%;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+hr {
+    border-color: #94989d;
+}

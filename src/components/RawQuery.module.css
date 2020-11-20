@@ -1,0 +1,51 @@
+.button {
+    position: relative;
+    left: 50%;
+    display: block;
+    width: 200px;
+    height: 2em;
+    transform: translateX(-50%);
+    border-radius: 20px 20px 0 0;
+    border: none;
+    background-color: white;
+    pointer-events: auto;
+}
+
+.button:focus {
+    outline: 0;
+}
+
+.container {
+    position: absolute;
+    z-index: 10;
+    bottom: 0;
+    overflow: hidden;
+    width: 100%;
+    pointer-events: none;
+}
+
+.input {
+    position: relative;
+    left: 50%;
+    width: 70%;
+    transform: translateX(-50%);
+    pointer-events: auto;
+    border: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.dark {
+}
+
+.dark .button {
+    background-color: #151d29;
+    color: white;
+}
+
+.dark .input {
+    background-color: #444b55;
+    color: white;
+}

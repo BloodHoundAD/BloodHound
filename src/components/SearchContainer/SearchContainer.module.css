@@ -19,3 +19,246 @@
 #searchb:focus {
     box-shadow: none;
 } */
+
+.darkmenu {
+    background-color: #2b333e;
+}
+
+.darkmenu :global mark {
+    color: white;
+}
+
+.darkmenu :global .dropdown-item {
+    color: white;
+}
+
+.darkmenu :global li :global a:hover {
+    background: none;
+    background-color: #406f8e;
+    color: white;
+}
+
+@media all and (min-width: 600px) {
+    .container {
+        position: absolute;
+        z-index: 10;
+        top: 1em;
+        left: 1em;
+        overflow: visible;
+        min-width: 415px;
+        max-width: 45%;
+        background-color: white;
+    }
+}
+
+@media all and (min-width: 1000px) {
+    .container {
+        position: absolute;
+        z-index: 10;
+        top: 1em;
+        left: 1em;
+        overflow: visible;
+        min-width: 415px;
+        max-width: 40%;
+        background-color: white;
+    }
+}
+
+@media all and (min-width: 1200px) {
+    .container {
+        position: absolute;
+        z-index: 10;
+        top: 1em;
+        left: 1em;
+        overflow: visible;
+        min-width: 415px;
+        max-width: 30%;
+        background-color: white;
+    }
+}
+
+@media all and (min-width: 1600px) {
+    .container {
+        position: absolute;
+        z-index: 10;
+        top: 1em;
+        left: 1em;
+        overflow: visible;
+        min-width: 415px;
+        max-width: 25%;
+        background-color: white;
+    }
+}
+
+.container :global #tabcontainer > ul {
+    display: table;
+    width: 100%;
+}
+
+.container :global #tabcontainer > div {
+    padding: 0 0 0 0;
+}
+
+.light {
+    background-color: #f6f6f6;
+}
+
+.light :global .input-group span {
+    background-color: white;
+}
+
+.light :global .input-group {
+    background-color: white;
+}
+
+.light :global .input-group input {
+    background-color: white;
+    box-shadow: none;
+}
+.dark :global #tabcontainer > ul > li {
+    border-top: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    border-radius: 0;
+    display: table-cell;
+    width: 33.4%;
+    text-align: center;
+    background-color: #1D2735;
+}
+
+.dark :global #tabcontainer > ul > li > a {
+    color: #787e87 !important;
+    font-weight: 800;
+}
+
+.dark :global #tabcontainer > ul > li.active > a {
+    color: white !important;
+    font-weight: 800;
+}
+
+.dark :global #tabcontainer > ul > li.active > a {
+    background-color: #141c27;
+}
+
+.dark :global #tabcontainer > ul > li > a:hover {
+    color: white !important;
+    background-color: #293545;
+}
+
+.light :global #tabcontainer > ul > li > a:hover {
+    background-color: #e7e7e7;
+}
+
+.light :global #tabcontainer > ul > li {
+    border-top: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    border-radius: 0;
+    display: table-cell;
+    width: 33.4%;
+    text-align: center;
+    background-color: #dfdfdf;
+}
+
+.light :global #tabcontainer > ul > li > a {
+    color: #a5a7ab !important;
+    font-weight: 800;
+}
+
+.light :global #tabcontainer > ul > li > a:focus {
+    background-color: white;
+    color: #1f2734;
+    outline: none;
+}
+
+.light :global #tabcontainer > ul > li > a:hover {
+    color: #1f2734 !important;
+    background-color: #E7E7E7;
+    font-weight: 800;
+}
+
+.light :global #tabcontainer > ul > li > a:hover {
+    background-color: #e7e7e7;
+}
+
+.light :global #tabcontainer > ul > li.active > a {
+    background-color: white;
+    color: #1f2734 !important;
+    font-weight: 800;
+}
+
+.dark :global .searchSelectorS > span {
+    background: #444b55;
+}
+
+.dark :global .searchSelectorS > span > i {
+    color: white;
+}
+
+.light :global .searchSelectorS {
+    background: white;
+}
+
+.light :global .searchSelectorP {
+    background: white;
+}
+
+.dark :global .searchSelectorS {
+    background: #444b55;
+}
+
+.dark :global .searchSelectorP {
+    background: #444b55;
+}
+
+.dark :global .searchSelectorP > span {
+    background: #444b55;
+}
+
+.dark :global .searchSelectorP > span > i {
+    color: white;
+}
+
+.dark :global .searchSelectorS input {
+    background: #444b55;
+    color: white;
+}
+
+.dark :global .searchSelectorP input {
+    background: #444b55;
+    color: white;
+}
+
+.light :global .searchSelectorS > span {
+    background: white;
+}
+
+.light :global .searchSelectorS > span > i {
+    color: #878b91;
+}
+
+.light :global .searchSelectorP > span {
+    background: white;
+}
+
+.light :global .searchSelectorP > span > i {
+    color: #878b91;
+}
+
+.light :global .searchSelectorS input {
+    background: white;
+    color: #878b91;
+}
+
+.light :global .searchSelectorP input {
+    background: white;
+    color: #878b91;
+}
+
+.dark :global #tabcontainer > div {
+    background-color: #151d29;
+}
+
+.light :global #tabcontainer > div {
+    background-color: white;
+}

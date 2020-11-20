@@ -1,85 +1,49 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
+import { AppContext } from '../../AppContext';
+import { motion } from 'framer-motion';
 
-export default class MenuButton extends Component {
-    constructor() {
-        super();
+const MenuButton = ({ glyphicon, click, hoverVal }) => {
+    const [hovered, setHovered] = useState(false);
+    const context = useContext(AppContext);
 
-        this.state = {
-            darkMode: false,
-        };
-    }
+    const enterButton = () => {
+        setHovered(true);
+    };
 
-    componentDidMount() {
-        $(this.refs.btn).html(
-            '<span class="{}"></span>'.format(this.props.glyphicon)
-        );
+    const exitButton = () => {
+        setHovered(false);
+    };
 
-        emitter.on('toggleDarkMode', this.toggleDarkMode.bind(this));
-        this.toggleDarkMode(appStore.performance.darkMode);
-    }
+    const variants = {
+        open: { width: 'auto' },
+        closed: { width: '41px' },
+    };
 
-    toggleDarkMode(enabled) {
-        this.setState({ darkMode: enabled });
-    }
+    const clickHandler = (e) => {
+        click(e);
+        e.target.blur();
+    };
 
-    _leave(e) {
-        var target = $(e.target);
-        target.css('width', 'auto');
-        var oldWidth = target.width();
-        target.html('<span class="{}"></span>'.format(this.props.glyphicon));
-        var newWidth = target.outerWidth();
-        target.width(oldWidth);
-        target.animate(
-            {
-                width: newWidth + 'px',
-            },
-            100
-        );
-    }
-
-    _enter(e) {
-        var target = $(e.target);
-        target.css('width', 'auto');
-        var oldWidth = target.width();
-        target.html(
-            '{} <span class="{}"> </span>'.format(
-                this.props.hoverVal,
-                this.props.glyphicon
-            )
-        );
-        var newWidth = target.outerWidth();
-        target.width(oldWidth);
-        target.animate(
-            {
-                width: newWidth + 'px',
-            },
-            100
-        );
-    }
-
-    render() {
-        var c = 'glyphicon glyphicon-' + this.props.glyphicon;
-        return (
-            <button
-                ref='btn'
-                onClick={this.props.click}
-                onMouseLeave={this._leave.bind(this)}
-                onMouseEnter={this._enter.bind(this)}
-                className={
-                    this.state.darkMode
-                        ? 'btn menu-button-dark'
-                        : 'btn menu-button-light'
-                }
-            >
-                <span className={c} />
-            </button>
-        );
-    }
-}
-
-MenuButton.propTypes = {
-    hoverVal: PropTypes.string.isRequired,
-    glyphicon: PropTypes.string.isRequired,
-    click: PropTypes.func.isRequired,
+    return (
+        <motion.button
+            className={
+                context.darkMode
+                    ? 'btn menu-button-dark'
+                    : 'btn menu-button-light'
+            }
+            variants={variants}
+            initial={'closed'}
+            animate={hovered ? 'open' : 'closed'}
+            transition={{ duration: 0.1 }}
+            onMouseEnter={enterButton}
+            onMouseLeave={exitButton}
+            onClick={clickHandler}
+        >
+            {hovered ? hoverVal : ''} <span className={glyphicon} />
+        </motion.button>
+    );
 };
+
+MenuButton.propTypes = {};
+export default MenuButton;

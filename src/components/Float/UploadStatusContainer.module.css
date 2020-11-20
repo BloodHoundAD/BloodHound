@@ -1,0 +1,87 @@
+.panel {
+    width: 30%;
+    height: 50%;
+    position: fixed;
+    z-index: 30;
+    top: 10%;
+    left: 50%;
+    max-height: calc(100vh - 20%);
+    transform: translate(-50%, 0);
+    overflow-y: hidden;
+}
+
+.header {
+    width: 100%;
+    height: 15%;
+    background: #b9babd;
+    border-radius: 13px 13px 0 0;
+    font-family: Helvetica;
+    font-size: 23px;
+    padding: 5px 5px 0px 10px;
+    cursor: move;
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+    opacity: 0.96;
+    box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.68);
+    border-radius: 13px 13px 11px 11px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.uploads {
+    overflow-y: auto;
+    height: 75%;
+    width: 100%;
+}
+
+.footer {
+    height: 10%;
+    width: 100%;
+    display: grid;
+    align-items: flex-end;
+    justify-content: end;
+}
+
+.cheight {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.light .header {
+    color: #1d2735;
+}
+
+.light .content {
+    background: #f1f1f1;
+}
+
+.dark .header {
+    color: white;
+    background: #444b55;
+}
+
+.dark .content {
+    background: #1a2331;
+}
+
+.closeButton {
+    background: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+    color: white;
+    box-shadow: none;
+}
+
+.closeButton:hover {
+    background: transparent;
+    background-repeat: no-repeat;
+    color: white;
+}

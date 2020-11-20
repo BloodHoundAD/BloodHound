@@ -9,6 +9,7 @@ const BaseModal = ({ show, onHide, label, className, children }) => {
     return (
         <Modal
             show={show}
+            animation={false}
             onHide={onHide}
             aria-labelledby={label}
             className={clsx(context.darkMode && 'modal-dark', className)}

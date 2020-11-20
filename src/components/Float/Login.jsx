@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import neo4j from 'neo4j-driver';
 
 const Login = () => {
     const [url, setUrl] = useState('bolt://localhost:7687');
@@ -294,16 +295,14 @@ const Login = () => {
                 animate={visible ? 'visible' : 'hidden'}
                 initial={'hidden'}
             >
-                <img src='src/img/logo-white-transparent-full.png' />
+                <img src='src/img/logo-white-on-transparent.png' />
                 <div className='text-center'>
                     <span>Log in to Neo4j Database</span>
                 </div>
+                <br></br>
                 <form>
                     <div className='form-group has-feedback'>
                         <div className='input-group'>
-                            <span className='input-group-addon' id='dburladdon'>
-                                Database URL
-                            </span>
                             <input
                                 onFocus={function () {
                                     icon.tooltip('hide');
@@ -313,9 +312,9 @@ const Login = () => {
                                     setUrl(event.target.value);
                                 }}
                                 type='text'
-                                className='form-control'
+                                className='form-control login-text'
                                 value={url}
-                                placeholder='bolt://localhost:7687'
+                                placeholder='Neo4j URL'
                                 aria-describedby='dburladdon'
                             />
                             <i
@@ -324,12 +323,6 @@ const Login = () => {
                             />
                         </div>
                         <div className='input-group spacing'>
-                            <span
-                                className='input-group-addon'
-                                id='dbuseraddon'
-                            >
-                                DB Username
-                            </span>
                             <input
                                 type='text'
                                 value={user}
@@ -337,15 +330,12 @@ const Login = () => {
                                 onChange={(event) => {
                                     setUser(event.target.value);
                                 }}
-                                className='form-control'
-                                placeholder='neo4j'
+                                className='form-control login-text'
+                                placeholder='Neo4j Username'
                                 aria-describedby='dbuseraddon'
                             />
                         </div>
                         <div className='input-group spacing'>
-                            <span className='input-group-addon' id='dbpwaddon'>
-                                DB Password
-                            </span>
                             <input
                                 ref={passwordRef}
                                 value={password}
@@ -354,8 +344,8 @@ const Login = () => {
                                     setPassword(event.target.value);
                                 }}
                                 type='password'
-                                className='form-control'
-                                placeholder='neo4j'
+                                className='form-control login-text'
+                                placeholder='Neo4j Password'
                                 aria-describedby='dbpwaddon'
                             />
                         </div>
@@ -369,7 +359,7 @@ const Login = () => {
                                         }
                                         type='checkbox'
                                     />
-                                    Save Password
+                                    <font color='white'>Save Password</font>
                                 </label>
                             </div>
                             <div className='buttoncontainer'>
