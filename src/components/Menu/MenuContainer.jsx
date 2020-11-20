@@ -381,6 +381,12 @@ const MenuContainer = () => {
 
     const clearFinished = () => {
         let temp = { ...fileQueue };
+
+        if (Object.keys(temp).length === 0) {
+            alert.error('Really?');
+            return;
+        }
+
         for (let key of Object.keys(temp)) {
             if (
                 temp[key].status !== FileStatus.Processing &&

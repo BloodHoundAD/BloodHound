@@ -57,12 +57,7 @@ const UploadStatusContainer = ({ files, clearFinished, open, close }) => {
                     </div>
                 </AnimatePresence>
                 <div className={styles.footer}>
-                    <Button
-                        disabled={Object.keys(files).length === 0}
-                        onClick={clearFinished}
-                    >
-                        Clear Finished
-                    </Button>
+                    <Button onClick={clearFinished}>Clear Finished</Button>
                 </div>
             </div>
         </PoseContainer>
