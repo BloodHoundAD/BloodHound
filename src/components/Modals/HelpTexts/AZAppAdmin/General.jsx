@@ -1,7 +1,7 @@
 import { groupSpecialFormat, typeFormat } from '../Formatter';
 
 const General = (sourceName, sourceType, targetName, targetType) => {
-    let text = `General text goes here.`;
+    let text = `Principals with the Application Admin role can control tenant-resident apps.`;
     return { __html: text };
 };
 

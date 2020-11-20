@@ -1,5 +1,5 @@
 const References = () => {
-    let text = `<a href="https://www.google.com">References go here</a>`;
+    let text = `<a href="https://blog.netspi.com/maintaining-azure-persistence-via-automation-accounts/">https://blog.netspi.com/maintaining-azure-persistence-via-automation-accounts/</a>`;
     return { __html: text };
 };
 
