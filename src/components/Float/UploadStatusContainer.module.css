@@ -28,12 +28,21 @@
     box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.68);
     border-radius: 13px 13px 11px 11px;
     overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .uploads {
     overflow-y: auto;
-    height: 85%;
+    height: 75%;
     width: 100%;
+}
+
+.footer {
+    height: 10%;
+    width: 100%;
+    display: grid;
+    align-items: flex-end;
+    justify-content: end;
 }
 
 .cheight {
@@ -58,4 +67,21 @@
 
 .dark .content {
     background: #1a2331;
+}
+
+.closeButton {
+    background: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+    color: white;
+    box-shadow: none;
+}
+
+.closeButton:hover {
+    background: transparent;
+    background-repeat: no-repeat;
+    color: white;
 }

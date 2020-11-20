@@ -11,7 +11,9 @@ import { AnimatePresence, useDragControls } from 'framer-motion';
 
 const UploadStatusContainer = ({ files, clearFinished, open, close }) => {
     const dragControl = useDragControls();
+
     var context = useContext(AppContext);
+
     return (
         <PoseContainer
             visible={open}
@@ -29,13 +31,13 @@ const UploadStatusContainer = ({ files, clearFinished, open, close }) => {
                     <Grid fluid className={styles.cheight}>
                         <Row>
                             <Col xs={8}>Upload Progress</Col>
-                            <Col xs={3}>
-                                <Button onClick={clearFinished}>
-                                    Clear Finished
-                                </Button>
-                            </Col>
+                            <Col xs={3}></Col>
                             <Col xs={1}>
-                                <Button onClick={close} aria-label='Close'>
+                                <Button
+                                    onClick={close}
+                                    className={styles.closeButton}
+                                    aria-label='Close'
+                                >
                                     <span aria-hidden='true'>&times;</span>
                                 </Button>
                             </Col>
@@ -54,6 +56,14 @@ const UploadStatusContainer = ({ files, clearFinished, open, close }) => {
                         })}
                     </div>
                 </AnimatePresence>
+                <div className={styles.footer}>
+                    <Button
+                        disabled={Object.keys(files).length === 0}
+                        onClick={clearFinished}
+                    >
+                        Clear Finished
+                    </Button>
+                </div>
             </div>
         </PoseContainer>
     );
