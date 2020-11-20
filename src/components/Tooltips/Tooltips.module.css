@@ -12,11 +12,11 @@
 }
 
 .tooltip :global div:first-child {
-    text-align: center;
-    border-bottom: 1px solid black;
+    text-align: left;
+    border: none;
     font-weight: bold;
     font-size: 20px;
-    padding: 5px 10px;
+    padding: 5px 20px;
 }
 
 .tooltip :global ul {
@@ -29,16 +29,17 @@
 
 .tooltip :global ul li {
     padding: 8px 20px;
-    border-bottom: 1px solid #ecf0f1;
+    border-bottom: 1px solid #94989d;
 }
 
 .tooltip :global ul li:hover {
-    background-color: #ecf0f1;
+    background-color: #406f8e;
     cursor: pointer;
 }
 
 .tooltip :global ul li:last-child {
     border-radius: 0 0 12px 12px;
+    border: none;
 }
 
 .tooltip :global ul i {
@@ -47,10 +48,14 @@
 }
 
 .dark {
-    background: black;
+    background: #151d29;
     color: white;
 }
 
 .dark :global li:hover {
-    color: black;
+    color: white;
+}
+
+.dark div:first-child {
+    background-color: #2b333e;
 }

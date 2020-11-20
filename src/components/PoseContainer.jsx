@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { motion } from 'framer-motion';
 
-const PoseContainer = ({ className, visible, children }) => {
+const PoseContainer = ({
+    className,
+    visible,
+    dragHandle,
+    draggable = true,
+    children,
+}) => {
     return (
         <motion.div
             variants={{
@@ -19,6 +25,11 @@ const PoseContainer = ({ className, visible, children }) => {
             }}
             animate={visible ? 'visible' : 'hidden'}
             className={className}
+            drag={draggable}
+            dragControls={dragHandle}
+            dragListener={false}
+            dragElastic={false}
+            dragMomentum={false}
         >
             {children}
         </motion.div>

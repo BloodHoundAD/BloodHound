@@ -1,0 +1,45 @@
+.panel {
+    height: 100px;
+    width: 100%;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.panel > div:first-child {
+    width: 100%;
+}
+
+.fileName {
+    font-family: Helvetica;
+    font-size: 18px;
+
+    font-weight: bold;
+}
+
+.status {
+    font-family: Helvetica;
+    font-size: 15px;
+    line-height: 32px;
+}
+
+.progressBar {
+    color: #406f8e;
+    height: 5px;
+}
+
+.light .fileName {
+    color: #1d2735;
+}
+
+.dark .fileName {
+    color: white;
+}
+
+.light .status {
+    color: #406f8e;
+}
+
+.dark .status {
+    color: #67a3cb;
+}

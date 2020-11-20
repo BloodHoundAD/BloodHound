@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import CollapsibleSection from './CollapsibleSection';
+import styles from '../NodeData.module.css';
+import { Table } from 'react-bootstrap';
+import clsx from 'clsx';
+import { useContext } from 'react';
+import { AppContext } from '../../../../AppContext';
 
 const MappedNodeProps = ({ label, properties, displayMap }) => {
-    const [elements, setElements] = useState([]);
+    const [elements, setElements] = useState({});
+    const context = useContext(AppContext);
 
-    const createValue = value => {
+    const createValue = (value) => {
         let type = typeof value;
         if (type === 'number') {
             if (value === -1) {
@@ -29,60 +35,94 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
         return value;
     };
 
-    const convertProperty = propName => {
+    const convertProperty = (propName) => {
         let property = properties[propName];
         let type = typeof property;
         let temp = [];
         let displayProp = displayMap[propName];
-
         if (type === 'undefined') {
             return temp;
         }
-
         if (type === 'number') {
-            temp.push(<dt key={`${propName}a`}>{displayProp}</dt>);
-            temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
+            temp.push(
+                <td align='left' key={`${propName}a`}>
+                    {displayProp}
+                </td>
+            );
+            temp.push(
+                <td align='right' key={`${propName}b`}>
+                    {createValue(property)}
+                </td>
+            );
             return temp;
         }
-
         if (type === 'boolean') {
-            temp.push(<dt key={`${propName}a`}>{displayProp}</dt>);
-            temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
+            temp.push(
+                <td align='left' key={`${propName}a`}>
+                    {displayProp}
+                </td>
+            );
+            temp.push(
+                <td align='right' key={`${propName}b`}>
+                    {createValue(property)}
+                </td>
+            );
             return temp;
         }
-
         if (type === 'string') {
-            temp.push(<dt key={`${propName}a`}>{displayProp}</dt>);
-            temp.push(<dd key={`${propName}b`}>{createValue(property)}</dd>);
+            temp.push(
+                <td align='left' key={`${propName}a`}>
+                    {displayProp}
+                </td>
+            );
+            temp.push(
+                <td align='right' key={`${propName}b`}>
+                    {createValue(property)}
+                </td>
+            );
             return temp;
         }
-
         if (Array.isArray(property) && property.length > 0) {
-            temp.push(<dt key={`${propName}k`}>{displayProp}</dt>);
+            temp.push(
+                <td align='left' key={`${propName}k`}>
+                    {displayProp}
+                </td>
+            );
+            let d = '';
             property.forEach((val, index) => {
-                temp.push(
-                    <dd key={`${propName}${index}`}>{createValue(val)}</dd>
-                );
+                d += `${createValue(val)}\n`;
             });
+            temp.push(
+                <td align='right' style={{ whiteSpace: 'pre' }}>
+                    {d}
+                </td>
+            );
             return temp;
         }
-
         return temp;
     };
 
     useEffect(() => {
-        let temp = [];
+        let temp = {};
         Object.keys(displayMap).forEach((val, index) => {
-            temp = temp.concat(convertProperty(val));
+            let c = convertProperty(val);
+            if (c.length !== 0) temp[val] = c;
         });
-        temp = temp.filter(s => s !== undefined);
-
         setElements(temp);
     }, [label]);
 
     return elements.length == 0 ? null : (
-        <CollapsibleSection header={'Node Properties'}>
-            {elements}
+        <CollapsibleSection header={'NODE PROPERTIES'}>
+            <div className={styles.itemlist}>
+                <Table>
+                    <thead></thead>
+                    <tbody>
+                        {Object.keys(elements).map((key) => {
+                            return <tr key={key}>{elements[key]}</tr>;
+                        })}
+                    </tbody>
+                </Table>
+            </div>
         </CollapsibleSection>
     );
 };

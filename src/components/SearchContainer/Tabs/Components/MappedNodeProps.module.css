@@ -1,0 +1,129 @@
+.dark :global .table {
+    background-color: #151d29;
+    border-left: solid #151d29 15px;
+    border-right: solid #151d29 15px;
+    border-top: solid #151d29 15px;
+}
+
+.dark {
+    background-color: #151d29;
+    border-left: solid #151d29 0px;
+    border-right: solid #151d29 0px;
+}
+
+.itemlist {
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.itemlist :global table {
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
+.itemlist :global table > thead {
+    text-align: left;
+    position: -webkit-sticky;
+    position: sticky;
+}
+
+.itemlist :global table > tbody > tr {
+    font-family: Helvetica;
+    font-size: 12px;
+    border-style: 0px solid;
+}
+
+.itemlist :global table > tbody > tr > td:nth-of-type(1) {
+    border-bottom: 1px solid #94989d;
+    border-top: 0px solid;
+}
+
+.dark :global table > tbody > tr > td:nth-of-type(1) {
+    border-bottom: 1px solid #94989d;
+}
+
+.itemlist :global table > tbody > tr:last-child > td {
+    border-bottom: 0px solid;
+    border-top: 0px solid;
+}
+
+.itemlist :global table > tbody > tr > td {
+    border-top: 0px solid;
+}
+
+.dark :global table > tbody > tr > td {
+    border-bottom: 1px solid #94989d;
+}
+
+.dark :global table > tbody > tr:hover {
+    background-color: #0d1013;
+}
+
+.dark :global table > tbody > tr:hover {
+    background-color: #406f8e;
+}
+
+.dark :global table > tbody > tr {
+    background-color: #2b333e;
+}
+
+hr {
+    border-color: #94989d;
+}
+
+.dl {
+    margin-right: 0px;
+}
+
+.dl > h5 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
+    font-size: 18px;
+    font-family: Helvetica;
+    font-weight: bold;
+}
+
+.dl dt {
+    width: auto;
+    padding-right: 1em;
+    text-align: left;
+    pointer-events: none;
+    margin-left: 10px;
+    font-family: Helvetica;
+    font-size: 12px;
+}
+
+.dl dd:hover {
+    background-color: #ecf0f1;
+}
+
+.dl dd {
+    margin-left: 10px;
+    margin-right: 10px;
+    text-align: right;
+    border-bottom: 1px solid lightgray;
+    font-family: Helvetica;
+    font-size: 12px;
+}
+
+.dl dd:last-child {
+    border-bottom: none;
+}
+
+.dark > h5 {
+    color: white;
+}
+
+.light > h5 {
+    color: black;
+}
+
+.dark .itemlist {
+    color: white;
+}

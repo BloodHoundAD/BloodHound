@@ -15,111 +15,156 @@ const About = () => {
     const context = useContext(AppContext);
 
     const getVersion = async () => {
-        let data = await promises.readFile(join(app.getAppPath(), 'package.json'))
+        let data = await promises.readFile(
+            join(app.getAppPath(), 'package.json')
+        );
         let version = JSON.parse(data).version;
 
         setVersion(version);
-    }
+    };
 
     const getLicense = async () => {
-        let data = await promises.readFile(join(app.getAppPath(), 'LICENSE.md'), 'utf-8');
+        let data = await promises.readFile(
+            join(app.getAppPath(), 'LICENSE.md'),
+            'utf-8'
+        );
         setData(data);
-    }
+    };
 
     const handleOpen = () => {
         setOpen(true);
-    }
+    };
 
     const handleClose = () => {
         setOpen(false);
-    }
+    };
 
     const openLink = (link) => {
-        shell.openExternal(link)
-    }
+        shell.openExternal(link);
+    };
 
     useEffect(() => {
         getVersion();
         getLicense();
 
-        emitter.on('showAbout', handleOpen)
+        emitter.on('showAbout', handleOpen);
         return () => {
             emitter.removeListener('showAbout', handleOpen);
         };
-    }, [])
+    }, []);
 
     return (
         <BaseModal
             show={open}
             onHide={handleClose}
             label='AboutHeader'
+            className={context.darkMode ? styles.dark : styles.light}
         >
-            <Modal.Header closeButton>
+            <Modal.Header closeButton className={styles.about}>
                 <Modal.Title id='AboutHeader'>About BloodHound</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
+                <h5>Version: {version}</h5>
                 <h5>
-                    <b>Version:</b> {version}
-                </h5>
-                <h5>
-                    <b>GitHub:</b>{' '}
+                    GitHub:{' '}
                     <a
                         href='#'
-                        onClick={() => { openLink('https://www.github.com/BloodHoundAD/BloodHound') }}
+                        onClick={() => {
+                            openLink(
+                                'https://www.github.com/BloodHoundAD/BloodHound'
+                            );
+                        }}
                     >
                         https://www.github.com/BloodHoundAD/BloodHound
-                        </a>
+                    </a>
                 </h5>
                 <h5>
-                    <b>BloodHound Slack:</b>{' '}
+                    BloodHound Slack:{' '}
                     <a
                         href='#'
-                        onClick={() => { openLink('https://bloodhoundgang.herokuapp.com/') }}
+                        onClick={() => {
+                            openLink('https://bloodhoundgang.herokuapp.com/');
+                        }}
                     >
                         https://bloodhoundgang.herokuapp.com/
-                        </a>
+                    </a>
                 </h5>
                 <h5>
-                    <b>Authors:</b>{' '}
+                    Authors:{' '}
                     <a
                         href='#'
-                        onClick={() => { openLink('https://www.twitter.com/harmj0y') }}
-                    >
-                        @harmj0y
-                        </a>
-                    ,{' '}
-                    <a
-                        href='#'
-                        onClick={() => { openLink('https://www.twitter.com/_wald0') }}
+                        onClick={() => {
+                            openLink('https://www.twitter.com/_wald0');
+                        }}
                     >
                         @_wald0
-                        </a>
+                    </a>
                     ,{' '}
                     <a
                         href='#'
-                        onClick={() => { openLink('https://www.twitter.com/cptjesus') }}
+                        onClick={() => {
+                            openLink('https://www.twitter.com/cptjesus');
+                        }}
                     >
-                        @cptjesus
-                        </a>
+                        @CptJesus
+                    </a>
+                    ,{' '}
+                    <a
+                        href='#'
+                        onClick={() => {
+                            openLink('https://twitter.com/Haus3c');
+                        }}
+                    >
+                        @Haus3c
+                    </a>
+                </h5>
+                <h5>
+                    Created by:{' '}
+                    <a
+                        href='#'
+                        onClick={() => {
+                            openLink('https://www.twitter.com/_wald0');
+                        }}
+                    >
+                        @_wald0
+                    </a>
+                    ,{' '}
+                    <a
+                        href='#'
+                        onClick={() => {
+                            openLink('https://www.twitter.com/cptjesus');
+                        }}
+                    >
+                        @CptJesus
+                    </a>
+                    ,{' '}
+                    <a
+                        href='#'
+                        onClick={() => {
+                            openLink('https://www.twitter.com/harmj0y');
+                        }}
+                    >
+                        @harmj0y
+                    </a>
                 </h5>
                 <br />
-                <h5>
-                    <b>License</b>
-                </h5>
+                <h5>LICENSE</h5>
                 <div className={styles.scroll}>{data}</div>
             </Modal.Body>
 
-            <Modal.Footer>
-                <Button variant='primary' onClick={handleClose}>
-                    Close
+            <Modal.Footer className={styles.footer}>
+                <Button
+                    variant='primary'
+                    onClick={handleClose}
+                    className={styles.btndone}
+                >
+                    Done
                 </Button>
             </Modal.Footer>
-        </BaseModal >
-    )
-}
+        </BaseModal>
+    );
+};
 
-About.propTypes = {
-
-}
-export default About
+About.propTypes = {};
+export default About;

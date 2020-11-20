@@ -1,17 +1,20 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useContext } from 'react';
+import { AppContext } from '../../../AppContext';
 
-export default class NoNodeData extends Component {
-    render() {
-        return (
-            <div className={this.props.visible ? '' : 'hidden'}>
-                <h3>Node Properties</h3>
-                <p>Select a node for more information</p>
-            </div>
-        );
-    }
-}
-
-NoNodeData.propTypes = {
-    visible: PropTypes.bool.isRequired,
+const NoNodeData = ({ visible }) => {
+    const context = useContext(AppContext);
+    return (
+        <div
+            style={{ color: context.darkMode ? 'white' : 'black' }}
+            className={visible ? '' : 'hidden'}
+        >
+            <h3>Node Properties</h3>
+            <p style={{ marginLeft: 10 }}>Select a node for more information</p>
+        </div>
+    );
 };
+
+NoNodeData.propTypes = {};
+export default NoNodeData;

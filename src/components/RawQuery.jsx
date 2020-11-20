@@ -1,94 +1,78 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { useContext } from 'react';
+import { AppContext } from '../AppContext';
+import { motion } from 'framer-motion';
+import clsx from 'clsx';
+import styles from './RawQuery.module.css';
 
-export default class RawQuery extends Component {
-    constructor() {
-        super();
-        this.state = {
-            val: '',
-            open: false,
-            darkMode: false,
+const RawQuery = () => {
+    const [open, setOpen] = useState(false);
+    const [query, setQuery] = useState('');
+    const context = useContext(AppContext);
+
+    useEffect(() => {
+        emitter.on('setRawQuery', setQueryFromEvent);
+        return () => {
+            emitter.removeListener('setRawQuery', setQueryFromEvent);
         };
-    }
+    }, []);
 
-    componentWillMount() {
-        emitter.on('setRawQuery', this._setQueryFromEvent.bind(this));
-        emitter.on('toggleDarkMode', this.toggleDarkMode.bind(this));
-    }
+    const setQueryFromEvent = (query) => {
+        setQuery(query);
+    };
 
-    componentDidMount() {
-        $(this.refs.input).slideToggle(0);
-        this.toggleDarkMode(appStore.performance.darkMode);
-    }
-
-    toggleDarkMode(enabled) {
-        this.setState({ darkMode: enabled });
-    }
-
-    _onChange(event) {
-        this.setState({
-            val: event.target.value,
-        });
-    }
-
-    _onKeyUp(e) {
-        var key = e.keyCode ? e.keyCode : e.which;
+    const onKeyDown = (e) => {
+        let key = e.keyCode ? e.keyCode : e.which;
 
         if (key === 13) {
-            emitter.emit('query', this.state.val);
+            emitter.emit('query', query);
         }
-    }
+    };
 
-    _toggle() {
-        $(this.refs.input).slideToggle();
-        this.setState({
-            open: !this.state.open,
-        });
-    }
+    const onChange = (e) => {
+        setQueryFromEvent(e.target.value);
+    };
 
-    _setQueryFromEvent(query) {
-        this.setState({ val: query });
-    }
+    const toggleRawQuery = () => {
+        setOpen(!open);
+    };
 
-    render() {
-        return (
-            <div
-                className={
-                    this.state.darkMode
-                        ? 'bottomdiv bottomdiv-dark'
-                        : 'bottomdiv'
-                }
+    return (
+        <div
+            className={clsx(
+                styles.container,
+                context.darkMode ? styles.dark : null
+            )}
+        >
+            <button className={styles.button} onClick={toggleRawQuery}>
+                Raw Query
+            </button>
+            <motion.div
+                variants={{
+                    open: {
+                        height: 'auto',
+                    },
+                    closed: {
+                        height: 0,
+                    },
+                }}
+                transition={{ duration: 0.25 }}
+                animate={open ? 'open' : 'closed'}
             >
-                <button
-                    onClick={this._toggle.bind(this)}
-                    className='slideupbutton'
-                >
-                    <span
-                        className={
-                            this.state.open
-                                ? 'glyphicon glyphicon-chevron-down'
-                                : 'glyphicon glyphicon-chevron-up'
-                        }
-                    />
-                    Raw Query
-                    <span
-                        className={
-                            this.state.open
-                                ? 'glyphicon glyphicon-chevron-down'
-                                : 'glyphicon glyphicon-chevron-up'
-                        }
-                    />
-                </button>
                 <input
-                    ref='input'
                     type='text'
-                    onChange={this._onChange.bind(this)}
-                    value={this.state.val}
-                    onKeyUp={this._onKeyUp.bind(this)}
-                    className='form-control queryInput'
+                    onChange={onChange}
+                    value={query}
+                    onKeyDown={onKeyDown}
+                    className={clsx(styles.input, 'form-control')}
                     autoComplete='off'
-                    placeholder='Enter a raw query...'
+                    placeholder='Enter a cypher query. Your query must return nodes or paths.'
                 />
-            </div>
-        );
-    }
-}
+            </motion.div>
+        </div>
+    );
+};
+
+RawQuery.propTypes = {};
+export default RawQuery;

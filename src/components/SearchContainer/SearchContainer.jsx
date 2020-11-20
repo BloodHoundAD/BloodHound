@@ -1,13 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { AsyncTypeahead } from 'react-bootstrap-typeahead';
+import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 import GlyphiconSpan from '../GlyphiconSpan';
 import Icon from '../Icon';
 import TabContainer from './TabContainer';
 import { buildSearchQuery, buildSelectQuery } from 'utils';
 import SearchRow from './SearchRow';
 import styles from './SearchContainer.module.css';
-import EdgeFilter from './EdgeFilter';
+import { useContext } from 'react';
+import { AppContext } from '../../AppContext';
+import clsx from 'clsx';
+import EdgeFilter from './EdgeFilter/EdgeFilter';
 
 const SearchContainer = () => {
     const [pathfindingOpen, setPathfindingOpen] = useState(false);
@@ -21,7 +24,6 @@ const SearchContainer = () => {
     const [pathSearchLoading, setPathSearchLoading] = useState(false);
 
     const [filterVisible, setFilterVisible] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
 
     const pathfinding = useRef(null);
     const tabs = useRef(null);
@@ -29,15 +31,15 @@ const SearchContainer = () => {
     const mainSearchRef = useRef(null);
     const pathSearchRef = useRef(null);
 
+    const context = useContext(AppContext);
+
     useEffect(() => {
-        jQuery(pathfinding.current).slideToggle(0);
-        jQuery(tabs.current).slideToggle(0);
+        jQuery(pathfinding.current).slideToggle('fast');
+        jQuery(tabs.current).slideToggle('fast');
 
-        setDarkMode(appStore.performance.darkMode);
         emitter.on('nodeClicked', openNodeTab);
-        emitter.on('toggleDarkMode', toggleDarkMode);
 
-        emitter.on('setStart', node => {
+        emitter.on('setStart', (node) => {
             let temp = {
                 name: node.label,
                 objectid: node.objectid,
@@ -45,12 +47,12 @@ const SearchContainer = () => {
             };
             closeTooltip();
             setMainSearchSelected(temp);
-            let instance = mainSearchRef.current.getInstance();
+            let instance = mainSearchRef.current;
             instance.clear();
             instance.setState({ text: temp.name });
         });
 
-        emitter.on('setEnd', node => {
+        emitter.on('setEnd', (node) => {
             let temp = {
                 name: node.label,
                 objectid: node.objectid,
@@ -60,10 +62,10 @@ const SearchContainer = () => {
             var elem = jQuery(pathfinding.current);
             if (!elem.is(':visible')) {
                 setPathfindingOpen(true);
-                elem.slideToggle();
+                elem.slideToggle('fast');
             }
             setPathSearchSelected(temp);
-            let instance = pathSearchRef.current.getInstance();
+            let instance = pathSearchRef.current;
             instance.clear();
             instance.setState({ text: temp.name });
         });
@@ -78,11 +80,11 @@ const SearchContainer = () => {
             setPathSearchLoading(true);
         }
 
-        session.run(statement, { name: term }).then(result => {
+        session.run(statement, { name: term }).then((result) => {
             let data = [];
             for (let record of result.records) {
                 let properties = record._fields[0].properties;
-                properties.type = record._fields[0].labels[0];
+                properties.type = record._fields[0].labels[1];
                 data.push(properties);
             }
 
@@ -97,22 +99,18 @@ const SearchContainer = () => {
         });
     };
 
-    const toggleDarkMode = enabled => {
-        setDarkMode(enabled);
-    };
-
     const onFilterClick = () => {
         setFilterVisible(!filterVisible);
     };
 
     const onPathfindClick = () => {
-        jQuery(pathfinding.current).slideToggle();
+        jQuery(pathfinding.current).slideToggle('fast');
         let open = !pathfindingOpen;
         setPathfindingOpen(open);
     };
 
     const onExpandClick = () => {
-        jQuery(tabs.current).slideToggle();
+        jQuery(tabs.current).slideToggle('fast');
     };
 
     const onPlayClick = () => {
@@ -129,8 +127,8 @@ const SearchContainer = () => {
             pathSearchSelected
         );
 
-        mainSearchRef.current.getInstance().blur();
-        pathSearchRef.current.getInstance().blur();
+        mainSearchRef.current.blur();
+        pathSearchRef.current.blur();
         emitter.emit('query', query, props, startTarget, endTarget);
     };
 
@@ -152,7 +150,7 @@ const SearchContainer = () => {
 
         let stop = false;
         if (!$('.searchSelectorS > ul').is(':hidden')) {
-            $('.searchSelectorS > ul li').each(function(i) {
+            $('.searchSelectorS > ul li').each(function (i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -160,7 +158,7 @@ const SearchContainer = () => {
         }
 
         if (!$('.searchSelectorP > ul').is(':hidden')) {
-            $('.searchSelectorP > ul li').each(function(i) {
+            $('.searchSelectorP > ul li').each(function (i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -183,7 +181,7 @@ const SearchContainer = () => {
 
         let stop = false;
         if (!$('.searchSelectorS > ul').is(':hidden')) {
-            $('.searchSelectorS > ul li').each(function(i) {
+            $('.searchSelectorS > ul li').each(function (i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -191,7 +189,7 @@ const SearchContainer = () => {
         }
 
         if (!$('.searchSelectorP > ul').is(':hidden')) {
-            $('.searchSelectorP > ul li').each(function(i) {
+            $('.searchSelectorP > ul li').each(function (i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -210,11 +208,11 @@ const SearchContainer = () => {
     const openNodeTab = () => {
         let e = jQuery(tabs.current);
         if (!e.is(':visible')) {
-            e.slideToggle();
+            e.slideToggle('fast');
         }
     };
 
-    const onEnterPress = event => {
+    const onEnterPress = (event) => {
         let key = event.keyCode ? event.keyCode : event.which;
 
         if (key !== 13) {
@@ -223,7 +221,7 @@ const SearchContainer = () => {
 
         let stop = false;
         if (!$('.searchSelectorS > ul').is(':hidden')) {
-            $('.searchSelectorS > ul li').each(function(i) {
+            $('.searchSelectorS > ul li').each(function (i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -231,7 +229,7 @@ const SearchContainer = () => {
         }
 
         if (!$('.searchSelectorP > ul').is(':hidden')) {
-            $('.searchSelectorP > ul li').each(function(i) {
+            $('.searchSelectorP > ul li').each(function (i) {
                 if ($(this).hasClass('active')) {
                     stop = true;
                 }
@@ -242,8 +240,8 @@ const SearchContainer = () => {
             return;
         }
 
-        mainSearchRef.current.getInstance().blur();
-        pathSearchRef.current.getInstance().blur();
+        mainSearchRef.current.blur();
+        pathSearchRef.current.blur();
 
         if (!pathfindingOpen) {
             if (mainSearchSelected === null) {
@@ -264,11 +262,10 @@ const SearchContainer = () => {
 
     return (
         <div
-            id='searchdiv'
             className={
-                darkMode
-                    ? 'searchdiv searchdiv-dark'
-                    : 'searchdiv searchdiv-light'
+                context.darkMode
+                    ? clsx(styles.container, styles.dark)
+                    : clsx(styles.container, styles.light)
             }
         >
             <EdgeFilter open={filterVisible} />
@@ -301,23 +298,50 @@ const SearchContainer = () => {
                         return name.includes(search) || id.includes(search);
                     }}
                     placeholder={
-                        pathfindingOpen
-                            ? 'Start Node'
-                            : 'Start typing to search for a node...'
+                        pathfindingOpen ? 'Start Node' : 'Search for a node'
                     }
                     isLoading={mainSearchLoading}
                     delay={500}
-                    renderMenuItemChildren={SearchRow}
-                    labelKey={option => {
+                    renderMenu={(results, menuProps, props) => {
+                        return (
+                            <Menu
+                                {...menuProps}
+                                className={clsx(
+                                    context.darkMode ? styles.darkmenu : null
+                                )}
+                            >
+                                {results.map((result, index) => {
+                                    return (
+                                        <MenuItem
+                                            option={result}
+                                            position={index}
+                                            key={index}
+                                        >
+                                            <SearchRow
+                                                item={result}
+                                                search={mainSearchValue}
+                                            />
+                                        </MenuItem>
+                                    );
+                                })}
+                            </Menu>
+                        );
+                    }}
+                    // renderMenuItemChildren={(option, props, index) => {
+                    //     return (
+                    //         <SearchRow item={option} search={mainSearchValue} />
+                    //     );
+                    // }}
+                    labelKey={(option) => {
                         return option.name || option.objectid;
                     }}
                     useCache={false}
                     options={mainSearchResults}
-                    onSearch={query => doSearch(query, 'main')}
+                    onSearch={(query) => doSearch(query, 'main')}
                     inputProps={{ className: 'searchbox', id: styles.searcha }}
-                    onKeyDown={event => onEnterPress(event)}
-                    onChange={selection => setSelection(selection, 'main')}
-                    onInputChange={event => {
+                    onKeyDown={(event) => onEnterPress(event)}
+                    onChange={(selection) => setSelection(selection, 'main')}
+                    onInputChange={(event) => {
                         setMainSearchSelected(null);
                         setMainSearchValue(event);
                     }}
@@ -337,7 +361,7 @@ const SearchContainer = () => {
                     tooltipDir='bottom'
                     tooltipTitle='Back'
                     classes='input-group-addon spanfix glyph-hover-style'
-                    click={function() {
+                    click={function () {
                         emitter.emit('graphBack');
                     }}
                 >
@@ -367,8 +391,34 @@ const SearchContainer = () => {
                         placeholder={'Target Node'}
                         isLoading={pathSearchLoading}
                         delay={500}
-                        renderMenuItemChildren={SearchRow}
-                        labelKey={option => {
+                        renderMenu={(results, menuProps, props) => {
+                            return (
+                                <Menu
+                                    {...menuProps}
+                                    className={clsx(
+                                        context.darkMode
+                                            ? styles.darkmenu
+                                            : null
+                                    )}
+                                >
+                                    {results.map((result, index) => {
+                                        return (
+                                            <MenuItem
+                                                option={result}
+                                                position={index}
+                                                key={index}
+                                            >
+                                                <SearchRow
+                                                    item={result}
+                                                    search={pathSearchValue}
+                                                />
+                                            </MenuItem>
+                                        );
+                                    })}
+                                </Menu>
+                            );
+                        }}
+                        labelKey={(option) => {
                             return option.name || option.objectid;
                         }}
                         filterBy={(option, props) => {
@@ -389,12 +439,12 @@ const SearchContainer = () => {
                         }}
                         useCache={false}
                         options={pathSearchResults}
-                        onSearch={query => doSearch(query, 'secondary')}
-                        onKeyDown={event => onEnterPress(event)}
-                        onChange={selection =>
+                        onSearch={(query) => doSearch(query, 'secondary')}
+                        onKeyDown={(event) => onEnterPress(event)}
+                        onChange={(selection) =>
                             setSelection(selection, 'secondary')
                         }
-                        onInputChange={event => {
+                        onInputChange={(event) => {
                             setPathSearchValue(event);
                             setPathSearchSelected(null);
                         }}

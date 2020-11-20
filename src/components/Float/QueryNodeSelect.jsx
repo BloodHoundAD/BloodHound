@@ -38,8 +38,8 @@ class QueryNodeSelect extends Component {
             });
             $(this.refs.outer).fadeToggle(true);
             var session = driver.session();
-            session.run(query.query, query.props).then(results => {
-                var y = $.map(results.records, x => {
+            session.run(query.query, query.props).then((results) => {
+                var y = $.map(results.records, (x) => {
                     let a = x.keys.map((e, i) => {
                         let obj = {};
                         obj[e.split('.')[1]] = x._fields[i];
@@ -52,7 +52,13 @@ class QueryNodeSelect extends Component {
 
                     return b;
                 });
-                this.setState({ data: y });
+                if (y.length === 0) {
+                    this.props.alert.info('No data returned from query');
+                    appStore.prebuiltQuery = [];
+                    this._dismiss();
+                } else {
+                    this.setState({ data: y });
+                }
                 session.close();
             });
         }
@@ -85,15 +91,15 @@ class QueryNodeSelect extends Component {
             });
             var session = driver.session();
             session.run(query.query, { result: querydata }).then(
-                function(results) {
-                    var y = $.map(results.records, function(x) {
-                        let a = x.keys.map(function(e, i) {
+                function (results) {
+                    var y = $.map(results.records, function (x) {
+                        let a = x.keys.map(function (e, i) {
                             let obj = {};
                             obj[e.split('.')[1]] = x._fields[i];
                             return obj;
                         });
                         let b = {};
-                        $.each(a, function(index, o) {
+                        $.each(a, function (index, o) {
                             Object.assign(b, o);
                         });
 
@@ -140,7 +146,7 @@ class QueryNodeSelect extends Component {
                             <Then>
                                 <ListGroup ref='list'>
                                     {this.state.data.map(
-                                        function(key) {
+                                        function (key) {
                                             var x = (
                                                 <QueryNodeSelectItem
                                                     key={key.name}

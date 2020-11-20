@@ -34,11 +34,11 @@ const NodeCypherLinkComplex = ({
             objectid: target,
             domain: domain,
         })
-            .then(result => {
+            .then((result) => {
                 setValue(result.records[0]._fields[0]);
                 setReady(true);
             })
-            .catch(error => {
+            .catch((error) => {
                 if (
                     !error.message.includes(
                         'The transaction has been terminated'
@@ -50,24 +50,21 @@ const NodeCypherLinkComplex = ({
     }, [target]);
 
     return (
-        <>
-            <dt>{property}</dt>
-            <dd>
-                <NodeALink
-                    ready={ready}
-                    value={value}
-                    click={() => {
-                        emitter.emit(
-                            'query',
-                            graphQuery,
-                            { objectid: target },
-                            start,
-                            end
-                        );
-                    }}
-                />
-            </dd>
-        </>
+        <tr
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+                emitter.emit(
+                    'query',
+                    graphQuery,
+                    { objectid: target },
+                    start,
+                    end
+                );
+            }}
+        >
+            <td align='left'>{property}</td>
+            <td align='right'>{value}</td>
+        </tr>
     );
 };
 

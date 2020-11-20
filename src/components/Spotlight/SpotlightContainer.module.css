@@ -1,28 +1,79 @@
+.light {
+    background: white;
+    color: black;
+}
+
 .dark {
     background: #383332;
     color: white;
 }
 
 .dark :global input {
-    background-color: black;
+    background-color: #444b55;
     color: white;
+    font-family: Helvetica;
+    font-size: 13px;
 }
 
 .dark :global .input-group-addon {
-    background-color: black;
+    background-color: #444b55;
     color: white;
 }
 
 .dark :global .table {
-    background-color: black;
-    color: white;
+    background-color: #151d29;
+    border-left: solid #151d29 15px;
+    border-right: solid #151d29 15px;
+    border-top: solid #151d29 15px;
+}
+
+.dark .nodelist {
+    background-color: #151d29;
+    border-left: solid #151d29 15px;
+    border-right: solid #151d29 15px;
 }
 
 .nodelist {
-    overflow: auto;
-    background-color: white;
+    height: 800px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .nodelist :global table > thead {
-    text-align: center;
+    text-align: left;
+    position: -webkit-sticky;
+    position: sticky;
+}
+
+.nodelist :global table > tbody > tr {
+    font-family: Helvetica;
+    font-size: 12px;
+    border-style: hidden;
+}
+
+.dark .nodelist :global table > tbody > tr:hover {
+    background-color: #406f8e;
+}
+
+.dark .nodelist :global table > tbody > tr:hover:nth-of-type(odd) {
+    background-color: #406f8e;
+}
+
+.dark .nodelist :global table > tbody > tr:nth-of-type(odd) {
+    background-color: #2b333e;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px #151d29;
+}
+::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 24px rgba(140, 197, 201);
+}
+
+.light :global table > tbody > tr {
+    background-color: #e7e7e7;
+    opacity: 0.87;
 }
