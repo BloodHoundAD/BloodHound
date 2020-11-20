@@ -38,16 +38,18 @@ const PrebuiltQueriesDisplay = () => {
     };
 
     const readBase = async () => {
-        let filePath =
-            'src/components/SearchContainer/Tabs/PrebuiltQueries.json';
-        fs.readFile(filePath, 'utf8', (err, data) => {
-            let j = JSON.parse(data);
-            var y = [];
-            j.queries.forEach((query) => {
-                y.push(query);
-            });
+        $.ajax({
+            url: 'src/components/SearchContainer/Tabs/PrebuiltQueries.json',
+            type: 'GET',
+            success: function (response) {
+                var y = [];
 
-            setQueries(y);
+                $.each(response.queries, function (_, el) {
+                    y.push(el);
+                });
+
+                setQueries(y);
+            },
         });
     };
 
