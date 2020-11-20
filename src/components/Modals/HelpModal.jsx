@@ -29,6 +29,20 @@ import ReadGMSAPassword from './HelpTexts/ReadGMSAPassword/ReadGMSAPassword';
 import HasSIDHistory from './HelpTexts/HasSIDHistory/HasSIDHistory';
 import TrustedBy from './HelpTexts/TrustedBy/TrustedBy';
 import CanPSRemote from './HelpTexts/CanPSRemote/CanPSRemote';
+import AZAddMembers from './HelpTexts/AZAddMembers/AZAddMembers';
+import AZContains from './HelpTexts/AZContains/AZContains';
+import AZContributor from './HelpTexts/AZContributor/AZContributor';
+import AZGetCertificates from './HelpTexts/AZGetCertificates/AZGetCertificates';
+import AZGetKeys from './HelpTexts/AZGetKeys/AZGetKeys';
+import AZGetSecrets from './HelpTexts/AZGetSecrets/AZGetSecrets';
+import AZOwns from './HelpTexts/AZOwns/AZOwns';
+import AZPrivilegedRoleAdmin from './HelpTexts/AZPrivilegedRoleAdmin/AZPrivilegedRoleAdmin';
+import AZResetPassword from './HelpTexts/AZResetPassword/AZResetPassword';
+import AZUserAccessAdministrator from './HelpTexts/AZUserAccessAdministrator/AZUserAccessAdministrator';
+import AZGlobalAdmin from './HelpTexts/AZGlobalAdmin/AZGlobalAdmin';
+import AZAppAdmin from './HelpTexts/AZAppAdmin/AZAppAdmin';
+import AZCloudAppAdmin from './HelpTexts/AZCloudAppAdmin/AZCloudAppAdmin';
+import AZRunsAs from './HelpTexts/AZRunsAs/AZRunsAs';
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -89,6 +103,21 @@ const HelpModal = () => {
         HasSIDHistory: HasSIDHistory,
         TrustedBy: TrustedBy,
         CanPSRemote: CanPSRemote,
+        AZAddMembers: AZAddMembers,
+        AZContains: AZContains,
+        AZContributor: AZContributor,
+        AZGetCertificates: AZGetCertificates,
+        AZGetKeys: AZGetKeys,
+        AZGetSecrets: AZGetSecrets,
+        AZOwns: AZOwns,
+        AZPrivilegedRoleAdmin: AZPrivilegedRoleAdmin,
+        AZResetPassword: AZResetPassword,
+        AZUserAccessAdministrator: AZUserAccessAdministrator,
+        AZGlobalAdmin: AZGlobalAdmin,
+        AZUserAccessAdministrator: AZUserAccessAdministrator,
+        AZAppAdmin: AZAppAdmin,
+        AZCloudAppAdmin: AZCloudAppAdmin,
+        AZRunsAs: AZRunsAs,
     };
 
     const Component = components[edge];

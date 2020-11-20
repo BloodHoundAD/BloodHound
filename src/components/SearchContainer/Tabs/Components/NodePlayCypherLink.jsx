@@ -23,6 +23,20 @@ const NodePlayCypherLink = ({
         setReady(false);
     }, [target]);
 
+    const onClick = () => {
+        if (!played) {
+            startQuery();
+        } else {
+            emitter.emit(
+                'query',
+                `${baseQuery} RETURN p`,
+                { objectid: target, domain: domain },
+                start,
+                end
+            );
+        }
+    };
+
     const startQuery = () => {
         setPlayed(true);
 
@@ -46,11 +60,11 @@ const NodePlayCypherLink = ({
             objectid: target,
             domain: domain,
         })
-            .then(result => {
+            .then((result) => {
                 setValue(result.records[0]._fields[0]);
                 setReady(true);
             })
-            .catch(error => {
+            .catch((error) => {
                 if (
                     !error.message.includes(
                         'The transaction has been terminated'
@@ -64,35 +78,18 @@ const NodePlayCypherLink = ({
     };
 
     return (
-        <>
-            <dt>{property}</dt>
-            <dd>
-                {!played && (
-                    <Icon
-                        glyph='play'
-                        extraClass={styles.icon}
-                        onClick={() => {
-                            startQuery();
-                        }}
-                    />
-                )}
-                {played && (
-                    <NodeALink
-                        ready={ready}
-                        value={value}
-                        click={() => {
-                            emitter.emit(
-                                'query',
-                                `${baseQuery} RETURN p`,
-                                { objectid: target, domain: domain },
-                                start,
-                                end
-                            );
-                        }}
-                    />
-                )}
-            </dd>
-        </>
+        <tr
+            onClick={onClick}
+            style={{ cursor: 'pointer' }}
+        >
+            <td align='left'>
+                {property}
+            </td>
+            <td align='right'>
+                {!played && <Icon glyph='play' extraClass={styles.icon} />}
+                {played && <NodeALink ready={ready} value={value} />}
+            </td>
+        </tr>
     );
 };
 

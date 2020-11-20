@@ -1,8 +1,19 @@
 .header {
     cursor: pointer;
+    font-family: helvetica;
+    font-size: 18px;
+    padding-left: 10px;
+}
+
+.dark {
+    color: #82b1c5;
+}
+
+.light {
+    color: #406f8e;
 }
 
 .removeGutters {
     padding-left: 0;
-    padding-right: 0;
+    padding-right: 15px;
 }

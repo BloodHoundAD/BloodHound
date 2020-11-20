@@ -4,13 +4,22 @@ import styles from './CollapsibleSection.module.css';
 import clsx from 'clsx';
 import { Row, Col, Grid } from 'react-bootstrap';
 import { motion } from 'framer-motion';
+import { useContext } from 'react';
+import { AppContext } from '../../../../AppContext';
 
 const CollapsibleSection = ({ header, children }) => {
     const [open, setOpen] = useState(true);
+    const context = useContext(AppContext);
 
     return (
         <>
-            <h4 className={styles.header} onClick={() => setOpen(!open)}>
+            <h4
+                className={clsx(
+                    styles.header,
+                    context.darkMode ? styles.dark : styles.light
+                )}
+                onClick={() => setOpen(!open)}
+            >
                 <Grid fluid className={styles.removeGutters}>
                     <Row className={'row-no-gutters'}>
                         <Col sm={11}>{header}</Col>
@@ -18,10 +27,8 @@ const CollapsibleSection = ({ header, children }) => {
                             <span>
                                 <i
                                     className={clsx(
-                                        open &&
-                                            'glyphicon glyphicon-chevron-down',
-                                        !open &&
-                                            'glyphicon glyphicon-chevron-up'
+                                        open && 'fa fa-minus',
+                                        !open && 'fa fa-plus'
                                     )}
                                 />
                             </span>
@@ -43,6 +50,7 @@ const CollapsibleSection = ({ header, children }) => {
                     },
                 }}
                 animate={open ? 'open' : 'closed'}
+                transition={{ duration: 0.0 }}
             >
                 {children}
             </motion.div>

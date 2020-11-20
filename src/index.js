@@ -24,7 +24,6 @@ import { EventEmitter2 as e } from 'eventemitter2';
 global.emitter = new e({});
 emitter.setMaxListeners(0);
 global.renderEmit = new e({});
-global.neo4j = require('neo4j-driver');
 global.Mustache = require('mustache');
 
 //open links externally by default
@@ -148,6 +147,66 @@ global.appStore = {
                 content: '\uF03A',
                 scale: 1.25,
                 color: '#7F72FD',
+            },
+            AZUser: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf007',
+                scale: 1.25,
+                color: '#34D2EB',
+            },
+            AZGroup: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uF0C0',
+                scale: 1.25,
+                color: '#34D2EB',
+            },
+            AZTenant: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf0c2',
+                scale: 1.25,
+                color: '#3975b3',
+            },
+            AZSubscription: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf084',
+                scale: 1.25,
+                color: '#E6E600',
+            },
+            AZResourceGroup: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf1b2',
+                scale: 1.25,
+                color: '#FFE066',
+            },
+            AZVM: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf108',
+                scale: 1.25,
+                color: '#34D2EB',
+            },
+            AZDevice: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf108',
+                scale: 1.25,
+                color: '#B18FCF',
+            },
+            AZKeyVault: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf023',
+                scale: 1.25,
+                color: '#E83F6F',
+            },
+            AZApp: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf2d2',
+                scale: 1.25,
+                color: '#03fc84',
+            },
+            AZServicePrincipal: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf544',
+                scale: 1.25,
+                color: '#c1d6d6',
             },
             Unknown: {
                 font: "'Font Awesome 5 Free'",
@@ -336,42 +395,6 @@ const alertOptions = {
 };
 
 appStore.edgeincluded = conf.get('edgeincluded');
-//Code to add new edges to filter
-if (!appStore.edgeincluded.hasOwnProperty('AddAllowedToAct')) {
-    appStore.edgeincluded.AddAllowedToAct = true;
-    conf.set('edgeincluded', appStore.edgeincluded);
-}
-
-if (!appStore.edgeincluded.hasOwnProperty('AllowedToAct')) {
-    appStore.edgeincluded.AllowedToAct = true;
-    conf.set('edgeincluded', appStore.edgeincluded);
-}
-
-if (!appStore.edgeincluded.hasOwnProperty('SQLAdmin')) {
-    appStore.edgeincluded.SQLAdmin = true;
-    conf.set('edgeincluded', appStore.edgeincluded);
-}
-
-if (!appStore.edgeincluded.hasOwnProperty('ReadGMSAPassword')) {
-    appStore.edgeincluded.ReadGMSAPassword = true;
-    conf.set('edgeincluded', appStore.edgeincluded);
-}
-
-if (!appStore.edgeincluded.hasOwnProperty('HasSIDHistory')) {
-    appStore.edgeincluded.HasSIDHistory = true;
-    conf.set('edgeincluded', appStore.edgeincluded);
-}
-
-if (!appStore.edgeincluded.hasOwnProperty('CanPSRemote')) {
-    appStore.edgeincluded.HasSIDHistory = true;
-    conf.set('edgeincluded', appStore.edgeincluded);
-}
-
-// if (!appStore.edgeincluded.hasOwnProperty("ReadLAPSPassword")) {
-//     appStore.edgeincluded.ReadLAPSPassword = true;
-//     conf.set("edgeincluded", appStore.edgeincluded)
-// }
-
 appStore.performance = conf.get('performance');
 
 if (typeof appStore.performance.edgeLabels === 'undefined') {

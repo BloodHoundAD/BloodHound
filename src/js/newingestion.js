@@ -4,7 +4,7 @@ export function buildGroupJsonNew(chunk) {
     let queries = {};
     queries.properties = {};
     queries.properties.statement =
-        'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:Group ON CREATE SET n:Group SET n += prop.map';
+        'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:Group SET n += prop.map';
     queries.properties.props = [];
 
     for (let group of chunk) {
@@ -22,10 +22,10 @@ export function buildGroupJsonNew(chunk) {
         for (let group in grouped) {
             format[0] = group;
             let props = grouped[group]
-                .filter(g => {
+                .filter((g) => {
                     return g.MemberId != null;
                 })
-                .map(g => {
+                .map((g) => {
                     return { source: g.MemberId, target: identifier };
                 });
 
@@ -39,7 +39,7 @@ export function buildComputerJsonNew(chunk) {
     let queries = {};
     queries.properties = {};
     queries.properties.statement =
-        'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:Computer ON CREATE SET n:Computer SET n += prop.map';
+        'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:Computer SET n += prop.map';
     queries.properties.props = [];
 
     for (let computer of chunk) {
@@ -69,7 +69,7 @@ export function buildComputerJsonNew(chunk) {
 
         format = ['Computer', 'Computer', 'AllowedToDelegate', '{isacl:false}'];
 
-        let props = (allowedToDelegate || []).map(delegate => {
+        let props = (allowedToDelegate || []).map((delegate) => {
             return { source: identifier, target: delegate };
         });
 
@@ -79,14 +79,14 @@ export function buildComputerJsonNew(chunk) {
         grouped = groupBy(allowedToAct || [], 'MemberType');
         for (let group in grouped) {
             format[0] = group;
-            props = grouped[group].map(group => {
+            props = grouped[group].map((group) => {
                 return { source: group.MemberId, target: identifier };
             });
             insertNew(queries, format, props);
         }
 
         format = ['Computer', 'User', 'HasSession', '{isacl:false}'];
-        props = (sessions || []).map(session => {
+        props = (sessions || []).map((session) => {
             return { source: session.ComputerId, target: session.UserId };
         });
         insertNew(queries, format, props);
@@ -96,7 +96,7 @@ export function buildComputerJsonNew(chunk) {
         for (let group in grouped) {
             format[0] = group;
             format[2] = 'AdminTo';
-            props = grouped[group].map(group => {
+            props = grouped[group].map((group) => {
                 return { source: group.MemberId, target: identifier };
             });
             insertNew(queries, format, props);
@@ -106,7 +106,7 @@ export function buildComputerJsonNew(chunk) {
         for (let group in grouped) {
             format[0] = group;
             format[2] = 'CanRDP';
-            props = grouped[group].map(group => {
+            props = grouped[group].map((group) => {
                 return { source: group.MemberId, target: identifier };
             });
             insertNew(queries, format, props);
@@ -116,7 +116,7 @@ export function buildComputerJsonNew(chunk) {
         for (let group in grouped) {
             format[0] = group;
             format[2] = 'ExecuteDCOM';
-            props = grouped[group].map(group => {
+            props = grouped[group].map((group) => {
                 return { source: group.MemberId, target: identifier };
             });
             insertNew(queries, format, props);
@@ -126,7 +126,7 @@ export function buildComputerJsonNew(chunk) {
         for (let group in grouped) {
             format[0] = group;
             format[2] = 'CanPSRemote';
-            props = grouped[group].map(group => {
+            props = grouped[group].map((group) => {
                 return { source: group.MemberId, target: identifier };
             });
             insertNew(queries, format, props);
@@ -139,7 +139,7 @@ export function buildUserJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:User ON CREATE SET n:User SET n += prop.map',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:User SET n += prop.map',
         props: [],
     };
 
@@ -168,7 +168,7 @@ export function buildUserJsonNew(chunk) {
         }
 
         format = ['User', 'Computer', 'AllowedToDelegate', '{isacl: false}'];
-        let props = allowedToDelegate.map(x => {
+        let props = allowedToDelegate.map((x) => {
             return { source: identifier, target: x };
         });
 
@@ -179,7 +179,7 @@ export function buildUserJsonNew(chunk) {
         for (let x in grouped) {
             format[1] = x;
             format[2] = 'HasSIDHistory';
-            props = grouped[x].map(history => {
+            props = grouped[x].map((history) => {
                 return { source: identifier, target: history.MemberId };
             });
 
@@ -195,7 +195,7 @@ export function buildGpoJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:GPO ON CREATE SET n:GPO SET n += prop.map',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:GPO SET n += prop.map',
         props: [],
     };
 
@@ -215,7 +215,7 @@ export function buildOuJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:OU ON CREATE SET n:OU SET n += prop.map',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:OU SET n += prop.map',
         props: [],
     };
 
@@ -239,19 +239,19 @@ export function buildOuJsonNew(chunk) {
         queries.properties.props.push({ source: identifier, map: properties });
 
         let format = ['OU', 'User', 'Contains', '{isacl: false}'];
-        let props = users.map(user => {
+        let props = users.map((user) => {
             return { source: identifier, target: user };
         });
         insertNew(queries, format, props);
 
         format = ['OU', 'Computer', 'Contains', '{isacl: false}'];
-        props = computers.map(computer => {
+        props = computers.map((computer) => {
             return { source: identifier, target: computer };
         });
         insertNew(queries, format, props);
 
         format = ['OU', 'OU', 'Contains', '{isacl: false}'];
-        props = childOus.map(ou => {
+        props = childOus.map((ou) => {
             return { source: identifier, target: ou };
         });
         insertNew(queries, format, props);
@@ -262,7 +262,7 @@ export function buildOuJsonNew(chunk) {
             'GpLink',
             '{isacl: false, enforced: prop.enforced}',
         ];
-        props = links.map(link => {
+        props = links.map((link) => {
             return {
                 source: link.Guid.toUpperCase(),
                 target: identifier,
@@ -276,8 +276,8 @@ export function buildOuJsonNew(chunk) {
         for (let x in grouped) {
             format[0] = x;
             format[2] = 'AdminTo';
-            let flattened = computers.flatMap(computer => {
-                return grouped[x].map(admin => {
+            let flattened = computers.flatMap((computer) => {
+                return grouped[x].map((admin) => {
                     return { source: admin.MemberId, target: computer };
                 });
             });
@@ -289,8 +289,8 @@ export function buildOuJsonNew(chunk) {
         for (let x in grouped) {
             format[0] = x;
             format[2] = 'CanPSRemote';
-            let flattened = computers.flatMap(computer => {
-                return grouped[x].map(admin => {
+            let flattened = computers.flatMap((computer) => {
+                return grouped[x].map((admin) => {
                     return { source: admin.MemberId, target: computer };
                 });
             });
@@ -302,8 +302,8 @@ export function buildOuJsonNew(chunk) {
         for (let x in grouped) {
             format[0] = x;
             format[2] = 'ExecuteDCOM';
-            let flattened = computers.flatMap(computer => {
-                return grouped[x].map(admin => {
+            let flattened = computers.flatMap((computer) => {
+                return grouped[x].map((admin) => {
                     return { source: admin.MemberId, target: computer };
                 });
             });
@@ -316,8 +316,8 @@ export function buildOuJsonNew(chunk) {
         for (let x in grouped) {
             format[0] = x;
             format[2] = 'CanRDP';
-            let flattened = computers.flatMap(computer => {
-                return grouped[x].map(admin => {
+            let flattened = computers.flatMap((computer) => {
+                return grouped[x].map((admin) => {
                     return { source: admin.MemberId, target: computer };
                 });
             });
@@ -332,7 +332,7 @@ export function buildDomainJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:Domain ON CREATE SET n:Domain SET n += prop.map',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:Domain SET n += prop.map',
         props: [],
     };
 
@@ -358,19 +358,19 @@ export function buildDomainJsonNew(chunk) {
         });
 
         let format = ['Domain', 'User', 'Contains', '{isacl: false}'];
-        let props = users.map(user => {
+        let props = users.map((user) => {
             return { source: identifier, target: user };
         });
         insertNew(queries, format, props);
 
         format = ['Domain', 'Computer', 'Contains', '{isacl: false}'];
-        props = computers.map(computer => {
+        props = computers.map((computer) => {
             return { source: identifier, target: computer };
         });
         insertNew(queries, format, props);
 
         format = ['Domain', 'OU', 'Contains', '{isacl: false}'];
-        props = childOus.map(ou => {
+        props = childOus.map((ou) => {
             return { source: identifier, target: ou.toUpperCase() };
         });
         insertNew(queries, format, props);
@@ -381,7 +381,7 @@ export function buildDomainJsonNew(chunk) {
             'GpLink',
             '{isacl: false, enforced: prop.enforced}',
         ];
-        props = links.map(link => {
+        props = links.map((link) => {
             return {
                 source: link.Guid,
                 target: identifier,
@@ -469,8 +469,8 @@ export function buildDomainJsonNew(chunk) {
         for (let x in grouped) {
             format[0] = x;
             format[2] = 'AdminTo';
-            let flattened = computers.flatMap(computer => {
-                return grouped[x].map(admin => {
+            let flattened = computers.flatMap((computer) => {
+                return grouped[x].map((admin) => {
                     return { source: admin.MemberId, target: computer };
                 });
             });
@@ -482,8 +482,8 @@ export function buildDomainJsonNew(chunk) {
         for (let x in grouped) {
             format[0] = x;
             format[2] = 'CanPSRemote';
-            let flattened = computers.flatMap(computer => {
-                return grouped[x].map(admin => {
+            let flattened = computers.flatMap((computer) => {
+                return grouped[x].map((admin) => {
                     return { source: admin.MemberId, target: computer };
                 });
             });
@@ -495,8 +495,8 @@ export function buildDomainJsonNew(chunk) {
         for (let x in grouped) {
             format[0] = x;
             format[2] = 'ExecuteDCOM';
-            let flattened = computers.flatMap(computer => {
-                return grouped[x].map(admin => {
+            let flattened = computers.flatMap((computer) => {
+                return grouped[x].map((admin) => {
                     return { source: admin.MemberId, target: computer };
                 });
             });
@@ -509,8 +509,8 @@ export function buildDomainJsonNew(chunk) {
         for (let x in grouped) {
             format[0] = x;
             format[2] = 'CanRDP';
-            let flattened = computers.flatMap(computer => {
-                return grouped[x].map(admin => {
+            let flattened = computers.flatMap((computer) => {
+                return grouped[x].map((admin) => {
                     return { source: admin.MemberId, target: computer };
                 });
             });
@@ -523,7 +523,7 @@ export function buildDomainJsonNew(chunk) {
 }
 
 const baseInsertStatement =
-    'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) ON MATCH SET n:{0} ON CREATE SET n:{0} MERGE (m:Base {objectid: prop.target}) ON MATCH SET m:{1} ON CREATE SET m:{1} MERGE (n)-[r:{2} {3}]->(m)';
+    'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:{0} MERGE (m:Base {objectid: prop.target}) SET m:{1} MERGE (n)-[r:{2} {3}]->(m)';
 
 /**
  * Inserts a query into the queries table
@@ -562,7 +562,7 @@ function insertNew(queries, formatProps, queryProps) {
 }
 
 function processAceArrayNew(aces, objectid, objecttype, queries) {
-    var convertedAces = aces.flatMap(ace => {
+    var convertedAces = aces.flatMap((ace) => {
         let pSid = ace.PrincipalSID;
         let pType = ace.PrincipalType;
         let right = ace.RightName;
@@ -616,7 +616,7 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
             rights.push('ReadGMSAPassword');
         }
 
-        return rights.map(right => {
+        return rights.map((right) => {
             return {
                 pSid: pSid,
                 right: right,
@@ -626,7 +626,7 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
         });
     });
 
-    convertedAces = convertedAces.filter(ace => {
+    convertedAces = convertedAces.filter((ace) => {
         return ace != null;
     });
 
@@ -642,7 +642,7 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
         for (let inner in innerGrouped) {
             format[0] = inner;
             format[2] = right;
-            var mapped = innerGrouped[inner].map(x => {
+            var mapped = innerGrouped[inner].map((x) => {
                 return {
                     source: x.pSid,
                     target: objectid,
@@ -659,7 +659,7 @@ function processSPNTargetArrayNew(spns, objectid, queries) {
     let grouped = groupBy(spns, 'Service');
     for (let group in grouped) {
         format[2] = group;
-        let props = grouped[group].map(spn => {
+        let props = grouped[group].map((spn) => {
             return {
                 source: objectid,
                 target: spn.ComputerSid,
@@ -669,4 +669,842 @@ function processSPNTargetArrayNew(spns, objectid, queries) {
 
         insertNew(queries, format, props);
     }
+}
+
+//Azure Functions
+export function buildAzureDevices(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.id}) SET n:AZDevice SET n.name = prop.name',
+        props: [],
+    };
+
+    let format = [
+        'AZUser',
+        'AZDevice',
+        'AZOwns',
+        '{isacl: false, isazure: true}',
+    ];
+    for (let row of chunk) {
+        queries.properties.props.push({
+            id: row.DeviceID.toUpperCase(),
+            name: row.DeviceDisplayname.toUpperCase(),
+        });
+
+        if (row.OwnerID !== null) {
+            format[0] = 'AZUser';
+            insertNew(queries, format, {
+                source: row.OwnerID.toUpperCase(),
+                target: row.DeviceID.toUpperCase(),
+            });
+        }
+        if (row.OwnerOnPremID !== null) {
+            format[0] = 'User';
+            insertNew(queries, format, {
+                source: row.OwnerOnPremID.toUpperCase(),
+                target: row.DeviceID.toUpperCase(),
+            });
+        }
+    }
+
+    return queries;
+}
+
+export function buildAzureGlobalAdminRights(chunk) {
+    let queries = {};
+
+    let format = [
+        '',
+        'AZTenant',
+        'AZGlobalAdmin',
+        '{isacl: false, isazure: true}',
+    ];
+    for (let row of chunk) {
+        let type = row.ObjectType.toUpperCase();
+        if (type === 'USER') {
+            if (row.UserOnPremID === null) {
+                format[0] = 'AZUser';
+                insertNew(queries, format, {
+                    source: row.UserID.toUpperCase(),
+                    target: row.TenantID.toUpperCase(),
+                });
+            } else {
+                format[0] = 'User';
+                insertNew(queries, format, {
+                    source: row.UserOnPremID.toUpperCase(),
+                    target: row.TenantID.toUpperCase(),
+                });
+            }
+        } else if (type === 'GROUP') {
+            format[0] = 'AZGroup';
+            insertNew(queries, format, {
+                source: row.UserID.toUpperCase(),
+                target: row.TenantID.toUpperCase(),
+            });
+        } else if (type === 'SERVICEPRINCIPAL') {
+            format[0] = 'AZServicePrincipal';
+            insertNew(queries, format, {
+                source: row.UserID.toUpperCase(),
+                target: row.TenantID.toUpperCase(),
+            });
+        }
+    }
+
+    return queries;
+}
+
+export function buildAzureUsers(chunk) {
+    let queries = {};
+    queries.azproperties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZUser SET n.name = prop.name',
+        props: [],
+    };
+
+    queries.opproperties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:User SET n.name = prop.name',
+        props: [],
+    };
+
+    let format = [
+        'AzureUser',
+        'AZTenant',
+        'AZGlobalAdmin',
+        '{isacl: false, isazure: true}',
+    ];
+    for (let row of chunk) {
+        if (
+            row.OnPremisesSecurityIdentifier === null &&
+            row.TenantID === null
+        ) {
+            queries.azproperties.props.push({
+                source: row.ObjectID.toUpperCase(),
+                name: row.UserPrincipalName.toUpperCase(),
+            });
+        } else if (
+            row.OnPremisesSecurityIdentifier === null &&
+            row.TenantID !== null
+        ) {
+            format[0] = 'AZTenant';
+            format[1] = 'AZUser';
+            format[2] = 'AZContains';
+            queries.azproperties.props.push({
+                source: row.ObjectID.toUpperCase(),
+                name: row.UserPrincipalName.toUpperCase(),
+            });
+            insertNew(queries, format, {
+                source: row.TenantID.toUpperCase(),
+                target: row.ObjectID.toUpperCase(),
+            });
+        } else if (row.OnPremisesSecurityIdentifier !== null) {
+            queries.opproperties.props.push({
+                source: row.OnPremisesSecurityIdentifier.toUpperCase(),
+                name: row.UserPrincipalName.toUpperCase(),
+            });
+        }
+    }
+    return queries;
+}
+
+export function buildAzureGroups(chunk) {
+    let queries = {};
+    queries.azproperties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.name = prop.name',
+        props: [],
+    };
+
+    queries.opproperties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:Group SET n.name = prop.name SET n.azsyncid=prop.sync',
+        props: [],
+    };
+    let format = [
+        'AZTenant',
+        'AZGroup',
+        'AZContains',
+        '{isacl: false, isazure: true}',
+    ];
+    for (let row of chunk) {
+        if (row.OnPremisesSecurityIdentifier !== null) {
+            queries.opproperties.props.push({
+                source: row.OnPremisesSecurityIdentifier.toUpperCase(),
+                name: row.DisplayName.toUpperCase(),
+                sync: row.ObjectID.toUpperCase(),
+            });
+        } else {
+            queries.azproperties.props.push({
+                source: row.ObjectID.toUpperCase(),
+                name: row.DisplayName.toUpperCase(),
+            });
+
+            insertNew(queries, format, {
+                source: row.TenantID.toUpperCase(),
+                target: row.ObjectID.toUpperCase(),
+            });
+        }
+    }
+
+    return queries;
+}
+
+export function buildAzureTenants(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZTenant SET n.name = prop.name',
+        props: [],
+    };
+
+    for (let row of chunk) {
+        queries.properties.props.push({
+            source: row.ObjectID.toUpperCase(),
+            name: row.DisplayName.toUpperCase(),
+        });
+    }
+
+    return queries;
+}
+
+export function buildAzureSubscriptions(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZSubscription SET n.name = prop.name',
+        props: [],
+    };
+    let format = [
+        'AZTenant',
+        'AZSubscription',
+        'AZContains',
+        '{isacl: false, isazure: true}',
+    ];
+    for (let row of chunk) {
+        queries.properties.props.push({
+            source: row.SubscriptionId.toUpperCase(),
+            name: row.Name.toUpperCase(),
+        });
+
+        insertNew(queries, format, {
+            source: row.TenantId.toUpperCase(),
+            target: row.SubscriptionId.toUpperCase(),
+        });
+    }
+    return queries;
+}
+
+export function buildAzureResourceGroups(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZResourceGroup SET n.name = prop.name',
+        props: [],
+    };
+    let format = [
+        'AZSubscription',
+        'AZResourceGroup',
+        'AZContains',
+        '{isacl: false, isazure: true}',
+    ];
+
+    for (let row of chunk) {
+        queries.properties.props.push({
+            source: row.ResourceGroupID.toUpperCase(),
+            name: row.ResourceGroupName.toUpperCase(),
+        });
+
+        insertNew(queries, format, {
+            source: row.SubscriptionID.toUpperCase(),
+            target: row.ResourceGroupID.toUpperCase(),
+        });
+    }
+
+    return queries;
+}
+
+export function buildAzureVMs(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZVM SET n.name = prop.name',
+        props: [],
+    };
+    let format = [
+        'AZResourceGroup',
+        'AZVM',
+        'AZContains',
+        '{isacl: false, isazure: true}',
+    ];
+
+    for (let row of chunk) {
+        queries.properties.props.push({
+            source: row.AZID.toUpperCase(),
+            name: row.AzVMName.toUpperCase(),
+        });
+
+        insertNew(queries, format, {
+            source: row.ResourceGroupID.toUpperCase(),
+            target: row.AZID.toUpperCase(),
+        });
+    }
+
+    return queries;
+}
+
+export function buildAzureKeyVaults(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZKeyVault SET n.name = prop.name',
+        props: [],
+    };
+    let format = [
+        'AZResourceGroup',
+        'AZKeyVault',
+        'AZContains',
+        '{isacl: false, isazure: true}',
+    ];
+
+    for (let row of chunk) {
+        queries.properties.props.push({
+            source: row.AzKeyVaultID.toUpperCase(),
+            name: row.AzKeyVaultName.toUpperCase(),
+        });
+
+        insertNew(queries, format, {
+            source: row.ResourceGroupID.toUpperCase(),
+            target: row.AzKeyVaultID.toUpperCase(),
+        });
+    }
+
+    return queries;
+}
+
+export function buildAzureGroupOwners(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.name = prop.name',
+        props: [],
+    };
+    let format = ['', 'AZGroup', 'AZOwns', '{isacl: false, isazure: true}'];
+
+    for (let row of chunk) {
+        queries.properties.props.push({
+            source: row.GroupID.toUpperCase(),
+            name: row.GroupName.toUpperCase(),
+        });
+
+        if (row.OwnerOnPremID === null) {
+            format[0] = 'AZUser';
+            insertNew(queries, format, {
+                source: row.OwnerID.toUpperCase(),
+                target: row.GroupID.toUpperCase(),
+            });
+        } else {
+            format[0] = 'User';
+            insertNew(queries, format, {
+                source: row.OwnerOnPremID.toUpperCase(),
+                target: row.GroupID.toUpperCase(),
+            });
+        }
+    }
+
+    return queries;
+}
+
+export function buildAzureAppOwners(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZApp SET n.name = prop.name',
+        props: [],
+    };
+    let format = ['', 'AZApp', 'AZOwns', '{isacl: false, isazure: true}'];
+
+    for (let row of chunk) {
+        queries.properties.props.push({
+            source: row.AppId.toUpperCase(),
+            name: row.AppName.toUpperCase(),
+        });
+
+        if (row.OwnerOnPremID === null) {
+            format[0] = 'AZUser';
+            insertNew(queries, format, {
+                source: row.OwnerID.toUpperCase(),
+                target: row.AppId.toUpperCase(),
+            });
+        } else {
+            format[0] = 'User';
+            insertNew(queries, format, {
+                source: row.OwnerOnPremID.toUpperCase(),
+                target: row.AppId.toUpperCase(),
+            });
+        }
+    }
+
+    return queries;
+}
+
+export function buildAzureAppToSP(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZApp SET n.name = prop.AppName',
+        props: [],
+    };
+    let format = [
+        '',
+        'AZServicePrincipal',
+        'AZRunsAs',
+        '{isacl: false, isazure: true}',
+    ];
+
+    for (let row of chunk) {
+        queries.properties.props.push({
+            source: row.AppId.toUpperCase(),
+            name: row.AppName.toUpperCase(),
+        });
+
+        format[0] = 'AZApp';
+        insertNew(queries, format, {
+            source: row.AppId.toUpperCase(),
+            target: row.ServicePrincipalId.toUpperCase(),
+        });
+    }
+
+    return queries;
+}
+
+export function buildAzureGroupMembers(chunk) {
+    let queries = {};
+    let format = ['', '', 'MemberOf', '{isacl: false, isazure: false}'];
+
+    for (let row of chunk) {
+        let type = row.MemberType.toUpperCase();
+        if (row.GroupOnPremID === null) {
+            if (type === 'GROUP') {
+                if (row.GroupOnPremID === null) {
+                    format[0] = 'AZGroup';
+                    format[1] = 'AZGroup';
+                    insertNew(queries, format, {
+                        source: row.MemberID.toUpperCase(),
+                        target: row.GroupID.toUpperCase(),
+                    });
+                } else {
+                    format[0] = 'Group';
+                    format[1] = 'AZGroup';
+                    insertNew(queries, format, {
+                        source: row.MemberOnPremID.toUpperCase(),
+                        target: row.GroupID.toUpperCase(),
+                    });
+                }
+            } else if (type === 'USER') {
+                if (row.GroupOnPremID === null) {
+                    format[0] = 'AZUser';
+                    format[1] = 'AZGroup';
+                    insertNew(queries, format, {
+                        source: row.MemberID.toUpperCase(),
+                        target: row.GroupID.toUpperCase(),
+                    });
+                } else {
+                    format[0] = 'User';
+                    format[1] = 'AZGroup';
+                    insertNew(queries, format, {
+                        source: row.MemberOnPremID.toUpperCase(),
+                        target: row.GroupID.toUpperCase(),
+                    });
+                }
+            }
+        } else {
+            if (type === 'GROUP') {
+                format[0] = 'Group';
+                format[1] = 'Group';
+                insertNew(queries, format, {
+                    source: row.MemberOnPremID.toUpperCase(),
+                    target: row.GroupOnPremID.toUpperCase(),
+                });
+            } else if (type === 'USER') {
+                format[0] = 'User';
+                format[1] = 'Group';
+                insertNew(queries, format, {
+                    source: row.MemberOnPremID.toUpperCase(),
+                    target: row.GroupOnPremID.toUpperCase(),
+                });
+            }
+        }
+    }
+
+    return queries;
+}
+
+export function buildAzureVmPerms(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.name = prop.name',
+        props: [],
+    };
+    let format = ['', 'AZVM', '', '{isacl: false, isazure: true}'];
+
+    for (let row of chunk) {
+        let role = row.RoleName.toUpperCase();
+        let controllerType = row.ControllerType.toUpperCase();
+        let vmid = row.VMID.toUpperCase();
+        let source;
+
+        if (controllerType === 'UNKNOWN') continue;
+
+        if (role === 'OWNER') {
+            format[2] = 'AZOwns';
+        } else if (role === 'CONTRIBUTOR') {
+            format[2] = 'AZContributor';
+        } else if (role === 'VIRTUAL MACHINE CONTRIBUTOR') {
+            format[2] = 'AZVMContributor';
+        } else if (role === 'AVERE CONTRIBUTOR') {
+            format[2] = 'AZAvereContributor';
+        } else if (role === 'USER ACCESS ADMINISTRATOR') {
+            format[2] = 'AZUserAccessAdministrator';
+        } else {
+            continue;
+        }
+
+        if (row.ControllerOnPremID === null) {
+            source = row.ControllerID.toUpperCase();
+            if (controllerType === 'USER') {
+                format[0] = 'AZUser';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'AZGroup';
+            } else if (controllerType === 'SERVICEPRINCIPAL') {
+                format[0] = 'AZServicePrincipal';
+            }
+        } else {
+            source = row.ControllerOnPremID.toUpperCase();
+            if (controllerType === 'USER') {
+                format[0] = 'User';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'Group';
+            }
+        }
+
+        insertNew(queries, format, {
+            source: source,
+            target: vmid,
+        });
+    }
+
+    return queries;
+}
+
+export function buildAzureRGPermissions(chunk) {
+    let queries = {};
+    let format = ['', 'AZResourceGroup', '', '{isacl: false, isazure: true}'];
+
+    for (let row of chunk) {
+        let role = row.RoleName.toUpperCase();
+        let controllerType = row.ControllerType.toUpperCase();
+        let rgid = row.RGID.toUpperCase();
+        let source;
+
+        if (controllerType === 'UNKNOWN' || role === 'CONTRIBUTOR') continue;
+
+        if (role === 'OWNER') {
+            format[2] = 'AZOwns';
+        } else if (role === 'USER ACCESS ADMINISTRATOR') {
+            format[2] = 'AZUserAccessAdministrator';
+        } else {
+            continue;
+        }
+
+        if (row.ControllerOnPremID === null) {
+            source = row.ControllerID.toUpperCase();
+            if (controllerType === 'USER') {
+                format[0] = 'AZUser';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'AZGroup';
+            } else if (controllerType === 'SERVICEPRINCIPAL') {
+                format[0] = 'AZServicePrincipal';
+            }
+        } else {
+            source = row.ControllerOnPremID.toUpperCase();
+            if (controllerType === 'USER') {
+                format[0] = 'User';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'Group';
+            }
+        }
+
+        insertNew(queries, format, {
+            source: source,
+            target: rgid,
+        });
+    }
+
+    return queries;
+}
+
+export function buildAzureKVPermissions(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.name = prop.name',
+        props: [],
+    };
+    let format = ['', 'AZKeyVault', '', '{isacl: false, isazure: true}'];
+
+    for (let row of chunk) {
+        let role = row.RoleName.toUpperCase();
+        let controllerType = row.ControllerType.toUpperCase();
+        let kvid = row.KVID.toUpperCase();
+        let source;
+        if (controllerType === 'UNKNOWN') continue;
+
+        if (role === 'OWNER') {
+            format[2] = 'AZOwns';
+        } else if (role === 'CONTRIBUTOR') {
+            format[2] = 'AZContributor';
+        } else if (role === 'USER ACCESS ADMINISTRATOR') {
+            format[2] = 'AZUserAccessAdministrator';
+        } else if (role === 'KEY VAULT CONTRIBUTOR') {
+            format[2] = 'AZKeyVaultContributor';
+        } else {
+            continue;
+        }
+
+        if (row.ControllerOnPremID === null) {
+            source = row.ControllerID.toUpperCase();
+            if (controllerType === 'USER') {
+                format[0] = 'AZUser';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'AZGroup';
+            } else if (controllerType === 'SERVICEPRINCIPAL') {
+                format[0] = 'AZServicePrincipal';
+            }
+        } else {
+            source = row.ControllerOnPremID.toUpperCase();
+            if (controllerType === 'USER') {
+                format[0] = 'User';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'Group';
+            }
+        }
+
+        insertNew(queries, format, {
+            source: source,
+            target: kvid,
+        });
+    }
+
+    return queries;
+}
+
+export function buildAzureKVAccessPolicies(chunk) {
+    let queries = {};
+
+    let format = ['Base', 'AZKeyVault', '', '{isacl: false, isazure: true}'];
+    for (let row of chunk) {
+        let kvid = row.KVID.toUpperCase();
+        let access = row.Access.toUpperCase();
+
+        if (access === 'GETKEYS') {
+            format[2] = 'AZGetKeys';
+        } else if (access === 'GETCERTIFICATES') {
+            format[2] = 'AZGetCertificates';
+        } else if (access === 'GETSECRETS') {
+            format[2] = 'AZGetSecrets';
+        }
+
+        if (row.ControllerOnPremID === null) {
+            insertNew(queries, format, {
+                source: row.ControllerOnPremID.toUpperCase(),
+                target: kvid,
+            });
+        } else {
+            insertNew(queries, format, {
+                source: row.ControllerID.toUpperCase(),
+                target: kvid,
+            });
+        }
+    }
+
+    return queries;
+}
+
+export function buildAzurePWResetRights(chunk) {
+    let queries = {};
+
+    let format = ['', '', 'AZResetPassword', '{isacl: false, isazure: true}'];
+    for (let row of chunk) {
+        let source;
+        let target;
+
+        if (row.UserOnPremID === null) {
+            format[0] = 'AZUser';
+            source = row.UserID.toUpperCase();
+        } else {
+            format[0] = 'User';
+            source = row.UserOnPremID.toUpperCase();
+        }
+
+        if (row.TargetUserOnPremID === null) {
+            format[1] = 'AZUser';
+            target = row.TargetUserID.toUpperCase();
+        } else {
+            format[1] = 'User';
+            target = row.TargetUserOnPremID.toUpperCase();
+        }
+
+        insertNew(queries, format, { source: source, target: target });
+    }
+
+    return queries;
+}
+
+export function buildAzureGroupRights(chunk) {
+    let queries = {};
+
+    let format = [
+        '',
+        'AZGroup',
+        'AZAddMembers',
+        '{isacl: false, isazure: true}',
+    ];
+    for (let row of chunk) {
+        let type = row.ObjectType.toUpperCase();
+        if (type === 'USER') {
+            if (row.UserOnPremID === null) {
+                format[0] = 'AZUser';
+                insertNew(queries, format, {
+                    source: row.UserID.toUpperCase(),
+                    target: row.TargetGroupID.toUpperCase(),
+                });
+            } else {
+                format[0] = 'User';
+                insertNew(queries, format, {
+                    source: row.UserOnPremID.toUpperCase(),
+                    target: row.TargetGroupID.toUpperCase(),
+                });
+            }
+        } else if (type === 'GROUP') {
+            format[0] = 'AZGroup';
+            insertNew(queries, format, {
+                source: row.UserID.toUpperCase(),
+                target: row.TargetGroupID.toUpperCase(),
+            });
+        } else if (type === 'SERVICEPRINCIPAL') {
+            format[0] = 'AZServicePrincipal';
+            insertNew(queries, format, {
+                source: row.UserID.toUpperCase(),
+                target: row.TargetGroupID.toUpperCase(),
+            });
+        }
+    }
+
+    return queries;
+}
+
+export function buildAzurePrivRileAdminRights(chunk) {
+    let queries = {};
+
+    let format = [
+        '',
+        'AZTenant',
+        'AZPrivilegedRoleAdmin',
+        '{isacl: false, isazure: true}',
+    ];
+    for (let row of chunk) {
+        let source;
+
+        if (row.UserOnPremID === null) {
+            format[0] = 'AZUser';
+            source = row.UserID.toUpperCase();
+        } else {
+            format[0] = 'User';
+            source = row.UserOnPremID.toUpperCase();
+        }
+
+        insertNew(queries, format, {
+            source: source,
+            target: row.TenantID.toUpperCase(),
+        });
+    }
+
+    return queries;
+}
+
+export function buildAzureApplicationAdmins(chunk) {
+    let queries = {};
+
+    let format = ['', 'AZApp', 'AZAppAdmin', '{isacl: false, isazure: true}'];
+
+    for (let row of chunk) {
+        let source;
+        let controllerType = row.AppAdminType.toUpperCase();
+        if (row.AppAdminOnPremID === null) {
+            source = row.AppAdminID.toUpperCase();
+            if (controllerType === 'USER') {
+                format[0] = 'AZUser';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'AZGroup';
+            } else if (controllerType === 'SERVICEPRINCIPAL') {
+                format[0] = 'AZServicePrincipal';
+            }
+        } else {
+            source = row.AppAdminOnPremID.toUpperCase();
+            if (controllerType === 'USER') {
+                format[0] = 'User';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'Group';
+            }
+        }
+
+        insertNew(queries, format, {
+            source: source,
+            target: row.TargetAppID.toUpperCase(),
+        });
+    }
+
+    return queries;
+}
+
+export function buildAzureCloudApplicationAdmins(chunk) {
+    let queries = {};
+
+    let format = [
+        '',
+        'AZApp',
+        'AZCloudAppAdmin',
+        '{isacl: false, isazure: true}',
+    ];
+
+    for (let row of chunk) {
+        let source;
+        let controllerType = row.AppAdminType.toUpperCase();
+        if (row.AppAdminOnPremID === null) {
+            source = row.AppAdminID.toUpperCase();
+            if (controllerType === 'USER') {
+                format[0] = 'AZUser';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'AZGroup';
+            } else if (controllerType === 'SERVICEPRINCIPAL') {
+                format[0] = 'AZServicePrincipal';
+            }
+        } else {
+            source = row.AppAdminOnPremID.toUpperCase();
+            if (controllerType === 'USER') {
+                format[0] = 'User';
+            } else if (controllerType === 'GROUP') {
+                format[0] = 'Group';
+            }
+        }
+
+        insertNew(queries, format, {
+            source: source,
+            target: row.TargetAppID.toUpperCase(),
+        });
+    }
+
+    return queries;
 }
