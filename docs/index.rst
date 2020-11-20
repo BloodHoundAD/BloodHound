@@ -10,7 +10,8 @@ BloodHound: Six Degrees of Domain Admin
    :alt: BloodHound logo
 
 BloodHound uses graph theory to reveal the hidden and often unintended
-relationships within an Active Directory environment. Attackers can use
+relationships within an Active Directory environment. As of version 4.0, BloodHound
+now also supports Azure. Attackers can use
 BloodHound to easily identify highly complex attack paths that would otherwise
 be impossible to quickly identify. Defenders can use BloodHound to identify
 and eliminate those same attack paths. Both blue and red teams can use
@@ -31,20 +32,31 @@ OS-specific instructions:
 Collect Your First Dataset
 --------------------------
 
-BloodHound is a data analysis tool and needs data to be useful. The officially
-supported data collection tool for BloodHound is called SharpHound. Download
-SharpHound or build it from source to collect your first data set. From a
+BloodHound is a data analysis tool and needs data to be useful. There are two
+officially supported data collection tools for BloodHound: SharpHound and
+AzureHound. Download AzureHound and/or SharpHound to collect your first data set. From a
 domain-joined system in your target Active Directory environnment, collecting
 your first dataset is quite simple:
 
 ::
 
    C:\> SharpHound.exe
+   
+Collecting your first data set with AzureHound:
+
+::
+
+   PS C:\> Import-Module Az
+   PS C:\> Import-Module AzureADPreview
+   PS C:\> Connect-AzureAD
+   PS C:\> Connect-AzAccount
+   PS C:\> . .\AzureHound.ps1
+   PS C:\> Invoke-AzureHound
 
 Import and Explore the Data
 ---------------------------
 
-By default, SharpHound will generate several JSON files and place them into one
+By default, SharpHound and AzureHound will generate several JSON files and place them into one
 zip. Drag and drop that zip into the BloodHound GUI, and BloodHound will import
 that data.
 
@@ -85,6 +97,7 @@ Need assistance? Join us in the `BloodHound Gang Slack`_
 
    data-collection/sharphound
    data-collection/sharphound-all-flags
+   data-collection/azurehound
    data-collection/bloodhound-py
 
 .. toctree::
