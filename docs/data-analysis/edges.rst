@@ -1747,3 +1747,386 @@ References
 ----------
 
 http://www.harmj0y.net/blog/redteaming/the-trustpocalypse/
+
+|
+
+----
+
+|
+
+AZAddMembers
+^^^^^^^^^^^^
+
+The ability to add other principals to an Azure security group
+
+Abuse Info
+----------
+
+Via the Azure portal:
+1. Find the group in your tenant (Azure Active Directory -> Groups -> Find Group in list)</li>
+2. Click the group from the list</li>
+3. In the left pane, click “Members”</li>
+4. At the top, click “Add members”</li>
+5. Find the principals you want to add to the group and click them, then click “select” at the bottom</li>
+6. You should see a message in the top right saying “Member successfully added”</li>
+    
+Via PowerZure: Add-AzureADGroup -User [UPN] -Group [Group name]
+
+Opsec Considerations
+--------------------
+
+The Azure activity log for the tenant will log who added what principal to what group, including the date and time.
+
+References
+----------
+
+https://powerzure.readthedocs.io/en/latest/Functions/operational.html#add-azureadgroup
+https://docs.microsoft.com/en-us/powershell/module/azuread/add-azureadgroupmember?view=azureadps-2.0-preview
+
+|
+
+----
+
+|
+
+
+AZAppAdmin
+^^^^^^^^^^
+
+Principals with the Application Admin role can control tenant-resident apps.
+
+Abuse Info
+----------
+
+Create a new credential for the app, then authenticate to the tenant as the
+app’s service principal, then abuse whatever privilege it is that the service
+principal has.
+
+Opsec Considerations
+--------------------
+
+The Azure portal will create a log even whenever a new credential is created for a service principal.
+
+References
+----------
+
+https://dirkjanm.io/azure-ad-privilege-escalation-application-admin/
+
+|
+
+----
+
+|
+
+AZCloudAppAdmin
+^^^^^^^^^^^^^^^
+
+Principals with the Cloud App Admin role can control tenant-resident apps.
+
+Abuse Info
+----------
+
+Create a new credential for the app, then authenticate to the tenant as the
+app’s service principal, then abuse whatever privilege it is that the service
+principal has.
+
+Opsec Considerations
+--------------------
+
+The Azure portal will create a log even whenever a new credential is created for a service principal.
+
+References
+----------
+
+https://dirkjanm.io/azure-ad-privilege-escalation-application-admin/
+
+|
+
+----
+
+|
+
+AZContains
+^^^^^^^^^^
+
+This indicates that the parent object contains the child object, such as a resource
+group containing a virtual machine, or a tenant “containing” a subscription.
+
+|
+
+----
+
+|
+
+AZContributor
+^^^^^^^^^^^^^
+
+The contributor role grants almost all abusable privileges in all circumstances,
+with some exceptions. Those exceptions are not collected by AzureHound.
+
+Abuse Info
+----------
+
+This depends on what the target object is:
+* **Key Vault:** You can read secrets and alter access policies (grant yourself
+access to read secrets)
+* **Automation Account:** You can create a new runbook that runs as the Automation
+Account, and edit existing runbooks. Runbooks can be used to authenticate as the
+Automation Account and abuse privileges held by the Automation Account. If the
+Automation Account is using a ‘RunAs’ account, you can gather the certificate used
+to login and impersonate that account.
+* **Virtual Machine:** Run SYSTEM commands on the VM
+
+Opsec Considerations
+--------------------
+
+This will depend on which particular abuse you perform, but in general Azure will
+create a log event for each abuse.
+
+References
+----------
+
+https://blog.netspi.com/maintaining-azure-persistence-via-automation-accounts/
+https://blog.netspi.com/azure-automation-accounts-key-stores/
+https://blog.netspi.com/get-azurepasswords/
+https://blog.netspi.com/attacking-azure-cloud-shell/
+
+|
+
+----
+
+|
+
+AZGetCertificates
+^^^^^^^^^^^^^^^^^
+
+The ability to read certificates from key vaults.
+
+Abuse Info
+----------
+
+Use PowerShell or PowerZure to fetch the certificate from the key vault.
+    
+Via PowerZure:
+* Get-AzureKeyVaultContent
+* Export-AzureKeyVaultcontent
+
+Opsec Considerations
+--------------------
+
+Azure will create a new log event for the key vault whenever a secret is accessed.
+
+References
+----------
+
+https://blog.netspi.com/azure-automation-accounts-key-stores/
+https://powerzure.readthedocs.io/en/latest/Functions/operational.html#get-azurekeyvaultcontent
+
+|
+
+----
+
+|
+
+AZGetKeys
+^^^^^^^^^
+
+The ability to read keys from key vaults.
+
+Abuse Info
+----------
+
+Use PowerShell or PowerZure to fetch the certificate from the key vault.
+    
+Via PowerZure:
+* Get-AzureKeyVaultContent
+* Export-AzureKeyVaultcontent
+
+Opsec Considerations
+--------------------
+
+Azure will create a new log event for the key vault whenever a secret is accessed.
+
+References
+----------
+
+https://blog.netspi.com/azure-automation-accounts-key-stores/
+https://powerzure.readthedocs.io/en/latest/Functions/operational.html#get-azurekeyvaultcontent
+
+|
+
+----
+
+|
+
+AZGetSecrets
+^^^^^^^^^^^^
+
+The ability to read secrets from key vaults.
+
+Abuse Info
+----------
+
+Use PowerShell or PowerZure to fetch the certificate from the key vault.
+    
+Via PowerZure:
+* Get-AzureKeyVaultContent
+* Export-AzureKeyVaultcontent
+
+Opsec Considerations
+--------------------
+
+Azure will create a new log event for the key vault whenever a secret is accessed.
+
+References
+----------
+
+https://blog.netspi.com/azure-automation-accounts-key-stores/
+https://powerzure.readthedocs.io/en/latest/Functions/operational.html#get-azurekeyvaultcontent
+
+|
+
+----
+
+|
+
+AZGlobalAdmin
+^^^^^^^^^^^^^
+
+This edge indicates the principal has the Global Admin role active against
+the target tenant. In other words, the principal is a Global Admin. Global
+Admins can do almost anything against almost every object type in the tenant,
+this is the highest privilege role in Azure.
+
+Abuse Info
+----------
+
+As a Global Admin, you can change passwords, run commands on VMs, read key vault
+secrets, activate roles for other users, etc.
+
+For Global Admin to be able to abuse Azure resources, you must first grant yourself
+the ‘User Access Administrator’ role in Azure RBAC. This is done through a toggle
+button in the portal, or via the PowerZure function Set-AzureElevatedPrivileges. 
+    
+Once that role is applied to account, you can then add yourself as an Owner to all
+subscriptions in the tenant
+
+Opsec Considerations
+--------------------
+
+This depends on exactly what you do, but in general Azure will log each abuse action.
+
+References
+----------
+
+https://blog.netspi.com/attacking-azure-cloud-shell/
+
+|
+
+----
+
+|
+
+AZPrivilegedRoleAdmin
+^^^^^^^^^^^^^^^^^^^^^
+
+The Privileged Role Admin role can grant any other admin role to another principal
+at the tenant level.
+
+Abuse Info
+----------
+
+Activate the Global Admin role for yourself or for another user using PowerZure or
+PowerShell.
+
+Opsec Considerations
+--------------------
+
+The Azure Activity Log will log who activated an admin role for what other principal,
+including the date and time.
+
+References
+----------
+
+https://powerzure.readthedocs.io/en/latest/Functions/operational.html#add-azureadrole
+
+|
+
+----
+
+|
+
+AZResetPassword
+^^^^^^^^^^^^^^^
+
+The ability to change another user’s password without knowing their current password.
+
+Abuse Info
+----------
+
+Find the user in the Azure portal, then click “Reset Password”, or use PowerZure’s
+Set-AzureUserPassword cmdlet. If password write-back is enabled, this password will
+also be set for a synced on-prem user.
+
+Opsec Considerations
+--------------------
+
+Azure will log each password reset event, including who performed the reset, against which account, and at what date and time.
+
+References
+----------
+
+https://powerzure.readthedocs.io/en/latest/Functions/operational.html#set-azureuserpassword
+
+|
+
+----
+
+|
+
+AZRunsAs
+^^^^^^^^
+
+The Azure App runs as the Service Principal when it needs to authenticate to the tenant.
+
+Abuse Info
+----------
+
+This edge should be taken into consideration when abusing control of an app. Apps authenticate
+with service principals to the tenant, so if you have control of an app, what you are abusing
+is that control plus the fact that the app runs as a privileged service principal.
+
+
+|
+
+----
+
+|
+
+AZUserAccessAdministrator
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The User Access Admin role can edit roles against many other objects.
+
+Abuse Info
+----------
+This role can be used to grant yourself or another principal any privilege
+you want against Automation Accounts, VMs, Key Vaults, and Resource Groups.
+Use the Azure portal to add a new, abusable role assignment against the target
+object for yourself.
+
+Opsec Considerations
+--------------------
+
+Azure will log any role activation event for any object type.
+
+References
+----------
+
+https://blog.netspi.com/maintaining-azure-persistence-via-automation-accounts/
+
+|
+
+----
+
+|
