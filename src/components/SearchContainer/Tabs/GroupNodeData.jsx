@@ -281,7 +281,7 @@ const GroupNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header='OUTBOUND COTROL RIGHTS'>
+                <CollapsibleSection header='OUTBOUND CONTROL RIGHTS'>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
