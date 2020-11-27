@@ -320,8 +320,11 @@
             "queryList": [
                 {
                     "final": true,
-                    "query": "MATCH (c:Computer)-[:MemberOf]->(t:Group) WHERE NOT t.name STARTS WITH 'DOMAIN CONTROLLERS' WITH c as NonDC MATCH p=(NonDC)-[:HasSession]->(n:User)-[:MemberOf]-> (g:Group) WHERE g.name STARTS WITH 'DOMAIN ADMINS' RETURN p",
-                    "allowCollapse": true
+                    "query": "MATCH (dc)-[r:MemberOf*0..]->(g:Group) WHERE g.objectid =~ $domain_controllers_id WITH COLLECT(dc) AS exclude MATCH p = (c:Computer)-[n:HasSession]->(u:User)-[r2:MemberOf*1..]->(g:Group) WHERE  g.objectid =~ $domain_admins_id AND NOT c IN exclude RETURN p",
+                    "props": {
+                        "domain_controllers_id": "S-1-5-.*-516",
+                        "domain_admins_id": "S-1-5-.*-512"
+                    }
                 }
             ]
         },
