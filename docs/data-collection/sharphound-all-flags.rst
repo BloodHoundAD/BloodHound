@@ -53,6 +53,8 @@ Here are the less common CollectionMethods and what they do:
   domain-joined computer
 * **PSRemote:** Just collect the members of the Remote Management group on each
   domain-joined computer
+* **ObjectProps** - Performs Object Properties collection for properties 
+  such as LastLogon or PwdLastSet
 
 Domain
 ------
