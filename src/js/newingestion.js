@@ -687,24 +687,29 @@ export function buildAzureDevices(chunk) {
         '{isacl: false, isazure: true}',
     ];
     for (let row of chunk) {
-        queries.properties.props.push({
-            id: row.DeviceID.toUpperCase(),
-            name: row.DeviceDisplayname.toUpperCase(),
-        });
+        try {
+            queries.properties.props.push({
+                id: row.DeviceID.toUpperCase(),
+                name: row.DeviceDisplayname.toUpperCase(),
+            });
 
-        if (row.OwnerID !== null) {
-            format[0] = 'AZUser';
-            insertNew(queries, format, {
-                source: row.OwnerID.toUpperCase(),
-                target: row.DeviceID.toUpperCase(),
-            });
-        }
-        if (row.OwnerOnPremID !== null) {
-            format[0] = 'User';
-            insertNew(queries, format, {
-                source: row.OwnerOnPremID.toUpperCase(),
-                target: row.DeviceID.toUpperCase(),
-            });
+            if (row.OwnerID !== null) {
+                format[0] = 'AZUser';
+                insertNew(queries, format, {
+                    source: row.OwnerID.toUpperCase(),
+                    target: row.DeviceID.toUpperCase(),
+                });
+            }
+            if (row.OwnerOnPremID !== null) {
+                format[0] = 'User';
+                insertNew(queries, format, {
+                    source: row.OwnerOnPremID.toUpperCase(),
+                    target: row.DeviceID.toUpperCase(),
+                });
+            }
+        } catch (e) {
+            console.log(e);
+            console.log(row);
         }
     }
 
@@ -721,33 +726,38 @@ export function buildAzureGlobalAdminRights(chunk) {
         '{isacl: false, isazure: true}',
     ];
     for (let row of chunk) {
-        let type = row.ObjectType.toUpperCase();
-        if (type === 'USER') {
-            if (row.UserOnPremID === null) {
-                format[0] = 'AZUser';
+        try {
+            let type = row.ObjectType.toUpperCase();
+            if (type === 'USER') {
+                if (row.UserOnPremID === null) {
+                    format[0] = 'AZUser';
+                    insertNew(queries, format, {
+                        source: row.UserID.toUpperCase(),
+                        target: row.TenantID.toUpperCase(),
+                    });
+                } else {
+                    format[0] = 'User';
+                    insertNew(queries, format, {
+                        source: row.UserOnPremID.toUpperCase(),
+                        target: row.TenantID.toUpperCase(),
+                    });
+                }
+            } else if (type === 'GROUP') {
+                format[0] = 'AZGroup';
                 insertNew(queries, format, {
                     source: row.UserID.toUpperCase(),
                     target: row.TenantID.toUpperCase(),
                 });
-            } else {
-                format[0] = 'User';
+            } else if (type === 'SERVICEPRINCIPAL') {
+                format[0] = 'AZServicePrincipal';
                 insertNew(queries, format, {
-                    source: row.UserOnPremID.toUpperCase(),
+                    source: row.UserID.toUpperCase(),
                     target: row.TenantID.toUpperCase(),
                 });
             }
-        } else if (type === 'GROUP') {
-            format[0] = 'AZGroup';
-            insertNew(queries, format, {
-                source: row.UserID.toUpperCase(),
-                target: row.TenantID.toUpperCase(),
-            });
-        } else if (type === 'SERVICEPRINCIPAL') {
-            format[0] = 'AZServicePrincipal';
-            insertNew(queries, format, {
-                source: row.UserID.toUpperCase(),
-                target: row.TenantID.toUpperCase(),
-            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
         }
     }
 
@@ -775,34 +785,39 @@ export function buildAzureUsers(chunk) {
         '{isacl: false, isazure: true}',
     ];
     for (let row of chunk) {
-        if (
-            row.OnPremisesSecurityIdentifier === null &&
-            row.TenantID === null
-        ) {
-            queries.azproperties.props.push({
-                source: row.ObjectID.toUpperCase(),
-                name: row.UserPrincipalName.toUpperCase(),
-            });
-        } else if (
-            row.OnPremisesSecurityIdentifier === null &&
-            row.TenantID !== null
-        ) {
-            format[0] = 'AZTenant';
-            format[1] = 'AZUser';
-            format[2] = 'AZContains';
-            queries.azproperties.props.push({
-                source: row.ObjectID.toUpperCase(),
-                name: row.UserPrincipalName.toUpperCase(),
-            });
-            insertNew(queries, format, {
-                source: row.TenantID.toUpperCase(),
-                target: row.ObjectID.toUpperCase(),
-            });
-        } else if (row.OnPremisesSecurityIdentifier !== null) {
-            queries.opproperties.props.push({
-                source: row.OnPremisesSecurityIdentifier.toUpperCase(),
-                name: row.UserPrincipalName.toUpperCase(),
-            });
+        try {
+            if (
+                row.OnPremisesSecurityIdentifier === null &&
+                row.TenantID === null
+            ) {
+                queries.azproperties.props.push({
+                    source: row.ObjectID.toUpperCase(),
+                    name: row.UserPrincipalName.toUpperCase(),
+                });
+            } else if (
+                row.OnPremisesSecurityIdentifier === null &&
+                row.TenantID !== null
+            ) {
+                format[0] = 'AZTenant';
+                format[1] = 'AZUser';
+                format[2] = 'AZContains';
+                queries.azproperties.props.push({
+                    source: row.ObjectID.toUpperCase(),
+                    name: row.UserPrincipalName.toUpperCase(),
+                });
+                insertNew(queries, format, {
+                    source: row.TenantID.toUpperCase(),
+                    target: row.ObjectID.toUpperCase(),
+                });
+            } else if (row.OnPremisesSecurityIdentifier !== null) {
+                queries.opproperties.props.push({
+                    source: row.OnPremisesSecurityIdentifier.toUpperCase(),
+                    name: row.UserPrincipalName.toUpperCase(),
+                });
+            }
+        } catch (e) {
+            console.log(e);
+            console.log(row);
         }
     }
     return queries;
@@ -828,22 +843,27 @@ export function buildAzureGroups(chunk) {
         '{isacl: false, isazure: true}',
     ];
     for (let row of chunk) {
-        if (row.OnPremisesSecurityIdentifier !== null) {
-            queries.opproperties.props.push({
-                source: row.OnPremisesSecurityIdentifier.toUpperCase(),
-                name: row.DisplayName.toUpperCase(),
-                sync: row.ObjectID.toUpperCase(),
-            });
-        } else {
-            queries.azproperties.props.push({
-                source: row.ObjectID.toUpperCase(),
-                name: row.DisplayName.toUpperCase(),
-            });
+        try {
+            if (row.OnPremisesSecurityIdentifier !== null) {
+                queries.opproperties.props.push({
+                    source: row.OnPremisesSecurityIdentifier.toUpperCase(),
+                    name: row.DisplayName.toUpperCase(),
+                    sync: row.ObjectID.toUpperCase(),
+                });
+            } else {
+                queries.azproperties.props.push({
+                    source: row.ObjectID.toUpperCase(),
+                    name: row.DisplayName.toUpperCase(),
+                });
 
-            insertNew(queries, format, {
-                source: row.TenantID.toUpperCase(),
-                target: row.ObjectID.toUpperCase(),
-            });
+                insertNew(queries, format, {
+                    source: row.TenantID.toUpperCase(),
+                    target: row.ObjectID.toUpperCase(),
+                });
+            }
+        } catch (e) {
+            console.log(e);
+            console.log(row);
         }
     }
 
@@ -859,10 +879,15 @@ export function buildAzureTenants(chunk) {
     };
 
     for (let row of chunk) {
-        queries.properties.props.push({
-            source: row.ObjectID.toUpperCase(),
-            name: row.DisplayName.toUpperCase(),
-        });
+        try {
+            queries.properties.props.push({
+                source: row.ObjectID.toUpperCase(),
+                name: row.DisplayName.toUpperCase(),
+            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
+        }
     }
 
     return queries;
@@ -882,15 +907,20 @@ export function buildAzureSubscriptions(chunk) {
         '{isacl: false, isazure: true}',
     ];
     for (let row of chunk) {
-        queries.properties.props.push({
-            source: row.SubscriptionId.toUpperCase(),
-            name: row.Name.toUpperCase(),
-        });
+        try {
+            queries.properties.props.push({
+                source: row.SubscriptionId.toUpperCase(),
+                name: row.Name.toUpperCase(),
+            });
 
-        insertNew(queries, format, {
-            source: row.TenantId.toUpperCase(),
-            target: row.SubscriptionId.toUpperCase(),
-        });
+            insertNew(queries, format, {
+                source: row.TenantId.toUpperCase(),
+                target: row.SubscriptionId.toUpperCase(),
+            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
+        }
     }
     return queries;
 }
@@ -910,15 +940,20 @@ export function buildAzureResourceGroups(chunk) {
     ];
 
     for (let row of chunk) {
-        queries.properties.props.push({
-            source: row.ResourceGroupID.toUpperCase(),
-            name: row.ResourceGroupName.toUpperCase(),
-        });
+        try {
+            queries.properties.props.push({
+                source: row.ResourceGroupID.toUpperCase(),
+                name: row.ResourceGroupName.toUpperCase(),
+            });
 
-        insertNew(queries, format, {
-            source: row.SubscriptionID.toUpperCase(),
-            target: row.ResourceGroupID.toUpperCase(),
-        });
+            insertNew(queries, format, {
+                source: row.SubscriptionID.toUpperCase(),
+                target: row.ResourceGroupID.toUpperCase(),
+            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
+        }
     }
 
     return queries;
@@ -939,15 +974,20 @@ export function buildAzureVMs(chunk) {
     ];
 
     for (let row of chunk) {
-        queries.properties.props.push({
-            source: row.AZID.toUpperCase(),
-            name: row.AzVMName.toUpperCase(),
-        });
+        try {
+            queries.properties.props.push({
+                source: row.AZID.toUpperCase(),
+                name: row.AzVMName.toUpperCase(),
+            });
 
-        insertNew(queries, format, {
-            source: row.ResourceGroupID.toUpperCase(),
-            target: row.AZID.toUpperCase(),
-        });
+            insertNew(queries, format, {
+                source: row.ResourceGroupID.toUpperCase(),
+                target: row.AZID.toUpperCase(),
+            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
+        }
     }
 
     return queries;
@@ -968,15 +1008,20 @@ export function buildAzureKeyVaults(chunk) {
     ];
 
     for (let row of chunk) {
-        queries.properties.props.push({
-            source: row.AzKeyVaultID.toUpperCase(),
-            name: row.AzKeyVaultName.toUpperCase(),
-        });
+        try {
+            queries.properties.props.push({
+                source: row.AzKeyVaultID.toUpperCase(),
+                name: row.AzKeyVaultName.toUpperCase(),
+            });
 
-        insertNew(queries, format, {
-            source: row.ResourceGroupID.toUpperCase(),
-            target: row.AzKeyVaultID.toUpperCase(),
-        });
+            insertNew(queries, format, {
+                source: row.ResourceGroupID.toUpperCase(),
+                target: row.AzKeyVaultID.toUpperCase(),
+            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
+        }
     }
 
     return queries;
@@ -992,23 +1037,28 @@ export function buildAzureGroupOwners(chunk) {
     let format = ['', 'AZGroup', 'AZOwns', '{isacl: false, isazure: true}'];
 
     for (let row of chunk) {
-        queries.properties.props.push({
-            source: row.GroupID.toUpperCase(),
-            name: row.GroupName.toUpperCase(),
-        });
+        try {
+            queries.properties.props.push({
+                source: row.GroupID.toUpperCase(),
+                name: row.GroupName.toUpperCase(),
+            });
 
-        if (row.OwnerOnPremID === null) {
-            format[0] = 'AZUser';
-            insertNew(queries, format, {
-                source: row.OwnerID.toUpperCase(),
-                target: row.GroupID.toUpperCase(),
-            });
-        } else {
-            format[0] = 'User';
-            insertNew(queries, format, {
-                source: row.OwnerOnPremID.toUpperCase(),
-                target: row.GroupID.toUpperCase(),
-            });
+            if (row.OwnerOnPremID === null) {
+                format[0] = 'AZUser';
+                insertNew(queries, format, {
+                    source: row.OwnerID.toUpperCase(),
+                    target: row.GroupID.toUpperCase(),
+                });
+            } else {
+                format[0] = 'User';
+                insertNew(queries, format, {
+                    source: row.OwnerOnPremID.toUpperCase(),
+                    target: row.GroupID.toUpperCase(),
+                });
+            }
+        } catch (e) {
+            console.log(e);
+            console.log(row);
         }
     }
 
@@ -1025,23 +1075,28 @@ export function buildAzureAppOwners(chunk) {
     let format = ['', 'AZApp', 'AZOwns', '{isacl: false, isazure: true}'];
 
     for (let row of chunk) {
-        queries.properties.props.push({
-            source: row.AppId.toUpperCase(),
-            name: row.AppName.toUpperCase(),
-        });
+        try {
+            queries.properties.props.push({
+                source: row.AppId.toUpperCase(),
+                name: row.AppName.toUpperCase(),
+            });
 
-        if (row.OwnerOnPremID === null) {
-            format[0] = 'AZUser';
-            insertNew(queries, format, {
-                source: row.OwnerID.toUpperCase(),
-                target: row.AppId.toUpperCase(),
-            });
-        } else {
-            format[0] = 'User';
-            insertNew(queries, format, {
-                source: row.OwnerOnPremID.toUpperCase(),
-                target: row.AppId.toUpperCase(),
-            });
+            if (row.OwnerOnPremID === null) {
+                format[0] = 'AZUser';
+                insertNew(queries, format, {
+                    source: row.OwnerID.toUpperCase(),
+                    target: row.AppId.toUpperCase(),
+                });
+            } else {
+                format[0] = 'User';
+                insertNew(queries, format, {
+                    source: row.OwnerOnPremID.toUpperCase(),
+                    target: row.AppId.toUpperCase(),
+                });
+            }
+        } catch (e) {
+            console.log(e);
+            console.log(row);
         }
     }
 
@@ -1063,16 +1118,21 @@ export function buildAzureAppToSP(chunk) {
     ];
 
     for (let row of chunk) {
-        queries.properties.props.push({
-            source: row.AppId.toUpperCase(),
-            name: row.AppName.toUpperCase(),
-        });
+        try {
+            queries.properties.props.push({
+                source: row.AppId.toUpperCase(),
+                name: row.AppName.toUpperCase(),
+            });
 
-        format[0] = 'AZApp';
-        insertNew(queries, format, {
-            source: row.AppId.toUpperCase(),
-            target: row.ServicePrincipalId.toUpperCase(),
-        });
+            format[0] = 'AZApp';
+            insertNew(queries, format, {
+                source: row.AppId.toUpperCase(),
+                target: row.ServicePrincipalId.toUpperCase(),
+            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
+        }
     }
 
     return queries;
@@ -1083,57 +1143,62 @@ export function buildAzureGroupMembers(chunk) {
     let format = ['', '', 'MemberOf', '{isacl: false, isazure: false}'];
 
     for (let row of chunk) {
-        let type = row.MemberType.toUpperCase();
-        if (row.GroupOnPremID === null) {
-            if (type === 'GROUP') {
-                if (row.GroupOnPremID === null) {
-                    format[0] = 'AZGroup';
-                    format[1] = 'AZGroup';
-                    insertNew(queries, format, {
-                        source: row.MemberID.toUpperCase(),
-                        target: row.GroupID.toUpperCase(),
-                    });
-                } else {
+        try {
+            let type = row.MemberType.toUpperCase();
+            if (row.GroupOnPremID === null) {
+                if (type === 'GROUP') {
+                    if (row.GroupOnPremID === null) {
+                        format[0] = 'AZGroup';
+                        format[1] = 'AZGroup';
+                        insertNew(queries, format, {
+                            source: row.MemberID.toUpperCase(),
+                            target: row.GroupID.toUpperCase(),
+                        });
+                    } else {
+                        format[0] = 'Group';
+                        format[1] = 'AZGroup';
+                        insertNew(queries, format, {
+                            source: row.MemberOnPremID.toUpperCase(),
+                            target: row.GroupID.toUpperCase(),
+                        });
+                    }
+                } else if (type === 'USER') {
+                    if (row.GroupOnPremID === null) {
+                        format[0] = 'AZUser';
+                        format[1] = 'AZGroup';
+                        insertNew(queries, format, {
+                            source: row.MemberID.toUpperCase(),
+                            target: row.GroupID.toUpperCase(),
+                        });
+                    } else {
+                        format[0] = 'User';
+                        format[1] = 'AZGroup';
+                        insertNew(queries, format, {
+                            source: row.MemberOnPremID.toUpperCase(),
+                            target: row.GroupID.toUpperCase(),
+                        });
+                    }
+                }
+            } else {
+                if (type === 'GROUP') {
                     format[0] = 'Group';
-                    format[1] = 'AZGroup';
+                    format[1] = 'Group';
                     insertNew(queries, format, {
                         source: row.MemberOnPremID.toUpperCase(),
-                        target: row.GroupID.toUpperCase(),
+                        target: row.GroupOnPremID.toUpperCase(),
                     });
-                }
-            } else if (type === 'USER') {
-                if (row.GroupOnPremID === null) {
-                    format[0] = 'AZUser';
-                    format[1] = 'AZGroup';
-                    insertNew(queries, format, {
-                        source: row.MemberID.toUpperCase(),
-                        target: row.GroupID.toUpperCase(),
-                    });
-                } else {
+                } else if (type === 'USER') {
                     format[0] = 'User';
-                    format[1] = 'AZGroup';
+                    format[1] = 'Group';
                     insertNew(queries, format, {
                         source: row.MemberOnPremID.toUpperCase(),
-                        target: row.GroupID.toUpperCase(),
+                        target: row.GroupOnPremID.toUpperCase(),
                     });
                 }
             }
-        } else {
-            if (type === 'GROUP') {
-                format[0] = 'Group';
-                format[1] = 'Group';
-                insertNew(queries, format, {
-                    source: row.MemberOnPremID.toUpperCase(),
-                    target: row.GroupOnPremID.toUpperCase(),
-                });
-            } else if (type === 'USER') {
-                format[0] = 'User';
-                format[1] = 'Group';
-                insertNew(queries, format, {
-                    source: row.MemberOnPremID.toUpperCase(),
-                    target: row.GroupOnPremID.toUpperCase(),
-                });
-            }
+        } catch (e) {
+            console.log(e);
+            console.log(row);
         }
     }
 
@@ -1150,49 +1215,54 @@ export function buildAzureVmPerms(chunk) {
     let format = ['', 'AZVM', '', '{isacl: false, isazure: true}'];
 
     for (let row of chunk) {
-        let role = row.RoleName.toUpperCase();
-        let controllerType = row.ControllerType.toUpperCase();
-        let vmid = row.VMID.toUpperCase();
-        let source;
+        try {
+            let role = row.RoleName.toUpperCase();
+            let controllerType = row.ControllerType.toUpperCase();
+            let vmid = row.VMID.toUpperCase();
+            let source;
 
-        if (controllerType === 'UNKNOWN') continue;
+            if (controllerType === 'UNKNOWN') continue;
 
-        if (role === 'OWNER') {
-            format[2] = 'AZOwns';
-        } else if (role === 'CONTRIBUTOR') {
-            format[2] = 'AZContributor';
-        } else if (role === 'VIRTUAL MACHINE CONTRIBUTOR') {
-            format[2] = 'AZVMContributor';
-        } else if (role === 'AVERE CONTRIBUTOR') {
-            format[2] = 'AZAvereContributor';
-        } else if (role === 'USER ACCESS ADMINISTRATOR') {
-            format[2] = 'AZUserAccessAdministrator';
-        } else {
-            continue;
-        }
-
-        if (row.ControllerOnPremID === null) {
-            source = row.ControllerID.toUpperCase();
-            if (controllerType === 'USER') {
-                format[0] = 'AZUser';
-            } else if (controllerType === 'GROUP') {
-                format[0] = 'AZGroup';
-            } else if (controllerType === 'SERVICEPRINCIPAL') {
-                format[0] = 'AZServicePrincipal';
+            if (role === 'OWNER') {
+                format[2] = 'AZOwns';
+            } else if (role === 'CONTRIBUTOR') {
+                format[2] = 'AZContributor';
+            } else if (role === 'VIRTUAL MACHINE CONTRIBUTOR') {
+                format[2] = 'AZVMContributor';
+            } else if (role === 'AVERE CONTRIBUTOR') {
+                format[2] = 'AZAvereContributor';
+            } else if (role === 'USER ACCESS ADMINISTRATOR') {
+                format[2] = 'AZUserAccessAdministrator';
+            } else {
+                continue;
             }
-        } else {
-            source = row.ControllerOnPremID.toUpperCase();
-            if (controllerType === 'USER') {
-                format[0] = 'User';
-            } else if (controllerType === 'GROUP') {
-                format[0] = 'Group';
-            }
-        }
 
-        insertNew(queries, format, {
-            source: source,
-            target: vmid,
-        });
+            if (row.ControllerOnPremID === null) {
+                source = row.ControllerID.toUpperCase();
+                if (controllerType === 'USER') {
+                    format[0] = 'AZUser';
+                } else if (controllerType === 'GROUP') {
+                    format[0] = 'AZGroup';
+                } else if (controllerType === 'SERVICEPRINCIPAL') {
+                    format[0] = 'AZServicePrincipal';
+                }
+            } else {
+                source = row.ControllerOnPremID.toUpperCase();
+                if (controllerType === 'USER') {
+                    format[0] = 'User';
+                } else if (controllerType === 'GROUP') {
+                    format[0] = 'Group';
+                }
+            }
+
+            insertNew(queries, format, {
+                source: source,
+                target: vmid,
+            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
+        }
     }
 
     return queries;
@@ -1203,43 +1273,49 @@ export function buildAzureRGPermissions(chunk) {
     let format = ['', 'AZResourceGroup', '', '{isacl: false, isazure: true}'];
 
     for (let row of chunk) {
-        let role = row.RoleName.toUpperCase();
-        let controllerType = row.ControllerType.toUpperCase();
-        let rgid = row.RGID.toUpperCase();
-        let source;
+        try {
+            let role = row.RoleName.toUpperCase();
+            let controllerType = row.ControllerType.toUpperCase();
+            let rgid = row.RGID.toUpperCase();
+            let source;
 
-        if (controllerType === 'UNKNOWN' || role === 'CONTRIBUTOR') continue;
+            if (controllerType === 'UNKNOWN' || role === 'CONTRIBUTOR')
+                continue;
 
-        if (role === 'OWNER') {
-            format[2] = 'AZOwns';
-        } else if (role === 'USER ACCESS ADMINISTRATOR') {
-            format[2] = 'AZUserAccessAdministrator';
-        } else {
-            continue;
-        }
-
-        if (row.ControllerOnPremID === null) {
-            source = row.ControllerID.toUpperCase();
-            if (controllerType === 'USER') {
-                format[0] = 'AZUser';
-            } else if (controllerType === 'GROUP') {
-                format[0] = 'AZGroup';
-            } else if (controllerType === 'SERVICEPRINCIPAL') {
-                format[0] = 'AZServicePrincipal';
+            if (role === 'OWNER') {
+                format[2] = 'AZOwns';
+            } else if (role === 'USER ACCESS ADMINISTRATOR') {
+                format[2] = 'AZUserAccessAdministrator';
+            } else {
+                continue;
             }
-        } else {
-            source = row.ControllerOnPremID.toUpperCase();
-            if (controllerType === 'USER') {
-                format[0] = 'User';
-            } else if (controllerType === 'GROUP') {
-                format[0] = 'Group';
-            }
-        }
 
-        insertNew(queries, format, {
-            source: source,
-            target: rgid,
-        });
+            if (row.ControllerOnPremID === null) {
+                source = row.ControllerID.toUpperCase();
+                if (controllerType === 'USER') {
+                    format[0] = 'AZUser';
+                } else if (controllerType === 'GROUP') {
+                    format[0] = 'AZGroup';
+                } else if (controllerType === 'SERVICEPRINCIPAL') {
+                    format[0] = 'AZServicePrincipal';
+                }
+            } else {
+                source = row.ControllerOnPremID.toUpperCase();
+                if (controllerType === 'USER') {
+                    format[0] = 'User';
+                } else if (controllerType === 'GROUP') {
+                    format[0] = 'Group';
+                }
+            }
+
+            insertNew(queries, format, {
+                source: source,
+                target: rgid,
+            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
+        }
     }
 
     return queries;
@@ -1255,46 +1331,51 @@ export function buildAzureKVPermissions(chunk) {
     let format = ['', 'AZKeyVault', '', '{isacl: false, isazure: true}'];
 
     for (let row of chunk) {
-        let role = row.RoleName.toUpperCase();
-        let controllerType = row.ControllerType.toUpperCase();
-        let kvid = row.KVID.toUpperCase();
-        let source;
-        if (controllerType === 'UNKNOWN') continue;
+        try {
+            let role = row.RoleName.toUpperCase();
+            let controllerType = row.ControllerType.toUpperCase();
+            let kvid = row.KVID.toUpperCase();
+            let source;
+            if (controllerType === 'UNKNOWN') continue;
 
-        if (role === 'OWNER') {
-            format[2] = 'AZOwns';
-        } else if (role === 'CONTRIBUTOR') {
-            format[2] = 'AZContributor';
-        } else if (role === 'USER ACCESS ADMINISTRATOR') {
-            format[2] = 'AZUserAccessAdministrator';
-        } else if (role === 'KEY VAULT CONTRIBUTOR') {
-            format[2] = 'AZKeyVaultContributor';
-        } else {
-            continue;
-        }
-
-        if (row.ControllerOnPremID === null) {
-            source = row.ControllerID.toUpperCase();
-            if (controllerType === 'USER') {
-                format[0] = 'AZUser';
-            } else if (controllerType === 'GROUP') {
-                format[0] = 'AZGroup';
-            } else if (controllerType === 'SERVICEPRINCIPAL') {
-                format[0] = 'AZServicePrincipal';
+            if (role === 'OWNER') {
+                format[2] = 'AZOwns';
+            } else if (role === 'CONTRIBUTOR') {
+                format[2] = 'AZContributor';
+            } else if (role === 'USER ACCESS ADMINISTRATOR') {
+                format[2] = 'AZUserAccessAdministrator';
+            } else if (role === 'KEY VAULT CONTRIBUTOR') {
+                format[2] = 'AZKeyVaultContributor';
+            } else {
+                continue;
             }
-        } else {
-            source = row.ControllerOnPremID.toUpperCase();
-            if (controllerType === 'USER') {
-                format[0] = 'User';
-            } else if (controllerType === 'GROUP') {
-                format[0] = 'Group';
-            }
-        }
 
-        insertNew(queries, format, {
-            source: source,
-            target: kvid,
-        });
+            if (row.ControllerOnPremID === null) {
+                source = row.ControllerID.toUpperCase();
+                if (controllerType === 'USER') {
+                    format[0] = 'AZUser';
+                } else if (controllerType === 'GROUP') {
+                    format[0] = 'AZGroup';
+                } else if (controllerType === 'SERVICEPRINCIPAL') {
+                    format[0] = 'AZServicePrincipal';
+                }
+            } else {
+                source = row.ControllerOnPremID.toUpperCase();
+                if (controllerType === 'USER') {
+                    format[0] = 'User';
+                } else if (controllerType === 'GROUP') {
+                    format[0] = 'Group';
+                }
+            }
+
+            insertNew(queries, format, {
+                source: source,
+                target: kvid,
+            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
+        }
     }
 
     return queries;
@@ -1305,27 +1386,32 @@ export function buildAzureKVAccessPolicies(chunk) {
 
     let format = ['Base', 'AZKeyVault', '', '{isacl: false, isazure: true}'];
     for (let row of chunk) {
-        let kvid = row.KVID.toUpperCase();
-        let access = row.Access.toUpperCase();
+        try {
+            let kvid = row.KVID.toUpperCase();
+            let access = row.Access.toUpperCase();
 
-        if (access === 'GETKEYS') {
-            format[2] = 'AZGetKeys';
-        } else if (access === 'GETCERTIFICATES') {
-            format[2] = 'AZGetCertificates';
-        } else if (access === 'GETSECRETS') {
-            format[2] = 'AZGetSecrets';
-        }
+            if (access === 'GETKEYS') {
+                format[2] = 'AZGetKeys';
+            } else if (access === 'GETCERTIFICATES') {
+                format[2] = 'AZGetCertificates';
+            } else if (access === 'GETSECRETS') {
+                format[2] = 'AZGetSecrets';
+            }
 
-        if (row.ControllerOnPremID === null) {
-            insertNew(queries, format, {
-                source: row.ControllerOnPremID.toUpperCase(),
-                target: kvid,
-            });
-        } else {
-            insertNew(queries, format, {
-                source: row.ControllerID.toUpperCase(),
-                target: kvid,
-            });
+            if (row.ControllerOnPremID === null) {
+                insertNew(queries, format, {
+                    source: row.ControllerOnPremID.toUpperCase(),
+                    target: kvid,
+                });
+            } else {
+                insertNew(queries, format, {
+                    source: row.ControllerID.toUpperCase(),
+                    target: kvid,
+                });
+            }
+        } catch (e) {
+            console.log(e);
+            console.log(row);
         }
     }
 
@@ -1337,26 +1423,31 @@ export function buildAzurePWResetRights(chunk) {
 
     let format = ['', '', 'AZResetPassword', '{isacl: false, isazure: true}'];
     for (let row of chunk) {
-        let source;
-        let target;
+        try {
+            let source;
+            let target;
 
-        if (row.UserOnPremID === null) {
-            format[0] = 'AZUser';
-            source = row.UserID.toUpperCase();
-        } else {
-            format[0] = 'User';
-            source = row.UserOnPremID.toUpperCase();
+            if (row.UserOnPremID === null) {
+                format[0] = 'AZUser';
+                source = row.UserID.toUpperCase();
+            } else {
+                format[0] = 'User';
+                source = row.UserOnPremID.toUpperCase();
+            }
+
+            if (row.TargetUserOnPremID === null) {
+                format[1] = 'AZUser';
+                target = row.TargetUserID.toUpperCase();
+            } else {
+                format[1] = 'User';
+                target = row.TargetUserOnPremID.toUpperCase();
+            }
+
+            insertNew(queries, format, { source: source, target: target });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
         }
-
-        if (row.TargetUserOnPremID === null) {
-            format[1] = 'AZUser';
-            target = row.TargetUserID.toUpperCase();
-        } else {
-            format[1] = 'User';
-            target = row.TargetUserOnPremID.toUpperCase();
-        }
-
-        insertNew(queries, format, { source: source, target: target });
     }
 
     return queries;
@@ -1372,33 +1463,38 @@ export function buildAzureGroupRights(chunk) {
         '{isacl: false, isazure: true}',
     ];
     for (let row of chunk) {
-        let type = row.ObjectType.toUpperCase();
-        if (type === 'USER') {
-            if (row.UserOnPremID === null) {
-                format[0] = 'AZUser';
+        try {
+            let type = row.ObjectType.toUpperCase();
+            if (type === 'USER') {
+                if (row.UserOnPremID === null) {
+                    format[0] = 'AZUser';
+                    insertNew(queries, format, {
+                        source: row.UserID.toUpperCase(),
+                        target: row.TargetGroupID.toUpperCase(),
+                    });
+                } else {
+                    format[0] = 'User';
+                    insertNew(queries, format, {
+                        source: row.UserOnPremID.toUpperCase(),
+                        target: row.TargetGroupID.toUpperCase(),
+                    });
+                }
+            } else if (type === 'GROUP') {
+                format[0] = 'AZGroup';
                 insertNew(queries, format, {
                     source: row.UserID.toUpperCase(),
                     target: row.TargetGroupID.toUpperCase(),
                 });
-            } else {
-                format[0] = 'User';
+            } else if (type === 'SERVICEPRINCIPAL') {
+                format[0] = 'AZServicePrincipal';
                 insertNew(queries, format, {
-                    source: row.UserOnPremID.toUpperCase(),
+                    source: row.UserID.toUpperCase(),
                     target: row.TargetGroupID.toUpperCase(),
                 });
             }
-        } else if (type === 'GROUP') {
-            format[0] = 'AZGroup';
-            insertNew(queries, format, {
-                source: row.UserID.toUpperCase(),
-                target: row.TargetGroupID.toUpperCase(),
-            });
-        } else if (type === 'SERVICEPRINCIPAL') {
-            format[0] = 'AZServicePrincipal';
-            insertNew(queries, format, {
-                source: row.UserID.toUpperCase(),
-                target: row.TargetGroupID.toUpperCase(),
-            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
         }
     }
 
@@ -1415,20 +1511,25 @@ export function buildAzurePrivRileAdminRights(chunk) {
         '{isacl: false, isazure: true}',
     ];
     for (let row of chunk) {
-        let source;
+        try {
+            let source;
 
-        if (row.UserOnPremID === null) {
-            format[0] = 'AZUser';
-            source = row.UserID.toUpperCase();
-        } else {
-            format[0] = 'User';
-            source = row.UserOnPremID.toUpperCase();
+            if (row.UserOnPremID === null) {
+                format[0] = 'AZUser';
+                source = row.UserID.toUpperCase();
+            } else {
+                format[0] = 'User';
+                source = row.UserOnPremID.toUpperCase();
+            }
+
+            insertNew(queries, format, {
+                source: source,
+                target: row.TenantID.toUpperCase(),
+            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
         }
-
-        insertNew(queries, format, {
-            source: source,
-            target: row.TenantID.toUpperCase(),
-        });
     }
 
     return queries;
@@ -1440,30 +1541,35 @@ export function buildAzureApplicationAdmins(chunk) {
     let format = ['', 'AZApp', 'AZAppAdmin', '{isacl: false, isazure: true}'];
 
     for (let row of chunk) {
-        let source;
-        let controllerType = row.AppAdminType.toUpperCase();
-        if (row.AppAdminOnPremID === null) {
-            source = row.AppAdminID.toUpperCase();
-            if (controllerType === 'USER') {
-                format[0] = 'AZUser';
-            } else if (controllerType === 'GROUP') {
-                format[0] = 'AZGroup';
-            } else if (controllerType === 'SERVICEPRINCIPAL') {
-                format[0] = 'AZServicePrincipal';
+        try {
+            let source;
+            let controllerType = row.AppAdminType.toUpperCase();
+            if (row.AppAdminOnPremID === null) {
+                source = row.AppAdminID.toUpperCase();
+                if (controllerType === 'USER') {
+                    format[0] = 'AZUser';
+                } else if (controllerType === 'GROUP') {
+                    format[0] = 'AZGroup';
+                } else if (controllerType === 'SERVICEPRINCIPAL') {
+                    format[0] = 'AZServicePrincipal';
+                }
+            } else {
+                source = row.AppAdminOnPremID.toUpperCase();
+                if (controllerType === 'USER') {
+                    format[0] = 'User';
+                } else if (controllerType === 'GROUP') {
+                    format[0] = 'Group';
+                }
             }
-        } else {
-            source = row.AppAdminOnPremID.toUpperCase();
-            if (controllerType === 'USER') {
-                format[0] = 'User';
-            } else if (controllerType === 'GROUP') {
-                format[0] = 'Group';
-            }
-        }
 
-        insertNew(queries, format, {
-            source: source,
-            target: row.TargetAppID.toUpperCase(),
-        });
+            insertNew(queries, format, {
+                source: source,
+                target: row.TargetAppID.toUpperCase(),
+            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
+        }
     }
 
     return queries;
@@ -1480,30 +1586,35 @@ export function buildAzureCloudApplicationAdmins(chunk) {
     ];
 
     for (let row of chunk) {
-        let source;
-        let controllerType = row.AppAdminType.toUpperCase();
-        if (row.AppAdminOnPremID === null) {
-            source = row.AppAdminID.toUpperCase();
-            if (controllerType === 'USER') {
-                format[0] = 'AZUser';
-            } else if (controllerType === 'GROUP') {
-                format[0] = 'AZGroup';
-            } else if (controllerType === 'SERVICEPRINCIPAL') {
-                format[0] = 'AZServicePrincipal';
+        try {
+            let source;
+            let controllerType = row.AppAdminType.toUpperCase();
+            if (row.AppAdminOnPremID === null) {
+                source = row.AppAdminID.toUpperCase();
+                if (controllerType === 'USER') {
+                    format[0] = 'AZUser';
+                } else if (controllerType === 'GROUP') {
+                    format[0] = 'AZGroup';
+                } else if (controllerType === 'SERVICEPRINCIPAL') {
+                    format[0] = 'AZServicePrincipal';
+                }
+            } else {
+                source = row.AppAdminOnPremID.toUpperCase();
+                if (controllerType === 'USER') {
+                    format[0] = 'User';
+                } else if (controllerType === 'GROUP') {
+                    format[0] = 'Group';
+                }
             }
-        } else {
-            source = row.AppAdminOnPremID.toUpperCase();
-            if (controllerType === 'USER') {
-                format[0] = 'User';
-            } else if (controllerType === 'GROUP') {
-                format[0] = 'Group';
-            }
-        }
 
-        insertNew(queries, format, {
-            source: source,
-            target: row.TargetAppID.toUpperCase(),
-        });
+            insertNew(queries, format, {
+                source: source,
+                target: row.TargetAppID.toUpperCase(),
+            });
+        } catch (e) {
+            console.log(e);
+            console.log(row);
+        }
     }
 
     return queries;
