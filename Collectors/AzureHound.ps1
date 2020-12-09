@@ -510,7 +510,7 @@ function Invoke-AzureHound {
         }
 
         $GroupID = $_.ObjectID
-        $Members = Get-AzureADGroupMember -ObjectId "$GroupID"
+        $Members = Get-AzureADGroupMember -All $True -ObjectId "$GroupID"
         
         ForEach ($Member in $Members) {
 
@@ -581,11 +581,15 @@ function Invoke-AzureHound {
                 If ($ControllerType -eq "User") {
                     $Controller = Get-AzureADUser -ObjectID $Role.ObjectID
                     $OnPremID = $Controller.OnPremisesSecurityIdentifier
-                } elseIf ($ControllerType -eq "Group") {
+                }
+                
+                If ($ControllerType -eq "Group") {
                     $Controller = Get-AzureADGroup -ObjectID $Role.ObjectID
                     $OnPremID = $Controller.OnPremisesSecurityIdentifier
-                } else {
-                    # e.g. ServicePrincipal
+                }
+				
+				If ($ControllerType -eq "ServicePrincipal") {
+                    $Controller = Get-AzureADServicePrincipal -ObjectID $Role.ObjectID
                     $OnPremID = $null
                 }
             
@@ -656,12 +660,11 @@ function Invoke-AzureHound {
                 If ($ControllerType -eq "User") {
                     $Controller = Get-AzureADUser -ObjectID $Role.ObjectID
                     $OnPremID = $Controller.OnPremisesSecurityIdentifier
-                } elseIf ($ControllerType -eq "Group") {
+                }
+                
+                If ($ControllerType -eq "Group") {
                     $Controller = Get-AzureADGroup -ObjectID $Role.ObjectID
                     $OnPremID = $Controller.OnPremisesSecurityIdentifier
-                } else {
-                    # e.g. ServicePrincipal
-                    $OnPremID = $null
                 }
 
                 $RGPrivilege = [PSCustomObject]@{
@@ -730,12 +733,11 @@ function Invoke-AzureHound {
                 If ($ControllerType -eq "User") {
                     $Controller = Get-AzureADUser -ObjectID $Role.ObjectID
                     $OnPremID = $Controller.OnPremisesSecurityIdentifier
-                } elseIf ($ControllerType -eq "Group") {
+                }
+                
+                If ($ControllerType -eq "Group") {
                     $Controller = Get-AzureADGroup -ObjectID $Role.ObjectID
                     $OnPremID = $Controller.OnPremisesSecurityIdentifier
-                } else {
-                    # e.g. ServicePrincipal
-                    $OnPremID = $null
                 }
 
                 $KVPrivilege = [PSCustomObject]@{
