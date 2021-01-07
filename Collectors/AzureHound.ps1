@@ -40,7 +40,7 @@ function Write-Info ($Message) {
 }
 
 function New-Output($Coll, $Type, $Directory) {
-    
+
     $Count = $Coll.Count
 
     Write-Host "Writing output for $($Type)"
@@ -48,15 +48,58 @@ function New-Output($Coll, $Type, $Directory) {
         $Coll = New-Object System.Collections.ArrayList
     }
 
-    $Output = New-Object PSObject
-    $Meta = New-Object PSObject
-    $Meta | Add-Member Noteproperty 'count' $Coll.Count
-    $Meta | Add-Member Noteproperty 'type' "az$($Type)"
-    $Meta | Add-Member Noteproperty 'version' 4
-    $Output | Add-Member Noteproperty 'meta' $Meta
-    $Output | Add-Member Noteproperty 'data' $Coll
-    $FileName = $Directory + "\" + $date + "-" + "az" + $($Type) + ".json"
-    $Output | ConvertTo-Json | Out-File -Encoding "utf8" -FilePath $FileName  
+    # ConvertTo-Json consumes too much memory on larger objects, which can have millions
+    # of entries in a large tenant. Write out the JSON structure a bit at a time to work
+    # around this. This is a bit inefficient, but makes this work when the tenant becomes
+    # too large.
+    $FileName = $Directory + [IO.Path]::DirectorySeparatorChar + $date + "-" + "az" + $($Type) + ".json"
+    try {
+        $Stream = [System.IO.StreamWriter]::new($FileName)
+
+        # Write file header JSON
+        $Stream.WriteLine('{')
+        $Stream.WriteLine("`t""meta"": {")
+        $Stream.WriteLine("`t`t""count"": $Count,")
+        $Stream.WriteLine("`t`t""type"": ""az$($Type)"",")
+        $Stream.WriteLine("`t`t""version"": 4")
+        $Stream.WriteLine("`t},")        
+
+        # Write data JSON
+        $Stream.WriteLine("`t""data"": [")
+        $Stream.Flush()
+
+        $chunksize = 250
+        $chunkarray = @()
+        $parts = [math]::Ceiling($coll.Count / $chunksize)
+
+        Write-Info "Chunking output in $chunksize item sections"
+        for($n=0; $n -lt $parts; $n++){
+            $start = $n * $chunksize
+            $end = (($n+1)*$chunksize)-1
+            $chunkarray += ,@($coll[$start..$end])
+        }
+        $Count = $chunkarray.Count
+
+        $chunkcounter = 1
+        $jsonout = ""
+        ForEach ($chunk in $chunkarray) {
+            Write-Info "Writing JSON chunk $chunkcounter/$Count"
+            $jsonout = ConvertTo-Json($chunk)
+            $jsonout = $jsonout.trimstart("[`r`n").trimend("`r`n]")
+            $Stream.Write($jsonout)
+            If ($chunkcounter -lt $Count) {
+                $Stream.WriteLine(",")
+            } Else {
+                $Stream.WriteLine("")
+            }
+            $Stream.Flush()
+            $chunkcounter += 1
+        }
+        $Stream.WriteLine("`t]")
+        $Stream.WriteLine("}")
+    } finally {
+        $Stream.close()
+    }
 }
 
 function Invoke-AzureHound {
@@ -1432,19 +1475,26 @@ function Invoke-AzureHound {
 
     Write-Host "Compressing files"
     $location = Get-Location
+    $name = $date + "-azurecollection"
     If($OutputDirectory.path -eq $location.path){
-        $name = $date + "-azurecollection"
-        $jsonpath = $OutputDirectory.Path + '\' + "*.json"
-        $destinationpath = $OutputDirectory.Path + '\' + "$name.zip"       
-        Compress-Archive $jsonpath -DestinationPath $destinationpath
-        rm $jsonpath
+        $jsonpath = $OutputDirectory.Path + [IO.Path]::DirectorySeparatorChar + "$date-*.json"
+        $destinationpath = $OutputDirectory.Path + [IO.Path]::DirectorySeparatorChar + "$name.zip"
     }
     else{
-        $name = $date + "-azurecollection"
-        $jsonpath = $OutputDirectory + '\' + "*.json"
-        $destinationpath = $OutputDirectory + '\' + "$name.zip"
-        Compress-Archive $jsonpath -DestinationPath $destinationpath
-        rm $jsonpath
+        $jsonpath = $OutputDirectory + [IO.Path]::DirectorySeparatorChar + "$date-*.json"
+        $destinationpath = $OutputDirectory + [IO.Path]::DirectorySeparatorChar + "$name.zip"
     }
-    Write-Host "Done! Drag and drop the zip into the BloodHound GUI to import data."
+
+    $error.Clear()
+    try {
+        Compress-Archive $jsonpath -DestinationPath $destinationpath
+    }
+    catch {
+        Write-Host "Zip file creation failed, JSON files may still be importable."
+    }
+    if (!$error) {
+        Write-Host "Zip file created: $destinationpath"
+        rm $jsonpath
+        Write-Host "Done! Drag and drop the zip into the BloodHound GUI to import data."
+    }
 }
