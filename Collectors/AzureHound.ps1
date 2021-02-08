@@ -34,27 +34,72 @@ function Get-AzureGraphToken
 
 $Verbose = $True
 function Write-Info ($Message) {
-    If ($Verbose -eq $True) {
+    If ($Verbose) {
         Write-Host $Message
     }
 }
 
 function New-Output($Coll, $Type, $Directory) {
-    
-    Write-Host "Writing output for $($Type)"
+
     $Count = $Coll.Count
-    if ($Count = $null) {
-        $Coll = @($Coll)
+
+    Write-Host "Writing output for $($Type)"
+	if ($null -eq $Coll) {
+        $Coll = New-Object System.Collections.ArrayList
     }
-    $Output = New-Object PSObject
-    $Meta = New-Object PSObject
-    $Meta | Add-Member Noteproperty 'count' $Coll.Count
-    $Meta | Add-Member Noteproperty 'type' "az$($Type)"
-    $Meta | Add-Member Noteproperty 'version' 4
-    $Output | Add-Member Noteproperty 'meta' $Meta
-    $Output | Add-Member Noteproperty 'data' $Coll
-    $FileName = $Directory + "\" + $date + "-" + "az" + $($Type) + ".json"
-    $Output | ConvertTo-Json | Out-File -Encoding "utf8" -FilePath $FileName  
+
+    # ConvertTo-Json consumes too much memory on larger objects, which can have millions
+    # of entries in a large tenant. Write out the JSON structure a bit at a time to work
+    # around this. This is a bit inefficient, but makes this work when the tenant becomes
+    # too large.
+    $FileName = $Directory + [IO.Path]::DirectorySeparatorChar + $date + "-" + "az" + $($Type) + ".json"
+    try {
+        $Stream = [System.IO.StreamWriter]::new($FileName)
+
+        # Write file header JSON
+        $Stream.WriteLine('{')
+        $Stream.WriteLine("`t""meta"": {")
+        $Stream.WriteLine("`t`t""count"": $Count,")
+        $Stream.WriteLine("`t`t""type"": ""az$($Type)"",")
+        $Stream.WriteLine("`t`t""version"": 4")
+        $Stream.WriteLine("`t},")        
+
+        # Write data JSON
+        $Stream.WriteLine("`t""data"": [")
+        $Stream.Flush()
+
+        $chunksize = 250
+        $chunkarray = @()
+        $parts = [math]::Ceiling($coll.Count / $chunksize)
+
+        Write-Info "Chunking output in $chunksize item sections"
+        for($n=0; $n -lt $parts; $n++){
+            $start = $n * $chunksize
+            $end = (($n+1)*$chunksize)-1
+            $chunkarray += ,@($coll[$start..$end])
+        }
+        $Count = $chunkarray.Count
+
+        $chunkcounter = 1
+        $jsonout = ""
+        ForEach ($chunk in $chunkarray) {
+            Write-Info "Writing JSON chunk $chunkcounter/$Count"
+            $jsonout = ConvertTo-Json($chunk)
+            $jsonout = $jsonout.trimstart("[`r`n").trimend("`r`n]")
+            $Stream.Write($jsonout)
+            If ($chunkcounter -lt $Count) {
+                $Stream.WriteLine(",")
+            } Else {
+                $Stream.WriteLine("")
+            }
+            $Stream.Flush()
+            $chunkcounter += 1
+        }
+        $Stream.WriteLine("`t]")
+        $Stream.WriteLine("}")
+    } finally {
+        $Stream.close()
+    }
 }
 
 function Invoke-AzureHound {
@@ -97,7 +142,7 @@ function Invoke-AzureHound {
 	}
 
     # Enumerate users
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     Write-Info "Building users object, this may take a few minutes."
 	$AADUsers = Get-AzureADUser -All $True | Select UserPrincipalName,OnPremisesSecurityIdentifier,ObjectID,TenantId
     $TotalCount = $AADUsers.Count
@@ -132,14 +177,14 @@ function Invoke-AzureHound {
             TenantID                        =   $CurrentUserTenantID
         }
         
-        $Coll += $CurrentUser
+        $null = $Coll.Add($CurrentUser)
     }
     New-Output -Coll $Coll -Type "users" -Directory $OutputDirectory
 
     # Enumerate groups
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     Write-Info "Building groups object, this may take a few minutes."
-    $AADGroups = Get-AzureADGroup -All $True | ?{$_.SecurityEnabled -Match "True"}
+    $AADGroups = Get-AzureADGroup -All $True -Filter "securityEnabled eq true"
     $TotalCount = $AADGroups.Count
     Write-Info "Done building groups object, processing ${TotalCount} groups"
     $Progress = 0
@@ -166,12 +211,12 @@ function Invoke-AzureHound {
             TenantID                       =  $TenantID
         }
         
-        $Coll += $CurrentGroup
+        $null = $Coll.Add($CurrentGroup)
     }
     New-Output -Coll $Coll -Type "groups" -Directory $OutputDirectory
     
     # Enumerate tenants:
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     Write-Info "Building tenant(s) object."
     $AADTenants = Get-AzureADTenantDetail
     $TotalCount = $AADTenants.Count
@@ -202,12 +247,12 @@ function Invoke-AzureHound {
             DisplayName = $Tenant.DisplayName
         }
 
-        $Coll += $Current
+        $null = $Coll.Add($Current)
     }
     New-Output -Coll $Coll -Type "tenants" -Directory $OutputDirectory
 
     # Enumerate subscriptions:
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     Write-Info "Building subscription(s) object."
     $AADSubscriptions = Get-AzSubscription
     $TotalCount = $AADSubscriptions.Count
@@ -239,12 +284,12 @@ function Invoke-AzureHound {
             TenantId        = $Subscription.TenantId
         }
 
-        $Coll += $Current
+        $null = $Coll.Add($Current)
     }
     New-Output -Coll $Coll -Type "subscriptions" -Directory $OutputDirectory
     
     # Enumerate resource groups:
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     $AADSubscriptions | ForEach-Object {
 
         $SubDisplayName = $_.Name
@@ -285,13 +330,13 @@ function Invoke-AzureHound {
                 ResourceGroupID     = $RG.ResourceId
             }
         
-            $Coll += $ResourceGroup
+            $null = $Coll.Add($ResourceGroup)
         }
     }
 
     New-Output -Coll $Coll -Type "resourcegroups" -Directory $OutputDirectory
 
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     # Get VMs
     $AADSubscriptions | ForEach-Object {
 
@@ -338,13 +383,13 @@ function Invoke-AzureHound {
                 ResourceGroupID = $RGID
             }
 
-            $Coll += $AzVM
+            $null = $Coll.Add($AzVM)
         
         }
     }
     New-Output -Coll $Coll -Type "vms" -Directory $OutputDirectory
     
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     # Get KeyVaults
     $AADSubscriptions | ForEach-Object {
 
@@ -392,12 +437,12 @@ function Invoke-AzureHound {
                 ResourceGroupID     = $RGID
             }
         
-            $Coll += $AzKeyVault
+            $null = $Coll.Add($AzKeyVault)
         }
     }
     New-Output -Coll $Coll -Type "keyvaults" -Directory $OutputDirectory
     
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     # Get devices and their owners
     Write-Info "Building devices object."
     $AADDevices =  Get-AzureADDevice | ?{$_.DeviceOSType -Match "Windows" -Or $_.DeviceOSType -Match "Mac"}
@@ -432,16 +477,16 @@ function Invoke-AzureHound {
             OwnerOnPremID       = $Owner.OnPremisesSecurityIdentifier
         }
 
-        $Coll += $AzureDeviceOwner
+        $null = $Coll.Add($AzureDeviceOwner)
     }
     New-Output -Coll $Coll -Type "devices" -Directory $OutputDirectory
     
     # Enumerate group owners
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     Write-Info "Checking if groups object is already built..."
     If ($AADGroups.Count -eq 0) {
         Write-Info "Creating groups object, this may take a few minutes."
-        $AADGroups = Get-AzureADGroup -All $True | ?{$_.SecurityEnabled -Match "True"}
+        $AADGroups = Get-AzureADGroup -All $True -Filter "securityEnabled eq true"
     }
     $TargetGroups = $AADGroups | ?{$_.OnPremisesSecurityIdentifier -eq $null}
     $TotalCount = $TargetGroups.Count
@@ -476,17 +521,17 @@ function Invoke-AzureHound {
                 OwnerType       = $Owner.ObjectType
                 OwnerOnPremID   = $Owner.OnPremisesSecurityIdentifier
             }
-            $Coll += $AZGroupOwner   
+            $null = $Coll.Add($AZGroupOwner)   
         }   
     }
     New-Output -Coll $Coll -Type "groupowners" -Directory $OutputDirectory
 
     # Enumerate group members
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     Write-Info "Checking if groups object is already built..."
     If ($AADGroups.Count -eq 0) {
         Write-Info "Creating groups object, this may take a few minutes."
-        $AADGroups = Get-AzureADGroup -All $True | ?{$_.SecurityEnabled -Match "True"}
+        $AADGroups = Get-AzureADGroup -All $True -Filter "securityEnabled eq true"
     }
     $TotalCount = $AADGroups.Count
     Write-Info "Done building groups object, processing ${TotalCount} groups"
@@ -508,7 +553,7 @@ function Invoke-AzureHound {
         }
 
         $GroupID = $_.ObjectID
-        $Members = Get-AzureADGroupMember -ObjectId "$GroupID"
+        $Members = Get-AzureADGroupMember -All $True -ObjectId "$GroupID"
         
         ForEach ($Member in $Members) {
 
@@ -521,7 +566,7 @@ function Invoke-AzureHound {
                 MemberType = $Member.ObjectType
                 MemberOnPremID = $Member.OnPremisesSecurityIdentifier
             }
-            $Coll += $AZGroupMember
+            $null = $Coll.Add($AZGroupMember)
         }
     }
     New-Output -Coll $Coll -Type "groupmembers" -Directory $OutputDirectory
@@ -534,7 +579,7 @@ function Invoke-AzureHound {
     # User Access Administrator     18d7d88d-d35e-4fb5-a5c3-7773c20a72d9
     # Avere Contributor             4f8fab4f-1852-4a58-a46a-8eaf358af14a
     # Virtual Machine Contributor   9980e02c-c2be-4d73-94e8-173b1dc7cf3c
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     $AADSubscriptions | ForEach-Object {
 
         $SubDisplayName = $_.Name
@@ -603,7 +648,7 @@ function Invoke-AzureHound {
                     RoleDefinitionId    = $Role.RoleDefinitionId
                 }
                 
-                $Coll += $VMPrivilege
+                $null = $Coll.Add($VMPrivilege)
             }
         }
     }
@@ -614,7 +659,7 @@ function Invoke-AzureHound {
     # ------------------            ----------------
     # Owner                         8e3af657-a8ff-443c-a75c-2fe8c4bcb635
     # User Access Administrator     18d7d88d-d35e-4fb5-a5c3-7773c20a72d9
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     $AADSubscriptions | ForEach-Object {
 
         $SubDisplayName = $_.Name
@@ -674,7 +719,7 @@ function Invoke-AzureHound {
                     RoleName = $Role.RoleDefinitionName
                     RoleDefinitionId = $Role.RoleDefinitionId
                 } 
-                $Coll += $RGPrivilege
+                $null = $Coll.Add($RGPrivilege)
             }
         }
     }
@@ -687,7 +732,7 @@ function Invoke-AzureHound {
     # Owner                         8e3af657-a8ff-443c-a75c-2fe8c4bcb635
     # User Access Administrator     18d7d88d-d35e-4fb5-a5c3-7773c20a72d9
     # Key Vaults
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     $AADSubscriptions | ForEach-Object {
 
         $SubDisplayName = $_.Name
@@ -747,7 +792,7 @@ function Invoke-AzureHound {
                     RoleName = $Role.RoleDefinitionName
                     RoleDefinitionId = $Role.RoleDefinitionId
                 }
-                $Coll += $KVPrivilege
+                $null = $Coll.Add($KVPrivilege)
             }
         }
     }
@@ -1236,7 +1281,7 @@ function Invoke-AzureHound {
     # Privilege role administrator
     # Can add role assignments to any other user including themselves
     Write-Info "Processing Privileged Role Admin role"
-    $PrivRoleColl = @()
+    $PrivRoleColl = New-Object System.Collections.ArrayList
     $PrivilegedRoleAdmins = $UserRoles | ? { $_.RoleID -Contains 'e8611ab8-c189-46e8-94e1-60213ab1f814' }
     $PrivilegedRoleAdminRights = ForEach ($User in $PrivilegedRoleAdmins) { 
 
@@ -1248,40 +1293,40 @@ function Invoke-AzureHound {
             TenantDisplayName   = $TenantDetails.DisplayName
             TenantID            = $TenantDetails.ObjectID
         }
-        $PrivRoleColl += $PrivilegedRoleAdminRight
+        $null = $PrivRoleColl.Add($PrivilegedRoleAdminRight)
     }
     Write-Info "Done processing Privileged Role Admin role"
     
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     $PrivilegedAuthenticationAdminRights | ForEach-Object {
-        $Coll += $_
+        $null = $Coll.Add($_)
     }
     $AuthAdminsRights | ForEach-Object {
-        $Coll += $_
+        $null = $Coll.Add($_)
     }
     $HelpdeskAdminsRights | ForEach-Object {
-        $Coll += $_
+        $null = $Coll.Add($_)
     }
     $PasswordAdminsRights | ForEach-Object {
-        $Coll += $_
+        $null = $Coll.Add($_)
     }
     $UserAccountAdminsRights | ForEach-Object {
-        $Coll += $_
+        $null = $Coll.Add($_)
     }
     New-Output -Coll $Coll -Type "pwresetrights" -Directory $OutputDirectory  
 
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     $IntuneAdminsRights | ForEach-Object {
-        $Coll += $_
+        $null = $Coll.Add($_)
     }
     $GroupsAdminsRights | ForEach-Object {
-        $Coll += $_
+        $null = $Coll.Add($_)
     }
     New-Output -Coll $Coll -Type "groupsrights" -Directory $OutputDirectory
     New-Output -Coll $GlobalAdminsRights -Type "globaladminrights" -Directory $OutputDirectory
     New-Output -Coll $PrivRoleColl -Type "privroleadminrights" -Directory $OutputDirectory
 
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     # Get app owners
 	Write-Info "Processing application owners"
     Get-AzureADApplication -All $True | ForEach-Object {
@@ -1303,13 +1348,13 @@ function Invoke-AzureHound {
             OwnerOnPremID   = $Owner.OnPremisesSecurityIdentifier
         }
 
-        $Coll += $AzureAppOwner
+        $null = $Coll.Add($AzureAppOwner)
     }
     }
     New-Output -Coll $Coll -Type "applicationowners" -Directory $OutputDirectory
 	Write-Info "Done processing application owners"
 
-   $Coll = @()
+   $Coll = New-Object System.Collections.ArrayList
    Write-Info "Processing application to service principal relations"
    $SPOS = Get-AzADApplication | Get-AzADServicePrincipal | %{
 
@@ -1320,7 +1365,7 @@ function Invoke-AzureHound {
         ServicePrincipalType    = $_.ObjectType
     }
 
-    $Coll += $ServicePrincipals
+    $null = $Coll.Add($ServicePrincipals)
 
     }
     New-Output -Coll $Coll -Type "applicationtosp" -Directory $OutputDirectory
@@ -1343,7 +1388,7 @@ function Invoke-AzureHound {
    
     $SPswithoutRoles = $SPOS | Where-Object {$_.ServicePrincipalID -notin $PrincipalRoles.SPId}
 
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
 	Write-Info "Processing Application Admins"
     # Application Admins - Can create new secrets for application service principals
     # Write to appadmins.json
@@ -1366,7 +1411,7 @@ function Invoke-AzureHound {
                 TargetAppID         = $TargetApp.AppID
             }
             
-            $Coll += $AppRight
+            $null = $Coll.Add($AppRight)
             
         }
         
@@ -1379,7 +1424,7 @@ function Invoke-AzureHound {
                 TargetAppID         = $TargetApp.AppID
             }
             
-            $Coll += $AppRight
+            $null = $Coll.Add($AppRight)
 
         }
     }
@@ -1389,7 +1434,7 @@ function Invoke-AzureHound {
     # Cloud Application Admins - Can create new secrets for application service principals
     # Write to cloudappadmins.json
 	Write-Info "Processing Cloud Application Admins"
-    $Coll = @()
+    $Coll = New-Object System.Collections.ArrayList
     $CloudAppAdmins = $UserRoles | Where-Object {$_.RoleID -match '158c047a-c907-4556-b7ef-446551a6b5f7'}
     $SPsWithAzureAppAdminRole = $UserRoles | Where-Object {$_.RoleID -match '158c047a-c907-4556-b7ef-446551a6b5f7' -and $_.UserType -match 'serviceprincipal' }
     $AppsWithAppAdminRole = ForEach ($SP in $SPsWithAzureAppAdminRole) {
@@ -1409,7 +1454,7 @@ function Invoke-AzureHound {
                 TargetAppID         = $TargetApp.AppID
             }
             
-            $Coll += $AppRight
+            $null = $Coll.Add($AppRight)
             
         }
         
@@ -1422,7 +1467,7 @@ function Invoke-AzureHound {
                 TargetAppID         = $TargetApp.AppID
             }
             
-            $Coll += $AppRight
+            $null = $Coll.Add($AppRight)
         }
     }
     New-Output -Coll $Coll -Type "cloudappadmins" -Directory $OutputDirectory
@@ -1430,19 +1475,26 @@ function Invoke-AzureHound {
 
     Write-Host "Compressing files"
     $location = Get-Location
+    $name = $date + "-azurecollection"
     If($OutputDirectory.path -eq $location.path){
-        $name = $date + "-azurecollection"
-        $jsonpath = $OutputDirectory.Path + '\' + "*.json"
-        $destinationpath = $OutputDirectory.Path + '\' + "$name.zip"       
-        Compress-Archive $jsonpath -DestinationPath $destinationpath
-        rm $jsonpath
+        $jsonpath = $OutputDirectory.Path + [IO.Path]::DirectorySeparatorChar + "$date-*.json"
+        $destinationpath = $OutputDirectory.Path + [IO.Path]::DirectorySeparatorChar + "$name.zip"
     }
     else{
-        $name = $date + "-azurecollection"
-        $jsonpath = $OutputDirectory + '\' + "*.json"
-        $destinationpath = $OutputDirectory + '\' + "$name.zip"
-        Compress-Archive $jsonpath -DestinationPath $destinationpath
-        rm $jsonpath
+        $jsonpath = $OutputDirectory + [IO.Path]::DirectorySeparatorChar + "$date-*.json"
+        $destinationpath = $OutputDirectory + [IO.Path]::DirectorySeparatorChar + "$name.zip"
     }
-    Write-Host "Done! Drag and drop the zip into the BloodHound GUI to import data."
+
+    $error.Clear()
+    try {
+        Compress-Archive $jsonpath -DestinationPath $destinationpath
+    }
+    catch {
+        Write-Host "Zip file creation failed, JSON files may still be importable."
+    }
+    if (!$error) {
+        Write-Host "Zip file created: $destinationpath"
+        rm $jsonpath
+        Write-Host "Done! Drag and drop the zip into the BloodHound GUI to import data."
+    }
 }

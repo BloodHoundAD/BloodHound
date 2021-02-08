@@ -66,6 +66,10 @@ const SearchRow = ({ item, search }) => {
         case 'AZServicePrincipal':
             icon.className = 'fa fa-robot';
             break;
+        default:
+            icon.className = 'fa fa-question';
+            type = 'Unknown';
+            break;
     }
 
     icon.style = { color: appStore.highResPalette.iconScheme[type].color };
