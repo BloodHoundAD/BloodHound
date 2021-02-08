@@ -50,12 +50,12 @@ export function buildSearchQuery(searchterm) {
         let [type, term] = searchterm.split(':');
         type = getRealLabel(type);
 
-        let statement = `MATCH (n:${type}) WHERE n.name CONTAINS $name OR n.objectid CONTAINS $name RETURN n LIMIT 10`;
+        let statement = `MATCH (n:${type}) WHERE n.name = $name RETURN n LIMIT 10 UNION MATCH (n:${type}) WHERE n.name CONTAINS $name OR n.objectid CONTAINS $name RETURN n LIMIT 10`;
 
         return [statement, term.toUpperCase()];
     } else {
         return [
-            'MATCH (n:Base) WHERE n.name CONTAINS $name OR n.objectid CONTAINS $name RETURN n LIMIT 10',
+            'MATCH (n:Base) WHERE n.name = $name RETURN n LIMIT 10 UNION MATCH (n) WHERE n.name CONTAINS $name OR n.objectid CONTAINS $name RETURN n LIMIT 10',
             searchterm.toUpperCase(),
         ];
     }
