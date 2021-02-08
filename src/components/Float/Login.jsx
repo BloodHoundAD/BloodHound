@@ -281,7 +281,7 @@ const Login = () => {
     };
 
     const triggerLogin = (event) => {
-        let key = event.keyCode ? event.KeyCode : event.which;
+        let key = event.keyCode;
 
         if (key === 13) {
             checkDatabaseCreds();
