@@ -320,7 +320,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query": "MATCH (c:Computer)-[:MemberOf]->(t:Group) WHERE NOT t.name STARTS WITH 'DOMAIN CONTROLLERS' WITH c as NonDC MATCH p=(NonDC)-[:HasSession]->(n:User)-[:MemberOf]-> (g:Group) WHERE g.name STARTS WITH 'DOMAIN ADMINS' RETURN p",
+                    "query": "MATCH (c:Computer)-[:MemberOf]->(t:Group) WHERE NOT t.name STARTS WITH 'DOMAIN CONTROLLERS' WITH c as NonDC MATCH p=(NonDC)-[:HasSession]->(n:User)-[:MemberOf]-> (g:Group) WHERE g.objectid ENDS WITH '-512' RETURN p",
                     "allowCollapse": true
                 }
             ]
