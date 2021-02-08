@@ -211,6 +211,21 @@
             ]
         },
         {
+            "name": "Find Computers where Domain Users can read LAPS passwords",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain Users Group...",
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
+                },
+                {
+                    "final": true,
+                    "query": "MATCH p=(Group {name:$result})-[:MemberOf*0..]->(g:Group)-[:AllExtendedRights|ReadLAPSPassword]->(n:Computer) RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
             "name": "Shortest Paths from Domain Users to High Value Targets",
             "queryList": [
                 {
