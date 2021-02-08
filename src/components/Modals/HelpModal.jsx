@@ -114,7 +114,6 @@ const HelpModal = () => {
         AZResetPassword: AZResetPassword,
         AZUserAccessAdministrator: AZUserAccessAdministrator,
         AZGlobalAdmin: AZGlobalAdmin,
-        AZUserAccessAdministrator: AZUserAccessAdministrator,
         AZAppAdmin: AZAppAdmin,
         AZCloudAppAdmin: AZCloudAppAdmin,
         AZRunsAs: AZRunsAs,
