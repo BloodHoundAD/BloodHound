@@ -46,7 +46,7 @@ export default class ZoomContainer extends Component {
                                 : 'btn menu-button-light'
                         }
                     >
-                        <span className='fa fa-ban' style={{ width: 11 }} />
+                        <span className='fa fa-home' style={{ width: 13 }} />
                     </button>
                 </div>
                 <div>

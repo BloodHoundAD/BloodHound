@@ -211,6 +211,21 @@
             ]
         },
         {
+            "name": "Find Computers where Domain Users can read LAPS passwords",
+            "queryList": [
+                {
+                    "final": false,
+                    "title": "Select a Domain Users Group...",
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
+                },
+                {
+                    "final": true,
+                    "query": "MATCH p=(Group {name:$result})-[:MemberOf*0..]->(g:Group)-[:AllExtendedRights|ReadLAPSPassword]->(n:Computer) RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
             "name": "Shortest Paths from Domain Users to High Value Targets",
             "queryList": [
                 {
@@ -320,7 +335,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query": "MATCH (dc:Computer)-[:MemberOf*1..]->(g:Group) WHERE g.name CONTAINS \"DOMAIN CONTROLLERS\" WITH COLLECT(dc.name) as dcs MATCH (c:Computer) WHERE NOT c.name in dcs MATCH p=(c)-[:HasSession]->(n:User)-[:MemberOf]->(g:Group)  WHERE g.name STARTS WITH \"DOMAIN ADMINS\"  RETURN p",
+                    "query": "MATCH (dc)-[r:MemberOf*0..]->(g:Group) WHERE g.objectid ENDS WITH '-516' WITH COLLECT(dc) AS exclude MATCH p = (c:Computer)-[n:HasSession]->(u:User)-[r2:MemberOf*1..]->(g:Group) WHERE  g.objectid ENDS WITH '-512' AND NOT c IN exclude RETURN p",
                     "allowCollapse": true
                 }
             ]

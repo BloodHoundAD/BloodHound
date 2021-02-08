@@ -11,4 +11,6 @@ export const AppContext = React.createContext({
     setEdgeLabels: () => {},
     nodeLabels: 0,
     setNodeLabels: () => {},
+    edgeIncluded: {},
+    setEdgeIncluded: () => {},
 });

@@ -1,6 +1,6 @@
 {
     "name": "bloodhound",
-    "version": "3.0.5",
+    "version": "4.0.1",
     "description": "Graph Theory for Active Directory",
     "prettier": {
         "tabWidth": 4,
@@ -23,7 +23,8 @@
     "author": "Rohan Vazarkar <rvazarkr@gmail.com> (https://blog.cptjesus.com)",
     "contributors": [
         "Andy Robbins <robbins.andy@gmail.com> (https://www.wald0.com)",
-        "Will Schroeder <will@harmj0y.net> (https://www.harmj0y.net)"
+        "Will Schroeder <will@harmj0y.net> (https://www.harmj0y.net)",
+        "Ryan Hausknecht (https://hausec.com/)"
     ],
     "main": "main.js",
     "scripts": {
@@ -54,7 +55,7 @@
         "electron-packager": "^15.0.0",
         "express": "^4.16.2",
         "style-loader": "^1.2.1",
-        "webpack": "^4.43.0",
+        "webpack": "^4.44.1",
         "webpack-cli": "^3.3.12",
         "webpack-dev-middleware": "^3.7.2",
         "webpack-hot-middleware": "^2.25.0"
@@ -62,9 +63,9 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.14.0",
         "async": "^2.6.3",
-        "bootstrap": "^3.3.7",
+        "bootstrap": "^3.4.1",
         "clsx": "^1.1.1",
-        "dagre": "^0.7.4",
+        "dagre": "^0.8.5",
         "electron-store": "^1.3.0",
         "eventemitter2": "^6.4.3",
         "fontfaceobserver": "^2.0.13",
@@ -83,8 +84,8 @@
         "react": "^16.13.1",
         "react-alert": "^5.5.0",
         "react-alert-template-basic": "^1.0.0",
-        "react-bootstrap": "^0.32.4",
-        "react-bootstrap-typeahead": "^3.4.7",
+        "react-bootstrap": "^0.33.1",
+        "react-bootstrap-typeahead": "^4.2.3",
         "react-dom": "^16.13.1",
         "react-draggable": "^4.4.3",
         "react-if": "^3.4.3",
@@ -92,7 +93,8 @@
         "react-photo-gallery": "^8.0.0",
         "react-transition-group": "^4.4.1",
         "sanitize-filename": "^1.6.3",
-        "stream-json": "^1.7.0",
+        "stream-chain": "^2.2.3",
+        "stream-json": "^1.7.1",
         "unzipper": "^0.10.11",
         "uuid": "^3.4.0"
     }

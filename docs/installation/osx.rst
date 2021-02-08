@@ -57,4 +57,4 @@ Build BloodHound with `npm run macbuild`:
 
 ::
 
-   $ npm run winbuild
+   $ npm run macbuild

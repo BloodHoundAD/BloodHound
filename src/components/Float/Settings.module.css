@@ -9,44 +9,130 @@
 
 .container :global {
     position: absolute;
-    z-index: 20;
-    top: 1em;
-    right: 10em;
-    overflow: auto;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    box-shadow: 0 5px 15px 0 black;
 }
 
 .container :global .panel {
     margin-bottom: 0;
+    border: none;
+    overflow: hidden;
 }
 
 .container :global .panel-heading {
-    cursor: move;
+    border: none;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
 }
 
 .dark :global .panel-heading {
-    background: black;
+    background: #444b55;
+    font-family: Helvetica;
+    font-size: 20px;
+    font-weight: 400;
     color: white;
 }
 
 .dark :global .panel-body {
-    background: black;
+    background: #151d29;
     color: white;
 }
 
 .dark :global button.close {
     opacity: 1;
-    background-color: black;
+    background-color: 151d29;
     color: white;
 }
 
 .dark :global select {
-    background-color: black;
+    background-color: #444b55;
+    font-family: Helvetica;
     color: white;
+    border: none;
 }
 
 .dark :global input {
-    background-color: black;
+    background-color: #444b55;
+    font-family: Helvetica;
+    font-weight: 400;
     color: white;
+    border: none;
+}
+
+label {
+    font-family: Helvetica;
+    font-weight: 400 !important;
+}
+
+/* Below adapted from https://stackoverflow.com/a/24465732 */
+
+#slider {
+    width: 400px;
+    height: 17px;
+    position: relative;
+    margin: 100px auto;
+    background: white;
+}
+
+#slider .bar {
+    width: 388px;
+    height: 5px;
+    background: #333;
+    position: relative;
+    top: 1px;
+    left: 1px;
+}
+
+#slider .highlight {
+    height: 2px;
+    position: absolute;
+    width: 388px;
+    top: 6px;
+    left: 6px;
+
+    -webkit-border-radius: 40px;
+    -moz-border-radius: 40px;
+    border-radius: 40px;
+
+    background: rgba(255, 255, 255, 0.25);
+}
+
+input[type='range'] {
+    -webkit-appearance: none;
+    background-color: #444b55;
+    height: 5px;
+    padding: 0px 0px;
+}
+
+input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    position: relative;
+    top: 0px;
+    z-index: 1;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    -webkit-border-radius: 40px;
+    -moz-border-radius: 40px;
+    border-radius: 40px;
+    background-color: #4f80a1;
+}
+
+input[type='range']:hover ~ #rangevalue,
+input[type='range']:active ~ #rangevalue {
+    -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=100)';
+    filter: alpha(opacity=100);
+    opacity: 1;
+    top: -75px;
+}
+
+input[type='range']:focus {
+    outline: none;
+}
+
+.slider {
+    top: 11px;
 }

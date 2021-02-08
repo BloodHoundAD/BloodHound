@@ -55,7 +55,7 @@ Node Properties
 * **AdminCount**: Whether the user object in Active Directory currently,
   or possibly ever has belonged to a certain set of highly privileged
   groups. This property is related to the AdminSDHolder object and the
-  SDProp process. Read about that here: https://adsecurity.org/?p=2053
+  SDProp process. Read about that here: https://adsecurity.org/?p=1906
 * **Compromised**: Whether the user is marked as Owned. You can mark any
   user in the BloodHound GUI as Owned by right-clicking it and clicking
   "Mark User as Owned".
@@ -609,3 +609,292 @@ Descendant Objects
 * **Total Computer Objects**: The number of computer objects under this OU
 * **Sibling Objects within OU**: The total number of other objects that belong to the same OU
   this OU belongs to
+
+AZTenant
+^^^^^^^
+At the top of the node info tab you will see the following info:
+
+* **TENANT NAME**: The name of the tenant in Azure.
+
+Node Properties
+--------------
+* **Object ID**: The tenant ID for the tenant.
+
+Extra Properties
+--------------
+* **Object ID**: The tenant ID for the tenant.
+
+Descendant Objects
+--------------
+* **Subscriptions**: The subscriptions that fall under the tenant
+* **Total VM Objects**: The virtual machine resources in Azure resources
+* **Total Resource Group Objects**: The resource groups contained within the subscriptions under the tenant
+* **Total Key Vault Objects**: The key vault resources within Azure resources
+* **Total User Objects**: The number of users in AzureAD
+* **Total Group Objects**: The number of groups in AzureAD
+
+Inbound Control
+---------------
+* **Global Admins**: Principals with the Global Admin role activated against this tenant
+* **Privileged Role Admins**: Principlas with the Privileged Role Admin role activated against this tenant
+* **Transitive Object Controllers**: Principals with an object-control attack path to the tenant
+
+AZUser
+^^^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **USERNAME@DOMAIN.COM**: the fully formatted name of the user, directly from Azure.
+
+Overview
+--------------
+
+* **Sessions**: The count of computers this user has been observed
+  logging onto. Click this number to visually see the connections
+  between those computers and this user.
+* **Reachable High Value Targets**: The count of how many high value
+  targets this user has an attack path to. A high value target is by
+  default any computer or user that belongs to the domain admins,
+  domain controllers, and several other high privilege Active Directory
+  groups. Click this number to see the shortest attack paths from this user
+  to those high value targets.
+
+Node Properties
+---------------
+
+* **Object ID**: The user's object ID in AzureAD.
+
+Group Membership
+----------------
+
+This section displays stats about Active Directory security groups the user
+belongs to:
+
+* **First Degree Group Memberships**:  The AzureAD security groups the user is
+  directly added to. 
+* **Unrolled Group Membership**: Groups that can be added to groups in AzureAD.
+
+Outbound Object Control
+-----------------------
+
+* **First Degree Object Control**: The number of objects where this user has direct control of in AzureAD and Azure resources.
+* **Group Delegated Object Control**: The number of objects in AzureAD and Azure resources where the group the user is assigned to has direct control over.
+* **Transitive Object Control**: The number of objects this user can gain control
+  of by performing ACL-only based attacks in Active Directory. In other words,
+  the maximum number of objects the user can gain control of without needing
+  to pivot to any other system in the network, just by manipulating objects
+  in the directory
+
+Inbound Object Control
+----------------------
+
+* **Explicit Object Controllers**: The number of principals that have direct control of  this user.
+* **Unrolled Object Controllers**: The number of principals that have
+  control of this object through Azure group delegation. 
+* **Transitive Object Controllers**: The number of objects in AD that can achieve
+  control of this object through ACL-based attacks
+
+AZGroup
+^^^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **GROUPNAME**: The name of the AzureAD Group.
+
+Overview
+------------
+* **Sessions**: The number of on-premise computers that users belonging to this group have
+  been seen logging onto. This will include users that belong to this group through
+  any number of nested memberships. Very useful for targetting users that belong
+  to a particular security group
+* **Reachable High Value Targets**: The count of how many high value targets this
+  group (and therefore the users belonging to this group) has an attack path to.
+  A high value target is by default any computer or user that belongs to the domain
+  admins, domain controllers, and several other high privilege on-premise Active Directory
+  groups. Click this number to see the shortest attack paths from this user to
+  those high value targets.
+
+Node Properties
+---------------
+
+* **Object ID**: The group’s objectID in AzureAD
+
+Extra Properties
+---------------
+
+* **Object ID**: The group’s objectID in AzureAD
+
+Group Members
+-------------
+
+* **Direct Members**: The number of principals that have been directly added to
+  this in AzureAD. 
+* **Unrolled Members**: The actual number of users that effectively belong to
+  this group, no matter how many layers of nested group membership that goes
+* **On-Prem Members**: The number of users that contain an on-premise SID that are members of the group.
+
+Group Membership
+----------------
+
+* **First Degree Group Membership**: The number of groups this group has been
+  added to
+* **Unrolled Member Of**: The number of groups this group belongs to through
+  nested group memberships
+
+Outbound Object Control
+-----------------------
+
+* **First Degree Object Control**: In AzureAD, the number of objects where this group has direct control of. 
+* **Group Delegated Object Control**: The number of objects where this
+  group has control via security group delegation, regardless of how deep those
+  group nestings may go.
+* **Transitive Object Control**: The number of objects this group can gain control through an object-control abuse attack path.
+
+Inbound Object Control
+----------------------
+
+* **Explicit Object Controllers**: In AzureAD, the number of principals that have direct control of this group. 
+* **Unrolled Object Controllers**: The *actual* number of principals that have
+  control of this group through security group delegation. This number can
+  sometimes be wildly higher than the previous number
+* **Transitive Object Controllers**: The number of objects that can assume control of this group through an object-control attack path.
+
+AZApp
+^^^^^
+At the top of the node info tab you will see the following info:
+
+* **APPID**: The application ID of the application in AzureAD. 
+
+Inbound Object Control
+------------------------------
+* **Explicit Object Controllers**: The principals in AzureAD that are part of a role which can directly control the application. 
+* **Unrolled Object Controllers**: The number of principals that can control the application through group membership and the roles applied to that group.
+* **Transitive Object Controllers**: The number of objects in AzureAD that can achieve control of this object through an object-control attack path.
+
+AZSubscription
+^^^^^^^^^^^^^^^
+At the top of the node info tab you will see the following info:
+
+* **See Subscription Under Tenant**: See where the subscription lives relative to the tenant it trusts.
+
+Node Properties
+---------------
+
+* **Object ID**: The Azure objectid for the resource group.
+
+Descendent Objects
+----------------
+
+* **Total VM Objects**: The VMs in Azure that belong to the subscription
+* **Total Resource Group Objects**: The resource groups that belong to the subscription
+* **Total Key Vault Objects**: The Key vaults in Azure that belong to the subscription
+
+AZResourceGroup
+^^^^^^^^^^^^^^^
+At the top of the node info tab you will see the following info:
+
+* **RESOURCEGROUPNAME**: The full name of the resource group.
+
+Node Properties
+---------------
+
+* **Object ID**: The Azure objectid for the resource group.
+
+Descendent Objects
+----------------
+
+* **Descendent VMs**: The VMs in Azure that belong to the resource group
+* **Descendent KeyVaults**: The Key vaults in Azure that belong to the resource group
+
+Inbound Object Control
+------------------------------
+* **Explicit Object Controllers**: The principals in AzureAD that directly can control the resource group.
+* **Unrolled Object Controllers**: The number of principals that can control the resource group through group membership.
+* **Transitive Object Controllers**: The number of objects in AzureAD that can achieve control of this object through object-control attack paths.
+
+AZVM
+^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **COMPUTERNAME**: The full name of the VM
+
+Overview
+------------
+* **See VM within Tenant**: Unrolls the VM membership within Azure, displaying the VM’s resource group & subscription.
+
+Node Properties
+---------------
+
+* **Object ID**: The Azure objectid for the VM.
+
+Extra Properties
+----------------
+
+* **Object ID**: The Azure objectid for the computer.
+
+Inbound Execution Privileges
+----------------------------
+
+* **First Degree Execution Rights**: Principals that have the ability to execute commands or directly log onto the machine.
+* **Group Delegated Execution Rights**: Groups that have the ability to execute commands or directly log onto the machine.
+
+Inbound Object Control
+----------------------
+
+* **Explicit Object Controllers**: The number of principals that are in a role that has the ability to manage or execute code on the machine.
+* **Unrolled Object Controllers**: The actual number of principals that have control of this
+  object through security group delegation. This number can sometimes be wildly higher than
+  the previous number
+* **Transitive Object Controllers**: The number of objects in AzureAD that can achieve control of this object through object-control attack paths.
+
+AZDevice
+^^^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **DEVICENAME**: The full name of the device
+
+Node Properties
+---------------
+
+* **Object ID**: The Azure objectid for the device.
+
+Inbound Execution Privileges
+----------------------------
+
+* **Owners**: Principals that have the ability to execute commands or directly log onto the machine.
+* **InTune Admins**: Principals that have the ability to setup InTune scripts to run on the machine.
+
+AZServicePrincipal
+^^^^^^^^^^^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **ObjectID**: The object ID of the service principal in AzureAD.
+
+Group Membership
+----------------
+
+This section displays stats about Active Directory security groups the user
+belongs to:
+
+* **First Degree Group Memberships**:  The AzureAD security groups the service principal is
+  directly added to. 
+* **Unrolled Group Membership**: Groups that are added to groups in AzureAD.
+
+Outbound Object Control
+-----------------------
+
+* **First Degree Object Control**: The number of objects where this service principal has direct control of in AzureAD and Azure resources.
+* **Group Delegated Object Control**: The number of objects in AzureAD and Azure resources where the group the service principal is assigned to has direct control over.
+* **Transitive Object Control**: The number of objects this service principal can gain control of by performing object-control attack paths
+
+Inbound Object Control
+----------------------
+
+* **Explicit Object Controllers**: The number of principals that have direct control of this service principal.
+* **Unrolled Object Controllers**: The number of principals that have
+  control of this object through Azure group delegation.
+* **Transitive Object Controllers**: The number of objects in AD that can achieve
+  control of this object through object-control attack paths

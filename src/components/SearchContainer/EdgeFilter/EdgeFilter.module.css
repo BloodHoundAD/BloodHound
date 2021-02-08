@@ -1,0 +1,72 @@
+.edgeFilter {
+    position: absolute;
+    left: 100%;
+    display: inline-block;
+    width: auto;
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
+    margin-left: 2px;
+    overflow: hidden;
+}
+
+.edgeFilter h4 {
+    display: inline-block;
+    white-space: nowrap;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.edgeFilter h3 {
+    white-space: nowrap;
+    margin: 0;
+}
+
+.dark {
+    background-color: #444b55;
+    color: white;
+}
+
+.dark button {
+    background-color: #444b55;
+}
+
+.light {
+    background-color: white;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-left: 8px;
+    margin-right: 8px;
+    white-space: nowrap;
+    column-gap: 1rem;
+}
+
+.input {
+    margin-left: 8px;
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+.input > input {
+    margin-top: 0;
+    white-space: nowrap;
+    margin-right: 2px;
+}
+
+.section > h4 {
+    display: inline;
+    margin-right: 5px;
+}
+
+.section > button {
+    height: 20px;
+    width: 30px;
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+}

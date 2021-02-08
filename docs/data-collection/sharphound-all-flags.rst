@@ -53,6 +53,8 @@ Here are the less common CollectionMethods and what they do:
   domain-joined computer
 * **PSRemote:** Just collect the members of the Remote Management group on each
   domain-joined computer
+* **ObjectProps** - Performs Object Properties collection for properties 
+  such as LastLogon or PwdLastSet
 
 Domain
 ------
@@ -81,6 +83,15 @@ ComputerFile
 
 Load a list of computer names or IP addresses for SharpHound to collect information
 from. The file should be line-separated.
+
+SearchBase
+----------
+Base DistinguishedName to start search at. Use this to limit your search.
+Equivalent to the old --OU option
+
+::
+
+   C:\> SharpHound.exe --SearchBase "OU=New York,DC=Contoso,DC=Local"
 
 LDAPFilter
 ----------

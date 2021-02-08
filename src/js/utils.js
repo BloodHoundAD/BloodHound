@@ -1,6 +1,23 @@
 import { groupBy } from 'lodash/collection';
 
-var labels = ['OU', 'GPO', 'User', 'Computer', 'Group', 'Domain'];
+var labels = [
+    'OU',
+    'GPO',
+    'User',
+    'Computer',
+    'Group',
+    'Domain',
+    'AZApp',
+    'AZDevice',
+    'AZGroup',
+    'AZKeyVault',
+    'AZResourceGroup',
+    'AZServicePrincipal',
+    'AZSubscription',
+    'AZTenant',
+    'AZUser',
+    'AZVM',
+];
 
 export function generateUniqueId(sigmaInstance, isNode) {
     var i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
@@ -38,7 +55,7 @@ export function buildSearchQuery(searchterm) {
         return [statement, term.toUpperCase()];
     } else {
         return [
-            'MATCH (n) WHERE n.name CONTAINS $name OR n.objectid CONTAINS $name RETURN n LIMIT 10',
+            'MATCH (n:Base) WHERE n.name CONTAINS $name OR n.objectid CONTAINS $name RETURN n LIMIT 10',
             searchterm.toUpperCase(),
         ];
     }

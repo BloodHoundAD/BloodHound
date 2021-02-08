@@ -45,47 +45,26 @@ const NodeTooltip = ({ node, x, y }) => {
         >
             <div>{label}</div>
             <ul>
-                <If condition={type === 'OU'}>
-                    <Then>
-                        <li
-                            onClick={() => {
-                                emitter.emit('setStart', `${type}:${objectid}`);
-                            }}
-                        >
-                            <i className='fa fa-map-marker-alt' /> Set as
-                            Starting Node
-                        </li>
-                        <li
-                            onClick={() => {
-                                emitter.emit('setEnd', `${type}:${objectid}`);
-                            }}
-                        >
-                            <i className='fa fa-bullseye' /> Set as Ending Node
-                        </li>
-                    </Then>
-                    <Else>
-                        <li
-                            onClick={() => {
-                                emitter.emit('setStart', node);
-                            }}
-                        >
-                            <i className='fa fa-map-marker-alt' /> Set as
-                            Starting Node
-                        </li>
-                        <li
-                            onClick={() => {
-                                emitter.emit('setEnd', node);
-                            }}
-                        >
-                            <i className='fa fa-bullseye' /> Set as Ending Node
-                        </li>
-                    </Else>
-                </If>
+                <li
+                    onClick={() => {
+                        emitter.emit('setStart', node);
+                    }}
+                >
+                    <i className='fa fa-map-marker-alt' /> Set as
+                    Starting Node
+                </li>
+                <li
+                    onClick={() => {
+                        emitter.emit('setEnd', node);
+                    }}
+                >
+                    <i className='fa fa-bullseye' /> Set as Ending Node
+                </li>
                 <li
                     onClick={() => {
                         emitter.emit(
                             'query',
-                            `MATCH (n:${type} {objectid: $objectid}), (m), p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NOT m=n RETURN p`,
+                            `MATCH (n:${type} {objectid: $objectid}), (m), p=shortestPath((m)-[r*1..]->(n)) WHERE NOT m=n RETURN p`,
                             { objectid: objectid },
                             label
                         );

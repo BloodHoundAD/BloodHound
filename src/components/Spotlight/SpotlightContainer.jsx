@@ -29,16 +29,16 @@ const SpotlightContainer = () => {
         setRegex(new RegExp('', 'i'));
     };
 
-    const handleSearch = event => {
+    const handleSearch = (event) => {
         setSearchVal(event.target.value);
         setRegex(new RegExp(event.target.value, 'i'));
     };
 
-    const handleSpace = event => {
+    const handleSpace = (event) => {
         var key = event.keyCode ? event.keyCode : event.which;
 
         if (document.activeElement === document.body && key === 32) {
-            setVisible(v => !v);
+            setVisible((v) => !v);
         }
     };
 
@@ -59,7 +59,11 @@ const SpotlightContainer = () => {
     return (
         <PoseContainer
             visible={visible}
-            className={clsx('spotlight', context.darkMode ? styles.dark : null)}
+            className={clsx(
+                'spotlight',
+                context.darkMode ? styles.dark : styles.light
+            )}
+            draggable={false}
         >
             <div
                 className={'input-group input-group-unstyled no-border-radius'}
@@ -76,13 +80,19 @@ const SpotlightContainer = () => {
                     type='search'
                     className='form-control searchbox'
                     autoComplete='off'
-                    placeholder='Explore Nodes'
+                    placeholder='Search for a node'
                     data-type='search'
                 />
+                <GlyphiconSpan
+                    tooltip={false}
+                    classes='input-group-addon spanfix'
+                >
+                    <Icon glyph='times' />
+                </GlyphiconSpan>
             </div>
 
             <div className={styles.nodelist}>
-                <Table>
+                <Table striped>
                     <thead>
                         <tr>
                             <td>Node Label</td>
@@ -93,7 +103,7 @@ const SpotlightContainer = () => {
                         {Object.keys(data)
                             .sort()
                             .map(
-                                function(key) {
+                                function (key) {
                                     var d = data[key];
                                     var nid = parseInt(key);
                                     var x = regex.test(d[0]) ? (
