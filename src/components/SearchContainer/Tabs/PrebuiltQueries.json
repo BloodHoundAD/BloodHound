@@ -201,7 +201,7 @@
                 {
                     "final": false,
                     "title": "Select a Domain Users Group...",
-                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH \"-513\" RETURN n.name ORDER BY n.name DESC"
                 },
                 {
                     "final": true,
@@ -231,11 +231,11 @@
                 {
                     "final": false,
                     "title": "Select a Domain Users Group...",
-                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH \"-513\" RETURN n.name ORDER BY n.name DESC"
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((g:Group {name:$result})-[*1..]->(n {highvalue:true})) WHERE g.objectid ENDS WITH '-513' AND g<>n return p",
+                    "query": "MATCH p=shortestPath((g:Group {name:$result})-[*1..]->(n {highvalue:true})) WHERE g.objectid ENDS WITH \"-513\" AND g<>n return p",
                     "allowCollapse": true
                 }
             ]
@@ -246,7 +246,7 @@
                 {
                     "final": false,
                     "title": "Select a Domain Users Group...",
-                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH \"-513\" RETURN n.name ORDER BY n.name DESC"
                 },
                 {
                     "final": true,
@@ -261,11 +261,11 @@
                 {
                     "final": false,
                     "title": "Select a Domain Users Group...",
-                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH \"-513\" RETURN n.name ORDER BY n.name DESC"
                 },
                 {
                     "final": true,
-                    "query": "match p=(g:Group {name:$result})-[:CanRDP]->(c:Computer) where NOT c.operatingsystem CONTAINS 'Server' return p",
+                    "query": "match p=(g:Group {name:$result})-[:CanRDP]->(c:Computer) where NOT c.operatingsystem CONTAINS \"Server\" return p",
                     "allowCollapse": true
                 }
             ]
@@ -276,11 +276,11 @@
                 {
                     "final": false,
                     "title": "Select a Domain Users Group...",
-                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH \"-513\" RETURN n.name ORDER BY n.name DESC"
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=(g:Group {name:$result})-[:CanRDP]->(c:Computer) WHERE c.operatingsystem CONTAINS 'Server' return p",
+                    "query": "MATCH p=(g:Group {name:$result})-[:CanRDP]->(c:Computer) WHERE c.operatingsystem CONTAINS \"Server\" return p",
                     "allowCollapse": false
                 }
             ]
@@ -291,11 +291,11 @@
                 {
                     "final": false,
                     "title": "Select a Domain Users Group...",
-                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' RETURN n.name ORDER BY n.name DESC"
+                    "query": "MATCH (n:Group) WHERE n.objectid ENDS WITH \"-513\" RETURN n.name ORDER BY n.name DESC"
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=(m:Group)-[:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(n:Computer) WHERE m.objectid ENDS WITH '-513' RETURN p",
+                    "query": "MATCH p=(m:Group)-[:Owns|WriteDacl|GenericAll|WriteOwner|ExecuteDCOM|GenericWrite|AllowedToDelegate|ForceChangePassword]->(n:Computer) WHERE m.objectid ENDS WITH \"-513\" RETURN p",
                     "allowCollapse": true
                 }
             ]
@@ -305,7 +305,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((n:User)-[r:MemberOf]->(g:Group)) WHERE g.highvalue=true AND n.hasspn=true RETURN p",
+                    "query": "MATCH p=shortestPath((n:User)-[:MemberOf]->(g:Group)) WHERE g.highvalue=true AND n.hasspn=true RETURN p",
                     "allowCollapse": true
                 }
             ]
@@ -345,7 +345,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query": "MATCH (n:Computer) WHERE n.operatingsystem =~ '(?i).*\\\\b(2000|2003|2008|xp|vista|7|me)\\\\b.*' RETURN n",
+                    "query": "MATCH (n:Computer) WHERE n.operatingsystem =~ \"(?i).*(2000|2003|2008|xp|vista|7|me).*\" RETURN n",
                     "allowCollapse": true
                 }
             ]
