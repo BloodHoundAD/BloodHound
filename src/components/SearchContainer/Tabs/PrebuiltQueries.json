@@ -335,7 +335,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query": "MATCH (c:Computer)-[:MemberOf]->(t:Group) WHERE NOT t.name STARTS WITH 'DOMAIN CONTROLLERS' WITH c as NonDC MATCH p=(NonDC)-[:HasSession]->(n:User)-[:MemberOf]-> (g:Group) WHERE g.objectid ENDS WITH '-512' RETURN p",
+                    "query": "MATCH (dc)-[r:MemberOf*0..]->(g:Group) WHERE g.objectid ENDS WITH '-516' WITH COLLECT(dc) AS exclude MATCH p = (c:Computer)-[n:HasSession]->(u:User)-[r2:MemberOf*1..]->(g:Group) WHERE  g.objectid ENDS WITH '-512' AND NOT c IN exclude RETURN p",
                     "allowCollapse": true
                 }
             ]
