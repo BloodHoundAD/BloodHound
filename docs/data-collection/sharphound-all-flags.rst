@@ -84,6 +84,15 @@ ComputerFile
 Load a list of computer names or IP addresses for SharpHound to collect information
 from. The file should be line-separated.
 
+SearchBase
+----------
+Base DistinguishedName to start search at. Use this to limit your search.
+Equivalent to the old --OU option
+
+::
+
+   C:\> SharpHound.exe --SearchBase "OU=New York,DC=Contoso,DC=Local"
+
 LDAPFilter
 ----------
 
