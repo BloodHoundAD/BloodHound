@@ -1,7 +1,5 @@
 const References = () => {
-    let text = `<a href=""></a>
-    <a href=""></a>
-    <a href=""></a>`;
+    let text = `<a href="https://blog.netspi.com/running-powershell-scripts-on-azure-vms/">https://blog.netspi.com/running-powershell-scripts-on-azure-vms/</a>`;
     return { __html: text };
 };
 
