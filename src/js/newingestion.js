@@ -676,7 +676,7 @@ export function buildAzureDevices(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.id}) SET n:AZDevice SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.id}) SET n:AZDevice SET n.azname = prop.name',
         props: [],
     };
 
@@ -768,13 +768,13 @@ export function buildAzureUsers(chunk) {
     let queries = {};
     queries.azproperties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZUser SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZUser SET n.azname = prop.name',
         props: [],
     };
 
     queries.opproperties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:User SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:User SET n.azname = prop.name',
         props: [],
     };
 
@@ -827,13 +827,13 @@ export function buildAzureGroups(chunk) {
     let queries = {};
     queries.azproperties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.azname = prop.name',
         props: [],
     };
 
     queries.opproperties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:Group SET n.name = prop.name SET n.azsyncid=prop.sync',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:Group SET n.azname = prop.name SET n.azsyncid=prop.sync',
         props: [],
     };
     let format = [
@@ -874,7 +874,7 @@ export function buildAzureTenants(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZTenant SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZTenant SET n.azname = prop.name',
         props: [],
     };
 
@@ -897,7 +897,7 @@ export function buildAzureSubscriptions(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZSubscription SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZSubscription SET n.azname = prop.name',
         props: [],
     };
     let format = [
@@ -929,7 +929,7 @@ export function buildAzureResourceGroups(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZResourceGroup SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZResourceGroup SET n.azname = prop.name',
         props: [],
     };
     let format = [
@@ -963,7 +963,7 @@ export function buildAzureVMs(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZVM SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZVM SET n.azname = prop.name',
         props: [],
     };
     let format = [
@@ -997,7 +997,7 @@ export function buildAzureKeyVaults(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZKeyVault SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZKeyVault SET n.azname = prop.name',
         props: [],
     };
     let format = [
@@ -1031,7 +1031,7 @@ export function buildAzureGroupOwners(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.azname = prop.name',
         props: [],
     };
     let format = ['', 'AZGroup', 'AZOwns', '{isacl: false, isazure: true}'];
@@ -1069,7 +1069,7 @@ export function buildAzureAppOwners(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZApp SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZApp SET n.azname = prop.name',
         props: [],
     };
     let format = ['', 'AZApp', 'AZOwns', '{isacl: false, isazure: true}'];
@@ -1107,7 +1107,7 @@ export function buildAzureAppToSP(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZApp SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZApp SET n.azname = prop.name',
         props: [],
     };
     let format = [
@@ -1209,7 +1209,7 @@ export function buildAzureVmPerms(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.azname = prop.name',
         props: [],
     };
     let format = ['', 'AZVM', '', '{isacl: false, isazure: true}'];
@@ -1325,7 +1325,7 @@ export function buildAzureKVPermissions(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.name = prop.name',
+            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:AZGroup SET n.azname = prop.name',
         props: [],
     };
     let format = ['', 'AZKeyVault', '', '{isacl: false, isazure: true}'];
