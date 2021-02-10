@@ -44,6 +44,7 @@ import AZAppAdmin from './HelpTexts/AZAppAdmin/AZAppAdmin';
 import AZCloudAppAdmin from './HelpTexts/AZCloudAppAdmin/AZCloudAppAdmin';
 import AZRunsAs from './HelpTexts/AZRunsAs/AZRunsAs';
 import AZVMContributor from './HelpTexts/AZVmContributor/AZVmContributor';
+import Default from './HelpTexts/Default/Default';
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -121,7 +122,7 @@ const HelpModal = () => {
         AZVMContributor: AZVMContributor,
     };
 
-    const Component = components[edge];
+    const Component = edge in components ? components[edge] : Default;
 
     return (
         <BaseModal
