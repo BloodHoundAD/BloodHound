@@ -190,14 +190,20 @@ const AddEdgeModal = () => {
                             placeholder={'Source Node'}
                             delay={500}
                             renderMenuItemChildren={SearchRow}
-                            labelKey={option => {
-                                return option.name || option.objectid;
+                            labelKey={(option) => {
+                                return (
+                                    option.name ||
+                                    option.azname ||
+                                    option.objectid
+                                );
                             }}
                             useCache={false}
                             options={sourceSearchResults}
                             filterBy={(option, props) => {
                                 let name = (
-                                    option.name || option.objectid
+                                    option.name ||
+                                    option.azname ||
+                                    option.objectid
                                 ).toLowerCase();
                                 let id = option.objectid.toLowerCase();
                                 let search;
@@ -210,10 +216,10 @@ const AddEdgeModal = () => {
                                     name.includes(search) || id.includes(search)
                                 );
                             }}
-                            onChange={selection =>
+                            onChange={(selection) =>
                                 setSelection(selection, 'main')
                             }
-                            onSearch={query => doSearch(query, 'main')}
+                            onSearch={(query) => doSearch(query, 'main')}
                             onInputChange={() => {
                                 setSource(null);
                                 setErrors(defaultErrors);
@@ -230,7 +236,7 @@ const AddEdgeModal = () => {
                         <FormControl
                             value={edgeValue}
                             componentClass='select'
-                            onChange={event => {
+                            onChange={(event) => {
                                 setEdgeValue(event.target.value);
                             }}
                         >
@@ -282,14 +288,20 @@ const AddEdgeModal = () => {
                             placeholder={'Target Node'}
                             delay={500}
                             renderMenuItemChildren={SearchRow}
-                            labelKey={option => {
-                                return option.name || option.objectid;
+                            labelKey={(option) => {
+                                return (
+                                    option.name ||
+                                    option.azname ||
+                                    option.objectid
+                                );
                             }}
                             useCache={false}
                             options={targetSearchResults}
                             filterBy={(option, props) => {
                                 let name = (
-                                    option.name || option.objectid
+                                    option.name ||
+                                    option.azname ||
+                                    option.objectid
                                 ).toLowerCase();
                                 let id = option.objectid.toLowerCase();
                                 let search;
@@ -302,10 +314,10 @@ const AddEdgeModal = () => {
                                     name.includes(search) || id.includes(search)
                                 );
                             }}
-                            onChange={selection =>
+                            onChange={(selection) =>
                                 setSelection(selection, 'target')
                             }
-                            onSearch={query => doSearch(query, 'target')}
+                            onSearch={(query) => doSearch(query, 'target')}
                             onInputChange={() => {
                                 setTarget(null);
                                 setErrors(defaultErrors);

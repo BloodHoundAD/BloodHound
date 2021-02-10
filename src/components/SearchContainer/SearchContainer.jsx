@@ -283,7 +283,9 @@ const SearchContainer = () => {
                     id={'mainSearchBar'}
                     filterBy={(option, props) => {
                         let name = (
-                            option.name || option.objectid
+                            option.name ||
+                            option.azname ||
+                            option.objectid
                         ).toLowerCase();
                         let id =
                             option.objectid != null
@@ -333,7 +335,7 @@ const SearchContainer = () => {
                     //     );
                     // }}
                     labelKey={(option) => {
-                        return option.name || option.objectid;
+                        return option.name || option.azname || option.objectid;
                     }}
                     useCache={false}
                     options={mainSearchResults}
@@ -419,11 +421,15 @@ const SearchContainer = () => {
                             );
                         }}
                         labelKey={(option) => {
-                            return option.name || option.objectid;
+                            return (
+                                option.name || option.azname || option.objectid
+                            );
                         }}
                         filterBy={(option, props) => {
                             let name = (
-                                option.name || option.objectid
+                                option.name ||
+                                option.azname ||
+                                option.objectid
                             ).toLowerCase();
                             let id =
                                 option.objectid != null
