@@ -513,12 +513,12 @@ class GraphContainer extends Component {
                     this.props.alert.info('No data returned from query');
                 } else {
                     $.each(graph.nodes, function (i, node) {
-                        node.glyphs = $.map(node.glyphs, function (
-                            value,
-                            index
-                        ) {
-                            return [value];
-                        });
+                        node.glyphs = $.map(
+                            node.glyphs,
+                            function (value, index) {
+                                return [value];
+                            }
+                        );
                     });
                     appStore.queryStack.push({
                         nodes: this.state.sigmaInstance.graph.nodes(),
@@ -1424,13 +1424,13 @@ class GraphContainer extends Component {
 
                 if (e.data.leave.nodes.length > 0) {
                     if (appStore.highlightedEdges.length > 0) {
-                        $.each(appStore.highlightedEdges, function (
-                            index,
-                            edge
-                        ) {
-                            edge.color =
-                                sigmaInstance.settings.defaultEdgeColor;
-                        });
+                        $.each(
+                            appStore.highlightedEdges,
+                            function (index, edge) {
+                                edge.color =
+                                    sigmaInstance.settings.defaultEdgeColor;
+                            }
+                        );
                         appStore.highlightedEdges = [];
                         sigmaInstance.refresh({ skipIndexation: true });
                     }
