@@ -48,7 +48,7 @@ const DomainNodeData = () => {
                 .then((r) => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
-                    setLabel(props.name || objectid);
+                    setLabel(props.name || props.azname || objectid);
                     setDomain(props.name || objectid);
                     session.close();
                 });

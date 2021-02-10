@@ -48,7 +48,7 @@ const AZServicePrincipalNodeData = () => {
                 .then((r) => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
-                    setLabel(props.name || objectid);
+                    setLabel(props.name || props.azname || objectid);
                     session.close();
                 });
         } else {
