@@ -43,7 +43,7 @@ import AZGlobalAdmin from './HelpTexts/AZGlobalAdmin/AZGlobalAdmin';
 import AZAppAdmin from './HelpTexts/AZAppAdmin/AZAppAdmin';
 import AZCloudAppAdmin from './HelpTexts/AZCloudAppAdmin/AZCloudAppAdmin';
 import AZRunsAs from './HelpTexts/AZRunsAs/AZRunsAs';
-import AZVMContributor from './HelpTexts/AZVmContributor/AZVmContributor';
+import AZVMContributor from './HelpTexts/AZVMContributor/AZVMContributor';
 import Default from './HelpTexts/Default/Default';
 
 const HelpModal = () => {
