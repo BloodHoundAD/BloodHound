@@ -127,8 +127,8 @@ const SearchContainer = () => {
             pathSearchSelected
         );
 
-        mainSearchRef.current.blur();
-        pathSearchRef.current.blur();
+        mainSearchRef.current.getInstance().getInput().blur();
+        pathSearchRef.current.getInstance().getInput().blur();
         emitter.emit('query', query, props, startTarget, endTarget);
     };
 
@@ -240,8 +240,8 @@ const SearchContainer = () => {
             return;
         }
 
-        mainSearchRef.current.blur();
-        pathSearchRef.current.blur();
+        mainSearchRef.current.getInstance().getInput().blur();
+        pathSearchRef.current.getInstance().getInput().blur();
 
         if (!pathfindingOpen) {
             if (mainSearchSelected === null) {
@@ -329,18 +329,16 @@ const SearchContainer = () => {
                             </Menu>
                         );
                     }}
-                    // renderMenuItemChildren={(option, props, index) => {
-                    //     return (
-                    //         <SearchRow item={option} search={mainSearchValue} />
-                    //     );
-                    // }}
                     labelKey={(option) => {
                         return option.name || option.azname || option.objectid;
                     }}
                     useCache={false}
                     options={mainSearchResults}
                     onSearch={(query) => doSearch(query, 'main')}
-                    inputProps={{ className: 'searchbox', id: styles.searcha }}
+                    inputProps={{
+                        className: 'searchbox',
+                        id: styles.searcha,
+                    }}
                     onKeyDown={(event) => onEnterPress(event)}
                     onChange={(selection) => setSelection(selection, 'main')}
                     onInputChange={(event) => {
