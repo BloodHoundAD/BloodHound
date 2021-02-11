@@ -7,18 +7,23 @@ import {
     Button,
     ControlLabel,
 } from 'react-bootstrap';
-import { AsyncTypeahead } from 'react-bootstrap-typeahead';
+import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 import styles from './AddEdgeModal.module.css';
 import SearchRow from '../SearchContainer/SearchRow';
 import { buildSearchQuery, buildSelectQuery } from 'utils';
 import BaseModal from './BaseModal';
 import { motion } from 'framer-motion';
+import clsx from 'clsx';
+import { useContext } from 'react';
+import { AppContext } from '../../AppContext';
 
 const AddEdgeModal = () => {
     const [open, setOpen] = useState(false);
     const [showComplete, setShowComplete] = useState(false);
     const [source, setSource] = useState(null);
     const [target, setTarget] = useState(null);
+    const [sourceValue, setSourceValue] = useState('');
+    const [targetValue, setTargetValue] = useState('');
     const [edgeValue, setEdgeValue] = useState('MemberOf');
     const defaultErrors = {
         sourceErrors: '',
@@ -31,6 +36,8 @@ const AddEdgeModal = () => {
     const [targetLoading, setTargetLoading] = useState(false);
     const [sourceSearchResults, setSourceSearchResults] = useState([]);
     const [targetSearchResults, setTargetSearchResults] = useState([]);
+
+    const context = useContext(AppContext);
 
     useEffect(() => {
         emitter.on('addEdge', handleOpen);
@@ -49,7 +56,7 @@ const AddEdgeModal = () => {
     };
 
     const setSelection = (selection, source) => {
-        if (selection.length === 0) {
+        if (selection == null || selection.length === 0) {
             return;
         }
 
@@ -76,7 +83,7 @@ const AddEdgeModal = () => {
         let data = [];
         for (let record of result.records) {
             let properties = record._fields[0].properties;
-            properties.type = record._fields[0].labels[0];
+            properties.type = record._fields[0].labels[1];
             data.push(properties);
         }
 
@@ -186,10 +193,35 @@ const AddEdgeModal = () => {
                         <AsyncTypeahead
                             id={'addEdgeSourceSearch'}
                             isLoading={sourceLoading}
-                            onSearch={() => {}}
                             placeholder={'Source Node'}
                             delay={500}
-                            renderMenuItemChildren={SearchRow}
+                            renderMenu={(results, menuProps, props) => {
+                                return (
+                                    <Menu
+                                        {...menuProps}
+                                        className={clsx(
+                                            context.darkMode
+                                                ? styles.darkmenu
+                                                : null
+                                        )}
+                                    >
+                                        {results.map((result, index) => {
+                                            return (
+                                                <MenuItem
+                                                    option={result}
+                                                    position={index}
+                                                    key={index}
+                                                >
+                                                    <SearchRow
+                                                        item={result}
+                                                        search={sourceValue}
+                                                    />
+                                                </MenuItem>
+                                            );
+                                        })}
+                                    </Menu>
+                                );
+                            }}
                             labelKey={(option) => {
                                 return (
                                     option.name ||
@@ -220,8 +252,9 @@ const AddEdgeModal = () => {
                                 setSelection(selection, 'main')
                             }
                             onSearch={(query) => doSearch(query, 'main')}
-                            onInputChange={() => {
+                            onInputChange={(event) => {
                                 setSource(null);
+                                setSourceValue(event);
                                 setErrors(defaultErrors);
                             }}
                         />
@@ -287,7 +320,33 @@ const AddEdgeModal = () => {
                             onSearch={() => {}}
                             placeholder={'Target Node'}
                             delay={500}
-                            renderMenuItemChildren={SearchRow}
+                            renderMenu={(results, menuProps, props) => {
+                                return (
+                                    <Menu
+                                        {...menuProps}
+                                        className={clsx(
+                                            context.darkMode
+                                                ? styles.darkmenu
+                                                : null
+                                        )}
+                                    >
+                                        {results.map((result, index) => {
+                                            return (
+                                                <MenuItem
+                                                    option={result}
+                                                    position={index}
+                                                    key={index}
+                                                >
+                                                    <SearchRow
+                                                        item={result}
+                                                        search={targetValue}
+                                                    />
+                                                </MenuItem>
+                                            );
+                                        })}
+                                    </Menu>
+                                );
+                            }}
                             labelKey={(option) => {
                                 return (
                                     option.name ||
@@ -318,7 +377,8 @@ const AddEdgeModal = () => {
                                 setSelection(selection, 'target')
                             }
                             onSearch={(query) => doSearch(query, 'target')}
-                            onInputChange={() => {
+                            onInputChange={(event) => {
+                                setTargetValue(event);
                                 setTarget(null);
                                 setErrors(defaultErrors);
                             }}
