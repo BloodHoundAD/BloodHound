@@ -9,6 +9,7 @@ env:
 os:
   - linux
   - osx
+    osx_image: xcode12.2
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
