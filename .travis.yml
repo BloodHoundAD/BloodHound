@@ -8,11 +8,10 @@ env:
 
 jobs:
     include:
+      -os: osx
         osx_image: xcode12.2
-
-os:
-    - linux
-    - osx
+      -os: linux
+      
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
