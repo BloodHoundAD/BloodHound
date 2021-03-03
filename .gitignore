@@ -5,3 +5,4 @@ npm-debug.log
 *.bin
 *.csv
 graph.json
+.DS_Store
