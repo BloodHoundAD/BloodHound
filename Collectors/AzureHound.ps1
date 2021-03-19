@@ -445,7 +445,7 @@ function Invoke-AzureHound {
     $Coll = New-Object System.Collections.ArrayList
     # Get devices and their owners
     Write-Info "Building devices object."
-    $AADDevices =  Get-AzureADDevice | ?{$_.DeviceOSType -Match "Windows" -Or $_.DeviceOSType -Match "Mac"}
+    $AADDevices =  Get-AzureADDevice -All $True | ?{$_.DeviceOSType -Match "Windows" -Or $_.DeviceOSType -Match "Mac"}
     $TotalCount = $AADDevices.Count
     Write-Info "Done building devices object, processing ${TotalCount} devices"
     $Progress = 0
