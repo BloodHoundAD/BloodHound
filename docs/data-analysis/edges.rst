@@ -710,7 +710,7 @@ Abuse Info
 
 Scott Sutherland from NetSPI has authored PowerUpSQL, a PowerShell Toolkit for Attacking SQL
 Server. Major contributors include Antti Rantasaari, Eric Gruber, and Thomas Elling. Before
-executing any of the below commands, download PowerUpSQL and laod it into your PowerShell
+executing any of the below commands, download PowerUpSQL and load it into your PowerShell
 instance. Get PowerUpSQL here: https://github.com/NetSPI/PowerUpSQL
 
 **Finding Data**
