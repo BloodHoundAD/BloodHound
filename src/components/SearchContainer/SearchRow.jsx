@@ -71,7 +71,7 @@ const SearchRow = ({ item, search }) => {
     icon.style = { color: appStore.highResPalette.iconScheme[type].color };
     icon.className = clsx(icon.className, styles.spacing);
 
-    let name = item.name || item.objectid;
+    let name = (item.name || item.azname ) || item.objectid;
 
     return (
         <>
