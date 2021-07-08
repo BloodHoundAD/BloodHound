@@ -170,7 +170,7 @@ function Invoke-AzureHound {
         }
 
         $CurrentUser = [PSCustomObject]@{
-            DisplayName                     =   $User.displayname
+            DisplayName                     =   $DisplayName
             UserPrincipalName               =   $User.UserPrincipalName
             OnPremisesSecurityIdentifier    =   $User.OnPremisesSecurityIdentifier
             ObjectID                        =   $User.ObjectID
