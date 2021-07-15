@@ -149,7 +149,7 @@ const AZServicePrincipalNodeData = () => {
                                     property='First Degree Object Control'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (g:AZServicePrincipal {objectid: $objectid})-[r:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor]->(n)'
+                                        'MATCH p = (g:AZServicePrincipal {objectid: $objectid})-[r:AZResetPassword|AZAddMembers|AZOwns|AZAvereContributor|AZVMContributor|AZContributor]->(n)'
                                     }
                                     start={label}
                                     distinct
@@ -158,7 +158,7 @@ const AZServicePrincipalNodeData = () => {
                                     property='Group Delegated Object Control'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (g1:AZServicePrincipal {objectid: $objectid})-[r1:MemberOf*1..]->(g2)-[r2:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor]->(n)'
+                                        'MATCH p = (g1:AZServicePrincipal {objectid: $objectid})-[r1:MemberOf*1..]->(g2)-[r2:AZResetPassword|AZAddMembers|AZOwns|AZAvereContributor|AZVMContributor|AZContributor]->(n)'
                                     }
                                     start={label}
                                     distinct
@@ -167,7 +167,7 @@ const AZServicePrincipalNodeData = () => {
                                     property='Transitive Object Control'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((g:AZServicePrincipal {objectid: $objectid})-[r:AZMemberOf|AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor*1..]->(n))'
+                                        'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((g:AZServicePrincipal {objectid: $objectid})-[r:AZMemberOf|AZResetPassword|AZAddMembers|AZOwns|AZAvereContributor|AZVMContributor|AZContributor*1..]->(n))'
                                     }
                                     start={label}
                                     distinct
