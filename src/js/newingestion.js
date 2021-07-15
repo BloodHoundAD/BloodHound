@@ -693,7 +693,7 @@ export function buildAzureDevices(chunk) {
                 name: row.DeviceDisplayname.toUpperCase(),
             });
 
-            if (row.OwnerID !== null) {
+            if (row.OwnerID !== null && row.OwnerOnPremID == null) {
                 format[0] = 'AZUser';
                 insertNew(queries, format, {
                     source: row.OwnerID.toUpperCase(),
@@ -1147,7 +1147,7 @@ export function buildAzureGroupMembers(chunk) {
             let type = row.MemberType.toUpperCase();
             if (row.GroupOnPremID === null) {
                 if (type === 'GROUP') {
-                    if (row.GroupOnPremID === null) {
+                    if (row.MemberOnPremID === null) {
                         format[0] = 'AZGroup';
                         format[1] = 'AZGroup';
                         insertNew(queries, format, {
@@ -1163,7 +1163,7 @@ export function buildAzureGroupMembers(chunk) {
                         });
                     }
                 } else if (type === 'USER') {
-                    if (row.GroupOnPremID === null) {
+                    if (row.MemberOnPremID === null) {
                         format[0] = 'AZUser';
                         format[1] = 'AZGroup';
                         insertNew(queries, format, {
