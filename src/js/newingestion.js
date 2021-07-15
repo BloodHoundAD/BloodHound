@@ -693,7 +693,7 @@ export function buildAzureDevices(chunk) {
                 name: row.DeviceDisplayname.toUpperCase(),
             });
 
-            if (row.OwnerID !== null) {
+            if (row.OwnerID !== null && row.OwnerOnPremID == null) {
                 format[0] = 'AZUser';
                 insertNew(queries, format, {
                     source: row.OwnerID.toUpperCase(),
