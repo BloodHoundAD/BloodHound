@@ -1,6 +1,6 @@
 {
     "name": "bloodhound",
-    "version": "4.0.2",
+    "version": "4.0.3",
     "description": "Graph Theory for Active Directory",
     "prettier": {
         "tabWidth": 4,
