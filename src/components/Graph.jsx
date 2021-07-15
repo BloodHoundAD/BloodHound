@@ -919,13 +919,13 @@ class GraphContainer extends Component {
         return edge;
     }
 
-    selectName(properties) {
-        if (properties.name !== null){
-            return properties.name;
-        }else if (properties.azname !== null){
-            return properties.azname;
+    selectLabel(properties){
+        if (properties.hasOwnProperty("name")){
+            return properties["name"];
+        }else if (properties.hasOwnProperty("azname")){
+            return properties["azname"];
         }else{
-            return properties.objectid
+            return properties["objectid"]
         }
     }
 
@@ -936,7 +936,7 @@ class GraphContainer extends Component {
         let id = data.identity;
         let fType = data.labels.filter((w) => w !== 'Base');
         let type = fType.length > 0 ? fType[0] : 'Unknown';
-        let label = this.selectName(data.properties)
+        let label = this.selectLabel(data.properties)
 
         let node = {
             id: id,

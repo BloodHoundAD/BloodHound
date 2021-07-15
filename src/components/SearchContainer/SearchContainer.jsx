@@ -84,7 +84,13 @@ const SearchContainer = () => {
             let data = [];
             for (let record of result.records) {
                 let properties = record._fields[0].properties;
-                properties.type = record._fields[0].labels[1];
+                let labels = record._fields[0].labels
+                if (labels.length === 1){
+                    properties.type = labels[0];
+                }else{
+                    properties.type = labels.filter(x => {return x !== "Base"})[0]
+                }
+
                 data.push(properties);
             }
 

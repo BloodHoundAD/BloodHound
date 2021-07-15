@@ -10,8 +10,19 @@ const SearchRow = ({ item, search }) => {
     } else {
         searched = search;
     }
+
     let type = item.type;
     let icon = {};
+
+    const selectName = () => {
+        if (item.hasOwnProperty("name")){
+            return item["name"];
+        }else if (item.hasOwnProperty("azname")){
+            return item["azname"];
+        }else{
+            return item["objectid"]
+        }
+    }
 
     switch (type) {
         case 'Group':
@@ -79,7 +90,7 @@ const SearchRow = ({ item, search }) => {
                 <i {...icon} />
             </span>
             <Highlighter matchElement='strong' search={searched}>
-                {name}
+                {selectName()}
             </Highlighter>
         </>
     );
