@@ -64,7 +64,7 @@ Table to demonstrate the differences
    :width: 900px
    :alt: SharpHound Cheat Sheet
 
-.. _Image credit: https://twitter.com/SadProcessor
+Image credit: https://twitter.com/SadProcessor
 
 
 Domain
