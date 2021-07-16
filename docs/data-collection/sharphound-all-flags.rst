@@ -59,25 +59,12 @@ Here are the less common CollectionMethods and what they do:
 Table to demonstrate the differences
 ------------------------------------
 
-|                                                                    | Default | All | DCOnly | ComputerOnly | Session | LoggedOn** | Group | ACL | GPOLocalGroup | Trusts | Container | LocalGroup | LocalAdmin | RDP | DCOM | PSRemote | ObjectProps |
-|:------------------------------------------------------------------:|:-------:|:---:|:------:|:------------:|:-------:|:----------:|:-----:|:---:|:-------------:|:------:|:---------:|:----------:|:----------:|:---:|:----:|:--------:|:-----------:|
-|                      Security group membership                     |    X    |  X  |    X   |              |         |      X     |   X   |     |               |        |           |            |            |     |      |          |             |
-|                            Domain Trusts                           |    X    |  X  |    X   |              |         |      X     |       |     |               |    X   |           |            |            |     |      |          |             |
-|                 abusable permissions on AD objects                 |    X    |  X  |    X   |              |         |      X     |       |  X  |               |        |           |            |            |     |      |          |             |
-|                          OU tree structure                         |    X    |  X  |    X   |              |         |      X     |       |     |               |        |     X     |            |            |     |      |          |             |
-|                         Group Policy links                         |    X    |  X  |    X   |              |         |      X     |       |     |               |        |     X     |            |            |     |      |          |             |
-|                        AD object properties                        |    X    |  X  |    X   |              |         |      X     |       |     |               |        |           |            |            |     |      |          |             |
-| Correlate Group Policy-enforced local groups to affected computers |    X    |     |    X   |              |         |            |       |     |       X       |        |           |            |            |     |      |          |             |
-|                            Local Groups                            |    X    |  X  |        |       X      |         |      X     |       |     |               |        |           |            |            |     |      |          |             |
-|                            User Session                            |    X    |  X  |        |       X      |    X    |      X     |       |     |               |        |           |            |            |     |      |          |             |
-|                            Local Admins                            |    X    |  X  |        |              |         |            |       |     |               |        |           |      X     |      X     |     |      |          |             |
-|                        RDP group membership                        |         |  X  |        |              |         |            |       |     |               |        |           |      X     |            |  X  |      |          |             |
-|                        DCOM group membership                       |         |  X  |        |              |         |            |       |     |               |        |           |      X     |            |     |   X  |          |             |
-|                      PSRemote group membership                     |         |  X  |        |              |         |            |       |     |               |        |           |      X     |            |     |      |     X    |             |
-|                            ObjectProps**                           |         |  X  |        |              |         |            |       |     |               |        |           |            |            |     |      |          |      X      |
+.. image:: /images/SharpHoundCheatSheet.png   
+   :align: center
+   :width: 300px
+   :alt: SharpHound Cheat Sheet
 
-*Does session collection using the privileged collection method. Use this if you are running as a user with local admin rights on lots of systems for the best user session data.
-*ObjectProps - Performs Object Properties collection for properties such as LastLogon or PwdLastSet
+.. _Image credit: https://twitter.com/SadProcessor
 
 
 Domain
