@@ -61,7 +61,7 @@ Table to demonstrate the differences
 
 .. image:: /images/SharpHoundCheatSheet.png   
    :align: center
-   :width: 300px
+   :width: 900px
    :alt: SharpHound Cheat Sheet
 
 .. _Image credit: https://twitter.com/SadProcessor
