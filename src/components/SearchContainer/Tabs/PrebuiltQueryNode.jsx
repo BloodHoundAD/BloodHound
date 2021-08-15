@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './PrebuiltQueries.module.css';
 
 export default class PrebuiltQueryNode extends Component {
     render() {
@@ -14,12 +15,10 @@ export default class PrebuiltQueryNode extends Component {
         }.bind(this);
 
         return (
-            <div>
-                <a href='#' onClick={c}>
-                    {this.props.info.name}
-                </a>
-                <br />
-            </div>
+                <tr style={{ cursor: 'pointer' }} onClick={c}>
+                    <td align='left'>{this.props.info.name}</td>
+                    <td align='right'></td>
+                </tr>
         );
     }
 }

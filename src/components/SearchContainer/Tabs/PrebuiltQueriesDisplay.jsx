@@ -10,6 +10,8 @@ import PrebuiltQueryNode from './PrebuiltQueryNode';
 import styles from './PrebuiltQueries.module.css';
 import { useContext } from 'react';
 import { AppContext } from '../../../AppContext';
+import { Table } from 'react-bootstrap';
+import CollapsibleSection from './Components/CollapsibleSection';
 
 const PrebuiltQueriesDisplay = () => {
     const [queries, setQueries] = useState([]);
@@ -19,6 +21,7 @@ const PrebuiltQueriesDisplay = () => {
     useEffect(() => {
         readCustom();
         readBase();
+        emitter.on('updateCustomQueries', refreshCustom);
     }, []);
 
     const readCustom = async () => {
@@ -30,7 +33,18 @@ const PrebuiltQueriesDisplay = () => {
             let j = JSON.parse(data);
             var y = [];
             j.queries.forEach((query) => {
-                y.push(query);
+                try {
+                    if (query.category === undefined) {
+                        query.category = "Uncategorized Query";
+                    }
+                    if (!(query.category in y)) {
+                            y[query.category] = [];
+                    }
+
+                    y[query.category].push(query);
+                } catch (e) {
+                    alert("Custom Queries Category Array Exception: " + e.message);
+                }
             });
 
             setCustom(y);
@@ -45,7 +59,17 @@ const PrebuiltQueriesDisplay = () => {
                 var y = [];
 
                 $.each(response.queries, function (_, el) {
-                    y.push(el);
+                    try {
+                        if (el.category === undefined) {
+                            el.category = "Uncategorized Query";
+                        }
+                        if (!(el.category in y)) {
+                            y[el.category] = [];
+                        }
+                        y[el.category].push(el);
+                    } catch (e){
+                        alert("Queries Category Array Exception: "+e.message);
+                    }
                 });
 
                 setQueries(y);
@@ -79,39 +103,55 @@ const PrebuiltQueriesDisplay = () => {
         readCustom();
     };
 
+    const createQuerieSections = (queryArray) => {
+        var finalQueryElement = [];
+        
+        for (var queryCategory in queryArray) {
+            try {
+                finalQueryElement.push(<CollapsibleSection header={queryCategory}><div className={styles.itemlist}><Table><thead></thead><tbody className='searchable'>{queryArray[queryCategory].map(function (a) { return <PrebuiltQueryNode key={a.name} info={a} />; })}</tbody></Table></div></CollapsibleSection>);
+            } catch (e) {
+                //alert("Create Query Section Exception: " + e.message + "\nqueryCategory: " + queryCategory);
+            }
+        }
+
+        emitter.emit('registerQueryCategories',queryArray);
+        return finalQueryElement;
+    }
+
+    const settingsClick = () => {
+        emitter.emit('openQueryCreate');
+    };
+
     return (
-        <div className={context.darkMode ? styles.dark : null}>
-            <h3>Pre-Built Analytics Queries</h3>
-            <div className='query-box'>
-                {queries.map(function (a) {
-                    return <PrebuiltQueryNode key={a.name} info={a} />;
-                })}
-            </div>
-            <h3>
-                Custom Queries
-                <i
-                    className='glyphicon glyphicon-pencil customQueryGlyph'
-                    data-toggle='tooltip'
-                    title='Edit Queries'
-                    onClick={editCustom}
-                />
-                <i
-                    className='glyphicon glyphicon-refresh customQueryGlyph'
-                    onClick={refreshCustom}
-                    style={{ paddingLeft: '5px' }}
-                    data-toggle='tooltip'
-                    title='Refresh Queries'
-                />
-            </h3>
-            <div className='query-box'>
-                {custom.length === 0 && <div>No user defined queries.</div>}
-                {custom.length > 0 && (
-                    <div>
-                        {custom.map(function (a) {
-                            return <PrebuiltQueryNode key={a.name} info={a} />;
-                        })}
-                    </div>
-                )}
+        <div className={context.darkMode ? styles.dark : styles.light}>
+            <div className={styles.dl}>
+                <h5>Pre-Built Analytics Queries</h5>
+
+                {createQuerieSections(queries).map((a) => { return a })}
+
+
+            
+                <hr />
+                <h5>
+                    Custom Queries
+                    <i
+                        className='glyphicon glyphicon-pencil customQueryGlyph'
+                        data-toggle='tooltip'
+                        title='Edit Queries'
+                        onClick={settingsClick}
+                    />
+                    <i
+                        className='glyphicon glyphicon-refresh customQueryGlyph'
+                        onClick={refreshCustom}
+                        style={{ paddingLeft: '5px' }}
+                        data-toggle='tooltip'
+                        title='Refresh Queries'
+                    />
+                </h5>
+                    {Object.keys(custom).length === 0 && <div>No user defined queries.</div>}
+                    {Object.keys(custom).length > 0 && (
+                        createQuerieSections(custom).map((a) => { return a })
+                    )}
             </div>
         </div>
     );
