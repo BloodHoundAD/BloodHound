@@ -34,8 +34,11 @@ const PrebuiltQueriesDisplay = () => {
             var y = [];
             j.queries.forEach((query) => {
                 try {
-                    if (query.category === undefined) {
+                    if (query.category === undefined || query.category === "") {
                         query.category = "Uncategorized Query";
+                    }
+                    if (query.name === "") {
+                        query.name = "Unnamed Query"
                     }
                     if (!(query.category in y)) {
                             y[query.category] = [];
@@ -60,8 +63,11 @@ const PrebuiltQueriesDisplay = () => {
 
                 $.each(response.queries, function (_, el) {
                     try {
-                        if (el.category === undefined) {
+                        if (el.category === undefined || el.category === "") {
                             el.category = "Uncategorized Query";
+                        }
+                        if (el.name === "") {
+                            el.name = "Unnamed Query"
                         }
                         if (!(el.category in y)) {
                             y[el.category] = [];
