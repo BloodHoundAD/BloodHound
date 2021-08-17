@@ -65,6 +65,8 @@ switch, e.g. “Invoke-AzureHound -OutputDirectory “C:\temp\results””
 
 AzureHound supports a few switches, as shown below:
 
--Install | Installs the PowerShell modules
--TenantId xxxx-xxxx-xxxx-xxxx | Gather using a specific tenant Id instead of using the current one
--OutputDirectory “C:\path\to\destination\folder” | Outputs the results to a custom directory
+::
+
+    -Install | Installs the PowerShell modules
+    -TenantId xxxx-xxxx-xxxx-xxxx | Gather using a specific tenant Id instead of using the current one
+    -OutputDirectory “C:\path\to\destination\folder” | Outputs the results to a custom directory
