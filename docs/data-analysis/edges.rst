@@ -1763,12 +1763,12 @@ Abuse Info
 ----------
 
 Via the Azure portal:
-1. Find the group in your tenant (Azure Active Directory -> Groups -> Find Group in list)</li>
-2. Click the group from the list</li>
-3. In the left pane, click “Members”</li>
-4. At the top, click “Add members”</li>
-5. Find the principals you want to add to the group and click them, then click “select” at the bottom</li>
-6. You should see a message in the top right saying “Member successfully added”</li>
+1. Find the group in your tenant (Azure Active Directory -> Groups -> Find Group in list)
+2. Click the group from the list
+3. In the left pane, click “Members”
+4. At the top, click “Add members”
+5. Find the principals you want to add to the group and click them, then click “select” at the bottom
+6. You should see a message in the top right saying “Member successfully added”
     
 Via PowerZure: Add-AzureADGroup -User [UPN] -Group [Group name]
 
