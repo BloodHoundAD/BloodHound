@@ -253,6 +253,25 @@ export async function addConstraints() {
     await session.run('CREATE INDEX ON :OU(name)').catch((_) => {});
     await session.run('CREATE INDEX ON :OU(objectid)').catch((_) => {});
     await session.run('CREATE INDEX ON :Base(name)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZApp(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZApp(azname)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZDevice(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZDevice(azname)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZGroup(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZGroup(azname)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZKeyVault(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZKeyVault(azname)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZResourceGroup(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZResourceGroup(azname)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZServicePrincipal(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZServicePrincipal(azname)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZTenant(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZTenant(azname)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZUser(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZUser(azname)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZVM(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :AZVM(azname)').catch((_) => {});
+    
     session.close();
 
     emitter.emit('hideDBClearModal');
