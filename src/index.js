@@ -4,23 +4,24 @@ import ReactDOM from 'react-dom';
 
 import AppContainer from './AppContainer';
 import Login from './components/Float/Login';
-import { transitions, positions, Provider as AlertProvider } from 'react-alert';
+import {positions, Provider as AlertProvider, transitions} from 'react-alert';
 import AlertTemplate from 'react-alert-template-basic';
 
-import { remote, shell } from 'electron';
-const { app } = remote;
-import { join } from 'path';
-import { writeFileSync, existsSync, mkdirSync } from 'fs';
+import {remote, shell} from 'electron';
+import {join} from 'path';
+import {existsSync, mkdirSync, writeFileSync} from 'fs';
 
 import ConfigStore from 'electron-store';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+import {EventEmitter2 as e} from 'eventemitter2';
+
+const { app } = remote;
 
 global.conf = new ConfigStore();
 global.imageconf = new ConfigStore({
     name: 'images',
 });
-import { EventEmitter2 as e } from 'eventemitter2';
 global.emitter = new e({});
 emitter.setMaxListeners(0);
 global.renderEmit = new e({});
@@ -41,8 +42,7 @@ String.prototype.format = function () {
 };
 
 String.prototype.formatAll = function () {
-    var args = arguments;
-    return this.replace(/{}/g, args[0]);
+    return this.replace(/{}/g, arguments[0]);
 };
 
 String.prototype.formatn = function () {
@@ -68,11 +68,10 @@ Array.prototype.allEdgesSameType = function () {
     return true;
 };
 
-Array.prototype.chunk = function () {
-    let i = 0;
+Array.prototype.chunk = function (chunkSize = 10000) {
+    let i;
     let len = this.length;
     let temp = [];
-    let chunkSize = 10000;
 
     for (i = 0; i < len; i += chunkSize) {
         temp.push(this.slice(i, i + chunkSize));

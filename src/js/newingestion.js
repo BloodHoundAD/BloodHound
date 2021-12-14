@@ -76,7 +76,7 @@ export function buildComputerJsonNew(chunk) {
         insertNew(queries, format, props);
 
         format = ['', 'Computer', 'AllowedToAct', '{isacl:false}'];
-        grouped = groupBy(allowedToAct || [], 'MemberType');
+        let grouped = groupBy(allowedToAct || [], 'MemberType');
         for (let group in grouped) {
             format[0] = group;
             props = grouped[group].map((group) => {
@@ -92,7 +92,7 @@ export function buildComputerJsonNew(chunk) {
         insertNew(queries, format, props);
 
         format = ['', 'Computer', '', '{isacl:false, fromgpo: false}'];
-        let grouped = groupBy(localAdmins || [], 'MemberType');
+        grouped = groupBy(localAdmins || [], 'MemberType');
         for (let group in grouped) {
             format[0] = group;
             format[2] = 'AdminTo';
@@ -346,7 +346,7 @@ export function buildDomainJsonNew(chunk) {
         let dcomUsers = domain.DcomUser;
         let psRemoteUsers = domain.PSRemoteUsers;
         let identifier = domain.ObjectIdentifier;
-        let aces = domain.Aces;
+        let aces = domain.Aces || [];
         let links = domain.Links || [];
         let trusts = domain.Trusts || [];
 
@@ -530,13 +530,13 @@ const baseInsertStatement =
  *
  * @param {*} queries - Query object being built
  * @param {*} formatProps - SourceLabel, TargetLabel, EdgeType, Edge Props
- * @param {*} queryProp - array of query props
+ * @param {*} queryProps - array of query props
  */
 function insertNew(queries, formatProps, queryProps) {
     if (formatProps.length < 4) {
         throw new NotEnoughArgumentsException();
     }
-    if (queryProps.length == 0) {
+    if (queryProps.length === 0) {
         return;
     }
 
@@ -569,7 +569,7 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
         let aceType = ace.AceType;
         let isInherited = ace.IsInherited || false;
 
-        if (objectid == pSid) {
+        if (objectid === pSid) {
             return null;
         }
 
@@ -584,7 +584,7 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
             rights.push('AddMember');
         } else if (aceType === 'AllowedToAct') {
             rights.push('AddAllowedToAct');
-        } else if (right === 'ExtendedRight' && aceType != '') {
+        } else if (right === 'ExtendedRight' && aceType !== '') {
             rights.push(aceType);
         }
 
@@ -1398,7 +1398,7 @@ export function buildAzureKVAccessPolicies(chunk) {
                 format[2] = 'AZGetSecrets';
             }
 
-            if (row.ControllerOnPremID === null) {
+            if (row.ControllerOnPremID !== null) {
                 insertNew(queries, format, {
                     source: row.ControllerOnPremID.toUpperCase(),
                     target: kvid,

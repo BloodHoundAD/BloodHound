@@ -1,22 +1,22 @@
-import React, { useEffect, useState, useRef } from 'react';
-import PropTypes from 'prop-types';
-import { remote } from 'electron';
-const { dialog, app } = remote;
-import { useAlert } from 'react-alert';
+import React, {useEffect, useState, useRef} from 'react';
+import {remote} from 'electron';
+
+const {dialog, app} = remote;
+import {useAlert} from 'react-alert';
 import MenuButton from './MenuButton';
-import { isZipSync } from 'is-zip-file';
+import {isZipSync} from 'is-zip-file';
 import sanitize from 'sanitize-filename';
-import { pick } from 'stream-json/filters/Pick';
-import { ignore } from 'stream-json/filters/Ignore';
-import { chain } from 'stream-chain';
+import {pick} from 'stream-json/filters/Pick';
+import {chain} from 'stream-chain';
 import fs from 'fs';
 import path from 'path';
-import { parser } from 'stream-json';
-import { streamValues } from 'stream-json/streamers/StreamValues';
+import {parser} from 'stream-json';
+
+const {batch} = require('stream-json/utils/Batch');
 import unzipper from 'unzipper';
 import * as NewIngestion from '../../js/newingestion';
 import UploadStatusContainer from '../Float/UploadStatusContainer';
-import clsx from 'clsx';
+import {streamArray} from "stream-json/streamers/StreamArray";
 
 const FileStatus = Object.freeze({
     ParseError: 0,
@@ -25,7 +25,7 @@ const FileStatus = Object.freeze({
     Waiting: 3,
     Processing: 4,
     Done: 5,
-    NoData: 6,
+    NoData: 6
 });
 
 const IngestFuncMap = {
@@ -81,7 +81,7 @@ const MenuContainer = () => {
     const inputUsed = (e) => {
         let fileNames = [];
         $.each(e.target.files, function (_, file) {
-            fileNames.push({ path: file.path, name: file.name });
+            fileNames.push({path: file.path, name: file.name});
         });
         unzipFiles(fileNames);
     };
@@ -89,7 +89,7 @@ const MenuContainer = () => {
     const filesDropped = (e) => {
         let fileNames = [];
         $.each(e.dataTransfer.files, function (_, file) {
-            fileNames.push({ path: file.path, name: file.name });
+            fileNames.push({path: file.path, name: file.name});
         });
         unzipFiles(fileNames);
     };
@@ -105,7 +105,7 @@ const MenuContainer = () => {
                 alert.info(`Unzipping file ${name}`);
                 const zip = fs
                     .createReadStream(fPath)
-                    .pipe(unzipper.Parse({ forceStream: true }));
+                    .pipe(unzipper.Parse({forceStream: true}));
 
                 for await (const entry of zip) {
                     let sanitizedPath = sanitize(entry.path);
@@ -147,7 +147,7 @@ const MenuContainer = () => {
             }
         }
 
-        checkFileValidity(finalFiles);
+        await checkFileValidity(finalFiles);
     };
 
     const getMetaTagQuick = async (file) => {
@@ -228,33 +228,6 @@ const MenuContainer = () => {
         let filteredFiles = {};
         for (let file of files) {
             let meta = await getMetaTagQuick(file);
-            // const pipeline = chain([
-            //     fs.createReadStream(file.path, { encoding: 'utf8' }),
-            //     parser(),
-            //     pick({ filter: 'meta' }),
-            //     ignore({ filter: 'data' }),
-            //     streamValues(),
-            //     (data) => {
-            //         const value = data.value;
-            //         return value;
-            //     },
-            // ]);
-
-            // alert.info(`Validating file ${file.name}`);
-
-            // let meta;
-            // try {
-            //     for await (let data of pipeline) {
-            //         meta = data;
-            //     }
-            // } catch (e) {
-            //     console.log(e);
-            //     filteredFiles[file.id] = {
-            //         ...file,
-            //         status: FileStatus.ParseError,
-            //     };
-            //     continue;
-            // }
 
             if (!('version' in meta) || meta.version < 3) {
                 filteredFiles[file.id] = {
@@ -283,16 +256,16 @@ const MenuContainer = () => {
         }
         setUploadVisible(true);
         setFileQueue((state) => {
-            return { ...state, ...filteredFiles };
+            return {...state, ...filteredFiles};
         });
     };
 
     const processJson = async (file) => {
         file.status = FileStatus.Processing;
         setFileQueue((state) => {
-            return { ...state, [file.id]: file };
+            return {...state, [file.id]: file};
         });
-        console.log(`Processing ${file.name}`);
+        console.log(`Processing ${file.name} with ${file.count} entries`);
         console.time('IngestTime');
         let tag;
         if (file.type.startsWith('az')) {
@@ -300,70 +273,60 @@ const MenuContainer = () => {
         } else {
             tag = file.type;
         }
+
         const pipeline = chain([
-            fs.createReadStream(file.path, { encoding: 'utf8' }),
+            fs.createReadStream(file.path, {encoding: 'utf8'}),
             parser(),
-            pick({ filter: tag }),
-            ignore({ filter: 'meta' }),
-            streamValues(),
-            (data) => {
-                const value = data.value;
-                return value;
-            },
+            pick({filter: tag}),
+            streamArray(),
+            data => data.value,
+            batch({batchSize: 200})
         ]);
 
         let count = 0;
-        let chunk = [];
         let processor = IngestFuncMap[file.type];
-        try {
-            for await (let data of pipeline) {
-                chunk.push(data);
-                count++;
+        pipeline.on('data', async (data) => {
+            try{
+                pipeline.pause()
+                count += data.length
 
-                if (count % 5 === 0) {
-                    pipeline.pause();
-                    let data = processor(chunk);
-                    for (let key in data) {
-                        if (data[key].props.length === 0) continue;
-                        let cData = data[key].props.chunk();
-                        let statement = data[key].statement;
+                let processedData = processor(data)
+                for (let key in processedData){
+                    let props = processedData[key].props;
+                    if (props.length === 0) continue
+                    let chunked = props.chunk();
+                    let statement = processedData[key].statement;
 
-                        for (let c of cData) {
-                            await uploadData(statement, c);
-                            //await sleep_test(100);
-                        }
+                    for (let chunk of chunked){
+                        await uploadData(statement, chunk)
                     }
-                    file.progress = count;
-                    setFileQueue((state) => {
-                        return { ...state, [file.id]: file };
-                    });
-                    chunk = [];
-                    pipeline.resume();
                 }
+
+                file.progress = count
+                setFileQueue((state) => {
+                    return {...state, [file.id]: file};
+                });
+
+                pipeline.resume()
+            }catch (e){
+                console.error(e)
             }
 
-            let data = processor(chunk);
-            for (let key in data) {
-                if (data[key].props.length === 0) continue;
-                let cData = data[key].props.chunk();
-                let statement = data[key].statement;
+            return null
+        })
 
-                for (let c of cData) {
-                    await uploadData(statement, c);
-                }
-            }
-            file.progress = count;
+        pipeline.on('end', () => {
+            setUploading(false)
             file.status = FileStatus.Done;
-            setUploading(false);
             setFileQueue((state) => {
-                return { ...state, [file.id]: file };
+                return {...state, [file.id]: file};
             });
 
-            console.timeEnd('IngestTime');
-            emitter.emit('refreshDBData');
-        } catch (e) {
-            console.log(e);
-        }
+            console.timeEnd('IngestTime')
+            emitter.emit('refreshDBData')
+
+            return null
+        })
     };
 
     const sleep_test = (ms) => {
@@ -372,15 +335,15 @@ const MenuContainer = () => {
 
     const uploadData = async (statement, props) => {
         let session = driver.session();
-        await session.run(statement, { props: props }).catch((err) => {
+        await session.run(statement, {props: props}).catch((err) => {
             console.log(statement);
             console.log(err);
         });
-        session.close();
+        await session.close();
     };
 
     const clearFinished = () => {
-        let temp = { ...fileQueue };
+        let temp = {...fileQueue};
 
         if (Object.keys(temp).length === 0) {
             alert.error('Really?');
@@ -407,21 +370,25 @@ const MenuContainer = () => {
         if (!uploading) {
             let f;
             for (let file of Object.values(fileQueue)) {
-                if (file.status == FileStatus.Waiting) {
-                    f = file;
+                f = file;
+                if (file.status === FileStatus.Waiting) {
                     break;
                 }
             }
+
             if (f !== undefined) {
+                if (f.status !== FileStatus.Waiting)
+                    return
                 setUploading(true);
                 processJson(f);
             }
         }
     }, [fileQueue]);
 
-    const cancelUpload = () => {};
+    const cancelUpload = () => {
+    };
 
-    const aboutClick = (e) => {
+    const aboutClick = () => {
         emitter.emit('showAbout');
     };
 
