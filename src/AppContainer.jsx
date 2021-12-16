@@ -66,6 +66,9 @@ const fullEdgeList = [
     'MemberOf',
     'HasSession',
     'AdminTo',
+    'AddSelf',
+    'WriteSPN',
+    'AddKeyCredentialLink'
 ];
 
 export default class AppContainer extends Component {
