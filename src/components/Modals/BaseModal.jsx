@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import { AppContext } from '../../AppContext';
 
 const BaseModal = ({ show, onHide, label, className, children }) => {
-    var context = useContext(AppContext);
+    let context = useContext(AppContext);
     return (
         <Modal
             show={show}

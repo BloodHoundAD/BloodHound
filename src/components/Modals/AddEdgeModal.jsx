@@ -94,7 +94,7 @@ const AddEdgeModal = () => {
             setTargetSearchResults(data);
             setTargetLoading(false);
         }
-        session.close();
+        await session.close();
     };
 
     const validateAndSubmit = async () => {
@@ -133,7 +133,7 @@ const AddEdgeModal = () => {
             sourceid: source.objectid,
             targetid: target.objectid,
         });
-        session.close();
+        await session.close();
 
         if (results.records.length > 0) {
             errors.edgeErrors = 'Edge already exists';
@@ -168,7 +168,7 @@ const AddEdgeModal = () => {
             sourceid: source.objectid,
             targetid: target.objectid,
         });
-        session.close();
+        await session.close();
         setShowComplete(true);
         setTimeout(() => {
             handleClose();

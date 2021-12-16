@@ -97,7 +97,7 @@ const MenuContainer = () => {
 
     const unzipFiles = async (files) => {
         let finalFiles = [];
-        var tempPath = app.getPath('temp');
+        const tempPath = app.getPath('temp');
         for (let file of files) {
             let fPath = file.path;
             let name = file.name;

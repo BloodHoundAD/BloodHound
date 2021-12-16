@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import NodeALink from './NodeALink';
 
 const NodeCypherLinkComplex = ({
     property,
@@ -28,9 +27,7 @@ const NodeCypherLinkComplex = ({
 
         setSession(sess);
         setReady(false);
-        let query = countQuery;
-
-        sess.run(query, {
+        sess.run(countQuery, {
             objectid: target,
             domain: domain,
         })

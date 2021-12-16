@@ -35,8 +35,8 @@ $(document).on('click', 'a[href^="http"]', function (event) {
 });
 
 String.prototype.format = function () {
-    var i = 0,
-        args = arguments;
+    let i = 0;
+    const args = arguments;
     return this.replace(/{}/g, function () {
         return typeof args[i] !== 'undefined' ? args[i++] : '';
     });
@@ -47,9 +47,9 @@ String.prototype.formatAll = function () {
 };
 
 String.prototype.formatn = function () {
-    var formatted = this;
-    for (var i = 0; i < arguments.length; i++) {
-        var regexp = new RegExp('\\{' + i + '\\}', 'gi');
+    let formatted = this;
+    for (let i = 0; i < arguments.length; i++) {
+        const regexp = new RegExp('\\{' + i + '\\}', 'gi');
         formatted = formatted.replace(regexp, arguments[i]);
     }
     return formatted;
@@ -62,7 +62,7 @@ String.prototype.toTitleCase = function () {
 };
 
 Array.prototype.allEdgesSameType = function () {
-    for (var i = 1; i < this.length; i++) {
+    for (let i = 1; i < this.length; i++) {
         if (this[i].neo4j_type !== this[0].neo4j_type) return false;
     }
 
@@ -416,7 +416,7 @@ if (typeof appStore.performance.darkMode === 'undefined') {
     conf.set('performance', appStore.performance);
 }
 
-var custompath = join(app.getPath('userData'), 'customqueries.json');
+const custompath = join(app.getPath('userData'), 'customqueries.json');
 if (!existsSync(custompath)) {
     writeFileSync(custompath, '{"queries": []}');
 }

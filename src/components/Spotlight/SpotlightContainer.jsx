@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useContext } from 'react';
-import PropTypes from 'prop-types';
+import React, {useContext, useEffect, useState} from 'react';
 import PoseContainer from '../PoseContainer';
 import GlyphiconSpan from '../GlyphiconSpan';
 import Icon from '../Icon';
 import SpotlightRow from './SpotlightRow';
-import { Table } from 'react-bootstrap';
-import { AppContext } from '../../AppContext';
+import {Table} from 'react-bootstrap';
+import {AppContext} from '../../AppContext';
 import clsx from 'clsx';
 import styles from './SpotlightContainer.module.css';
 
@@ -106,7 +105,7 @@ const SpotlightContainer = () => {
                                 function (key) {
                                     var d = data[key];
                                     var nid = parseInt(key);
-                                    var x = regex.test(d[0]) ? (
+                                    return regex.test(d[0]) ? (
                                         <SpotlightRow
                                             key={key}
                                             nodeId={nid}
@@ -117,7 +116,6 @@ const SpotlightContainer = () => {
                                             parentNodeType={d[4]}
                                         />
                                     ) : null;
-                                    return x;
                                 }.bind(this)
                             )}
                     </tbody>

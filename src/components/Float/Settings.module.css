@@ -104,13 +104,13 @@ input[type='range'] {
     -webkit-appearance: none;
     background-color: #444b55;
     height: 5px;
-    padding: 0px 0px;
+    padding: 0 0;
 }
 
 input[type='range']::-webkit-slider-thumb {
     -webkit-appearance: none;
     position: relative;
-    top: 0px;
+    top: 0;
     z-index: 1;
     width: 16px;
     height: 16px;

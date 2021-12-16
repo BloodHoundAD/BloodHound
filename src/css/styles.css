@@ -60,10 +60,7 @@ div.tooltip-inner-custom {
     pointer-events: auto;
     background-color: #444b55;
     border: none;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
+    border-radius: 8px 8px 0 0;
     color: white;
 }
 
@@ -768,7 +765,7 @@ div.tooltip-inner-custom {
 }
 
 .help-modal-width .modal-body {
-    padding: 0px;
+    padding: 0;
 }
 
 #alertContainer > div > div {
@@ -798,7 +795,7 @@ div.tooltip-inner-custom {
 }
 
 .nav-pills li a {
-    border-radius: 0px;
+    border-radius: 0;
 }
 
 .modal-dark ul li {

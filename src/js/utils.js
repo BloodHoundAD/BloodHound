@@ -272,7 +272,7 @@ export async function addConstraints() {
     await session.run('CREATE INDEX ON :AZVM(objectid)').catch((_) => {});
     await session.run('CREATE INDEX ON :AZVM(azname)').catch((_) => {});
     
-    session.close();
+    await session.close();
 
     emitter.emit('hideDBClearModal');
 }

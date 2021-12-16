@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { ListGroup, Panel } from 'react-bootstrap';
-import { If, Then, Else } from 'react-if';
+import React, {Component} from 'react';
+import {ListGroup, Panel} from 'react-bootstrap';
+import {Else, If, Then} from 'react-if';
 import QueryNodeSelectItem from './QueryNodeSelectItem';
-import { withAlert } from 'react-alert';
+import {withAlert} from 'react-alert';
 
 class QueryNodeSelect extends Component {
     constructor() {
@@ -147,14 +147,13 @@ class QueryNodeSelect extends Component {
                                 <ListGroup ref='list'>
                                     {this.state.data.map(
                                         function (key) {
-                                            var x = (
+                                            return (
                                                 <QueryNodeSelectItem
                                                     key={key.name}
                                                     label={key.name}
                                                     extraProps={key}
                                                 />
                                             );
-                                            return x;
                                         }.bind(this)
                                     )}
                                 </ListGroup>
