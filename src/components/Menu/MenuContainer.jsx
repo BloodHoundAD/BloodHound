@@ -35,6 +35,7 @@ const IngestFuncMap = {
     domains: NewIngestion.buildDomainJsonNew,
     ous: NewIngestion.buildOuJsonNew,
     gpos: NewIngestion.buildGpoJsonNew,
+    containers: NewIngestion.buildContainerJsonNew,
     azdevices: NewIngestion.buildAzureDevices,
     azusers: NewIngestion.buildAzureUsers,
     azgroups: NewIngestion.buildAzureGroups,
@@ -229,13 +230,13 @@ const MenuContainer = () => {
         for (let file of files) {
             let meta = await getMetaTagQuick(file);
 
-            if (!('version' in meta) || meta.version < 3) {
-                filteredFiles[file.id] = {
-                    ...file,
-                    status: FileStatus.InvalidVersion,
-                };
-                continue;
-            }
+            // if (!('version' in meta) || meta.version < 3) {
+            //     filteredFiles[file.id] = {
+            //         ...file,
+            //         status: FileStatus.InvalidVersion,
+            //     };
+            //     continue;
+            // }
 
             if (!Object.keys(IngestFuncMap).includes(meta.type)) {
                 console.log(meta.type);
@@ -267,17 +268,11 @@ const MenuContainer = () => {
         });
         console.log(`Processing ${file.name} with ${file.count} entries`);
         console.time('IngestTime');
-        let tag;
-        if (file.type.startsWith('az')) {
-            tag = 'data';
-        } else {
-            tag = file.type;
-        }
 
         const pipeline = chain([
             fs.createReadStream(file.path, {encoding: 'utf8'}),
             parser(),
-            pick({filter: tag}),
+            pick({filter: 'data'}),
             streamArray(),
             data => data.value,
             batch({batchSize: 200})
@@ -338,6 +333,7 @@ const MenuContainer = () => {
         await session.run(statement, {props: props}).catch((err) => {
             console.log(statement);
             console.log(err);
+
         });
         await session.close();
     };
