@@ -7,7 +7,7 @@ let child;
 import { join } from 'path';
 import { remote } from 'electron';
 const { dialog } = remote;
-const uuidv4 = require('uuid/v4');
+import { v4 as uuidv4 } from 'uuid'
 let Observer = require('fontfaceobserver');
 import { withAlert } from 'react-alert';
 import NodeTooltip from './Tooltips/NodeTooltip';
