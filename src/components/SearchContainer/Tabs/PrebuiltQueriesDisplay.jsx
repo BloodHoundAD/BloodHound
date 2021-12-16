@@ -59,8 +59,6 @@ const PrebuiltQueriesDisplay = () => {
                 return 'open';
             case 'win32':
                 return '';
-            case 'win64':
-                return '';
             default:
                 return 'xdg-open';
         }

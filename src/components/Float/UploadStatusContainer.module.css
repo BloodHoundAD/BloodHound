@@ -70,8 +70,7 @@
 }
 
 .closeButton {
-    background: transparent;
-    background-repeat: no-repeat;
+    background: transparent no-repeat;
     border: none;
     cursor: pointer;
     overflow: hidden;
@@ -81,7 +80,6 @@
 }
 
 .closeButton:hover {
-    background: transparent;
-    background-repeat: no-repeat;
+    background: transparent no-repeat;
     color: white;
 }

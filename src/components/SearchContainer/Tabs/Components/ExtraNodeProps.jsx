@@ -114,7 +114,7 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
         setElements(temp);
     }, [label]);
 
-    return elements.length == 0 ? null : (
+    return elements.length === 0 ? null : (
         <CollapsibleSection header={'EXTRA PROPERTIES'}>
             <div className={styles.itemlist}>
                 <Table bordered={false} hover responsive>

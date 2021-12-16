@@ -80,7 +80,7 @@ const SpotlightContainer = () => {
                     className='form-control searchbox'
                     autoComplete='off'
                     placeholder='Search for a node'
-                    data-type='search'
+                    datatype='search'
                 />
                 <GlyphiconSpan
                     tooltip={false}

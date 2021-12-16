@@ -43,7 +43,7 @@
 
 .dark :global button.close {
     opacity: 1;
-    background-color: 151d29;
+    background-color: #151d29;
     color: white;
 }
 

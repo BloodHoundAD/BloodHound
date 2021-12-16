@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from 'react';
-import clsx from 'clsx';
 const { app, shell } = require('electron').remote;
 import { join } from 'path';
 import { promises } from 'fs';

@@ -164,7 +164,7 @@ const AddEdgeModal = () => {
         session = driver.session();
         statement = `MATCH (n:${source.type} {objectid: $sourceid}) MATCH (m:${target.type} {objectid: $targetid}) MERGE (n)-${edgepart}->(m) RETURN r`;
 
-        results = await session.run(statement, {
+        await session.run(statement, {
             sourceid: source.objectid,
             targetid: target.objectid,
         });
@@ -317,7 +317,6 @@ const AddEdgeModal = () => {
                         <AsyncTypeahead
                             id={'addEdgeTargetSearch'}
                             isLoading={targetLoading}
-                            onSearch={() => {}}
                             placeholder={'Target Node'}
                             delay={500}
                             renderMenu={(results, menuProps, props) => {

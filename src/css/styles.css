@@ -37,7 +37,6 @@ body {
     font-family: Helvetica;
     height: 100%;
     overflow: hidden;
-    overflow: hidden;
 }
 
 .customQueryGlyph {
@@ -110,7 +109,6 @@ div.tooltip-inner-custom {
 }
 
 .graph-dark {
-    background-color: #2e363e;
     background-color: #2e363e;
 }
 

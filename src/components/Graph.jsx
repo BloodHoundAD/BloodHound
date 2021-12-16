@@ -8,7 +8,7 @@ import { join } from 'path';
 import { remote } from 'electron';
 const { dialog } = remote;
 const uuidv4 = require('uuid/v4');
-let observer = require('fontfaceobserver');
+let Observer = require('fontfaceobserver');
 import { withAlert } from 'react-alert';
 import NodeTooltip from './Tooltips/NodeTooltip';
 import StageTooltip from './Tooltips/StageTooltip';
@@ -112,7 +112,7 @@ class GraphContainer extends Component {
     }
 
     componentDidMount() {
-        const font = new observer('Font Awesome 5 Free');
+        const font = new Observer('Font Awesome 5 Free');
         font.load().then((x) => {
             this.inita();
         });
@@ -675,8 +675,8 @@ class GraphContainer extends Component {
             this.applyDesign();
             this.lockScale();
             appStore.spotlightData = query.spotlight;
-            (appStore.startNode = query.startNode),
-                (appStore.endNode = query.endNode);
+            appStore.startNode = query.startNode;
+            appStore.endNode = query.endNode;
             emitter.emit('spotlightUpdate');
         }
     }
@@ -787,13 +787,13 @@ class GraphContainer extends Component {
                                             edges[edge.id] = edge;
                                         }
 
-                                        if (end != null) {
+                                        if (end !== null) {
                                             if (!nodes[end.id]) {
                                                 nodes[end.id] = end;
                                             }
                                         }
 
-                                        if (start != null) {
+                                        if (start !== null) {
                                             if (!nodes[start.id]) {
                                                 nodes[start.id] = start;
                                             }
@@ -824,7 +824,7 @@ class GraphContainer extends Component {
                                                         value,
                                                         params
                                                     );
-                                                    if (node != null) {
+                                                    if (node !== null) {
                                                         nodes[id] = node;
                                                     }
                                                 }
@@ -848,7 +848,7 @@ class GraphContainer extends Component {
                                             field,
                                             params
                                         );
-                                        if (node != null) {
+                                        if (node !== null) {
                                             nodes[id] = node;
                                         }
                                     }

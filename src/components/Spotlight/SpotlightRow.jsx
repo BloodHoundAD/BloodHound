@@ -11,8 +11,8 @@ export default class SpotlightRow extends Component {
     }
 
     render() {
-        var nodeIcon = '';
-        var parentIcon = '';
+        let nodeIcon;
+        let parentIcon = '';
         switch (this.props.nodeType) {
             case 'Group':
                 nodeIcon = 'fa fa-users';
