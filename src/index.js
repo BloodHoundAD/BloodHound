@@ -1,4 +1,5 @@
-import '@babel/polyfill'; // generators
+import "core-js/stable";
+import "regenerator-runtime/runtime"; // generators
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -141,6 +142,12 @@ global.appStore = {
                 scale: 1.25,
                 color: '#FFAA00',
             },
+            Container: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uF466',
+                scale: 1.25,
+                color: '#F79A78',
+            },
             GPO: {
                 font: "'Font Awesome 5 Free'",
                 content: '\uF03A',
@@ -237,11 +244,14 @@ global.appStore = {
             AddAllowedToAct: 'tapered',
             AllowedToAct: 'tapered',
             GetChanges: 'tapered',
-            GetChangeAll: 'tapered',
+            GetChangesAll: 'tapered',
             SQLAdmin: 'tapered',
             ReadGMSAPassword: 'tapered',
             HasSIDHistory: 'tapered',
             CanPSRemote: 'tapered',
+            AddSelf: 'tapered',
+            WriteSPN: 'tapered',
+            AddKeyCredentialLink: 'tapered'
         },
     },
     lowResPalette: {
