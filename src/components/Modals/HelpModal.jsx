@@ -45,6 +45,8 @@ import AZCloudAppAdmin from './HelpTexts/AZCloudAppAdmin/AZCloudAppAdmin';
 import AZRunsAs from './HelpTexts/AZRunsAs/AZRunsAs';
 import AZVMContributor from './HelpTexts/AZVMContributor/AZVMContributor';
 import Default from './HelpTexts/Default/Default';
+import WriteSPN from "./HelpTexts/WriteSPN/WriteSPN";
+import AddSelf from "./HelpTexts/AddSelf/AddSelf";
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -120,6 +122,8 @@ const HelpModal = () => {
         AZCloudAppAdmin: AZCloudAppAdmin,
         AZRunsAs: AZRunsAs,
         AZVMContributor: AZVMContributor,
+        WriteSPN: WriteSPN,
+        AddSelf: AddSelf
     };
 
     const Component = edge in components ? components[edge] : Default;

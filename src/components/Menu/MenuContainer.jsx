@@ -67,6 +67,7 @@ const MenuContainer = () => {
     const [uploading, setUploading] = useState(false);
     const fileId = useRef(0);
     const [uploadVisible, setUploadVisible] = useState(false);
+    const [needsPostProcess, setNeedsPostProcess] = useState(false);
 
     useEffect(() => {
         emitter.on('cancelUpload', cancelUpload);
@@ -366,20 +367,64 @@ const MenuContainer = () => {
         if (!uploading) {
             let f;
             for (let file of Object.values(fileQueue)) {
-                f = file;
                 if (file.status === FileStatus.Waiting) {
+                    f = file;
                     break;
                 }
             }
 
             if (f !== undefined) {
-                if (f.status !== FileStatus.Waiting)
-                    return
+                setNeedsPostProcess(true)
                 setUploading(true);
                 processJson(f);
             }
+
+            if (f === undefined && needsPostProcess){
+                for (let file of Object.values(fileQueue)){
+                    if (!fileIsComplete(file.status)){
+                        return
+                    }
+                }
+
+                postProcessUpload()
+            }
+
         }
     }, [fileQueue]);
+
+    const postProcessUpload = async () => {
+        console.log("Running post processing queries")
+        setNeedsPostProcess(false)
+        let session = driver.session();
+
+        const highValueSids = ["-544", "-500", "-512", "-516", "-518", "-519", "1-5-9", "-526", "-527"]
+        const highValueStatement = "UNWIND sids AS sid MATCH (n:Base) WHERE n.objectid ENDS WITH sid SET n.highvalue=true"
+
+        await session.run(highValueStatement, {sids: highValueSids}).catch((err) => {
+            console.log(err);
+        });
+
+        const baseOwnedStatement = "MATCH (n) WHERE n:User or n:Computer AND WHERE NOT EXISTS(n.owned) SET n.owned = false"
+        await session.run(baseOwnedStatement, null).catch((err) => {
+            console.log(err);
+        });
+
+        const dUsersSids = ["S-1-1-0", "S-1-5-11"]
+        const domainUsersAssociationStatement = "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' OR n.objectid ENDS WITH '-515' WITH n UNWIND sids AS sid MATCH (m:Group) WHERE m.objectid ENDS WITH sid MERGE (n)-[:MemberOf]->(m)"
+        await session.run(domainUsersAssociationStatement, {sids: dUsersSids}).catch((err) => {
+            console.log(err);
+        });
+
+        await session.close();
+    }
+
+    /**
+     *
+     * @param {FileStatus} status
+     */
+    const fileIsComplete = (status) => {
+        return status !== FileStatus.Waiting && status !== FileStatus.Processing
+    }
 
     const cancelUpload = () => {
     };
