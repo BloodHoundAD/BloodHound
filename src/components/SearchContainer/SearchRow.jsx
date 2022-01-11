@@ -78,7 +78,7 @@ const SearchRow = ({ item, search }) => {
             break;
         default:
             icon.className = 'fa fa-question';
-            type = 'Unknown';
+            type = 'Base';
             break;
     }
 

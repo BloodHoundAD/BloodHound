@@ -83,8 +83,9 @@ const SearchContainer = () => {
         session.run(statement, { name: term }).then((result) => {
             let data = [];
             for (let record of result.records) {
-                let properties = record._fields[0].properties;
-                let labels = record._fields[0].labels
+                let node = record.get(0)
+                let properties = node.properties;
+                let labels = node.labels
                 if (labels.length === 1){
                     properties.type = labels[0];
                 }else{

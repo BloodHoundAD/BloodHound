@@ -37,9 +37,9 @@ class QueryNodeSelect extends Component {
                 currentQueryTitle: query.title,
             });
             $(this.refs.outer).fadeToggle(true);
-            var session = driver.session();
+            let session = driver.session();
             session.run(query.query, query.props).then((results) => {
-                var y = $.map(results.records, (x) => {
+                let y = $.map(results.records, (x) => {
                     let a = x.keys.map((e, i) => {
                         let obj = {};
                         obj[e.split('.')[1]] = x._fields[i];

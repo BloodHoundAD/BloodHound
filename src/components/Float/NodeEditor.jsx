@@ -32,7 +32,7 @@ const NodeEditor = () => {
         let statement = `MATCH (n:${node.type} {objectid: $id}) RETURN n`;
 
         session.run(statement, { id: node.objectid }).then((result) => {
-            let props = result.records[0]._fields[0].properties;
+            let props = result.records[0].get(0).properties;
             let label = props.name;
             delete props.name;
             setName(label || props.objectid);
@@ -61,7 +61,7 @@ const NodeEditor = () => {
         let session = driver.session();
         let statement = `MATCH (n:${type} {objectid:  $id}) SET n.${newAttrName}=$newprop RETURN n`;
         session.run(statement, { id: id, newprop: newValue }).then((result) => {
-            let props = result.records[0]._fields[0].properties;
+            let props = result.records[0].get(0).properties;
             let label = props.name;
             delete props.name;
             setName(label || props.objectid);
@@ -88,7 +88,7 @@ const NodeEditor = () => {
 
         let session = driver.session();
         session.run(statement, { id: id, newprop: newValue }).then((result) => {
-            let props = result.records[0]._fields[0].properties;
+            let props = result.records[0].get(0).properties;
             let label = props.name;
             delete props.name;
             setName(label || props.objectid);
@@ -102,7 +102,7 @@ const NodeEditor = () => {
 
         let session = driver.session();
         session.run(statement, { id: id }).then((result) => {
-            let props = result.records[0]._fields[0].properties;
+            let props = result.records[0].get(0).properties;
             let label = props.name;
             delete props.name;
             setName(label || props.objectid);

@@ -214,7 +214,7 @@ global.appStore = {
                 scale: 1.25,
                 color: '#c1d6d6',
             },
-            Unknown: {
+            Base: {
                 font: "'Font Awesome 5 Free'",
                 content: '\uF128',
                 scale: 1.25,
@@ -262,7 +262,7 @@ global.appStore = {
             Domain: '#17E6B9',
             OU: '#FFAA00',
             GPO: '#7F72FD',
-            Unknown: '#E6E600',
+            Base: '#E6E600',
         },
         edgeScheme: {
             AdminTo: 'line',

@@ -61,7 +61,7 @@ const NodePlayCypherLink = ({
             domain: domain,
         })
             .then((result) => {
-                setValue(result.records[0]._fields[0]);
+                setValue(result.records[0].get(0));
                 setReady(true);
             })
             .catch((error) => {
