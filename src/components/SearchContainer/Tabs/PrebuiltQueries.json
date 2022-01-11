@@ -189,7 +189,7 @@
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((n)-[*1..]->(m {highvalue:true})) WHERE m.domain=$result AND m<>n RETURN p",
+                    "query": "MATCH p=shortestPath((n)-[:{}*1..]->(m {highvalue:true})) WHERE m.domain=$result AND m<>n RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
                 }
@@ -235,7 +235,7 @@
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((g:Group {name:$result})-[*1..]->(n {highvalue:true})) WHERE g.objectid ENDS WITH \"-513\" AND g<>n return p",
+                    "query": "MATCH p=shortestPath((g:Group {name:$result})-[:{}*1..]->(n {highvalue:true})) WHERE g.objectid ENDS WITH \"-513\" AND g<>n return p",
                     "allowCollapse": true
                 }
             ]
@@ -250,7 +250,7 @@
                 },
                 {
                     "final": true,
-                    "query": "MATCH p=shortestPath((g:Group {name:$result})-[*1..]->(n {highvalue:true})) WHERE g<>n return p",
+                    "query": "MATCH p=shortestPath((g:Group {name:$result})-[:{}*1..]->(n {highvalue:true})) WHERE g<>n return p",
                     "allowCollapse": true
                 }
             ]
