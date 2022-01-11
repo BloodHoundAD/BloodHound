@@ -231,7 +231,7 @@ const Login = () => {
             tempUrl = `${tempUrl}:7687`;
         }
 
-        if (!url.startsWith('bolt://')) {
+        if (!url.startsWith('bolt://') && !url.startsWith("bolt+s://") && !url.startsWith("neo4j+s://") && !url.startsWith("neo4j://")) {
             tempUrl = `bolt://${tempUrl}`;
         }
 

@@ -13,7 +13,6 @@ import path from 'path';
 import {parser} from 'stream-json';
 
 const {batch} = require('stream-json/utils/Batch');
-import unzipper from 'unzipper';
 import AdmZip from 'adm-zip'
 import * as NewIngestion from '../../js/newingestion';
 import UploadStatusContainer from '../Float/UploadStatusContainer';
