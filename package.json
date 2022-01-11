@@ -63,6 +63,7 @@
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.4",
+        "adm-zip": "^0.5.9",
         "async": "^2.6.3",
         "bootstrap": "^3.4.1",
         "clsx": "^1.1.1",
@@ -97,7 +98,6 @@
         "sanitize-filename": "^1.6.3",
         "stream-chain": "^2.2.3",
         "stream-json": "^1.7.3",
-        "unzipper": "^0.10.11",
         "uuid": "^8.3.2"
     }
 }

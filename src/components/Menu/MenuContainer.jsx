@@ -14,6 +14,7 @@ import {parser} from 'stream-json';
 
 const {batch} = require('stream-json/utils/Batch');
 import unzipper from 'unzipper';
+import AdmZip from 'adm-zip'
 import * as NewIngestion from '../../js/newingestion';
 import UploadStatusContainer from '../Float/UploadStatusContainer';
 import {streamArray} from "stream-json/streamers/StreamArray";
@@ -105,38 +106,21 @@ const MenuContainer = () => {
 
             if (isZipSync(fPath)) {
                 alert.info(`Unzipping file ${name}`);
-                const zip = fs
-                    .createReadStream(fPath)
-                    .pipe(unzipper.Parse({forceStream: true}));
-
-                for await (const entry of zip) {
-                    let sanitizedPath = sanitize(entry.path);
+                const zip = new AdmZip(fPath)
+                const zipEntries = zip.getEntries()
+                for (let entry of zipEntries){
+                    let sanitizedPath = sanitize(entry.entryName);
                     let output = path.join(tempPath, sanitizedPath);
+                    zip.extractEntryTo(entry.entryName, tempPath, false, true, false, sanitizedPath)
 
-                    let success = await new Promise((resolve, reject) => {
-                        let st = fs.createWriteStream(output);
-                        st.on('error', (err) => {
-                            console.error(err);
-                            resolve(false);
-                        });
-
-                        st.on('finish', () => {
-                            resolve(true);
-                        });
-
-                        entry.pipe(st);
+                    finalFiles.push({
+                        path: output,
+                        name: sanitizedPath,
+                        zip_name: name,
+                        delete: true,
+                        id: fileId.current,
                     });
-
-                    if (success) {
-                        finalFiles.push({
-                            path: output,
-                            name: sanitizedPath,
-                            zip_name: name,
-                            delete: true,
-                            id: fileId.current,
-                        });
-                        fileId.current += 1;
-                    }
+                    fileId.current += 1;
                 }
             } else {
                 finalFiles.push({
@@ -314,6 +298,9 @@ const MenuContainer = () => {
         pipeline.on('end', () => {
             setUploading(false)
             file.status = FileStatus.Done;
+            if (file.delete) {
+                fs.unlinkSync(file.path)
+            }
             setFileQueue((state) => {
                 return {...state, [file.id]: file};
             });
