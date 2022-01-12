@@ -20,7 +20,7 @@ before_install:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y p7zip-full; fi
 
 install:
-    - npm install
+    - npm ci
     - npm install -g electron-packager
 
 script:
