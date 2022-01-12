@@ -81,7 +81,7 @@ const GPONodeData = () => {
                                     property='Reachable High Value Targets'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH (m:GPO {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                        'MATCH (m:GPO {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
                                     }
                                     start={label}
                                 />
