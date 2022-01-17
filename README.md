@@ -1,6 +1,6 @@
 # BloodHound: Six Degrees of Domain Admin (and Global Admin, too!)
 
-![BloodHound Logo](https://bloodhound.readthedocs.io/en/latest/_images/bloodhound-logo.png)
+![BloodHound Logo](https://imgur.com/a/eF0MDnO)
 
 # Getting Started with BloodHound
 
