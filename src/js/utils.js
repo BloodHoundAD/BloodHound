@@ -231,12 +231,47 @@ function dropIndexes(indexes) {
             session.close();
         });
     } else {
-        addConstraints();
+        setSchema();
     }
 }
 
-export async function addConstraints() {
+export async function setSchema() {
+    const luceneIndexProvider = "lucene+native-3.0"
+    const bTreeIndexProvider = "native-btree-1.0"
+    let labels = ["User", "Group", "Computer", "GPO", "OU", "Domain", "Container", "Base", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM"]
+    let azLabels = ["AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM"]
+    let schema = {}
+    for (let label of labels){
+        schema[label] = {
+            name: label,
+            indexes: [{
+                name: "{}_{}_index".format(label.toLowerCase(), "name"),
+                provider: luceneIndexProvider,
+                property: "name"
+            }],
+            constraints: [{
+                name: "{}_{}_constraint".format(label.toLowerCase(), "objectid"),
+                provider: luceneIndexProvider,
+                property: "objectid"
+            }],
+        }
+    }
+
+    for (let label of azLabels) {
+        schema[label]["indexes"].push({
+            name: "{}_{}_index".format(label.toLowerCase(), "azname"),
+            provider: luceneIndexProvider
+        })
+    }
+
     let session = driver.session();
+
+    const constraintStatement = "CREATE CONSTRAINT IF NOT EXISTS ON (c:{}) ASSERT c.objectid IS UNIQUE OPTIONS {indexProvider:{}}"
+
+    for (let label of labels){
+        await session.run(constraintStatement.format(label, "lucene+native-3.0"))
+        await session.run
+    }
     await session
         .run('CREATE CONSTRAINT ON (c:Base) ASSERT c.objectid IS UNIQUE')
         .catch((_) => {});
@@ -252,6 +287,8 @@ export async function addConstraints() {
     await session.run('CREATE INDEX ON :Domain(objectid)').catch((_) => {});
     await session.run('CREATE INDEX ON :OU(name)').catch((_) => {});
     await session.run('CREATE INDEX ON :OU(objectid)').catch((_) => {});
+    await session.run('CREATE INDEX ON :Container(name)').catch((_) => {});
+    await session.run('CREATE INDEX ON :Container(objectid)').catch((_) => {});
     await session.run('CREATE INDEX ON :Base(name)').catch((_) => {});
     await session.run('CREATE INDEX ON :AZApp(objectid)').catch((_) => {});
     await session.run('CREATE INDEX ON :AZApp(azname)').catch((_) => {});
