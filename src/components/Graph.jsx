@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { findGraphPath, generateUniqueId, addConstraints } from 'utils';
+import { findGraphPath, generateUniqueId, setSchema } from 'utils';
 import { writeFile, readFile } from 'fs';
 import { fork } from 'child_process';
 
@@ -67,7 +67,7 @@ class GraphContainer extends Component {
             }.bind(this)
         );
 
-        addConstraints();
+        setSchema();
 
         emitter.on(
             'doLogout',
