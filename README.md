@@ -1,4 +1,4 @@
-# BloodHound: Six Degrees of Domain Admin (and Global Admin, too!)
+# BloodHound
 
 ![BloodHound Logo](https://i.imgur.com/SRvk28m.png)
 
