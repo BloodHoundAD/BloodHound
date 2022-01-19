@@ -2,10 +2,25 @@ AzureHound
 ==========
 
 AzureHound uses the “Az” Azure PowerShell module and “Azure AD” PowerShell
-module for gathering data within Azure and Azure AD. If the modules are not
-installed, you can use the “-Install” switch to install them. The modules
-require PowerShell version 5.1 and greater. To check your PowerShell version,
-use “$PSVersionTable.PSVersion”. It’s also recommended to first set your TLS
+module for gathering data within Azure and Azure AD. 
+
+If the modules are not installed, you can use the the following commands to installed them. 
+The modules require PowerShell version 5.1 and greater. To check your PowerShell version,
+use “$PSVersionTable.PSVersion”. 
+
+:: 
+
+    Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
+    Install-Module -Name AzureAD -Scope CurrentUser -Repository PSGallery -Force
+
+You then need to import the modules
+
+::
+
+    Import-Module Az
+    Import-Module Azuread
+
+It’s also recommended to first set your TLS
 version to 1.2 with this command to prevent any issues while installing these
 modules:
 
