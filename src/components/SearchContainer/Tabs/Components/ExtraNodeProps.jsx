@@ -7,7 +7,7 @@ import { Table } from 'react-bootstrap';
 const ExtraNodeProps = ({ label, properties, displayMap }) => {
     const [elements, setElements] = useState([]);
 
-    const blacklist = ['highvalue', 'hasspn', 'primarygroupid'];
+    const blacklist = ['highvalue', 'hasspn', 'primarygroupid', 'name'];
 
     const createValue = (value) => {
         let type = typeof value;
