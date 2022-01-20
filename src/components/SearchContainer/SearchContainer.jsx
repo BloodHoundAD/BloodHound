@@ -134,8 +134,8 @@ const SearchContainer = () => {
             pathSearchSelected
         );
 
-        mainSearchRef.current.getInstance().getInput().blur();
-        pathSearchRef.current.getInstance().getInput().blur();
+        mainSearchRef.current.blur();
+        pathSearchRef.current.blur();
         emitter.emit('query', query, props, startTarget, endTarget);
     };
 
@@ -247,8 +247,8 @@ const SearchContainer = () => {
             return;
         }
 
-        mainSearchRef.current.getInstance().getInput().blur();
-        pathSearchRef.current.getInstance().getInput().blur();
+        mainSearchRef.current.blur();
+        pathSearchRef.current.blur();
 
         if (!pathfindingOpen) {
             if (mainSearchSelected === null) {
