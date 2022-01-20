@@ -240,7 +240,7 @@ const Abuse = (
         
         You can also abuse this without using Windows-based tooling if you are operating from a Linux host. DCSync.py from n00py will let you authenticate with either a plaintext password, NT hash, or kerberos ticket:
         
-        To grant the "n00py" user DCSync privileges, authenticating as the user "n00py" with the password "Password1":
+        To grant the "n00py" user DCSync privileges, authenticating as the user "n00py" with the password "Password123":
         <code>./dcsync.py -dc dc01.n00py.local -t 'CN=n00py,OU=Employees,DC=n00py,DC=local'  n00py\Administrator:Password123</code>
         
         Source: <a href="https://github.com/n00py/DCSync">https://github.com/n00py/DCSync</a>`
