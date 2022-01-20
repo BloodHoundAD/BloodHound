@@ -1,6 +1,8 @@
 import { groupBy } from 'lodash/collection';
 
-var labels = [
+const labels = [
+    'Base',
+    'Container',
     'OU',
     'GPO',
     'User',
@@ -36,11 +38,14 @@ export function generateUniqueId(sigmaInstance, isNode) {
 
 function getRealLabel(label) {
     let ret = null;
-    $.each(labels, (_, l) => {
-        if (l.toLowerCase() === label.toLowerCase()) {
+    let comp = label.toLowerCase()
+    for (let l of labels){
+        if (comp === l.toLowerCase()){
+
             ret = l;
+            break;
         }
-    });
+    }
 
     return ret;
 }
@@ -237,7 +242,6 @@ function dropIndexes(indexes) {
 
 export async function setSchema() {
     const luceneIndexProvider = "lucene+native-3.0"
-    const bTreeIndexProvider = "native-btree-1.0"
     let labels = ["User", "Group", "Computer", "GPO", "OU", "Domain", "Container", "Base", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM"]
     let azLabels = ["AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM"]
     let schema = {}
@@ -260,54 +264,45 @@ export async function setSchema() {
     for (let label of azLabels) {
         schema[label]["indexes"].push({
             name: "{}_{}_index".format(label.toLowerCase(), "azname"),
-            provider: luceneIndexProvider
+            provider: luceneIndexProvider,
+            property: "azname"
         })
     }
 
     let session = driver.session();
 
-    const constraintStatement = "CREATE CONSTRAINT IF NOT EXISTS ON (c:{}) ASSERT c.objectid IS UNIQUE OPTIONS {indexProvider:{}}"
-
     for (let label of labels){
-        await session.run(constraintStatement.format(label, "lucene+native-3.0"))
-        await session.run
+        for (let constraint of schema[label].constraints){
+            let props = {
+                name: constraint.name,
+                label: [label],
+                properties: [constraint.property],
+                provider: constraint.provider
+            }
+            try{
+
+                await session.run("CALL db.createUniquePropertyConstraint($name, $label, $properties, $provider)", props)
+            }catch (e) {
+                //console.error(e)
+            }
+        }
+
+        for (let index of schema[label].indexes) {
+            let props = {
+                name: index.name,
+                label: [label],
+                properties: [index.property],
+                provider: index.provider
+            }
+            try{
+
+                await session.run("CALL db.createIndex($name, $label, $properties, $provider)", props)
+            }catch (e) {
+                //console.error(e)
+            }
+
+        }
     }
-    await session
-        .run('CREATE CONSTRAINT ON (c:Base) ASSERT c.objectid IS UNIQUE')
-        .catch((_) => {});
-    await session.run('CREATE INDEX ON :User(name)').catch((_) => {});
-    await session.run('CREATE INDEX ON :User(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :Group(name)').catch((_) => {});
-    await session.run('CREATE INDEX ON :Group(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :Computer(name)').catch((_) => {});
-    await session.run('CREATE INDEX ON :Computer(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :GPO(name)').catch((_) => {});
-    await session.run('CREATE INDEX ON :GPO(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :Domain(name)').catch((_) => {});
-    await session.run('CREATE INDEX ON :Domain(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :OU(name)').catch((_) => {});
-    await session.run('CREATE INDEX ON :OU(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :Container(name)').catch((_) => {});
-    await session.run('CREATE INDEX ON :Container(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :Base(name)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZApp(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZApp(azname)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZDevice(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZDevice(azname)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZGroup(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZGroup(azname)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZKeyVault(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZKeyVault(azname)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZResourceGroup(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZResourceGroup(azname)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZServicePrincipal(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZServicePrincipal(azname)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZTenant(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZTenant(azname)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZUser(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZUser(azname)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZVM(objectid)').catch((_) => {});
-    await session.run('CREATE INDEX ON :AZVM(azname)').catch((_) => {});
     
     await session.close();
 
