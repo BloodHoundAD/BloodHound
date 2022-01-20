@@ -24,6 +24,7 @@ import imageType from 'image-type';
 import { withAlert } from 'react-alert';
 import styles from './TabContainer.module.css';
 import BaseNodeData from "./Tabs/BaseNodeData";
+import ContainerNodeData from "./Tabs/ContainerNodeData";
 
 class TabContainer extends Component {
 
@@ -38,6 +39,7 @@ class TabContainer extends Component {
             domainVisible: false,
             gpoVisible: false,
             ouVisible: false,
+            containerVisible: false,
             azGroupVisible: false,
             azUserVisible: false,
             azKeyVaultVisible: false,
@@ -97,6 +99,8 @@ class TabContainer extends Component {
             this._azAppNodeClicked();
         } else if (type === 'Base') {
             this._baseNodeClicked();
+        } else if (type === 'Container') {
+            this._containerNodeClicked()
         }
     }
 
@@ -126,6 +130,14 @@ class TabContainer extends Component {
         this.clearVisible()
         this.setState({
             baseVisible: true,
+            selected: 2
+        });
+    }
+
+    _containerNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            containerVisible: true,
             selected: 2
         });
     }
@@ -278,6 +290,8 @@ class TabContainer extends Component {
                     <Tab eventKey={2} title='Node Info'>
                         <NoNodeData
                             visible={
+                                !this.state.baseVisible &&
+                                !this.state.containerVisible &&
                                 !this.state.userVisible &&
                                 !this.state.computerVisible &&
                                 !this.state.groupVisible &&
@@ -306,6 +320,7 @@ class TabContainer extends Component {
                         <DomainNodeData visible={this.state.domainVisible} />
                         <GpoNodeData visible={this.state.gpoVisible} />
                         <OuNodeData visible={this.state.ouVisible} />
+                        <ContainerNodeData visible={this.state.containerVisible} />
                         <AZGroupNodeData visible={this.state.azGroupVisible} />
                         <AZUserNodeData visible={this.state.azUserVisible} />
                         <AZKeyVaultNodeData
