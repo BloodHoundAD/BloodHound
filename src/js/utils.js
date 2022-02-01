@@ -108,137 +108,109 @@ export function findGraphPath(sigmaInstance, reverse, nodeid, traversed) {
     }
 }
 
-export function clearSessions() {
+export async function clearSessions() {
     emitter.emit('openClearingModal');
-    deleteSessions();
+    await deleteSessions();
 }
 
-function deleteSessions() {
-    var session = driver.session();
-    session
-        .run(
-            'MATCH ()-[r:HasSession]-() WITH r LIMIT 100000 DELETE r RETURN count(r)'
-        )
-        .then(function (results) {
-            session.close();
-            emitter.emit('refreshDBData');
-            var count = results.records[0]._fields[0];
-            if (count === 0) {
-                emitter.emit('hideDBClearModal');
-            } else {
-                deleteSessions();
-            }
-        });
-}
-
-export function clearDatabase() {
-    emitter.emit('openClearingModal');
-    deleteEdges();
-}
-
-function deleteEdges() {
-    var session = driver.session();
-    session
-        .run('MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)')
-        .then(function (results) {
-            emitter.emit('refreshDBData');
-            session.close();
-            var count = results.records[0]._fields[0];
-            if (count === 0) {
-                deleteNodes();
-            } else {
-                deleteEdges();
-            }
-        });
-}
-
-function deleteNodes() {
-    var session = driver.session();
-    session
-        .run('MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)')
-        .then(function (results) {
-            emitter.emit('refreshDBData');
-            session.close();
-            var count = results.records[0]._fields[0];
-            if (count === 0) {
-                grabConstraints();
-            } else {
-                deleteNodes();
-            }
-        });
-}
-
-function grabConstraints() {
-    var session = driver.session();
-    let constraints = [];
-    session.run('CALL db.constraints').then(function (results) {
-        $.each(results.records, function (index, container) {
-            let constraint = container._fields[0];
-            let query;
-            if (neoVersion.startsWith('3.')) {
-                query = 'DROP ' + constraint;
-            } else {
-                query = 'DROP CONSTRAINT ' + constraint;
-            }
-
-            constraints.push(query);
-        });
-
-        session.close();
-
-        dropConstraints(constraints);
-    });
-}
-
-function dropConstraints(constraints) {
-    if (constraints.length > 0) {
-        let constraint = constraints.shift();
-        let session = driver.session();
-        session.run(constraint).then(function () {
-            dropConstraints(constraints);
-            session.close();
-        });
-    } else {
-        grabIndexes();
+async function deleteSessions() {
+    let session = driver.session();
+    let results = await session.run('MATCH ()-[r:HasSession]-() WITH r LIMIT 100000 DELETE r RETURN count(r)')
+    let count = results.records[0].get(0)
+    if (count === 0){
+        emitter.emit('hideDBClearModal')
+    }else{
+        await deleteSessions()
     }
 }
 
-function grabIndexes() {
-    var session = driver.session();
-    let constraints = [];
-
-    session.run('CALL db.indexes').then(function (results) {
-        $.each(results.records, function (index, container) {
-            let query;
-            if (neoVersion.startsWith('3.')) {
-                let constraint = container._fields[0];
-                query = 'DROP ' + constraint;
-            } else {
-                let constraint = container._fields[1];
-                query = 'DROP INDEX ' + constraint;
-            }
-
-            constraints.push(query);
-        });
-
-        session.close();
-
-        dropIndexes(constraints);
-    });
+export async function clearDatabase() {
+    emitter.emit('openClearingModal');
+    await deleteEdges();
 }
 
-function dropIndexes(indexes) {
-    if (indexes.length > 0) {
-        let constraint = indexes.shift();
-        let session = driver.session();
-        session.run(constraint).then(function () {
-            dropConstraints(indexes);
-            session.close();
-        });
-    } else {
-        setSchema();
+async function deleteEdges() {
+    let session = driver.session();
+    let results = await session.run('MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)')
+    emitter.emit('refreshDBData')
+    let count = results.records[0].get(0)
+    await session.close()
+
+    if (count === 0){
+        await deleteNodes()
+    }else{
+        await deleteEdges()
+    }
+
+}
+
+async function deleteNodes() {
+    let session = driver.session();
+    let results = await session.run('MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)')
+    emitter.emit('refreshDBData')
+    let count = results.records[0].get(0)
+    await session.close()
+
+    if (count === 0){
+        await dropConstraints()
+    }else{
+        await deleteNodes()
     }
 }
+
+async function dropConstraints() {
+    let session = driver.session();
+    let constraints = [];
+    let result = await session.run('CALL db.constraints')
+
+    for (let record of result.records){
+        let constraint = record.get(0)
+        let query;
+        if (neoVersion.startsWith('3.')){
+            query = 'DROP ' + constraint
+        }else{
+            query = 'DROP CONSTRAINT ' + constraint
+        }
+
+        constraints.push(query)
+    }
+
+    for (let constraintQuery of constraints){
+        await session.run(constraintQuery)
+    }
+
+    await session.close()
+
+    await dropIndexes()
+}
+
+async function dropIndexes() {
+    let session = driver.session();
+    let indexes = [];
+
+    let result = await session.run('CALL db.constraints')
+
+    for (let record of result.records){
+        let constraint = record.get(0)
+        let query;
+        if (neoVersion.startsWith('3.')){
+            query = 'DROP ' + constraint
+        }else{
+            query = 'DROP INDEX ' + constraint
+        }
+
+        indexes.push(query)
+    }
+
+    for (let indexQuery of indexes){
+        await session.run(indexQuery)
+    }
+
+    await session.close()
+
+    await setSchema()
+}
+
 
 export async function setSchema() {
     const luceneIndexProvider = "lucene+native-3.0"
