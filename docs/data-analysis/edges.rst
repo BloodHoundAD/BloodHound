@@ -1613,6 +1613,44 @@ https://www.youtube.com/watch?v=z8thoG7gPd0
 
 |
 
+AddKeyCredentialLink
+^^^^^^^^^^^^^^^^^^^^
+
+The ability to write to the "msds-KeyCredentialLink" property on a user or computer.
+Writing to this property allows an attacker to create "Shadow Credentials" on the
+object and authenticate as the principal using kerberos PKINIT.
+
+Abuse Info
+----------
+
+To abuse this privilege, use Whisker:
+    
+::
+
+    Whisker.exe add /target:<TargetPrincipal>
+    
+For other optional parameters, view the Whisper documentation.
+
+Opsec Considerations
+--------------------
+
+Executing the attack will generate a 5136 (A directory object was modified) event
+at the domain controller if an appropriate SACL is in place on the target object.
+    
+If PKINIT is not common in the environment, a 4768 (Kerberos authentication ticket
+(TGT) was requested) ticket can also expose the attacker.
+
+References
+----------
+
+https://posts.specterops.io/shadow-credentials-abusing-key-trust-account-mapping-for-takeover-8ee1a53566ab
+
+|
+
+----
+
+|
+
 Contains
 ^^^^^^^^
 
