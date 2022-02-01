@@ -214,13 +214,13 @@ const MenuContainer = () => {
         for (let file of files) {
             let meta = await getMetaTagQuick(file);
 
-            // if (!('version' in meta) || meta.version < 3) {
-            //     filteredFiles[file.id] = {
-            //         ...file,
-            //         status: FileStatus.InvalidVersion,
-            //     };
-            //     continue;
-            // }
+            if (!('version' in meta) || meta.version < 4) {
+                filteredFiles[file.id] = {
+                    ...file,
+                    status: FileStatus.InvalidVersion,
+                };
+                continue;
+            }
 
             if (!Object.keys(IngestFuncMap).includes(meta.type)) {
                 console.log(meta.type);
