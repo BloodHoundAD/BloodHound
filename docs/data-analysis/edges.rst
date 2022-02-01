@@ -432,6 +432,91 @@ References
 
 |
 
+AddSelf
+^^^^^^^^^^
+
+This edge indicates the principal has the ability to add itself to the target
+security group. Because of security group delegation, the members of a security group have
+the same privileges as that group.
+
+By adding yourself to a group and refreshing your token, you gain all the same privileges
+that group has.
+
+See this clip for an example of this edge being abused:
+
+.. raw:: html
+
+    <div style="text-align: center; margin-bottom: 2em;">
+    <iframe width="100%" height="350" src="https://www.youtube.com/embed/z8thoG7gPd0?t=2123?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+
+Abuse Info
+----------
+
+There are at least two ways to execute this attack. The first and most obvious is by using
+the built-in net.exe binary in Windows (e.g.: net group "Domain Admins" dfm.a /add
+/domain). See the opsec considerations tab for why this may be a bad idea. The second, and
+highly recommended method, is by using the Add-DomainGroupMember function in PowerView.
+This function is superior to using the net.exe binary in several ways. For instance, you
+can supply alternate credentials, instead of needing to run a process as or logon as the
+user with the AddSelf privilege. Additionally, you have much safer execution options than
+you do with spawning net.exe (see the opsec tab).
+
+To abuse this privilege with PowerView's Add-DomainGroupMember, first import PowerView into
+your agent session or into a PowerShell instance at the console. 
+
+You may need to authenticate to the Domain Controller as the user with the AddSelf right
+if you are not running a process as that user. To do this in conjunction with
+Add-DomainGroupMember, first create a PSCredential object (these examples comes from the
+PowerView help documentation):
+
+::
+
+  $SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+  $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)
+
+Then, use Add-DomainGroupMember, optionally specifying $Cred if you are not already running
+within a process owned by the user with the AddSelf privilege
+
+::
+
+  Add-DomainGroupMember -Identity 'Domain Admins' -Members 'harmj0y' -Credential $Cred
+
+Finally, verify that the user was successfully added to the group with PowerView's Get-DomainGroupMember:
+
+::
+
+  Get-DomainGroupMember -Identity 'Domain Admins'
+
+Opsec Considerations
+--------------------
+
+Executing this abuse with the net binary will require command line execution. If your target
+organization has command line logging enabled, this is a detection opportunity for their
+analysts.
+
+Regardless of what execution procedure you use, this action will generate a 4728 event on the
+domain controller that handled the request. This event may be centrally collected and analyzed
+by security analysts, especially for groups that are obviously very high privilege groups
+(i.e.: Domain Admins). Also be mindful that Powershell 5 introduced several key security
+features such as script block logging and AMSI that provide security analysts another detection
+opportunity. 
+
+You may be able to completely evade those features by downgrading to PowerShell v2.
+
+References
+----------
+
+* https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1
+* https://www.youtube.com/watch?v=z8thoG7gPd0
+* https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4728
+
+|
+
+----
+
+|
+
 CanRDP
 ^^^^^^
 
