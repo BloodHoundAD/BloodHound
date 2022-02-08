@@ -1,4 +1,4 @@
-import { groupSpecialFormat, typeFormat } from '../Formatter';
+import { typeFormat } from '../Formatter';
 
 const General = (sourceName, sourceType, targetName, targetType) => {
     let text = `The ${typeFormat(

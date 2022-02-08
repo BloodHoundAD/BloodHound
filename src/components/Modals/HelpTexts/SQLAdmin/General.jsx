@@ -1,5 +1,3 @@
-import { groupSpecialFormat, typeFormat } from '../Formatter';
-
 const General = (sourceName, sourceType, targetName, targetType) => {
     let text = `The user ${sourceName} is a SQL admin on the computer ${targetName}.
 

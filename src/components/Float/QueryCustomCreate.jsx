@@ -1,29 +1,17 @@
-import React, { useEffect, useState, useContext } from 'react';
-import PropTypes from 'prop-types';
-import {
-    Panel,
-    Button,
-    FormControl,
-    ControlLabel,
-    FormGroup,
-    Form,
-    Col,
-    Checkbox,
-    Row
-} from 'react-bootstrap';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import React, {useContext, useEffect, useState} from 'react';
+import {Button, Col, ControlLabel, FormGroup, Panel, Row} from 'react-bootstrap';
+import {Typeahead} from 'react-bootstrap-typeahead';
 import styles from './QueryCustomCreate.module.css';
-import Draggable from 'react-draggable';
 import clsx from 'clsx';
-import { AppContext } from '../../AppContext';
+import {AppContext} from '../../AppContext';
 import PoseContainer from '../PoseContainer';
-import { useDragControls } from 'framer-motion';
+import {useDragControls} from 'framer-motion';
 
-import { remote } from 'electron';
-const { app } = remote;
+import {remote} from 'electron';
 import path from 'path';
 import fs from 'fs';
-import { select } from 'async';
+
+const { app } = remote;
 
 const QueryCustomCreate = () => {
     const [nodeCollapse, setNodeCollapse] = useState(appStore.performance.edge);
@@ -83,7 +71,7 @@ const QueryCustomCreate = () => {
 
         fs.readFile(filePath, 'utf8', (err, data) => {
             let j = JSON.parse(data);
-            j.queries.push({ "name": queryName, "category": selectedCategory, "queryList": [{ "final": true, "query": query, "allowColapse": true }] })
+            j.queries.push({ "name": queryName, "category": selectedCategory, "queryList": [{ "final": true, "query": query, "allowCollapse": true }] })
             fs.writeFile(filePath, JSON.stringify(j, null, "\t"), function (err) { emitter.emit('updateCustomQueries'); })
         });
 
@@ -100,7 +88,7 @@ const QueryCustomCreate = () => {
 
     const registerCategories = (e) => {
         let tempCategories = categories;
-        for (var queryCategory in e) {
+        for (let queryCategory in e) {
             if (['last', 'chunk', 'allEdgesSameType'].includes(queryCategory) || categories.includes(queryCategory)) {
                 continue;
             }
@@ -152,7 +140,7 @@ const QueryCustomCreate = () => {
                                 <input
                                     id='queryName'
                                     type='text'
-                                    className={clsx(styles.input, 'form-control')}
+                                    className={clsx('form-control')}
                                     value={queryName}
                                     autoComplete='off'
                                     placeholder='Name your query.'
@@ -188,7 +176,7 @@ const QueryCustomCreate = () => {
                                 />
                             </Col>
                             <Col componentClass={ControlLabel} style={{ margin: "auto", cursor: "pointer"}} sm={1}>
-                                <i class="fa fa-play fa-2x" onClick={runQuery}></i>
+                                <i className="fa fa-play fa-2x" onClick={runQuery}/>
                             </Col>
                         </Row>
                     </FormGroup>
@@ -206,7 +194,7 @@ const QueryCustomCreate = () => {
                             </Col>
                             <Col
                                 componentClass={ControlLabel}
-                                style={{"text-align": "right"}}
+                                style={{textAlign: "right"}}
                                 sm={2}
                             >
                                 <Button

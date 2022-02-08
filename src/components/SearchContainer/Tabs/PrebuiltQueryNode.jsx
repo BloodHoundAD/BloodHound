@@ -3,7 +3,7 @@ import './PrebuiltQueries.module.css';
 
 export default class PrebuiltQueryNode extends Component {
     render() {
-        var c;
+        let c;
 
         c = function() {
             if (appStore.prebuiltQuery.length === 0) {
@@ -17,7 +17,7 @@ export default class PrebuiltQueryNode extends Component {
         return (
                 <tr style={{ cursor: 'pointer' }} onClick={c}>
                     <td align='left'>{this.props.info.name}</td>
-                    <td align='right'></td>
+                    <td align='right'/>
                 </tr>
         );
     }

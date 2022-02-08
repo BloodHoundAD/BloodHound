@@ -1,5 +1,5 @@
 const Abuse = (sourceName, sourceType, targetName,targetType) => {
-    let text = `A targeted kerberoast attack can be performed using PowerView’s Set-DomainObject along with Get-DomainSPNTicket. 
+    return `A targeted kerberoast attack can be performed using PowerView’s Set-DomainObject along with Get-DomainSPNTicket. 
 
         You may need to authenticate to the Domain Controller as ${
         (sourceType === 'User' || sourceType === 'Computer')
@@ -20,9 +20,7 @@ const Abuse = (sourceName, sourceType, targetName,targetType) => {
 
         The recovered hash can be cracked offline using the tool of your choice. Cleanup of the ServicePrincipalName can be done with the Set-DomainObject command:
 
-        <code>Set-DomainObject -Credential $Cred -Identity harmj0y -Clear serviceprincipalname</code>`;
-
-    return text
+        <code>Set-DomainObject -Credential $Cred -Identity harmj0y -Clear serviceprincipalname</code>`
 }
 
 export default Abuse;

@@ -1,5 +1,5 @@
-import React, {useEffect, useState, useRef, useContext} from 'react';
-import { AppContext } from '../../../AppContext';
+import React, {useContext, useEffect, useState} from 'react';
+import {AppContext} from '../../../AppContext';
 import CollapsibleSection from './Components/CollapsibleSection';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import MappedNodeProps from './Components/MappedNodeProps';

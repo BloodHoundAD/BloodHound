@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, {useEffect, useState} from 'react';
 import BaseModal from './BaseModal';
 import GenericAll from './HelpTexts/GenericAll/GenericAll';
-import { Button, Modal } from 'react-bootstrap';
-import { encode } from 'he';
+import {Button, Modal} from 'react-bootstrap';
+import {encode} from 'he';
 import MemberOf from './HelpTexts/MemberOf/MemberOf';
 import AllExtendedRights from './HelpTexts/AllExtendedRights/AllExtendedRights';
 import AdminTo from './HelpTexts/AdminTo/AdminTo';

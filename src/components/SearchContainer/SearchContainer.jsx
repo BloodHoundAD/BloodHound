@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import PropTypes from 'prop-types';
 import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 import GlyphiconSpan from '../GlyphiconSpan';
 import Icon from '../Icon';
@@ -59,7 +58,7 @@ const SearchContainer = () => {
                 type: node.type,
             };
             closeTooltip();
-            var elem = jQuery(pathfinding.current);
+            let elem = jQuery(pathfinding.current);
             if (!elem.is(':visible')) {
                 setPathfindingOpen(true);
                 elem.slideToggle('fast');

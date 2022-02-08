@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { remote } from 'electron';
 const { app } = remote;
 import path from 'path';
@@ -31,7 +30,7 @@ const PrebuiltQueriesDisplay = () => {
         );
         fs.readFile(filePath, 'utf8', (err, data) => {
             let j = JSON.parse(data);
-            var y = [];
+            let y = [];
             j.queries.forEach((query) => {
                 try {
                     if (query.category === undefined || query.category === "") {
@@ -59,7 +58,7 @@ const PrebuiltQueriesDisplay = () => {
             url: 'src/components/SearchContainer/Tabs/PrebuiltQueries.json',
             type: 'GET',
             success: function (response) {
-                var y = [];
+                let y = [];
 
                 $.each(response.queries, function (_, el) {
                     try {
@@ -108,11 +107,21 @@ const PrebuiltQueriesDisplay = () => {
     };
 
     const createQuerieSections = (queryArray) => {
-        var finalQueryElement = [];
+        let finalQueryElement = [];
         
-        for (var queryCategory in queryArray) {
+        for (let queryCategory in queryArray) {
             try {
-                finalQueryElement.push(<CollapsibleSection header={queryCategory}><div className={styles.itemlist}><Table><thead></thead><tbody className='searchable'>{queryArray[queryCategory].map(function (a) { return <PrebuiltQueryNode key={a.name} info={a} />; })}</tbody></Table></div></CollapsibleSection>);
+                finalQueryElement.push(
+                    <CollapsibleSection header={queryCategory} key={queryCategory}>
+                        <div className={styles.itemlist}>
+                            <Table>
+                                <thead/>
+                                <tbody className='searchable'>
+                                    {queryArray[queryCategory].map(function (a) { return <PrebuiltQueryNode key={a.name} info={a} />; })}
+                                </tbody>
+                            </Table>
+                        </div>
+                    </CollapsibleSection>);
             } catch (e) {
                 //alert("Create Query Section Exception: " + e.message + "\nqueryCategory: " + queryCategory);
             }

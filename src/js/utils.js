@@ -1,5 +1,3 @@
-import { groupBy } from 'lodash/collection';
-
 const labels = [
     'Base',
     'Container',
@@ -22,7 +20,7 @@ const labels = [
 ];
 
 export function generateUniqueId(sigmaInstance, isNode) {
-    var i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
+    let i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
     if (isNode) {
         while (typeof sigmaInstance.graph.nodes(i) !== 'undefined') {
             i = Math.floor(Math.random() * (100000 - 10 + 1)) + 10;
@@ -85,14 +83,14 @@ export function findGraphPath(sigmaInstance, reverse, nodeid, traversed) {
     traversed.push(nodeid);
     //This is our stop condition for recursing
     if (nodeid !== target.id) {
-        var edges = sigmaInstance.graph.adjacentEdges(nodeid);
-        var nodes = reverse
+        let edges = sigmaInstance.graph.adjacentEdges(nodeid);
+        let nodes = reverse
             ? sigmaInstance.graph.inboundNodes(nodeid)
             : sigmaInstance.graph.outboundNodes(nodeid);
         //Loop over the nodes near us and the edges connecting to those nodes
         $.each(nodes, function (index, node) {
             $.each(edges, function (index, edge) {
-                var check = reverse ? edge.source : edge.target;
+                let check = reverse ? edge.source : edge.target;
                 //If an edge is pointing in the right direction, set its color
                 //Push the edge into our store and then
                 node = parseInt(node);

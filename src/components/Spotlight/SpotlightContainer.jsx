@@ -34,7 +34,7 @@ const SpotlightContainer = () => {
     };
 
     const handleSpace = (event) => {
-        var key = event.keyCode ? event.keyCode : event.which;
+        let key = event.keyCode ? event.keyCode : event.which;
 
         if (document.activeElement === document.body && key === 32) {
             setVisible((v) => !v);
@@ -103,8 +103,8 @@ const SpotlightContainer = () => {
                             .sort()
                             .map(
                                 function (key) {
-                                    var d = data[key];
-                                    var nid = parseInt(key);
+                                    let d = data[key];
+                                    let nid = parseInt(key);
                                     return regex.test(d[0]) ? (
                                         <SpotlightRow
                                             key={key}

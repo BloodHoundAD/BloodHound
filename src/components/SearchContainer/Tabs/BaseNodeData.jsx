@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import clsx from "clsx";
 import styles from './NodeData.module.css';
 import CollapsibleSection from "./Components/CollapsibleSection";
@@ -6,8 +6,7 @@ import {Table} from "react-bootstrap";
 import NodeCypherLink from "./Components/NodeCypherLink";
 import NodeCypherLinkComplex from "./Components/NodeCypherLinkComplex";
 import NodeCypherNoNumberLink from "./Components/NodeCypherNoNumberLink";
-import { useContext } from 'react';
-import { AppContext } from '../../../AppContext';
+import {AppContext} from '../../../AppContext';
 
 const BaseNodeData = ({}) => {
     const [visible, setVisible] = useState(false);

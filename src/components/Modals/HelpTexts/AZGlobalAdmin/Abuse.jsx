@@ -1,4 +1,3 @@
-import { typeFormat } from '../Formatter';
 const Abuse = (sourceName, sourceType, targetName, targetType) => {
     let text = `As a Global Admin, you can change passwords, run commands on VMs, read key vault secrets, activate roles for other users, etc.
     

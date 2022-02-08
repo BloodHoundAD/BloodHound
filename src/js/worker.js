@@ -12,7 +12,7 @@ var sigmaInstance = new sigma();
 
 process.on('message', function(m) {
     var data = JSON.parse(m);
-    params = {
+    var params = {
         edge: data.edge,
         sibling: data.sibling,
         start: data.start,

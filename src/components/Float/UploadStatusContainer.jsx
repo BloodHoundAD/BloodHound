@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import PoseContainer from '../PoseContainer';
 import styles from './UploadStatusContainer.module.css';
 import clsx from 'clsx';
 import { useContext } from 'react';
 import { AppContext } from '../../AppContext';
-import { Button, Panel, Table, Grid, Row, Col } from 'react-bootstrap';
+import { Button, Grid, Row, Col } from 'react-bootstrap';
 import FileUploadDisplay from './FileUploadDisplay';
 import { AnimatePresence, useDragControls } from 'framer-motion';
 
 const UploadStatusContainer = ({ files, clearFinished, open, close }) => {
     const dragControl = useDragControls();
 
-    var context = useContext(AppContext);
+    let context = useContext(AppContext);
 
     return (
         <PoseContainer

@@ -9,14 +9,14 @@
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     border-bottom: none;
-    font-family: Helvetica;
+    font-family: Helvetica, serif;
 }
 
 .btndone {
     border-radius: 25px;
     border: none;
     padding: 8px;
-    font-family: Helvetica;
+    font-family: Helvetica, serif;
     font-size: 15px;
     font-weight: 400;
     text-shadow: none;

@@ -1,11 +1,9 @@
-import React, { useRef, useEffect, useState, useContext } from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect, useState, useContext } from 'react';
 import { withAlert } from 'react-alert';
 import NodeEditorRow from './NodeEditorRow.jsx';
 import { Button, Panel, Table } from 'react-bootstrap';
 import styles from './NodeEditor.module.css';
 import PoseContainer from '../PoseContainer';
-import Draggable from 'react-draggable';
 import clsx from 'clsx';
 import { AppContext } from '../../AppContext.jsx';
 import { useDragControls } from 'framer-motion';

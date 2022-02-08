@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, {useContext, useEffect, useState} from 'react';
 import CollapsibleSection from './CollapsibleSection';
 import styles from '../NodeData.module.css';
-import { Table } from 'react-bootstrap';
-import clsx from 'clsx';
-import { useContext } from 'react';
-import { AppContext } from '../../../../AppContext';
+import {Table} from 'react-bootstrap';
+import {AppContext} from '../../../../AppContext';
 
 const MappedNodeProps = ({ label, properties, displayMap }) => {
     const [elements, setElements] = useState({});

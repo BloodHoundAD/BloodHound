@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import styles from './NoteGallery.module.css';
 import clsx from 'clsx';
 import { useAlert } from 'react-alert';

@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, {useEffect, useState} from 'react';
 
 const DatabaseDataLabel = ({ label, query, index }) => {
     const [ready, setReady] = useState(false);

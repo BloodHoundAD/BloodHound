@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { useContext } from 'react';
-import { AppContext } from '../../../AppContext';
+import React, {useContext} from 'react';
+import {AppContext} from '../../../AppContext';
 import styles from './EdgeFilter.module.css';
 
 const EdgeFilterCheck = ({ name }) => {

@@ -1,4 +1,3 @@
-import { typeFormat } from '../Formatter';
 const Abuse = (
     sourceName,
     sourceType,

@@ -1,21 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react';
-import PropTypes from 'prop-types';
-import {
-    Modal,
-    FormGroup,
-    FormControl,
-    Button,
-    ControlLabel,
-} from 'react-bootstrap';
-import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
+import React, {useContext, useEffect, useState} from 'react';
+import {Button, ControlLabel, FormControl, FormGroup, Modal,} from 'react-bootstrap';
+import {AsyncTypeahead, Menu, MenuItem} from 'react-bootstrap-typeahead';
 import styles from './AddEdgeModal.module.css';
 import SearchRow from '../SearchContainer/SearchRow';
-import { buildSearchQuery, buildSelectQuery } from 'utils';
+import {buildSearchQuery} from 'utils';
 import BaseModal from './BaseModal';
-import { motion } from 'framer-motion';
+import {motion} from 'framer-motion';
 import clsx from 'clsx';
-import { useContext } from 'react';
-import { AppContext } from '../../AppContext';
+import {AppContext} from '../../AppContext';
 
 const AddEdgeModal = () => {
     const [open, setOpen] = useState(false);
@@ -85,8 +77,7 @@ const AddEdgeModal = () => {
             let node = record.get(0)
             let properties = node.properties;
             let fType = node.labels.filter((w) => w !== 'Base');
-            let type = fType.length > 0 ? fType[0] : 'Base';
-            properties.type = type;
+            properties.type = fType.length > 0 ? fType[0] : 'Base';
             data.push(properties);
         }
 

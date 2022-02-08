@@ -1,5 +1,3 @@
-import { groupSpecialFormat, typeFormat } from '../Formatter';
-
 const General = (sourceName, sourceType, targetName, targetType) => {
     let text = `The domain ${sourceName} is trusted by the domain ${targetName}.
     

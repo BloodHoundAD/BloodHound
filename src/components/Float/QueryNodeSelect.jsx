@@ -5,8 +5,8 @@ import QueryNodeSelectItem from './QueryNodeSelectItem';
 import {withAlert} from 'react-alert';
 
 class QueryNodeSelect extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
             data: [],
@@ -22,7 +22,7 @@ class QueryNodeSelect extends Component {
     }
 
     getEventInfo() {
-        var query = appStore.prebuiltQuery.shift();
+        let query = appStore.prebuiltQuery.shift();
         if (query.final) {
             emitter.emit(
                 'query',
@@ -65,7 +65,7 @@ class QueryNodeSelect extends Component {
     }
 
     doQueryStep(querydata) {
-        var query = appStore.prebuiltQuery.shift();
+        let query = appStore.prebuiltQuery.shift();
         if (query.final) {
             let start =
                 typeof query.startNode !== 'undefined'
@@ -89,10 +89,10 @@ class QueryNodeSelect extends Component {
             this.setState({
                 currentQueryTitle: query.title,
             });
-            var session = driver.session();
+            let session = driver.session();
             session.run(query.query, { result: querydata }).then(
                 function (results) {
-                    var y = $.map(results.records, function (x) {
+                    let y = $.map(results.records, function (x) {
                         let a = x.keys.map(function (e, i) {
                             let obj = {};
                             obj[e.split('.')[1]] = x._fields[i];
