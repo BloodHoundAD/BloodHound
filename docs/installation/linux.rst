@@ -34,7 +34,7 @@ Install neo4j
 
 ::
 
-  apt-get install apt-transport-https
+  sudo apt-get install apt-transport-https
 
 2. Install neo4j community edition using apt:
 
@@ -46,7 +46,7 @@ Install neo4j
 
 ::
 
-  systemctl stop neo4j
+  sudo systemctl stop neo4j
 
 4. Start neo4j as a console application and verify it starts up without errors:
 
@@ -76,7 +76,7 @@ Or use systemctl to start neo4j:
 
 ::
 
-  systemctl start neo4j
+  sudo systemctl start neo4j
 
 6. Open a web browser and navigate to https://localhost:7474/. You should see the neo4j web console.
 
