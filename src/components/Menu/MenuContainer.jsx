@@ -151,14 +151,14 @@ const MenuContainer = () => {
             }).on('data', (chunk) => {
                 let type, version, count;
                 try {
-                    type = /type.?:\s?"(\w*)"/g.exec(chunk)[1];
-                    count = parseInt(/count.?:\s?(\d*)/g.exec(chunk)[1]);
+                    type = /"type.?:\s?"(\w*)"/g.exec(chunk)[1];
+                    count = parseInt(/"count.?:\s?(\d*)/g.exec(chunk)[1]);
                 } catch (e) {
                     type = null;
                     count = null;
                 }
                 try {
-                    version = parseInt(/version.?:\s?(\d*)/g.exec(chunk)[1]);
+                    version = parseInt(/"version.?:\s?(\d*)/g.exec(chunk)[1]);
                 } catch (e) {
                     version = null;
                 }
