@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, {useEffect, useState} from 'react';
 import BaseModal from './BaseModal';
-import { Modal, Button } from 'react-bootstrap';
+import {Button, Modal} from 'react-bootstrap';
 import styles from './GraphErrorModal.module.css';
 
 const GraphErrorModal = () => {

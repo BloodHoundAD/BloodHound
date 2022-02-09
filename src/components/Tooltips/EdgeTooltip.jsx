@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState, useContext } from 'react';
-import PropTypes from 'prop-types';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import styles from './Tooltips.module.css';
 import clsx from 'clsx';
-import { AppContext } from '../../AppContext';
+import {AppContext} from '../../AppContext';
 
 const EdgeTooltip = ({ edge, x, y }) => {
     let label = edge.label;

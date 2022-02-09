@@ -43,6 +43,9 @@ const SearchRow = ({ item, search }) => {
         case 'OU':
             icon.className = 'fa fa-sitemap';
             break;
+        case 'Container':
+            icon.className = 'fa fa-box'
+            break
         case 'AZUser':
             icon.className = 'fa fa-user';
             break;
@@ -75,7 +78,7 @@ const SearchRow = ({ item, search }) => {
             break;
         default:
             icon.className = 'fa fa-question';
-            type = 'Unknown';
+            type = 'Base';
             break;
     }
 

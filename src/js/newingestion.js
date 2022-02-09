@@ -1,10 +1,45 @@
 import { groupBy } from 'lodash/collection';
 
+const LABEL_GROUP = 'Group'
+const LABEL_USER = 'User'
+const LABEL_COMPUTER = 'Computer'
+const LABEL_OU = 'OU'
+const LABEL_GPO = 'GPO'
+const LABEL_DOMAIN = 'Domain'
+const LABEL_CONTAINER = 'Container'
+
+const EDGE_MEMBER_OF = 'MemberOf'
+const EDGE_ALLOWED_TO_DELEGATE = 'AllowedToDelegate'
+const EDGE_ALLOWED_TO_ACT = 'AllowedToAct'
+const EDGE_HAS_SESSION = 'HasSession'
+const EDGE_ADMIN_TO = 'AdminTo'
+const EDGE_CAN_RDP = 'CanRDP'
+const EDGE_EXECUTE_DCOM = 'ExecuteDCOM'
+const EDGE_CAN_PSREMOTE = 'CanPSRemote'
+const EDGE_HAS_SID_HISTORY = 'HasSIDHistory'
+const EDGE_CONTAINS = 'Contains'
+const EDGE_GP_LINK = 'GpLink'
+const EDGE_TRUSTED_BY = 'TrustedBy'
+
+const TRUST_DIRECTION_INBOUND = 'Inbound'
+const TRUST_DIRECTION_OUTBOUND = 'Outbound'
+const TRUST_DIRECTION_BIDIRECTIONAL = 'Bidirectional'
+
+const PROP_QUERY = 'UNWIND $props AS prop MERGE (n:Base {objectid:prop.source}) SET n:{} SET n += prop.map'
+const NON_ACL_PROPS = '{isacl:false}'
+
+const GROUP_OBJECT_TYPE = 'ObjectType'
+const GROUP_SERVICE = 'Service'
+
+/**
+ *
+ * @param {Array.<Group>} chunk
+ * @returns {{}}
+ */
 export function buildGroupJsonNew(chunk) {
     let queries = {};
     queries.properties = {};
-    queries.properties.statement =
-        'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:Group SET n += prop.map';
+    queries.properties.statement = PROP_QUERY.format(LABEL_GROUP);
     queries.properties.props = [];
 
     for (let group of chunk) {
@@ -15,18 +50,17 @@ export function buildGroupJsonNew(chunk) {
 
         queries.properties.props.push({ source: identifier, map: properties });
 
-        processAceArrayNew(aces, identifier, 'Group', queries);
+        processAceArrayNew(aces, identifier, LABEL_GROUP, queries);
 
-        let format = ['', 'Group', 'MemberOf', '{isacl: false}'];
-        let grouped = groupBy(members || [], 'MemberType');
-        for (let group in grouped) {
-            format[0] = group;
-            let props = grouped[group]
-                .filter((g) => {
-                    return g.MemberId != null;
-                })
-                .map((g) => {
-                    return { source: g.MemberId, target: identifier };
+        let format = ['', LABEL_GROUP, EDGE_MEMBER_OF, NON_ACL_PROPS];
+
+        let grouped = groupBy(members, GROUP_OBJECT_TYPE);
+
+        for (let objectType in grouped) {
+            format[0] = objectType;
+            let props = grouped[objectType]
+                .map((member) => {
+                    return { source: member.ObjectIdentifier, target: identifier };
                 });
 
             insertNew(queries, format, props);
@@ -35,31 +69,37 @@ export function buildGroupJsonNew(chunk) {
     return queries;
 }
 
+/**
+ *
+ * @param {Array.<Computer>} chunk
+ * @returns {{}}
+ */
 export function buildComputerJsonNew(chunk) {
     let queries = {};
     queries.properties = {};
-    queries.properties.statement =
-        'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:Computer SET n += prop.map';
+    queries.properties.statement = PROP_QUERY.format(LABEL_COMPUTER);
     queries.properties.props = [];
 
     for (let computer of chunk) {
         let identifier = computer.ObjectIdentifier;
         let properties = computer.Properties;
-        let localAdmins = computer.LocalAdmins;
-        let rdp = computer.RemoteDesktopUsers;
-        let primaryGroup = computer.PrimaryGroupSid;
+        let localAdmins = computer.LocalAdmins.Results;
+        let rdp = computer.RemoteDesktopUsers.Results;
+        let dcom = computer.DcomUsers.Results;
+        let psremote = computer.PSRemoteUsers.Results;
+        let primaryGroup = computer.PrimaryGroupSID;
         let allowedToAct = computer.AllowedToAct;
-        let dcom = computer.DcomUsers;
-        let psremote = computer.PSRemoteUsers;
         let allowedToDelegate = computer.AllowedToDelegate;
-        let sessions = computer.Sessions;
+        let sessions = computer.Sessions.Results;
+        let privSessions = computer.PrivilegedSessions.Results;
+        let regSessions = computer.RegistrySessions.Results;
         let aces = computer.Aces;
 
         queries.properties.props.push({ source: identifier, map: properties });
 
-        processAceArrayNew(aces, identifier, 'Computer', queries);
+        processAceArrayNew(aces, identifier, LABEL_COMPUTER, queries);
 
-        let format = ['Computer', 'Group', 'MemberOf', '{isacl:false}'];
+        let format = [LABEL_COMPUTER, LABEL_GROUP, EDGE_MEMBER_OF, NON_ACL_PROPS];
         if (primaryGroup !== null) {
             insertNew(queries, format, {
                 source: identifier,
@@ -67,67 +107,78 @@ export function buildComputerJsonNew(chunk) {
             });
         }
 
-        format = ['Computer', 'Computer', 'AllowedToDelegate', '{isacl:false}'];
+        format = [LABEL_COMPUTER, LABEL_COMPUTER, EDGE_ALLOWED_TO_DELEGATE, NON_ACL_PROPS];
 
-        let props = (allowedToDelegate || []).map((delegate) => {
+        let props = allowedToDelegate.map((delegate) => {
             return { source: identifier, target: delegate };
         });
 
         insertNew(queries, format, props);
 
-        format = ['', 'Computer', 'AllowedToAct', '{isacl:false}'];
-        let grouped = groupBy(allowedToAct || [], 'MemberType');
-        for (let group in grouped) {
-            format[0] = group;
-            props = grouped[group].map((group) => {
-                return { source: group.MemberId, target: identifier };
+        format = ['', LABEL_COMPUTER, EDGE_ALLOWED_TO_ACT, NON_ACL_PROPS];
+        let grouped = groupBy(allowedToAct, GROUP_OBJECT_TYPE);
+        for (let objectType in grouped) {
+            format[0] = objectType;
+            props = grouped[objectType].map((principal) => {
+                return { source: principal.ObjectIdentifier, target: identifier };
             });
             insertNew(queries, format, props);
         }
 
-        format = ['Computer', 'User', 'HasSession', '{isacl:false}'];
-        props = (sessions || []).map((session) => {
-            return { source: session.ComputerId, target: session.UserId };
+        format = [LABEL_COMPUTER, LABEL_USER, EDGE_HAS_SESSION, '{isacl:false, source:"netsessionenum"}'];
+        props = sessions.map((session) => {
+            return { source: session.ComputerSID, target: session.UserSID };
         });
         insertNew(queries, format, props);
 
-        format = ['', 'Computer', '', '{isacl:false, fromgpo: false}'];
-        grouped = groupBy(localAdmins || [], 'MemberType');
-        for (let group in grouped) {
-            format[0] = group;
-            format[2] = 'AdminTo';
-            props = grouped[group].map((group) => {
-                return { source: group.MemberId, target: identifier };
+        format = [LABEL_COMPUTER, LABEL_USER, EDGE_HAS_SESSION, '{isacl:false, source:"netwkstauserenum"}'];
+        props = privSessions.map((session) => {
+            return { source: session.ComputerSID, target: session.UserSID };
+        });
+        insertNew(queries, format, props);
+
+        format = [LABEL_COMPUTER, LABEL_USER, EDGE_HAS_SESSION, '{isacl:false, source:"registry"}'];
+        props = regSessions.map((session) => {
+            return { source: session.ComputerSID, target: session.UserSID };
+        });
+        insertNew(queries, format, props);
+
+        format = ['', LABEL_COMPUTER, EDGE_ADMIN_TO, '{isacl:false, fromgpo: false}'];
+        grouped = groupBy(localAdmins, GROUP_OBJECT_TYPE);
+        for (let objectType in grouped) {
+            format[0] = objectType;
+            props = grouped[objectType].map((principal) => {
+                return { source: principal.ObjectIdentifier, target: identifier };
             });
             insertNew(queries, format, props);
         }
 
-        grouped = groupBy(rdp || [], 'MemberType');
-        for (let group in grouped) {
-            format[0] = group;
-            format[2] = 'CanRDP';
-            props = grouped[group].map((group) => {
-                return { source: group.MemberId, target: identifier };
+        format = ['', LABEL_COMPUTER, EDGE_CAN_RDP, '{isacl:false, fromgpo: false}'];
+        grouped = groupBy(rdp, GROUP_OBJECT_TYPE);
+        for (let objectType in grouped) {
+            format[0] = objectType;
+            props = grouped[objectType].map((principal) => {
+                return { source: principal.ObjectIdentifier, target: identifier };
             });
             insertNew(queries, format, props);
         }
 
-        grouped = groupBy(dcom || [], 'MemberType');
-        for (let group in grouped) {
-            format[0] = group;
-            format[2] = 'ExecuteDCOM';
-            props = grouped[group].map((group) => {
-                return { source: group.MemberId, target: identifier };
+        format = ['', LABEL_COMPUTER, EDGE_EXECUTE_DCOM, '{isacl:false, fromgpo: false}'];
+        grouped = groupBy(dcom, GROUP_OBJECT_TYPE);
+        for (let objectType in grouped) {
+            format[0] = objectType;
+            props = grouped[objectType].map((principal) => {
+                return { source: principal.ObjectIdentifier, target: identifier };
             });
             insertNew(queries, format, props);
         }
 
-        grouped = groupBy(psremote || [], 'MemberType');
-        for (let group in grouped) {
-            format[0] = group;
-            format[2] = 'CanPSRemote';
-            props = grouped[group].map((group) => {
-                return { source: group.MemberId, target: identifier };
+        format = ['', LABEL_COMPUTER, EDGE_CAN_PSREMOTE, '{isacl:false, fromgpo: false}'];
+        grouped = groupBy(psremote || [], GROUP_OBJECT_TYPE);
+        for (let objectType in grouped) {
+            format[0] = objectType;
+            props = grouped[objectType].map((principal) => {
+                return { source: principal.ObjectIdentifier, target: identifier };
             });
             insertNew(queries, format, props);
         }
@@ -135,6 +186,11 @@ export function buildComputerJsonNew(chunk) {
     return queries;
 }
 
+/**
+ *
+ * @param {Array.<User>}chunk
+ * @return {{}}
+ */
 export function buildUserJsonNew(chunk) {
     let queries = {};
     queries.properties = {
@@ -146,20 +202,20 @@ export function buildUserJsonNew(chunk) {
     for (let user of chunk) {
         let properties = user.Properties;
         let identifier = user.ObjectIdentifier;
-        let primaryGroup = user.PrimaryGroupSid;
+        let primaryGroup = user.PrimaryGroupSID;
         let allowedToDelegate = user.AllowedToDelegate;
         let spnTargets = user.SPNTargets;
         let sidHistory = user.HasSIDHistory;
         let aces = user.Aces;
 
-        processAceArrayNew(aces, identifier, 'User', queries);
+        processAceArrayNew(aces, identifier, LABEL_USER, queries);
 
         queries.properties.props.push({
             source: identifier,
             map: properties,
         });
 
-        let format = ['User', 'Group', 'MemberOf', '{isacl: false}'];
+        let format = [LABEL_USER, LABEL_GROUP, EDGE_MEMBER_OF, NON_ACL_PROPS];
         if (primaryGroup !== null) {
             insertNew(queries, format, {
                 source: identifier,
@@ -167,20 +223,19 @@ export function buildUserJsonNew(chunk) {
             });
         }
 
-        format = ['User', 'Computer', 'AllowedToDelegate', '{isacl: false}'];
-        let props = allowedToDelegate.map((x) => {
-            return { source: identifier, target: x };
+        format = [LABEL_USER, LABEL_COMPUTER, EDGE_ALLOWED_TO_DELEGATE, NON_ACL_PROPS];
+        let props = allowedToDelegate.map((principal) => {
+            return { source: identifier, target: principal };
         });
 
         insertNew(queries, format, props);
 
-        format = ['User', '', 'HasSIDHistory', '{isacl: false}'];
-        let grouped = groupBy(sidHistory, 'MemberType');
-        for (let x in grouped) {
-            format[1] = x;
-            format[2] = 'HasSIDHistory';
-            props = grouped[x].map((history) => {
-                return { source: identifier, target: history.MemberId };
+        format = [LABEL_USER, '', EDGE_HAS_SID_HISTORY, NON_ACL_PROPS];
+        let grouped = groupBy(sidHistory, GROUP_OBJECT_TYPE);
+        for (let objectType in grouped) {
+            format[1] = objectType;
+            props = grouped[objectType].map((principal) => {
+                return { source: identifier, target: principal.ObjectIdentifier };
             });
 
             insertNew(queries, format, props);
@@ -191,11 +246,15 @@ export function buildUserJsonNew(chunk) {
     return queries;
 }
 
+/**
+ * @param {Array.<IngestBase>} chunk
+ * @return {{}}
+ */
 export function buildGpoJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:GPO SET n += prop.map',
+            PROP_QUERY.format(LABEL_GPO),
         props: [],
     };
 
@@ -205,30 +264,65 @@ export function buildGpoJsonNew(chunk) {
         let properties = gpo.Properties;
 
         queries.properties.props.push({ source: identifier, map: properties });
-        processAceArrayNew(aces, identifier, 'GPO', queries);
+        processAceArrayNew(aces, identifier, LABEL_GPO, queries);
     }
 
     return queries;
 }
 
+/**
+ *
+ * @param {Array.<Container>} chunk
+ */
+export function buildContainerJsonNew(chunk) {
+    let queries = {};
+    queries.properties = {
+        statement:
+            PROP_QUERY.format(LABEL_CONTAINER),
+        props: [],
+    };
+
+    for (let container of chunk) {
+        let identifier = container.ObjectIdentifier;
+        let aces = container.Aces;
+        let properties = container.Properties;
+        let children = container.ChildObjects
+
+        queries.properties.props.push({ source: identifier, map: properties });
+        processAceArrayNew(aces, identifier, LABEL_CONTAINER, queries);
+
+        let format = [LABEL_CONTAINER, '', EDGE_CONTAINS, NON_ACL_PROPS]
+        let grouped = groupBy(children, GROUP_OBJECT_TYPE)
+
+        for (let objectType in grouped){
+            format[1] = objectType
+            let props = grouped[objectType].map((child) => {
+                return {source: identifier, target: child.ObjectIdentifier}
+            })
+
+            insertNew(queries, format, props)
+        }
+    }
+
+    return queries
+}
+
+/**
+ * @param {Array.<OU>} chunk
+ * @return {{}}
+ */
 export function buildOuJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:OU SET n += prop.map',
+            PROP_QUERY.format(LABEL_OU),
         props: [],
     };
 
     for (let ou of chunk) {
         let properties = ou.Properties;
-        let users = ou.Users;
-        let computers = ou.Computers;
-        let childOus = ou.ChildOus;
-        let rdpUsers = ou.RemoteDesktopUsers;
-        let admins = ou.LocalAdmins;
-        let dcomUsers = ou.DcomUsers;
-        let psRemoteUsers = ou.PSRemoteUsers;
-        let links = ou.Links || [];
+        let links = ou.Links;
+        let children = ou.ChildObjects
 
         let identifier = ou.ObjectIdentifier.toUpperCase();
         properties.objectid = identifier;
@@ -238,117 +332,105 @@ export function buildOuJsonNew(chunk) {
 
         queries.properties.props.push({ source: identifier, map: properties });
 
-        let format = ['OU', 'User', 'Contains', '{isacl: false}'];
-        let props = users.map((user) => {
-            return { source: identifier, target: user };
-        });
-        insertNew(queries, format, props);
+        let format = [LABEL_OU, '', EDGE_CONTAINS, NON_ACL_PROPS]
+        let grouped = groupBy(children, GROUP_OBJECT_TYPE)
 
-        format = ['OU', 'Computer', 'Contains', '{isacl: false}'];
-        props = computers.map((computer) => {
-            return { source: identifier, target: computer };
-        });
-        insertNew(queries, format, props);
+        for (let objectType in grouped){
+            format[1] = objectType
+            let props = grouped[objectType].map((child) => {
+                return {source: identifier, target: child.ObjectIdentifier}
+            })
 
-        format = ['OU', 'OU', 'Contains', '{isacl: false}'];
-        props = childOus.map((ou) => {
-            return { source: identifier, target: ou };
-        });
-        insertNew(queries, format, props);
+            insertNew(queries, format, props)
+        }
 
-        format = [
-            'GPO',
-            'OU',
-            'GpLink',
-            '{isacl: false, enforced: prop.enforced}',
-        ];
-        props = links.map((link) => {
+        format = [LABEL_GPO, LABEL_OU, EDGE_GP_LINK, '{isacl: false, enforced: prop.enforced}'];
+        let props = links.map((link) => {
             return {
-                source: link.Guid.toUpperCase(),
+                source: link.GUID,
                 target: identifier,
                 enforced: link.IsEnforced,
             };
         });
         insertNew(queries, format, props);
 
-        format = ['', 'Computer', '', '{isacl: false, fromgpo: true}'];
-        let grouped = groupBy(admins, 'MemberType');
-        for (let x in grouped) {
-            format[0] = x;
-            format[2] = 'AdminTo';
-            let flattened = computers.flatMap((computer) => {
-                return grouped[x].map((admin) => {
-                    return { source: admin.MemberId, target: computer };
-                });
-            });
+        let computers = ou.GPOChanges.AffectedComputers;
 
-            insertNew(queries, format, flattened);
+        format = ['', LABEL_COMPUTER, EDGE_ADMIN_TO, '{isacl: false, fromgpo: true}']
+        grouped = groupBy(ou.GPOChanges.LocalAdmins, GROUP_OBJECT_TYPE)
+        for (let objectType in grouped){
+            format[0] = objectType
+            let flattened = computers.flatMap((computer) => {
+                return grouped[objectType].map((localPrincipal) => {
+                    return {source: localPrincipal.ObjectIdentifier, target: computer.ObjectIdentifier}
+                })
+            })
+
+            insertNew(queries, format, flattened)
         }
 
-        grouped = groupBy(psRemoteUsers, 'MemberType');
-        for (let x in grouped) {
-            format[0] = x;
-            format[2] = 'CanPSRemote';
+        format = ['', LABEL_COMPUTER, EDGE_CAN_RDP, '{isacl: false, fromgpo: true}']
+        grouped = groupBy(ou.GPOChanges.RemoteDesktopUsers, GROUP_OBJECT_TYPE)
+        for (let objectType in grouped){
+            format[0] = objectType
             let flattened = computers.flatMap((computer) => {
-                return grouped[x].map((admin) => {
-                    return { source: admin.MemberId, target: computer };
-                });
-            });
+                return grouped[objectType].map((localPrincipal) => {
+                    return {source: localPrincipal.ObjectIdentifier, target: computer.ObjectIdentifier}
+                })
+            })
 
-            insertNew(queries, format, flattened);
+            insertNew(queries, format, flattened)
         }
 
-        grouped = groupBy(dcomUsers, 'MemberType');
-        for (let x in grouped) {
-            format[0] = x;
-            format[2] = 'ExecuteDCOM';
+        format = ['', LABEL_COMPUTER, EDGE_EXECUTE_DCOM, '{isacl: false, fromgpo: true}']
+        grouped = groupBy(ou.GPOChanges.DcomUsers, GROUP_OBJECT_TYPE)
+        for (let objectType in grouped){
+            format[0] = objectType
             let flattened = computers.flatMap((computer) => {
-                return grouped[x].map((admin) => {
-                    return { source: admin.MemberId, target: computer };
-                });
-            });
+                return grouped[objectType].map((localPrincipal) => {
+                    return {source: localPrincipal.ObjectIdentifier, target: computer.ObjectIdentifier}
+                })
+            })
 
-            insertNew(queries, format, flattened);
+            insertNew(queries, format, flattened)
         }
 
-        grouped = groupBy(rdpUsers, 'MemberType');
-
-        for (let x in grouped) {
-            format[0] = x;
-            format[2] = 'CanRDP';
+        format = ['', LABEL_COMPUTER, EDGE_CAN_PSREMOTE, '{isacl: false, fromgpo: true}']
+        grouped = groupBy(ou.GPOChanges.PSRemoteUsers, GROUP_OBJECT_TYPE)
+        for (let objectType in grouped){
+            format[0] = objectType
             let flattened = computers.flatMap((computer) => {
-                return grouped[x].map((admin) => {
-                    return { source: admin.MemberId, target: computer };
-                });
-            });
+                return grouped[objectType].map((localPrincipal) => {
+                    return {source: localPrincipal.ObjectIdentifier, target: computer.ObjectIdentifier}
+                })
+            })
 
-            insertNew(queries, format, flattened);
+            insertNew(queries, format, flattened)
         }
     }
     return queries;
 }
 
+/**
+ *
+ * @param {Array.<Domain>} chunk
+ * @return {{}}
+ */
 export function buildDomainJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:Domain SET n += prop.map',
+            PROP_QUERY.format(LABEL_DOMAIN),
         props: [],
     };
 
     for (let domain of chunk) {
         let properties = domain.Properties;
-        let users = domain.Users;
-        let computers = domain.Computers;
-        let childOus = domain.ChildOus;
-        let rdpUsers = domain.RemoteDesktopUsers;
-        let admins = domain.LocalAdmins;
-        let dcomUsers = domain.DcomUser;
-        let psRemoteUsers = domain.PSRemoteUsers;
+        let children = domain.ChildObjects
         let identifier = domain.ObjectIdentifier;
-        let aces = domain.Aces || [];
-        let links = domain.Links || [];
-        let trusts = domain.Trusts || [];
+        let aces = domain.Aces;
+        let links = domain.Links;
+        let trusts = domain.Trusts;
 
         processAceArrayNew(aces, identifier, 'Domain', queries);
 
@@ -357,61 +439,92 @@ export function buildDomainJsonNew(chunk) {
             map: properties,
         });
 
-        let format = ['Domain', 'User', 'Contains', '{isacl: false}'];
-        let props = users.map((user) => {
-            return { source: identifier, target: user };
-        });
-        insertNew(queries, format, props);
+        let format = [LABEL_DOMAIN, '', EDGE_CONTAINS, NON_ACL_PROPS]
+        let grouped = groupBy(children, GROUP_OBJECT_TYPE)
 
-        format = ['Domain', 'Computer', 'Contains', '{isacl: false}'];
-        props = computers.map((computer) => {
-            return { source: identifier, target: computer };
-        });
-        insertNew(queries, format, props);
+        for (let objectType in grouped){
+            format[1] = objectType
+            let props = grouped[objectType].map((child) => {
+                return {source: identifier, target: child.ObjectIdentifier}
+            })
 
-        format = ['Domain', 'OU', 'Contains', '{isacl: false}'];
-        props = childOus.map((ou) => {
-            return { source: identifier, target: ou.toUpperCase() };
-        });
-        insertNew(queries, format, props);
+            insertNew(queries, format, props)
+        }
 
-        format = [
-            'GPO',
-            'Domain',
-            'GpLink',
-            '{isacl: false, enforced: prop.enforced}',
-        ];
-        props = links.map((link) => {
+        format = [LABEL_GPO, LABEL_DOMAIN, EDGE_GP_LINK, '{isacl: false, enforced: prop.enforced}'];
+        let props = links.map((link) => {
             return {
-                source: link.Guid,
+                source: link.GUID,
                 target: identifier,
                 enforced: link.IsEnforced,
             };
         });
-
         insertNew(queries, format, props);
 
-        /*
-        TrustDirection
-        Disabled = 0
-        Inbound = 1,
-        Outbound = 2,
-        Bidirectional = 3
+        let computers = domain.GPOChanges.AffectedComputers;
 
-        TrustType
-        ParentChild = 0,
-        CrossLink = 1,
-        Forest = 2,
-        External = 3,
-        Unknown = 4
+        format = ['', LABEL_COMPUTER, EDGE_ADMIN_TO, '{isacl: false, fromgpo: true}']
+        grouped = groupBy(domain.GPOChanges.LocalAdmins, GROUP_OBJECT_TYPE)
+        for (let objectType in grouped){
+            format[0] = objectType
+            let flattened = computers.flatMap((computer) => {
+                return grouped[objectType].map((localPrincipal) => {
+                    return {source: localPrincipal.ObjectIdentifier, target: computer.ObjectIdentifier}
+                })
+            })
+
+            insertNew(queries, format, flattened)
+        }
+
+        format = ['', LABEL_COMPUTER, EDGE_CAN_RDP, '{isacl: false, fromgpo: true}']
+        grouped = groupBy(domain.GPOChanges.RemoteDesktopUsers, GROUP_OBJECT_TYPE)
+        for (let objectType in grouped){
+            format[0] = objectType
+            let flattened = computers.flatMap((computer) => {
+                return grouped[objectType].map((localPrincipal) => {
+                    return {source: localPrincipal.ObjectIdentifier, target: computer.ObjectIdentifier}
+                })
+            })
+
+            insertNew(queries, format, flattened)
+        }
+
+        format = ['', LABEL_COMPUTER, EDGE_EXECUTE_DCOM, '{isacl: false, fromgpo: true}']
+        grouped = groupBy(domain.GPOChanges.DcomUsers, GROUP_OBJECT_TYPE)
+        for (let objectType in grouped){
+            format[0] = objectType
+            let flattened = computers.flatMap((computer) => {
+                return grouped[objectType].map((localPrincipal) => {
+                    return {source: localPrincipal.ObjectIdentifier, target: computer.ObjectIdentifier}
+                })
+            })
+
+            insertNew(queries, format, flattened)
+        }
+
+        format = ['', LABEL_COMPUTER, EDGE_CAN_PSREMOTE, '{isacl: false, fromgpo: true}']
+        grouped = groupBy(domain.GPOChanges.PSRemoteUsers, GROUP_OBJECT_TYPE)
+        for (let objectType in grouped){
+            format[0] = objectType
+            let flattened = computers.flatMap((computer) => {
+                return grouped[objectType].map((localPrincipal) => {
+                    return {source: localPrincipal.ObjectIdentifier, target: computer.ObjectIdentifier}
+                })
+            })
+
+            insertNew(queries, format, flattened)
+        }
+
+        /*
         "UNWIND $props AS prop MERGE (n:Domain {name: prop.a}) MERGE (m:Domain {name: prop.b}) MERGE (n)-[:TrustedBy {trusttype : prop.trusttype, transitive: prop.transitive, isacl:false}]->(m)",
         */
         format = [
-            'Domain',
-            'Domain',
-            'TrustedBy',
+            LABEL_DOMAIN,
+            LABEL_DOMAIN,
+            EDGE_TRUSTED_BY,
             '{sidfiltering: prop.sidfiltering, trusttype: prop.trusttype, transitive: prop.transitive, isacl: false}',
         ];
+
         for (let trust of trusts) {
             let direction = trust.TrustDirection;
             let transitive = trust.IsTransitive;
@@ -420,29 +533,12 @@ export function buildDomainJsonNew(chunk) {
             let trustType = trust.TrustType;
             let targetName = trust.TargetDomainName;
 
-            switch (trustType) {
-                case 0:
-                    trustType = 'ParentChild';
-                    break;
-                case 1:
-                    trustType = 'CrossLink';
-                    break;
-                case 2:
-                    trustType = 'Forest';
-                    break;
-                case 3:
-                    trustType = 'External';
-                    break;
-                case 4:
-                    trustType = 'Unknown';
-            }
-
             queries.properties.props.push({
                 source: target,
                 map: { name: targetName },
             });
 
-            if (direction === 1 || direction === 3) {
+            if (direction === TRUST_DIRECTION_INBOUND || direction === TRUST_DIRECTION_BIDIRECTIONAL) {
                 insertNew(queries, format, {
                     source: identifier,
                     target: target,
@@ -452,7 +548,7 @@ export function buildDomainJsonNew(chunk) {
                 });
             }
 
-            if (direction === 2 || direction === 3) {
+            if (direction === TRUST_DIRECTION_OUTBOUND || direction === TRUST_DIRECTION_BIDIRECTIONAL) {
                 insertNew(queries, format, {
                     source: target,
                     target: identifier,
@@ -461,61 +557,6 @@ export function buildDomainJsonNew(chunk) {
                     sidfiltering: sidFilter,
                 });
             }
-        }
-
-        format = ['', 'Computer', '', '{isacl: false, fromgpo: true}'];
-
-        let grouped = groupBy(admins, 'MemberType');
-        for (let x in grouped) {
-            format[0] = x;
-            format[2] = 'AdminTo';
-            let flattened = computers.flatMap((computer) => {
-                return grouped[x].map((admin) => {
-                    return { source: admin.MemberId, target: computer };
-                });
-            });
-
-            insertNew(queries, format, flattened);
-        }
-
-        grouped = groupBy(psRemoteUsers, 'MemberType');
-        for (let x in grouped) {
-            format[0] = x;
-            format[2] = 'CanPSRemote';
-            let flattened = computers.flatMap((computer) => {
-                return grouped[x].map((admin) => {
-                    return { source: admin.MemberId, target: computer };
-                });
-            });
-
-            insertNew(queries, format, flattened);
-        }
-
-        grouped = groupBy(dcomUsers, 'MemberType');
-        for (let x in grouped) {
-            format[0] = x;
-            format[2] = 'ExecuteDCOM';
-            let flattened = computers.flatMap((computer) => {
-                return grouped[x].map((admin) => {
-                    return { source: admin.MemberId, target: computer };
-                });
-            });
-
-            insertNew(queries, format, flattened);
-        }
-
-        grouped = groupBy(rdpUsers, 'MemberType');
-
-        for (let x in grouped) {
-            format[0] = x;
-            format[2] = 'CanRDP';
-            let flattened = computers.flatMap((computer) => {
-                return grouped[x].map((admin) => {
-                    return { source: admin.MemberId, target: computer };
-                });
-            });
-
-            insertNew(queries, format, flattened);
         }
     }
 
@@ -561,92 +602,46 @@ function insertNew(queries, formatProps, queryProps) {
     }
 }
 
-function processAceArrayNew(aces, objectid, objecttype, queries) {
-    var convertedAces = aces.flatMap((ace) => {
-        let pSid = ace.PrincipalSID;
-        let pType = ace.PrincipalType;
-        let right = ace.RightName;
-        let aceType = ace.AceType;
-        let isInherited = ace.IsInherited || false;
+/**
+ *
+ * @param {Array.<ACE>} aces
+ * @param {string} target_object_identifier
+ * @param {string} target_object_type
+ * @param {Object} queries
+ */
+function processAceArrayNew(aces, target_object_identifier, target_object_type, queries) {
+    let convertedAces = aces.map((ace) => {
+        if (ace.PrincipalSID === target_object_identifier)
+            return null
 
-        if (objectid === pSid) {
-            return null;
+        return {
+            pSid: ace.PrincipalSID,
+            right: ace.RightName,
+            pType: ace.PrincipalType,
+            inherited: ace.IsInherited
         }
+    }).filter((cAce) => {
+        return cAce != null
+    })
 
-        let rights = [];
-
-        //Process the right/type to figure out the ACEs we need to add
-        if (aceType === 'All') {
-            rights.push('AllExtendedRights');
-        } else if (aceType === 'User-Force-Change-Password') {
-            rights.push('ForceChangePassword');
-        } else if (aceType === 'AddMember') {
-            rights.push('AddMember');
-        } else if (aceType === 'AllowedToAct') {
-            rights.push('AddAllowedToAct');
-        } else if (right === 'ExtendedRight' && aceType !== '') {
-            rights.push(aceType);
-        }
-
-        if (right === 'GenericAll') {
-            rights.push('GenericAll');
-        }
-
-        if (right === 'WriteDacl') {
-            rights.push('WriteDacl');
-        }
-
-        if (right === 'WriteOwner') {
-            rights.push('WriteOwner');
-        }
-
-        if (right === 'GenericWrite') {
-            rights.push('GenericWrite');
-        }
-
-        if (right === 'Owner') {
-            rights.push('Owns');
-        }
-
-        if (right === 'ReadLAPSPassword') {
-            rights.push('ReadLAPSPassword');
-        }
-
-        if (right === 'ReadGMSAPassword') {
-            rights.push('ReadGMSAPassword');
-        }
-
-        return rights.map((right) => {
-            return {
-                pSid: pSid,
-                right: right,
-                pType: pType,
-                isInherited: isInherited,
-            };
-        });
-    });
-
-    convertedAces = convertedAces.filter((ace) => {
-        return ace != null;
-    });
-
-    var grouped = groupBy(convertedAces, 'right');
+    let rightGrouped = groupBy(convertedAces, 'right');
     let format = [
         '',
-        objecttype,
+        target_object_type,
         '',
         '{isacl: true, isinherited: prop.isinherited}',
     ];
-    for (let right in grouped) {
-        let innerGrouped = groupBy(grouped[right], 'pType');
-        for (let inner in innerGrouped) {
-            format[0] = inner;
-            format[2] = right;
-            var mapped = innerGrouped[inner].map((x) => {
+
+    for (let rightName in rightGrouped) {
+        let typeGrouped = groupBy(rightGrouped[rightName], 'pType');
+        for (let objectType in typeGrouped) {
+            format[0] = objectType;
+            format[2] = rightName;
+            let mapped = typeGrouped[objectType].map((x) => {
                 return {
                     source: x.pSid,
-                    target: objectid,
-                    isinherited: x.isInherited,
+                    target: target_object_identifier,
+                    isinherited: x.inherited,
                 };
             });
             insertNew(queries, format, mapped);
@@ -654,16 +649,16 @@ function processAceArrayNew(aces, objectid, objecttype, queries) {
     }
 }
 
-function processSPNTargetArrayNew(spns, objectid, queries) {
-    let format = ['User', 'Computer', '', '{isacl: false, port: prop.port}'];
-    let grouped = groupBy(spns, 'Service');
-    for (let group in grouped) {
-        format[2] = group;
-        let props = grouped[group].map((spn) => {
+function processSPNTargetArrayNew(spnTargets, source_object_identifier, queries) {
+    let format = [LABEL_USER, LABEL_COMPUTER, '', '{isacl: false, port: prop.port}'];
+    let grouped = groupBy(spnTargets, GROUP_SERVICE);
+    for (let serviceName in grouped) {
+        format[2] = serviceName;
+        let props = grouped[serviceName].map((spnTarget) => {
             return {
-                source: objectid,
-                target: spn.ComputerSid,
-                port: spn.Port,
+                source: source_object_identifier,
+                target: spnTarget.ComputerSID,
+                port: spnTarget.Port,
             };
         });
 

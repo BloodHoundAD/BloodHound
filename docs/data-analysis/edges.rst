@@ -432,6 +432,91 @@ References
 
 |
 
+AddSelf
+^^^^^^^^^^
+
+This edge indicates the principal has the ability to add itself to the target
+security group. Because of security group delegation, the members of a security group have
+the same privileges as that group.
+
+By adding yourself to a group and refreshing your token, you gain all the same privileges
+that group has.
+
+See this clip for an example of this edge being abused:
+
+.. raw:: html
+
+    <div style="text-align: center; margin-bottom: 2em;">
+    <iframe width="100%" height="350" src="https://www.youtube.com/embed/z8thoG7gPd0?t=2123?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+
+Abuse Info
+----------
+
+There are at least two ways to execute this attack. The first and most obvious is by using
+the built-in net.exe binary in Windows (e.g.: net group "Domain Admins" dfm.a /add
+/domain). See the opsec considerations tab for why this may be a bad idea. The second, and
+highly recommended method, is by using the Add-DomainGroupMember function in PowerView.
+This function is superior to using the net.exe binary in several ways. For instance, you
+can supply alternate credentials, instead of needing to run a process as or logon as the
+user with the AddSelf privilege. Additionally, you have much safer execution options than
+you do with spawning net.exe (see the opsec tab).
+
+To abuse this privilege with PowerView's Add-DomainGroupMember, first import PowerView into
+your agent session or into a PowerShell instance at the console. 
+
+You may need to authenticate to the Domain Controller as the user with the AddSelf right
+if you are not running a process as that user. To do this in conjunction with
+Add-DomainGroupMember, first create a PSCredential object (these examples comes from the
+PowerView help documentation):
+
+::
+
+  $SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+  $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)
+
+Then, use Add-DomainGroupMember, optionally specifying $Cred if you are not already running
+within a process owned by the user with the AddSelf privilege
+
+::
+
+  Add-DomainGroupMember -Identity 'Domain Admins' -Members 'harmj0y' -Credential $Cred
+
+Finally, verify that the user was successfully added to the group with PowerView's Get-DomainGroupMember:
+
+::
+
+  Get-DomainGroupMember -Identity 'Domain Admins'
+
+Opsec Considerations
+--------------------
+
+Executing this abuse with the net binary will require command line execution. If your target
+organization has command line logging enabled, this is a detection opportunity for their
+analysts.
+
+Regardless of what execution procedure you use, this action will generate a 4728 event on the
+domain controller that handled the request. This event may be centrally collected and analyzed
+by security analysts, especially for groups that are obviously very high privilege groups
+(i.e.: Domain Admins). Also be mindful that Powershell 5 introduced several key security
+features such as script block logging and AMSI that provide security analysts another detection
+opportunity. 
+
+You may be able to completely evade those features by downgrading to PowerShell v2.
+
+References
+----------
+
+* https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1
+* https://www.youtube.com/watch?v=z8thoG7gPd0
+* https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4728
+
+|
+
+----
+
+|
+
 CanRDP
 ^^^^^^
 
@@ -1424,6 +1509,66 @@ https://www.youtube.com/watch?v=z8thoG7gPd0
 
 |
 
+WriteSPN
+^^^^^^^^
+
+The ability to write directly to the servicePrincipalNames attribute on a user object.
+Writing to this property gives you the opportunity to perform a targeted kerberoasting
+attack against that user.
+
+Abuse Info
+----------
+
+A targeted kerberoast attack can be performed using PowerView’s Set-DomainObject along with
+Get-DomainSPNTicket. 
+
+You may need to authenticate to the Domain Controller as the user with full control over the target
+user if you are not running a process as that user. To do this in conjunction with Set-DomainObject,
+first create a PSCredential object (these examples comes from the PowerView help documentation):
+
+::
+
+  $SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+  $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)
+
+Then, use Set-DomainObject, optionally specifying $Cred if you are not already running a process as
+the user with full control over the target user.
+
+::
+
+  Set-DomainObject -Credential $Cred -Identity harmj0y -SET @{serviceprincipalname='nonexistent/BLAHBLAH'}
+
+After running this, you can use Get-DomainSPNTicket as follows:
+    
+::
+
+  Get-DomainSPNTicket -Credential $Cred harmj0y | fl
+
+The recovered hash can be cracked offline using the tool of your choice. Cleanup of the ServicePrincipalName
+can be done with the Set-DomainObject command:
+
+::
+
+  Set-DomainObject -Credential $Cred -Identity harmj0y -Clear serviceprincipalname
+
+Opsec Considerations
+--------------------
+
+Modifying the servicePrincipalName attribute will not, by default, generate an event on the Domain Controller.
+Your target may have configured logging on users to generate 5136 events whenever a directory service is
+modified, but this configuration is very rare.
+
+References
+----------
+
+https://www.harmj0y.net/blog/redteaming/kerberoasting-revisited/
+
+|
+
+----
+
+|
+
 Owns
 ^^^^
 
@@ -1439,7 +1584,7 @@ This clip shows an example of abusing object ownership:
     </div>
 
 Abuse Info
----------
+----------
 
 With ownership of the object, you may modify the DACL of the object however you wish.
 For more information about that, see the WriteDacl edge section.
@@ -1461,6 +1606,44 @@ References
 ----------
 
 https://www.youtube.com/watch?v=z8thoG7gPd0
+
+|
+
+----
+
+|
+
+AddKeyCredentialLink
+^^^^^^^^^^^^^^^^^^^^
+
+The ability to write to the "msds-KeyCredentialLink" property on a user or computer.
+Writing to this property allows an attacker to create "Shadow Credentials" on the
+object and authenticate as the principal using kerberos PKINIT.
+
+Abuse Info
+----------
+
+To abuse this privilege, use Whisker:
+    
+::
+
+    Whisker.exe add /target:<TargetPrincipal>
+    
+For other optional parameters, view the Whisper documentation.
+
+Opsec Considerations
+--------------------
+
+Executing the attack will generate a 5136 (A directory object was modified) event
+at the domain controller if an appropriate SACL is in place on the target object.
+    
+If PKINIT is not common in the environment, a 4768 (Kerberos authentication ticket
+(TGT) was requested) ticket can also expose the attacker.
+
+References
+----------
+
+https://posts.specterops.io/shadow-credentials-abusing-key-trust-account-mapping-for-takeover-8ee1a53566ab
 
 |
 

@@ -37,7 +37,6 @@ body {
     font-family: Helvetica;
     height: 100%;
     overflow: hidden;
-    overflow: hidden;
 }
 
 .customQueryGlyph {
@@ -60,10 +59,7 @@ div.tooltip-inner-custom {
     pointer-events: auto;
     background-color: #444b55;
     border: none;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
+    border-radius: 8px 8px 0 0;
     color: white;
 }
 
@@ -113,7 +109,6 @@ div.tooltip-inner-custom {
 }
 
 .graph-dark {
-    background-color: #2e363e;
     background-color: #2e363e;
 }
 
@@ -768,7 +763,7 @@ div.tooltip-inner-custom {
 }
 
 .help-modal-width .modal-body {
-    padding: 0px;
+    padding: 0;
 }
 
 #alertContainer > div > div {
@@ -798,7 +793,7 @@ div.tooltip-inner-custom {
 }
 
 .nav-pills li a {
-    border-radius: 0px;
+    border-radius: 0;
 }
 
 .modal-dark ul li {
@@ -850,3 +845,204 @@ div.tooltip-inner-custom {
     opacity: 1;
     background-color: #383332;
 }
+
+.rbt .rbt-input-main::-ms-clear {
+    display: none;
+}
+
+/**
+ * Menu
+ */
+.rbt-menu {
+    margin-bottom: 2px;
+}
+
+    .rbt-menu > .dropdown-item {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .rbt-menu > .dropdown-item:focus {
+            outline: none;
+        }
+
+.rbt-menu-pagination-option {
+    text-align: center;
+}
+
+/**
+ * Multi-select Input
+ */
+.rbt-input-multi {
+    cursor: text;
+    overflow: hidden;
+    position: relative;
+}
+
+    .rbt-input-multi.focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        color: #495057;
+        outline: 0;
+    }
+
+    .rbt-input-multi.form-control {
+        height: auto;
+    }
+
+        .rbt-input-multi.form-control[disabled] {
+            background-color: #e9ecef;
+            opacity: 1;
+        }
+
+    .rbt-input-multi.is-invalid.focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+
+    .rbt-input-multi.is-valid.focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+
+    .rbt-input-multi input::-moz-placeholder {
+        color: #6c757d;
+        opacity: 1;
+    }
+
+    .rbt-input-multi input:-ms-input-placeholder {
+        color: #6c757d;
+    }
+
+    .rbt-input-multi input::-webkit-input-placeholder {
+        color: #6c757d;
+    }
+
+    .rbt-input-multi .rbt-input-wrapper {
+        align-items: flex-start;
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: -4px;
+        margin-top: -1px;
+        overflow: hidden;
+    }
+
+    .rbt-input-multi .rbt-input-main {
+        margin: 1px 0 4px;
+    }
+
+/**
+ * Close Button
+ */
+.rbt-close {
+    z-index: 1;
+}
+
+.rbt-close-lg {
+    font-size: 24px;
+}
+
+/**
+ * Token
+ */
+.rbt-token {
+    background-color: #e7f4ff;
+    border: 0;
+    border-radius: 0.25rem;
+    color: #007bff;
+    display: inline-block;
+    line-height: 1em;
+    margin: 1px 3px 2px 0;
+    padding: 4px 7px;
+    position: relative;
+}
+
+.rbt-token-disabled {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #495057;
+    pointer-events: none;
+}
+
+.rbt-token-removeable {
+    cursor: pointer;
+    padding-right: 21px;
+}
+
+.rbt-token-active {
+    background-color: #007bff;
+    color: #fff;
+    outline: none;
+    text-decoration: none;
+}
+
+.rbt-token .rbt-token-remove-button {
+    bottom: 0;
+    color: inherit;
+    font-size: inherit;
+    font-weight: normal;
+    opacity: 1;
+    outline: none;
+    padding: 3px 7px;
+    position: absolute;
+    right: 0;
+    text-shadow: none;
+    top: -2px;
+}
+
+/**
+ * Loader + CloseButton container
+ */
+.rbt-aux {
+    align-items: center;
+    display: flex;
+    bottom: 0;
+    justify-content: center;
+    pointer-events: none;
+    /* Don't block clicks on the input */
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 34px;
+}
+
+.rbt-aux-lg {
+    width: 46px;
+}
+
+.rbt-aux .rbt-close {
+    margin-top: -4px;
+    pointer-events: auto;
+    /* Override pointer-events: none; above */
+}
+
+.has-aux .rbt-input {
+    padding-right: 34px;
+}
+
+.rbt-highlight-text {
+    background-color: inherit;
+    color: inherit;
+    font-weight: bold;
+    padding: 0;
+}
+
+/**
+ * Input Groups
+ */
+.input-group > .rbt {
+    flex: 1;
+}
+
+    .input-group > .rbt .rbt-input-hint, .input-group > .rbt .rbt-aux {
+        z-index: 5;
+    }
+
+    .input-group > .rbt:not(:first-child) .form-control {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .input-group > .rbt:not(:last-child) .form-control {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }

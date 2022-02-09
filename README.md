@@ -1,7 +1,3 @@
-# BloodHound
-
-![BloodHound Logo](https://i.imgur.com/SRvk28m.png)
-
 # Getting Started with BloodHound
 
 To get started with BloodHound, check out the [BloodHound docs.](https://bloodhound.readthedocs.io/en/latest/index.html)

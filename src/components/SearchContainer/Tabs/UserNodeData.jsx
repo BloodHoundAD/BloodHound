@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 import NodeCypherLinkComplex from './Components/NodeCypherLinkComplex';
@@ -8,9 +7,7 @@ import NodeCypherNoNumberLink from './Components/NodeCypherNoNumberLink';
 import MappedNodeProps from './Components/MappedNodeProps';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import NodePlayCypherLink from './Components/NodePlayCypherLink';
-import Notes from './Components/Notes';
 import { withAlert } from 'react-alert';
-import NodeGallery from './Components/NodeGallery';
 import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
 import { useContext } from 'react';
@@ -115,7 +112,7 @@ const UserNodeData = () => {
                                     property='Reachable High Value Targets'
                                     target={objectId}
                                     baseQuery={
-                                        'MATCH (m:User {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                        'MATCH (m:User {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
                                     }
                                     start={label}
                                 />
@@ -327,7 +324,7 @@ const UserNodeData = () => {
                                     property='Transitive Object Control'
                                     target={objectId}
                                     baseQuery={
-                                        'MATCH (n) WHERE NOT n.objectid=$objectid MATCH p=shortestPath((u:User {objectid: $objectid})-[r1:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))'
+                                        'MATCH (n) WHERE NOT n.objectid=$objectid MATCH p=shortestPath((u:User {objectid: $objectid})-[r1:MemberOf|AddSelf|WriteSPN|AddKeyCredentialLink|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(n))'
                                     }
                                     start={label}
                                     distinct
@@ -357,7 +354,7 @@ const UserNodeData = () => {
                                     property='Unrolled Object Controllers'
                                     target={objectId}
                                     baseQuery={
-                                        'MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1:AddMember|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(u:User {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = u.objectid) AND NOT n.objectid = u.objectid'
+                                        'MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1:AddMember|AddSelf|WriteSPN|AddKeyCredentialLink|AllExtendedRights|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(u:User {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = u.objectid) AND NOT n.objectid = u.objectid'
                                     }
                                     end={label}
                                     distinct
@@ -366,7 +363,7 @@ const UserNodeData = () => {
                                     property='Transitive Object Controllers'
                                     target={objectId}
                                     baseQuery={
-                                        'MATCH (n) WHERE NOT n.objectid=$objectid MATCH p = shortestPath((n)-[r1:MemberOf|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(u1:User {objectid: $objectid}))'
+                                        'MATCH (n) WHERE NOT n.objectid=$objectid MATCH p = shortestPath((n)-[r1:MemberOf|AddSelf|WriteSPN|AddKeyCredentialLink|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner*1..]->(u1:User {objectid: $objectid}))'
                                     }
                                     end={label}
                                     distinct

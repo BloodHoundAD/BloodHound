@@ -1,20 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, {useContext, useEffect, useState} from 'react';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 import NodeCypherLinkComplex from './Components/NodeCypherLinkComplex';
 import NodeCypherLink from './Components/NodeCypherLink';
-import NodeCypherNoNumberLink from './Components/NodeCypherNoNumberLink';
 import MappedNodeProps from './Components/MappedNodeProps';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import NodePlayCypherLink from './Components/NodePlayCypherLink';
-import Notes from './Components/Notes';
-import { withAlert } from 'react-alert';
-import NodeGallery from './Components/NodeGallery';
-import { Table } from 'react-bootstrap';
+import {Table} from 'react-bootstrap';
 import styles from './NodeData.module.css';
-import { useContext } from 'react';
-import { AppContext } from '../../../AppContext';
+import {AppContext} from '../../../AppContext';
 
 const GPONodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -81,7 +75,7 @@ const GPONodeData = () => {
                                     property='Reachable High Value Targets'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH (m:GPO {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                        'MATCH (m:GPO {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
                                     }
                                     start={label}
                                 />
@@ -165,7 +159,7 @@ const GPONodeData = () => {
                                     property='Explicit Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:GPO {objectid: $objectid})'
+                                        'MATCH p = (n)-[r:AddMember|AddSelf|WriteSPN|AddKeyCredentialLink|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns]->(g:GPO {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -183,7 +177,7 @@ const GPONodeData = () => {
                                     property='Transitive Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH (n) WHERE NOT n.objectid= $objectid WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:GPO {objectid: $objectid}))'
+                                        'MATCH (n) WHERE NOT n.objectid= $objectid WITH n MATCH p = shortestPath((n)-[r:MemberOf|AddSelf|WriteSPN|AddKeyCredentialLink|AddMember|AllExtendedRights|ForceChangePassword|GenericAll|GenericWrite|WriteDacl|WriteOwner|Owns*1..]->(g:GPO {objectid: $objectid}))'
                                     }
                                     end={label}
                                     distinct

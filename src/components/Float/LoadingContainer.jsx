@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react';
-import PropTypes from 'prop-types';
-import { AppContext } from '../../AppContext';
+import React, {useContext, useEffect, useState} from 'react';
+import {AppContext} from '../../AppContext';
 import PoseContainer from '../PoseContainer';
 import clsx from 'clsx';
 

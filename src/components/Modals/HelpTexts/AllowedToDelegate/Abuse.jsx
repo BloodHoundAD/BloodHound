@@ -1,4 +1,3 @@
-import { typeFormat } from '../Formatter';
 const Abuse = (sourceName, sourceType, targetName, targetType) => {
     let text = `Abusing this privilege can utilize Benjamin Delpy’s Kekeo project, proxying in traffic generated from the Impacket library, or using the Rubeus project's s4u abuse.
 

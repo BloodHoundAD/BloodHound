@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
-import NodeCypherLinkComplex from './Components/NodeCypherLinkComplex';
 import NodeCypherLink from './Components/NodeCypherLink';
-import NodeCypherNoNumberLink from './Components/NodeCypherNoNumberLink';
 import MappedNodeProps from './Components/MappedNodeProps';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import NodePlayCypherLink from './Components/NodePlayCypherLink';
-import Notes from './Components/Notes';
 import { withAlert } from 'react-alert';
-import NodeGallery from './Components/NodeGallery';
 import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
 import { useContext } from 'react';
@@ -80,7 +75,7 @@ const AZAppNodeData = () => {
                                     property='Reachable High Value Targets'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH (m:AZApp {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                        'MATCH (m:AZApp {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r:{}*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
                                     }
                                     start={label}
                                 />

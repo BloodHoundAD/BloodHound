@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useContext } from 'react';
-import PropTypes from 'prop-types';
+import React, {useContext, useEffect, useState} from 'react';
 import PoseContainer from '../PoseContainer';
 import GlyphiconSpan from '../GlyphiconSpan';
 import Icon from '../Icon';
 import SpotlightRow from './SpotlightRow';
-import { Table } from 'react-bootstrap';
-import { AppContext } from '../../AppContext';
+import {Table} from 'react-bootstrap';
+import {AppContext} from '../../AppContext';
 import clsx from 'clsx';
 import styles from './SpotlightContainer.module.css';
 
@@ -35,7 +34,7 @@ const SpotlightContainer = () => {
     };
 
     const handleSpace = (event) => {
-        var key = event.keyCode ? event.keyCode : event.which;
+        let key = event.keyCode ? event.keyCode : event.which;
 
         if (document.activeElement === document.body && key === 32) {
             setVisible((v) => !v);
@@ -81,7 +80,7 @@ const SpotlightContainer = () => {
                     className='form-control searchbox'
                     autoComplete='off'
                     placeholder='Search for a node'
-                    data-type='search'
+                    datatype='search'
                 />
                 <GlyphiconSpan
                     tooltip={false}
@@ -104,9 +103,9 @@ const SpotlightContainer = () => {
                             .sort()
                             .map(
                                 function (key) {
-                                    var d = data[key];
-                                    var nid = parseInt(key);
-                                    var x = regex.test(d[0]) ? (
+                                    let d = data[key];
+                                    let nid = parseInt(key);
+                                    return regex.test(d[0]) ? (
                                         <SpotlightRow
                                             key={key}
                                             nodeId={nid}
@@ -117,7 +116,6 @@ const SpotlightContainer = () => {
                                             parentNodeType={d[4]}
                                         />
                                     ) : null;
-                                    return x;
                                 }.bind(this)
                             )}
                     </tbody>

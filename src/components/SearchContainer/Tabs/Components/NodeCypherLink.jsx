@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import NodeALink from './NodeALink';
 import './NodeCypherLink.module.css';
 
 const NodeCypherLink = ({

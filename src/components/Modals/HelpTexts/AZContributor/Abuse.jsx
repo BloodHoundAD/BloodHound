@@ -1,4 +1,3 @@
-import { typeFormat } from '../Formatter';
 const Abuse = (sourceName, sourceType, targetName, targetType) => {
     let text = `This depends on what the target object is:
     <strong>Key Vault</strong>: You can read secrets and alter access policies (grant yourself access to read secrets)

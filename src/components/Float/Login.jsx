@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
-import PropTypes from 'prop-types';
-import { Button } from 'react-bootstrap';
+import React, {useEffect, useRef, useState} from 'react';
+import {Button} from 'react-bootstrap';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
+import {motion} from 'framer-motion';
 import neo4j from 'neo4j-driver';
 
 const Login = () => {
@@ -116,7 +115,7 @@ const Login = () => {
                 setLoginRunning(false);
                 setLoginSuccess(true);
 
-                var dbInfo = {
+                const dbInfo = {
                     url: url,
                     user: user,
                     password: password,
@@ -150,8 +149,7 @@ const Login = () => {
                     )
                     .then((result) => {
                         let record = result.records[0];
-                        let version = record.get('version');
-                        global.neoVersion = version;
+                        global.neoVersion = record.get('version');
                         session.close();
                     });
 
@@ -233,7 +231,7 @@ const Login = () => {
             tempUrl = `${tempUrl}:7687`;
         }
 
-        if (!url.startsWith('bolt://')) {
+        if (!url.startsWith('bolt://') && !url.startsWith("bolt+s://") && !url.startsWith("neo4j+s://") && !url.startsWith("neo4j://")) {
             tempUrl = `bolt://${tempUrl}`;
         }
 
@@ -241,8 +239,8 @@ const Login = () => {
         icon.addClass('fa fa-spinner fa-spin form-control-feedback');
         icon.toggle(true);
 
-        var driver = neo4j.driver(url, neo4j.auth.basic('', ''));
-        var session = driver.session();
+        const driver = neo4j.driver(url, neo4j.auth.basic('', ''));
+        const session = driver.session();
 
         session
             .run('MATCH (n) RETURN n LIMIT 1')

@@ -26,6 +26,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { AppContext } from './AppContext';
 import GraphErrorModal from './components/Modals/GraphErrorModal';
 import MenuContainer from './components/Menu/MenuContainer';
+import QueryCustomCreate from './components/Float/QueryCustomCreate';
 
 const fullEdgeList = [
     'CanRDP',
@@ -66,6 +67,9 @@ const fullEdgeList = [
     'MemberOf',
     'HasSession',
     'AdminTo',
+    'AddSelf',
+    'WriteSPN',
+    'AddKeyCredentialLink'
 ];
 
 export default class AppContainer extends Component {
@@ -216,6 +220,7 @@ export default class AppContainer extends Component {
                             <NodeEditor />
                             <HelpModal />
                             <GraphErrorModal />
+                            <QueryCustomCreate />
                         </div>
                     </AppContext.Provider>
                 </CSSTransition>

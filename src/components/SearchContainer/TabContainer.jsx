@@ -23,6 +23,8 @@ import { openSync, readSync, closeSync } from 'fs';
 import imageType from 'image-type';
 import { withAlert } from 'react-alert';
 import styles from './TabContainer.module.css';
+import BaseNodeData from "./Tabs/BaseNodeData";
+import ContainerNodeData from "./Tabs/ContainerNodeData";
 
 class TabContainer extends Component {
 
@@ -30,12 +32,14 @@ class TabContainer extends Component {
         super(props);
 
         this.state = {
+            baseVisible: false,
             userVisible: false,
             computerVisible: false,
             groupVisible: false,
             domainVisible: false,
             gpoVisible: false,
             ouVisible: false,
+            containerVisible: false,
             azGroupVisible: false,
             azUserVisible: false,
             azKeyVaultVisible: false,
@@ -48,6 +52,16 @@ class TabContainer extends Component {
             azAppVisible: false,
             selected: 1,
         };
+    }
+
+    clearVisible() {
+        let temp = this.state;
+        for (let key in temp) {
+            if (key.includes('Visible'))
+                temp[key] = false
+        }
+
+        this.setState(temp)
     }
 
     nodeClickHandler(type) {
@@ -83,6 +97,10 @@ class TabContainer extends Component {
             this._azServicePrincipalNodeClicked();
         } else if (type === 'AZApp') {
             this._azAppNodeClicked();
+        } else if (type === 'Base') {
+            this._baseNodeClicked();
+        } else if (type === 'Container') {
+            this._containerNodeClicked()
         }
     }
 
@@ -108,356 +126,148 @@ class TabContainer extends Component {
         emitter.emit('imageUploadFinal', files);
     }
 
+    _baseNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            baseVisible: true,
+            selected: 2
+        });
+    }
+
+    _containerNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            containerVisible: true,
+            selected: 2
+        });
+    }
+
     _userNodeClicked() {
+        this.clearVisible()
         this.setState({
             userVisible: true,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _groupNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
             groupVisible: true,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _computerNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
             computerVisible: true,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _domainNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
             domainVisible: true,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _gpoNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
             gpoVisible: true,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _ouNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
             ouVisible: true,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _azGroupNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
             azGroupVisible: true,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _azUserNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
             azUserVisible: true,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _azKeyVaultNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
             azKeyVaultVisible: true,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _azResourceGroupNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
             azResourceGroupVisible: true,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _azDeviceNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
             azDeviceVisible: true,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _azSubscriptionNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
             azSubscriptionVisible: true,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _azTenantNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
             azTenantVisible: true,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _azVMNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
             azVMVisible: true,
-            azServicePrincipalVisible: false,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _azServicePrincipalNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
             azServicePrincipalVisible: true,
-            azAppVisible: false,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _azAppNodeClicked() {
+        this.clearVisible()
         this.setState({
-            userVisible: false,
-            computerVisible: false,
-            groupVisible: false,
-            domainVisible: false,
-            gpoVisible: false,
-            ouVisible: false,
-            azGroupVisible: false,
-            azUserVisible: false,
-            azKeyVaultVisible: false,
-            azResourceGroupVisible: false,
-            azDeviceVisible: false,
-            azSubscriptionVisible: false,
-            azTenantVisible: false,
-            azVMVisible: false,
-            azServicePrincipalVisible: false,
             azAppVisible: true,
+            selected: 2
         });
-        this.setState({ selected: 2 });
     }
 
     _handleSelect(index, last) {
@@ -480,6 +290,8 @@ class TabContainer extends Component {
                     <Tab eventKey={2} title='Node Info'>
                         <NoNodeData
                             visible={
+                                !this.state.baseVisible &&
+                                !this.state.containerVisible &&
                                 !this.state.userVisible &&
                                 !this.state.computerVisible &&
                                 !this.state.groupVisible &&
@@ -495,9 +307,11 @@ class TabContainer extends Component {
                                 !this.state.azTenantVisible &&
                                 !this.state.azVMVisible &&
                                 !this.state.azServicePrincipalVisible &&
-                                !this.state.azAppVisible
+                                !this.state.azAppVisible &&
+                                !this.state.baseVisible
                             }
                         />
+                        <BaseNodeData visible={this.state.baseVisible} />
                         <UserNodeData visible={this.state.userVisible} />
                         <GroupNodeData visible={this.state.groupVisible} />
                         <ComputerNodeData
@@ -506,6 +320,7 @@ class TabContainer extends Component {
                         <DomainNodeData visible={this.state.domainVisible} />
                         <GpoNodeData visible={this.state.gpoVisible} />
                         <OuNodeData visible={this.state.ouVisible} />
+                        <ContainerNodeData visible={this.state.containerVisible} />
                         <AZGroupNodeData visible={this.state.azGroupVisible} />
                         <AZUserNodeData visible={this.state.azUserVisible} />
                         <AZKeyVaultNodeData

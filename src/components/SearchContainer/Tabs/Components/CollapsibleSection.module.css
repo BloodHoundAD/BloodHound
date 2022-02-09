@@ -1,6 +1,6 @@
 .header {
     cursor: pointer;
-    font-family: helvetica;
+    font-family: helvetica, serif;
     font-size: 18px;
     padding-left: 10px;
 }

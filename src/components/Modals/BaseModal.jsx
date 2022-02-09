@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useContext } from 'react';
-import PropTypes from 'prop-types';
-import { Modal } from 'react-bootstrap';
+import React, {useContext} from 'react';
+import {Modal} from 'react-bootstrap';
 import clsx from 'clsx';
-import { AppContext } from '../../AppContext';
+import {AppContext} from '../../AppContext';
 
 const BaseModal = ({ show, onHide, label, className, children }) => {
-    var context = useContext(AppContext);
+    let context = useContext(AppContext);
     return (
         <Modal
             show={show}

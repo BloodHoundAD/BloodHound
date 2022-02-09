@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 export default class ProgressBarMenuButton extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
             expanded: false,
@@ -18,8 +18,8 @@ export default class ProgressBarMenuButton extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (this.state.expanded) {
-            var template = `<div class="progress" style="margin-bottom:0px"> 
-                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-value-now={} aria-value-max="100" style="width:{}%">
+            const template = `<div className="progress" style="margin-bottom:0px"> 
+                <div className="progress-bar progress-bar-striped active" role="progressbar" aria-value-now={} aria-value-max="100" style="width:{}%">
                 </div>
                 <span>
                     {}%
@@ -39,7 +39,7 @@ export default class ProgressBarMenuButton extends Component {
 
     _leave(e) {
         this.setState({ expanded: false });
-        var target = $(e.target);
+        const target = $(e.target);
         target.html('{}%'.format(this.props.progress));
         target.animate(
             {
@@ -51,10 +51,10 @@ export default class ProgressBarMenuButton extends Component {
 
     _enter(e) {
         this.setState({ expanded: true });
-        var target = $(e.target);
-        var template = `
-            <div class="progress" style="margin-bottom:0px"> 
-                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-value-now={} aria-value-max="100" style="width:{}%">
+        const target = $(e.target);
+        const template = `
+            <div className="progress" style="margin-bottom:0px"> 
+                <div className="progress-bar progress-bar-striped active" role="progressbar" aria-value-now={} aria-value-max="100" style="width:{}%">
                 </div>
                 <span>
                     {}%

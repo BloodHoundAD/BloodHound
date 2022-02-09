@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, {useContext, useEffect, useState} from 'react';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 import NodeCypherLinkComplex from './Components/NodeCypherLinkComplex';
@@ -8,13 +7,9 @@ import NodeCypherNoNumberLink from './Components/NodeCypherNoNumberLink';
 import MappedNodeProps from './Components/MappedNodeProps';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import NodePlayCypherLink from './Components/NodePlayCypherLink';
-import Notes from './Components/Notes';
-import { withAlert } from 'react-alert';
-import NodeGallery from './Components/NodeGallery';
-import { Table } from 'react-bootstrap';
+import {Table} from 'react-bootstrap';
 import styles from './NodeData.module.css';
-import { useContext } from 'react';
-import { AppContext } from '../../../AppContext';
+import {AppContext} from '../../../AppContext';
 
 const AZVMNodeData = () => {
     const [visible, setVisible] = useState(false);

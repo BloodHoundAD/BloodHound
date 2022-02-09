@@ -20,6 +20,7 @@ function createWindow() {
             icon: __dirname + '/src/img/icon.png',
             webPreferences: {
                 nodeIntegration: true,
+                enableRemoteModule: true
             },
         });
     } else if (platform === 'linux') {
@@ -29,6 +30,7 @@ function createWindow() {
             icon: __dirname + '/src/img/icon.png',
             webPreferences: {
                 nodeIntegration: true,
+                enableRemoteModule: true
             },
         });
     } else {
@@ -38,6 +40,7 @@ function createWindow() {
             icon: __dirname + '/src/img/icon.ico',
             webPreferences: {
                 nodeIntegration: true,
+                enableRemoteModule: true
             },
         });
     }

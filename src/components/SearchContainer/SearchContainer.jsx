@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import PropTypes from 'prop-types';
 import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 import GlyphiconSpan from '../GlyphiconSpan';
 import Icon from '../Icon';
@@ -59,7 +58,7 @@ const SearchContainer = () => {
                 type: node.type,
             };
             closeTooltip();
-            var elem = jQuery(pathfinding.current);
+            let elem = jQuery(pathfinding.current);
             if (!elem.is(':visible')) {
                 setPathfindingOpen(true);
                 elem.slideToggle('fast');
@@ -83,8 +82,9 @@ const SearchContainer = () => {
         session.run(statement, { name: term }).then((result) => {
             let data = [];
             for (let record of result.records) {
-                let properties = record._fields[0].properties;
-                let labels = record._fields[0].labels
+                let node = record.get(0)
+                let properties = node.properties;
+                let labels = node.labels
                 if (labels.length === 1){
                     properties.type = labels[0];
                 }else{
@@ -133,8 +133,8 @@ const SearchContainer = () => {
             pathSearchSelected
         );
 
-        mainSearchRef.current.getInstance().getInput().blur();
-        pathSearchRef.current.getInstance().getInput().blur();
+        mainSearchRef.current.blur();
+        pathSearchRef.current.blur();
         emitter.emit('query', query, props, startTarget, endTarget);
     };
 
@@ -246,8 +246,8 @@ const SearchContainer = () => {
             return;
         }
 
-        mainSearchRef.current.getInstance().getInput().blur();
-        pathSearchRef.current.getInstance().getInput().blur();
+        mainSearchRef.current.blur();
+        pathSearchRef.current.blur();
 
         if (!pathfindingOpen) {
             if (mainSearchSelected === null) {

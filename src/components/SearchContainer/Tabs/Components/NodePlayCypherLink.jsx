@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import Icon from '../../../Icon';
 import styles from './NodePlayCypherLink.module.css';
 import NodeALink from './NodeALink';
@@ -61,7 +60,7 @@ const NodePlayCypherLink = ({
             domain: domain,
         })
             .then((result) => {
-                setValue(result.records[0]._fields[0]);
+                setValue(result.records[0].get(0));
                 setReady(true);
             })
             .catch((error) => {

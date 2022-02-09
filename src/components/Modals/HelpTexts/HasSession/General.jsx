@@ -1,5 +1,3 @@
-import { groupSpecialFormat } from '../Formatter';
-
 const General = (sourceName, sourceType, targetName, targetType) => {
     let text = `The user ${targetName} has a session on the computer ${sourceName}.
             

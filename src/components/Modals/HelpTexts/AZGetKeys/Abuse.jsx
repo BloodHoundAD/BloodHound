@@ -1,4 +1,3 @@
-import { typeFormat } from '../Formatter';
 const Abuse = (sourceName, sourceType, targetName, targetType) => {
     let text = `Use PowerShell or PowerZure to fetch the key from the key vault
     

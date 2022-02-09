@@ -5,8 +5,8 @@ import { withAlert } from 'react-alert';
 import BaseModal from './BaseModal';
 
 class WarmupModal extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             open: false,
         };
@@ -22,7 +22,7 @@ class WarmupModal extends Component {
 
     closeAndWarmup() {
         this.setState({ open: false });
-        var session = driver.session();
+        let session = driver.session();
         session
             .run(
                 'MATCH (n) OPTIONAL MATCH (n)-[r]->() RETURN count(n.name) + count(r.isacl)'

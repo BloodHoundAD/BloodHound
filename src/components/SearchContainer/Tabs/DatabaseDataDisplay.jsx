@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, {useContext, useEffect, useState} from 'react';
 import styles from './DatabaseDataDisplay.module.css';
-import { Table } from 'react-bootstrap';
+import {Table} from 'react-bootstrap';
 import DatabaseDataLabel from './Components/DatabaseDataLabel';
-import { useContext } from 'react';
-import { AppContext } from '../../../AppContext';
+import {AppContext} from '../../../AppContext';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 
@@ -210,7 +208,7 @@ const DatabaseDataDisplay = () => {
 
             <hr></hr>
 
-            <div className={clsx('text-center', styles.buttongroup)} width="90%">
+            <div className={clsx('text-center', styles.buttongroup)}>
                 <div role='group' className={styles.buttongroup}>
                     <button
                         type='button'

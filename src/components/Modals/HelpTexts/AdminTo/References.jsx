@@ -1,5 +1,3 @@
-import { groupSpecialFormat } from '../Formatter';
-
 const References = () => {
     let text = `<h4>Lateral movement</h4>
             <a href="https://attack.mitre.org/wiki/Lateral_Movement">https://attack.mitre.org/wiki/Lateral_Movement</a>

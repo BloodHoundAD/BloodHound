@@ -11,8 +11,8 @@ export default class SpotlightRow extends Component {
     }
 
     render() {
-        var nodeIcon = '';
-        var parentIcon = '';
+        let nodeIcon;
+        let parentIcon = '';
         switch (this.props.nodeType) {
             case 'Group':
                 nodeIcon = 'fa fa-users';
@@ -29,6 +29,9 @@ export default class SpotlightRow extends Component {
             case 'OU':
                 nodeIcon = 'fa fa-sitemap';
                 break;
+            case 'Container':
+                nodeIcon = 'fa fa-archive'
+                break
             case 'GPO':
                 nodeIcon = 'fa fa-list';
                 break;
@@ -53,6 +56,9 @@ export default class SpotlightRow extends Component {
             case 'OU':
                 nodeIcon = 'fa fa-sitemap';
                 break;
+            case 'Container':
+                nodeIcon = 'fa fa-box';
+                break
             case 'GPO':
                 nodeIcon = 'fa fa-list';
                 break;

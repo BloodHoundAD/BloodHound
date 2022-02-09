@@ -5,3 +5,128 @@
 .dark h3 {
     color: white;
 }
+
+    .dark :global .table {
+        background-color: #151d29;
+        border-left: solid #151d29 0;
+        border-right: solid #151d29 0;
+        border-top: solid #151d29 0;
+    }
+
+.dark {
+    background-color: #151d29;
+    border-left: solid #151d29 0;
+    border-right: solid #151d29 0;
+}
+
+.light {
+    box-shadow: 0 4px 9px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 11px;
+}
+
+.itemlist {
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 5px 10px;
+}
+
+    .itemlist :global table {
+        margin-bottom: 0;
+        margin-top: 0;
+    }
+
+        .itemlist :global table > thead {
+            text-align: left;
+            position: -webkit-sticky;
+            position: sticky;
+        }
+
+        .itemlist :global table > tbody > tr {
+            font-family: Helvetica, serif;
+            font-size: 12px;
+            border: 0 solid;
+        }
+
+            .itemlist :global table > tbody > tr > td:nth-of-type(1) {
+                border-bottom: 1px solid #94989d;
+                border-top: 0 solid;
+            }
+
+.light :global table > tbody > tr > td:nth-of-type(1) {
+    border-bottom: 1px solid #94989d;
+}
+
+.itemlist :global table > tbody > tr:last-child > td {
+    border-bottom: 0 solid;
+    border-top: 0 solid;
+}
+
+.itemlist :global table > tbody > tr > td {
+    border-top: 0 solid;
+}
+
+.dark :global table > tbody > tr > td {
+    border-bottom: 1px solid #94989d;
+}
+
+.light :global table > tbody > tr > td {
+    border-bottom: 1px solid #94989d;
+}
+
+.dark :global table > tbody > tr:hover {
+    background-color: #0d1013;
+}
+
+.dark :global table > tbody > tr:hover {
+    background-color: #406f8e;
+}
+
+.dark :global table > tbody > tr {
+    opacity: 0.72;
+    background-color: #2b333e;
+}
+
+.light :global table > tbody > tr {
+    background-color: #e7e7e7;
+    opacity: 0.87;
+}
+
+.light table > tbody > tr td:nth-of-type(1) {
+    color: #1d2735;
+}
+
+.light table > tbody > tr td:nth-of-type(2) {
+    color: #1d2735;
+    font-weight: bold;
+}
+
+hr {
+    border-color: #94989d;
+}
+
+.dl {
+    margin-right: 0;
+}
+
+    .dl > h5 {
+        margin-top: 10px;
+        margin-bottom: 5px;
+        padding-right: 10px;
+        padding-left: 10px;
+        font-size: 18px;
+        font-family: Helvetica, serif;
+        font-weight: bold;
+    }
+
+.dark > .dl > h5 {
+    color: white !important;
+}
+
+.light > .dl > h5 {
+    color: black;
+}
+
+.dark .itemlist td {
+    color: white;
+    opacity: 1;
+}

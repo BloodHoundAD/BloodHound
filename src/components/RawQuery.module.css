@@ -31,10 +31,7 @@
     transform: translateX(-50%);
     pointer-events: auto;
     border: none;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
+    border-radius: 8px 8px 0 0;
 }
 
 .dark {

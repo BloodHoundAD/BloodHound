@@ -13,7 +13,7 @@ import path from 'path';
 import {parser} from 'stream-json';
 
 const {batch} = require('stream-json/utils/Batch');
-import unzipper from 'unzipper';
+import AdmZip from 'adm-zip'
 import * as NewIngestion from '../../js/newingestion';
 import UploadStatusContainer from '../Float/UploadStatusContainer';
 import {streamArray} from "stream-json/streamers/StreamArray";
@@ -35,6 +35,7 @@ const IngestFuncMap = {
     domains: NewIngestion.buildDomainJsonNew,
     ous: NewIngestion.buildOuJsonNew,
     gpos: NewIngestion.buildGpoJsonNew,
+    containers: NewIngestion.buildContainerJsonNew,
     azdevices: NewIngestion.buildAzureDevices,
     azusers: NewIngestion.buildAzureUsers,
     azgroups: NewIngestion.buildAzureGroups,
@@ -66,6 +67,7 @@ const MenuContainer = () => {
     const [uploading, setUploading] = useState(false);
     const fileId = useRef(0);
     const [uploadVisible, setUploadVisible] = useState(false);
+    const [needsPostProcess, setNeedsPostProcess] = useState(false);
 
     useEffect(() => {
         emitter.on('cancelUpload', cancelUpload);
@@ -96,45 +98,28 @@ const MenuContainer = () => {
 
     const unzipFiles = async (files) => {
         let finalFiles = [];
-        var tempPath = app.getPath('temp');
+        const tempPath = app.getPath('temp');
         for (let file of files) {
             let fPath = file.path;
             let name = file.name;
 
             if (isZipSync(fPath)) {
                 alert.info(`Unzipping file ${name}`);
-                const zip = fs
-                    .createReadStream(fPath)
-                    .pipe(unzipper.Parse({forceStream: true}));
-
-                for await (const entry of zip) {
-                    let sanitizedPath = sanitize(entry.path);
+                const zip = new AdmZip(fPath)
+                const zipEntries = zip.getEntries()
+                for (let entry of zipEntries){
+                    let sanitizedPath = sanitize(entry.entryName);
                     let output = path.join(tempPath, sanitizedPath);
+                    zip.extractEntryTo(entry.entryName, tempPath, false, true, false, sanitizedPath)
 
-                    let success = await new Promise((resolve, reject) => {
-                        let st = fs.createWriteStream(output);
-                        st.on('error', (err) => {
-                            console.error(err);
-                            resolve(false);
-                        });
-
-                        st.on('finish', () => {
-                            resolve(true);
-                        });
-
-                        entry.pipe(st);
+                    finalFiles.push({
+                        path: output,
+                        name: sanitizedPath,
+                        zip_name: name,
+                        delete: true,
+                        id: fileId.current,
                     });
-
-                    if (success) {
-                        finalFiles.push({
-                            path: output,
-                            name: sanitizedPath,
-                            zip_name: name,
-                            delete: true,
-                            id: fileId.current,
-                        });
-                        fileId.current += 1;
-                    }
+                    fileId.current += 1;
                 }
             } else {
                 finalFiles.push({
@@ -229,7 +214,7 @@ const MenuContainer = () => {
         for (let file of files) {
             let meta = await getMetaTagQuick(file);
 
-            if (!('version' in meta) || meta.version < 3) {
+            if (!('version' in meta) || meta.version < 4) {
                 filteredFiles[file.id] = {
                     ...file,
                     status: FileStatus.InvalidVersion,
@@ -267,17 +252,11 @@ const MenuContainer = () => {
         });
         console.log(`Processing ${file.name} with ${file.count} entries`);
         console.time('IngestTime');
-        let tag;
-        if (file.type.startsWith('az')) {
-            tag = 'data';
-        } else {
-            tag = file.type;
-        }
 
         const pipeline = chain([
             fs.createReadStream(file.path, {encoding: 'utf8'}),
             parser(),
-            pick({filter: tag}),
+            pick({filter: 'data'}),
             streamArray(),
             data => data.value,
             batch({batchSize: 200})
@@ -318,6 +297,9 @@ const MenuContainer = () => {
         pipeline.on('end', () => {
             setUploading(false)
             file.status = FileStatus.Done;
+            if (file.delete) {
+                fs.unlinkSync(file.path)
+            }
             setFileQueue((state) => {
                 return {...state, [file.id]: file};
             });
@@ -338,6 +320,7 @@ const MenuContainer = () => {
         await session.run(statement, {props: props}).catch((err) => {
             console.log(statement);
             console.log(err);
+
         });
         await session.close();
     };
@@ -370,20 +353,65 @@ const MenuContainer = () => {
         if (!uploading) {
             let f;
             for (let file of Object.values(fileQueue)) {
-                f = file;
                 if (file.status === FileStatus.Waiting) {
+                    f = file;
                     break;
                 }
             }
 
             if (f !== undefined) {
-                if (f.status !== FileStatus.Waiting)
-                    return
+                setNeedsPostProcess(true)
                 setUploading(true);
                 processJson(f);
             }
+
+            if (f === undefined && needsPostProcess){
+                for (let file of Object.values(fileQueue)){
+                    if (!fileIsComplete(file.status)){
+                        return
+                    }
+                }
+
+                postProcessUpload()
+            }
+
         }
     }, [fileQueue]);
+
+    const postProcessUpload = async () => {
+        console.log("Running post processing queries")
+        setNeedsPostProcess(false)
+        let session = driver.session();
+
+        const highValueSids = ["-544", "-500", "-512", "-516", "-518", "-519", "1-5-9", "-526", "-527"]
+        const highValueStatement = "UNWIND $sids AS sid MATCH (n:Base) WHERE n.objectid ENDS WITH sid SET n.highvalue=true"
+
+        await session.run(highValueStatement, {sids: highValueSids}).catch((err) => {
+            console.log(err);
+        });
+
+        const baseOwnedStatement = "MATCH (n) WHERE n:User or n:Computer AND NOT EXISTS(n.owned) SET n.owned = false"
+        await session.run(baseOwnedStatement, null).catch((err) => {
+            console.log(err);
+        });
+
+        const dUsersSids = ["S-1-1-0", "S-1-5-11"]
+        const domainUsersAssociationStatement = "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' OR n.objectid ENDS WITH '-515' WITH n UNWIND $sids AS sid MATCH (m:Group) WHERE m.objectid ENDS WITH sid MERGE (n)-[:MemberOf]->(m)"
+        await session.run(domainUsersAssociationStatement, {sids: dUsersSids}).catch((err) => {
+            console.log(err);
+        });
+
+        await session.close();
+        console.log("Post processing done")
+    }
+
+    /**
+     *
+     * @param {FileStatus} status
+     */
+    const fileIsComplete = (status) => {
+        return status !== FileStatus.Waiting && status !== FileStatus.Processing
+    }
 
     const cancelUpload = () => {
     };

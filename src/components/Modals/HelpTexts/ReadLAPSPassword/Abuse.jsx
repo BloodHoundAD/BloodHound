@@ -1,4 +1,3 @@
-import { typeFormat } from '../Formatter';
 const Abuse = (sourceName, sourceType, targetName, targetType) => {
     let text = `To abuse this privilege with PowerView's Get-DomainObject, first import PowerView into your agent session or into a PowerShell instance at the console. You may need to authenticate to the Domain Controller as ${
         sourceType === 'User'

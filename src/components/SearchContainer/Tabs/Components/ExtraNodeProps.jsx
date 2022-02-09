@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, {useEffect, useState} from 'react';
 import CollapsibleSection from './CollapsibleSection';
 import styles from '../NodeData.module.css';
-import { Table } from 'react-bootstrap';
+import {Table} from 'react-bootstrap';
 
 const ExtraNodeProps = ({ label, properties, displayMap }) => {
     const [elements, setElements] = useState([]);
 
-    const blacklist = ['highvalue', 'hasspn', 'primarygroupid'];
+    const blacklist = ['highvalue', 'hasspn', 'primarygroupid', 'name'];
 
     const createValue = (value) => {
         let type = typeof value;
@@ -114,7 +113,7 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
         setElements(temp);
     }, [label]);
 
-    return elements.length == 0 ? null : (
+    return elements.length === 0 ? null : (
         <CollapsibleSection header={'EXTRA PROPERTIES'}>
             <div className={styles.itemlist}>
                 <Table bordered={false} hover responsive>

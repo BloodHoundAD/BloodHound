@@ -1,4 +1,3 @@
-import { typeFormat } from '../Formatter';
 const Abuse = (sourceName, sourceType, targetName, targetType) => {
     let text = `The Virtual Machine Contributor role allows you to run SYSTEM commands on the VM
     <strong>Resource Group</strong>: NOT abusable, and not collected by AzureHound

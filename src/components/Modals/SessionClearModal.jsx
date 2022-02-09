@@ -5,8 +5,8 @@ import { Modal } from 'react-bootstrap';
 import BaseModal from './BaseModal';
 
 export default class SessionClearModal extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
             open: false,

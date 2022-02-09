@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { motion } from 'framer-motion';
-import { useContext } from 'react';
-import { AppContext } from '../../../AppContext';
+import React, {useContext} from 'react';
+import {motion} from 'framer-motion';
+import {AppContext} from '../../../AppContext';
 import styles from './EdgeFilter.module.css';
 import EdgeFilterCheck from './EdgeFilterCheck';
 import clsx from 'clsx';
@@ -58,6 +56,9 @@ const EdgeFilter = ({ open }) => {
                             'WriteOwner',
                             'ReadLAPSPassword',
                             'ReadGMSAPassword',
+                            'AddKeyCredentialLink',
+                            'WriteSPN',
+                            'AddSelf'
                         ]}
                         sectionName='ACL'
                     />
@@ -71,6 +72,9 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterCheck name='WriteOwner' />
                     <EdgeFilterCheck name='ReadLAPSPassword' />
                     <EdgeFilterCheck name='ReadGMSAPassword' />
+                    <EdgeFilterCheck name='AddKeyCredentialLink' />
+                    <EdgeFilterCheck name='WriteSPN' />
+                    <EdgeFilterCheck name='AddSelf' />
                     <EdgeFilterSection
                         title='Containers'
                         sectionName='container'
