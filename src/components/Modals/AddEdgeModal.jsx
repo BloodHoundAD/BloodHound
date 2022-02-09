@@ -146,7 +146,10 @@ const AddEdgeModal = () => {
             edgeValue === 'Owns' ||
             edgeValue === 'WriteDacl' ||
             edgeValue === 'WriteOwner' ||
-            edgeValue === 'ReadLAPSPassword'
+            edgeValue === 'ReadLAPSPassword' ||
+            edgeValue === 'WriteSPN' ||
+            edgeValue === 'AddKeyCredentialLink' ||
+            edgeValue === 'AddSelf'
         ) {
             edgepart = `[r:${edgeValue} {isacl: true}]`;
         } else if (edgeValue === 'SQLAdmin') {
@@ -297,6 +300,15 @@ const AddEdgeModal = () => {
                                 AddAllowedToAct
                             </option>
                             <option value='AllowedToAct'>AllowedToAct</option>
+                            <option value='AddKeyCredentialLink'>
+                                AddKeyCredentialLink
+                            </option>
+                            <option value='WriteSPN'>
+                                WriteSPN
+                            </option>
+                            <option value='AddSelf'>
+                                AddSelf
+                            </option>
                             <option value='SQLAdmin'>SQLAdmin</option>
                             <option value='HasSIDHistory'>HasSIDHistory</option>
                         </FormControl>
