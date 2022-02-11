@@ -1,0 +1,33 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup NodeJS
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Build (linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: npm run linuxbuild
+
+    - name: Build (macos)
+      if: matrix.os == 'macos-latest'
+      run: npm run macbuild
+
+    - name: Build (windows)
+      if: matrix.os == 'windows-latest'
+      run: npm run winbuild
