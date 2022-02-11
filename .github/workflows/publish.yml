@@ -28,7 +28,7 @@ jobs:
 
     - name: Zip (linux-x64)
       if: matrix.os == 'ubuntu-latest'
-      uses: edgarrc
+      uses: edgarrc/action-7z@v1
       with:
         args: 7z a -tzip -mx9 BloodHound-linux-x64-${GITHUB_SHA}.zip BloodHound-linux-x64
 
