@@ -31,27 +31,8 @@ jobs:
     - name: Build
       run: npm run build
 
-    - name: Upload Binary
-      uses: actions/upload-artifact@v2
-      with:
-        path: BloodHound-*
-        name: binaries
-
-  publish:
-    name: Compress
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-
-    - name: Download BloodHound binaries
-      uses: actions/download-artifact@v2
-      with:
-        name: binaries
-
     - name: Zip
-      uses: edgarrc/action-7z@v1
-      with:
-        args: |
-          for pkg in $(ls -D); do
-            7z a -tzip -mx9 ${pkg}-${GITHUB_SHA}.zip ${pkg}
-          done
+      run: |
+        for pkg in $(ls -D); do
+          7z a -tzip -mx9 ${pkg}-${GITHUB_SHA}.zip ${pkg}
+        done
