@@ -54,6 +54,6 @@ jobs:
       uses: edgarrc/action-7z@v1
       with:
         args: |
-        for pkg in $(ls -D); do
-          7z a -tzip -mx9 ${pkg}-${GITHUB_SHA}.zip ${pkg}
-        done
+          for pkg in $(ls -D); do
+            7z a -tzip -mx9 ${pkg}-${GITHUB_SHA}.zip ${pkg}
+          done
