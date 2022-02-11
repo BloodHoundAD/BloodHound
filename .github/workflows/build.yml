@@ -9,6 +9,8 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
+    name: Build (${{ matrix.os }})
+
     steps:
     - uses: actions/checkout@v2
 
@@ -16,18 +18,11 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 16
+        cache: npm
 
     - name: Install Dependencies
       run: npm ci
 
-    - name: Build (linux)
-      if: matrix.os == 'ubuntu-latest'
-      run: npm run linuxbuild
+    - name: Build
+      run: npm run build
 
-    - name: Build (macos)
-      if: matrix.os == 'macos-latest'
-      run: npm run macbuild
-
-    - name: Build (windows)
-      if: matrix.os == 'windows-latest'
-      run: npm run winbuild
