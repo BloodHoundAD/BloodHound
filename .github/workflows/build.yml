@@ -5,6 +5,10 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]

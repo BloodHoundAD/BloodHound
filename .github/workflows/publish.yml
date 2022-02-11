@@ -8,6 +8,10 @@ jobs:
   build:
     name: Build
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
@@ -48,7 +52,8 @@ jobs:
 
     - name: Zip
       uses: edgarrc/action-7z@v1
-      run: |
+      with:
+        args: |
         for pkg in $(ls -D); do
           7z a -tzip -mx9 ${pkg}-${GITHUB_SHA}.zip ${pkg}
         done
