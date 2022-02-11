@@ -34,13 +34,13 @@ jobs:
 
     - name: Zip (linux-armv7l)
       if: matrix.os == 'ubuntu-latest'
-      uses: edgarrc
+      uses: edgarrc/action-7z@v1
       with:
         args: 7z a -tzip -mx9 BloodHound-linux-armv7l-${GITHUB_SHA}.zip BloodHound-linux-armv7l
 
     - name: Zip (linux-arm64)
       if: matrix.os == 'ubuntu-latest'
-      uses: edgarrc
+      uses: edgarrc/action-7z@v1
       with:
         args: 7z a -tzip -mx9 BloodHound-linux-arm64-${GITHUB_SHA}.zip BloodHound-linux-arm64
 
@@ -50,13 +50,13 @@ jobs:
 
     - name: Zip (macos-arm64)
       if: matrix.os == 'macos-latest'
-      uses: edgarrc
+      uses: edgarrc/action-7z@v1
       with:
         args: 7z a -tzip -mx9 BloodHound-darwin-arm64-${GITHUB_SHA}.zip BloodHound-darwin-arm64
 
     - name: Zip (macos-x64)
       if: matrix.os == 'macos-latest'
-      uses: edgarrc
+      uses: edgarrc/action-7z@v1
       with:
         args: 7z a -tzip -mx9 BloodHound-darwin-x64-${GITHUB_SHA}.zip BloodHound-darwin-x64
 
@@ -66,18 +66,18 @@ jobs:
 
     - name: Zip (windows-arm64)
       if: matrix.os == 'windows-latest'
-      uses: edgarrc
+      uses: edgarrc/action-7z@v1
       with:
         args: 7z a -tzip -mx9 BloodHound-win32-arm64-${GITHUB_SHA}.zip BloodHound-win32-arm64
 
     - name: Zip (window-x64)
       if: matrix.os == 'window-latest'
-      uses: edgarrc
+      uses: edgarrc/action-7z@v1
       with:
         args: 7z a -tzip -mx9 BloodHound-win32-x64-${GITHUB_SHA}.zip BloodHound-win32-x64
 
     - name: Zip (window-ia32)
       if: matrix.os == 'window-latest'
-      uses: edgarrc
+      uses: edgarrc/action-7z@v1
       with:
         args: 7z a -tzip -mx9 BloodHound-win32-ia32-${GITHUB_SHA}.zip BloodHound-win32-ia32
