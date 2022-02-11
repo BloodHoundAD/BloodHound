@@ -33,6 +33,6 @@ jobs:
 
     - name: Zip
       run: |
-        for pkg in $(ls -D); do
+        for pkg in ./BloodHound-*; do
           7z a -tzip -mx9 ${pkg}-${GITHUB_SHA}.zip ${pkg}
         done
