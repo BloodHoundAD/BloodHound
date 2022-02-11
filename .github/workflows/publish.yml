@@ -6,7 +6,7 @@ on:
     
 jobs:
   build:
-    name: Build
+    name: Build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -15,8 +15,6 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-
-    name: Build (${{ matrix.os }})
 
     steps:
     - uses: actions/checkout@v2

@@ -32,7 +32,7 @@
         "dev": "concurrently -k \"babel-node server.js\" \"npm start\"",
         "compile": "webpack --config webpack.config.production.js",
         "package": "electron-packager . BloodHound --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.db --ignore=docs --ignore=Ingestors --ignore=node_modules/\\.bin",
-        "build:windows": "run-s compile 'package -- --platform=win32 --arch=all --icon=src/img/icon.ico'",
+        "build:windows": "run-s compile \"package -- --platform=win32 --arch=all --icon=src/img/icon.ico\"",
         "build:linux": "run-s compile 'package -- --platform=linux --arch=x64,armv7l,arm64'",
         "build:macos": "run-s compile 'package -- --platform=darwin --arch=all --icon=src/img/icon.icns",
         "build:host-os": "(run-s isWindows build:windows) || run-s compile 'package -- --arch=all --icon=src/img/icon.icns'",
