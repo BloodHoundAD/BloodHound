@@ -97,25 +97,7 @@ const About = () => {
                             openLink('https://www.twitter.com/_wald0');
                         }}
                     >
-                        @_wald0
-                    </a>
-                    ,{' '}
-                    <a
-                        href='#'
-                        onClick={() => {
-                            openLink('https://www.twitter.com/cptjesus');
-                        }}
-                    >
-                        @CptJesus
-                    </a>
-                    ,{' '}
-                    <a
-                        href='#'
-                        onClick={() => {
-                            openLink('https://twitter.com/Haus3c');
-                        }}
-                    >
-                        @Haus3c
+                        The BloodHound Enterprise Team
                     </a>
                 </h5>
                 <h5>
