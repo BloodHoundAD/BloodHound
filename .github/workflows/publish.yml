@@ -1,0 +1,83 @@
+name: Publish
+
+on:
+  push:
+    branches: [ github-actions ]
+    
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup NodeJS
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Build (linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: npm run linuxbuild
+
+    - name: Zip (linux-x64)
+      if: matrix.os == 'ubuntu-latest'
+      uses: edgarrc
+      with:
+        args: 7z a -tzip -mx9 BloodHound-linux-x64-${GITHUB_SHA}.zip BloodHound-linux-x64
+
+    - name: Zip (linux-armv7l)
+      if: matrix.os == 'ubuntu-latest'
+      uses: edgarrc
+      with:
+        args: 7z a -tzip -mx9 BloodHound-linux-armv7l-${GITHUB_SHA}.zip BloodHound-linux-armv7l
+
+    - name: Zip (linux-arm64)
+      if: matrix.os == 'ubuntu-latest'
+      uses: edgarrc
+      with:
+        args: 7z a -tzip -mx9 BloodHound-linux-arm64-${GITHUB_SHA}.zip BloodHound-linux-arm64
+
+    - name: Build (macos)
+      if: matrix.os == 'macos-latest'
+      run: npm run macbuild
+
+    - name: Zip (macos-arm64)
+      if: matrix.os == 'macos-latest'
+      uses: edgarrc
+      with:
+        args: 7z a -tzip -mx9 BloodHound-darwin-arm64-${GITHUB_SHA}.zip BloodHound-darwin-arm64
+
+    - name: Zip (macos-x64)
+      if: matrix.os == 'macos-latest'
+      uses: edgarrc
+      with:
+        args: 7z a -tzip -mx9 BloodHound-darwin-x64-${GITHUB_SHA}.zip BloodHound-darwin-x64
+
+    - name: Build (windows)
+      if: matrix.os == 'windows-latest'
+      run: npm run winbuild
+
+    - name: Zip (windows-arm64)
+      if: matrix.os == 'windows-latest'
+      uses: edgarrc
+      with:
+        args: 7z a -tzip -mx9 BloodHound-win32-arm64-${GITHUB_SHA}.zip BloodHound-win32-arm64
+
+    - name: Zip (window-x64)
+      if: matrix.os == 'window-latest'
+      uses: edgarrc
+      with:
+        args: 7z a -tzip -mx9 BloodHound-win32-x64-${GITHUB_SHA}.zip BloodHound-win32-x64
+
+    - name: Zip (window-ia32)
+      if: matrix.os == 'window-latest'
+      uses: edgarrc
+      with:
+        args: 7z a -tzip -mx9 BloodHound-win32-ia32-${GITHUB_SHA}.zip BloodHound-win32-ia32
