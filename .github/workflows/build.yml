@@ -4,16 +4,47 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.build.os }}
     defaults:
       run:
         shell: bash
 
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        build:
+        - os: macos-latest
+          ostype: darwin
+          arch: x64
 
-    name: Build (${{ matrix.os }})
+        - os: macos-latest
+          ostype: darwin
+          arch: arm64
+
+        - os: ubuntu-latest
+          ostype: linux
+          arch: x64
+
+        - os: ubuntu-latest
+          ostype: linux
+          arch: arm64
+
+        - os: ubuntu-latest
+          ostype: linux
+          arch: armv7l
+
+        - os: windows-latest
+          ostype: windows
+          arch: ia32
+
+        - os: windows-latest
+          ostype: windows
+          arch: x64
+
+        - os: windows-latest
+          ostype: windows
+          arch: arm64
+
+    name: Build (${{ matrix.build.ostype }} ${{ matrix.build.arch }})
 
     steps:
     - uses: actions/checkout@v2
@@ -28,5 +59,5 @@ jobs:
       run: npm ci
 
     - name: Build
-      run: npm run build
+      run: npm run build -- --arch=${{ matrix.build.arch }}
 
