@@ -395,6 +395,11 @@ const MenuContainer = () => {
             console.log(err);
         });
 
+        const baseHighValueStatement = "MATCH (n:Base) WHERE NOT EXISTS(n.highvalue) SET n.highvalue = false"
+        await session.run(baseHighValueStatement, null).catch((err) => {
+            console.log(err);
+        });
+
         const dUsersSids = ["S-1-1-0", "S-1-5-11"]
         const domainUsersAssociationStatement = "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' OR n.objectid ENDS WITH '-515' WITH n UNWIND $sids AS sid MATCH (m:Group) WHERE m.objectid ENDS WITH sid MERGE (n)-[:MemberOf]->(m)"
         await session.run(domainUsersAssociationStatement, {sids: dUsersSids}).catch((err) => {
