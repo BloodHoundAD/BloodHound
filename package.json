@@ -30,9 +30,9 @@
     "scripts": {
         "start": "cross-env NODE_ENV=development electron .",
         "dev": "concurrently -k \"babel-node server.js\" \"npm start\"",
-        "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.db --ignore=docs --ignore=Ingestors --ignore=node_modules/\\.bin --icon=src/img/icon.ico",
-        "macbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=darwin --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.db --ignore=docs --ignore=Ingestors --ignore=node_modules/\\.bin --icon=src/img/icon.icns",
-        "linuxbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=linux --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.db --ignore=docs --ignore=Ingestors --ignore=node_modules/\\.bin && electron-packager . BloodHound --platform=linux --ignore=docs --overwrite --arch=armv7l --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --ignore=Ingestors --ignore=node_modules/\\.bin && electron-packager . BloodHound --platform=linux --ignore=docs --arch=arm64 --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.graphdb --ignore=Ingestors --ignore=node_modules/\\.bin"
+        "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.db --ignore=docs --ignore=Collectors  --icon=src/img/icon.ico",
+        "macbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=darwin --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.db --ignore=docs --ignore=Collectors  --icon=src/img/icon.icns",
+        "linuxbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=linux --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.db --ignore=docs --ignore=Collectors --icon=src/img/icon.icns"
     },
     "babel": {
         "presets": [
