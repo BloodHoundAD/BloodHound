@@ -65,7 +65,7 @@ jobs:
       run: npm run build -- --arch=${{ matrix.build.arch }}
 
     - name: Zip
-      run: 7z a -tzip -mx9 BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}-${GITHUB_SHA}.zip BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}
+      run: 7z a -tzip -mx9 BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}.zip BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}
 
     - name: Upload
       uses: softprops/action-gh-release@v1
