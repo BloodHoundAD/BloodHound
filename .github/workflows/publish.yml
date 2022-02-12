@@ -70,4 +70,4 @@ jobs:
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}-*
+        files: BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}.zip
