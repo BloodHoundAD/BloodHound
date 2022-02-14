@@ -1,3 +1,6 @@
+[![Build](https://github.com/BloodHoundAD/BloodHound/actions/workflows/build.yml/badge.svg)](https://github.com/BloodHoundAD/BloodHound/actions/workflows/build.yml)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/BloodHoundAD/BloodHound)](https://github.com/BloodHoundAD/BloodHound/releases/latest)
+
 # Getting Started with BloodHound
 
 To get started with BloodHound, check out the [BloodHound docs.](https://bloodhound.readthedocs.io/en/latest/index.html)

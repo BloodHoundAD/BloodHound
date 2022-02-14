@@ -27,12 +27,24 @@
         "Ryan Hausknecht (https://hausec.com/)"
     ],
     "main": "main.js",
+    "engines": {
+        "node": "~16"
+    },
     "scripts": {
-        "start": "cross-env NODE_ENV=development electron .",
-        "dev": "concurrently -k \"babel-node server.js\" \"npm start\"",
-        "winbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=win32 --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.db --ignore=docs --ignore=Collectors  --icon=src/img/icon.ico",
-        "macbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=darwin --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.db --ignore=docs --ignore=Collectors  --icon=src/img/icon.icns",
-        "linuxbuild": "webpack --config webpack.config.production.js && electron-packager . BloodHound --platform=linux --arch=all --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.db --ignore=docs --ignore=Collectors --icon=src/img/icon.icns"
+        "start": "run-s start:client",
+        "start:server": "babel-node server.js",
+        "start:client": "cross-env NODE_ENV=development electron .",
+        "dev": "run-p start:**",
+        "compile": "webpack --config webpack.config.production.js",
+        "package": "electron-packager . BloodHound --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.db --ignore=docs --ignore=Ingestors --ignore=node_modules/\\.bin",
+        "package:linux": "run-s \"package -- --platform=linux --arch=x64,armv7l,arm64\"",
+        "package:macos": "run-s \"package -- --platform=darwin --arch=all --icon=src/img/icon.icns\"",
+        "package:win32": "run-s \"package -- --platform=win32 --arch=all --icon=src/img/icon.ico\"",
+        "build:win32": "run-s compile package:win32",
+        "build:linux": "run-s compile package:linux",
+        "build:macos": "run-s compile package:macos",
+        "build": "sh -c 'if [ \"$(run-s env:os)\" == \"win32\" ]; then run-s compile \"package -- --icon=src/img/icon.ico ${*}\"; else run-s compile \"package -- --icon=src/img/icon.icns ${*}\" ; fi' --",
+        "env:os": "node -e \"console.log(process.platform)\""
     },
     "babel": {
         "presets": [
@@ -47,13 +59,13 @@
         "@babel/preset-env": "^7.16.5",
         "@babel/preset-react": "^7.16.5",
         "babel-loader": "^8.1.0",
-        "concurrently": "^6.4.0",
         "core-js": "^3.19.3",
         "cross-env": "^6.0.3",
         "css-loader": "^3.6.0",
         "electron": "^11.5.0",
         "electron-packager": "^15.4.0",
         "express": "^4.16.2",
+        "npm-run-all": "^4.1.5",
         "regenerator-runtime": "^0.13.9",
         "style-loader": "^1.2.1",
         "webpack": "^4.44.1",

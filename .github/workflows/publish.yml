@@ -1,0 +1,73 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+    
+jobs:
+  build:
+    runs-on: ${{ matrix.build.os }}
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      matrix:
+        build:
+        - os: macos-latest
+          ostype: darwin
+          arch: x64
+
+        - os: macos-latest
+          ostype: darwin
+          arch: arm64
+
+        - os: ubuntu-latest
+          ostype: linux
+          arch: x64
+
+        - os: ubuntu-latest
+          ostype: linux
+          arch: arm64
+
+        - os: ubuntu-latest
+          ostype: linux
+          arch: armv7l
+
+        - os: windows-latest
+          ostype: win32
+          arch: ia32
+
+        - os: windows-latest
+          ostype: win32
+          arch: x64
+
+        - os: windows-latest
+          ostype: win32
+          arch: arm64
+
+    name: Build (${{ matrix.build.ostype }} ${{ matrix.build.arch }})
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup NodeJS
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16
+        cache: npm
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Build
+      run: npm run build -- --arch=${{ matrix.build.arch }}
+
+    - name: Zip
+      run: 7z a -tzip -mx9 BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}.zip BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}
+
+    - name: Upload
+      uses: softprops/action-gh-release@v1
+      with:
+        files: BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}.zip
