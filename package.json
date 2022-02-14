@@ -27,9 +27,14 @@
         "Ryan Hausknecht (https://hausec.com/)"
     ],
     "main": "main.js",
+    "engines": {
+        "node": "~16"
+    },
     "scripts": {
-        "start": "cross-env NODE_ENV=development electron .",
-        "dev": "concurrently -k \"babel-node server.js\" \"npm start\"",
+        "start": "run-s start:client",
+        "start:server": "babel-node server.js",
+        "start:client": "cross-env NODE_ENV=development electron .",
+        "dev": "run-p start:**",
         "compile": "webpack --config webpack.config.production.js",
         "package": "electron-packager . BloodHound --overwrite --prune --ignore=./*.zip --ignore=./BloodHound.* --ignore=BloodHoundExampleDB.db --ignore=docs --ignore=Ingestors --ignore=node_modules/\\.bin",
         "package:linux": "run-s \"package -- --platform=linux --arch=x64,armv7l,arm64\"",
@@ -54,7 +59,6 @@
         "@babel/preset-env": "^7.16.5",
         "@babel/preset-react": "^7.16.5",
         "babel-loader": "^8.1.0",
-        "concurrently": "^6.4.0",
         "core-js": "^3.19.3",
         "cross-env": "^6.0.3",
         "css-loader": "^3.6.0",

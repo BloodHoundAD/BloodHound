@@ -37,15 +37,15 @@ jobs:
           arch: armv7l
 
         - os: windows-latest
-          ostype: windows
+          ostype: win32
           arch: ia32
 
         - os: windows-latest
-          ostype: windows
+          ostype: win32
           arch: x64
 
         - os: windows-latest
-          ostype: windows
+          ostype: win32
           arch: arm64
 
     name: Build (${{ matrix.build.ostype }} ${{ matrix.build.arch }})
@@ -65,3 +65,18 @@ jobs:
     - name: Build
       run: npm run build -- --arch=${{ matrix.build.arch }}
 
+    - name: Zip
+      run: 7z a -tzip -mx9 BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}.zip BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}
+
+    - name: Update Rolling Release
+      if: "! startsWith(github.event_name, 'pull_request')"
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Rolling Release (unstable)
+        tag_name: rolling
+        prerelease: true
+        files: BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}.zip
+        body: |
+          Rolling release of BloodHound comiled from source (${{ github.sha }})
+
+          This is automatically kept up-to-date with the `${{ github.ref_name }}` ${{ github.ref_type }}.
