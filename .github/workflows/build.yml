@@ -77,6 +77,6 @@ jobs:
         prerelease: true
         files: BloodHound-${{ matrix.build.ostype }}-${{ matrix.build.arch }}.zip
         body: |
-          Rolling release of BloodHound comiled from source (${{ github.sha }})
+          Rolling release of BloodHound compiled from source (${{ github.sha }})
 
           This is automatically kept up-to-date with the `${{ github.ref_name }}` ${{ github.ref_type }}.
