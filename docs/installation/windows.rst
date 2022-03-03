@@ -75,8 +75,8 @@ Alternative: Build the BloodHound GUI
 
    C:\> npm install
 
-5. Build BloodHound with `npm run winbuild`
+5. Build BloodHound with `npm run build`
 
 ::
 
-   C:\> npm run winbuild
+   C:\> npm run build
