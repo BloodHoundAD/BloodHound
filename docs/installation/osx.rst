@@ -53,8 +53,8 @@ Alternative: Build the BloodHound GUI
 ::
 
    $ npm install
-Build BloodHound with `npm run macbuild`:
+Build BloodHound with `npm run build`:
 
 ::
 
-   $ npm run macbuild
+   $ npm run build
