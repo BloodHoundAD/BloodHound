@@ -110,7 +110,7 @@ export function buildComputerJsonNew(chunk) {
         format = [LABEL_COMPUTER, LABEL_COMPUTER, EDGE_ALLOWED_TO_DELEGATE, NON_ACL_PROPS];
 
         let props = allowedToDelegate.map((delegate) => {
-            return { source: identifier, target: delegate };
+            return { source: identifier, target: delegate.ObjectIdentifier };
         });
 
         insertNew(queries, format, props);
@@ -225,7 +225,7 @@ export function buildUserJsonNew(chunk) {
 
         format = [LABEL_USER, LABEL_COMPUTER, EDGE_ALLOWED_TO_DELEGATE, NON_ACL_PROPS];
         let props = allowedToDelegate.map((principal) => {
-            return { source: identifier, target: principal };
+            return { source: identifier, target: principal.ObjectIdentifier };
         });
 
         insertNew(queries, format, props);
