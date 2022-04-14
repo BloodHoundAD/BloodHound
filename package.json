@@ -76,7 +76,7 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.4",
         "adm-zip": "^0.5.9",
-        "async": "^2.6.3",
+        "async": "^3.2.2",
         "bootstrap": "^3.4.1",
         "clsx": "^1.1.1",
         "dagre": "^0.8.5",
