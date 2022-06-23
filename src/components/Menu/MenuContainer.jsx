@@ -383,7 +383,7 @@ const MenuContainer = () => {
         setNeedsPostProcess(false)
         let session = driver.session();
 
-        const highValueSids = ["-544", "-500", "-512", "-516", "-518", "-519", "1-5-9", "-526", "-527"]
+        const highValueSids = ["-544", "-500", "-512", "-516", "-518", "-519", "1-5-9", "-526", "-527", "-551"]
         const highValueStatement = "UNWIND $sids AS sid MATCH (n:Base) WHERE n.objectid ENDS WITH sid SET n.highvalue=true"
 
         await session.run(highValueStatement, {sids: highValueSids}).catch((err) => {
