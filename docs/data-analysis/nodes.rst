@@ -92,7 +92,7 @@ include:
   password.
 * **unconstraineddelegation**: Whether the user is allowed to perform
   unconstrained kerberos delegation. See more info about that here:
-  https://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+  https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 
 Group Membership
 ----------------
@@ -326,7 +326,7 @@ Node Properties
 * **Allows Unconstrained Delegation**: Whether the computer is trusted to perform
   unconstrained delegation. By default, all domain controllers are trusted for this
   style of kerberos delegation. For information about the abuse related to this
-  configuration, see https://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+  configuration, see https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 * **Compromised**: Whether the computer is marked as Owned. You can mark any computer in
   the BloodHound GUI as Owned by right-clicking it and clicking “Mark Computer as Owned”.
 * **LAPS Enabled**: Whether LAPS is running on the computer. This is determined by
