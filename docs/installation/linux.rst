@@ -119,8 +119,8 @@ Alternative: Build the BloodHound GUI
 
   npm install
 
-5. Build BloodHound with 'npm run build':
+5. Build BloodHound with 'npm run build:linux':
 
 ::
 
-  npm run build
+  npm run build:linux
