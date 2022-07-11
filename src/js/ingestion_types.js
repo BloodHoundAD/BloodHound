@@ -154,6 +154,12 @@
  */
 
 /**
+ * @typedef {Object} AzureBase
+ * @property {string} kind
+ * @property {Object} data
+ */
+
+/**
  * @typedef {Object} AzureDirectoryObject
  * @property {string} id
  * @property {string} type
@@ -192,7 +198,7 @@
  * @property {string} trustType
  * @property {string} tenantId
  * @property {string} tenantName
- * @property {string} data.Id
+ * @property {string} id
  */
 
 /**
@@ -218,7 +224,8 @@
  * @property {boolean} securityEnabled
  * @property {string} securityIdentifier
  * @property {string} tenantId
- * @property {string} data.Id
+ * @property {string} id
+ * @property {string} tenantName
  */
 
 /**
@@ -369,9 +376,14 @@
  */
 
 /**
+ * @typedef {Object} AzureManagementGroupProperties
+ * @property {string} displayName
+ */
+
+/**
  * @typedef {Object} AzureManagementGroup
  * @property {string} id
- * @property {string} displayName
+ * @property {AzureManagementGroupProperties} properties
  * @property {string} tenantName
  * @property {string} tenantId
  */
@@ -416,6 +428,7 @@
  * @property {boolean} isEnabled
  * @property {string} templateId
  * @property {string} tenantId
+ * @property {string} tenantName
  * @property {string} id
  */
 
@@ -444,6 +457,7 @@
  * @property {string} tenantName
  * @property {string} tenantId
  * @property {string} id
+ * @property {string} appId
  */
 
 /**
@@ -605,4 +619,43 @@
  * @typedef {Object} AzureVirtualUserAccessAdmins
  * @property {string} virtualMachineId
  * @property {Array.<AzureVirtualUserAccessAdmin>} userAccessAdmins
+ */
+
+/**
+ * @typedef {Object} RelPropWrapper
+ * @property {string} Statement
+ * @property {Array.<RelProp>} Props
+ */
+
+/**
+ * @typedef {Object} NodePropWrapper
+ * @property {string} Statement
+ * @property {Array.<NodeProp>} Props
+ */
+
+/**
+ * @typedef {Object} NodeProp
+ * @property {string} objectid
+ * @property {object} map
+ */
+
+/**
+ * @typedef {Object} RelProp
+ * @property {string} source
+ * @property {string} target
+ */
+
+/**
+ * @typedef {Object} AzureIngestionData
+ * @property {Object.<string, NodePropWrapper>} AzurePropertyMaps
+ * @property {Object.<string, NodePropWrapper>} OnPremPropertyMaps
+ * @property {Object.<string, RelPropWrapper>} RelPropertyMaps
+ */
+
+/**
+ * @typedef {Object} FormatProps
+ * @property {string} SourceLabel
+ * @property {string} TargetLabel
+ * @property {string} EdgeLabel
+ * @property {string} EdgeProps
  */
