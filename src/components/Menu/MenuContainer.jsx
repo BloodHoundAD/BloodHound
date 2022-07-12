@@ -36,28 +36,7 @@ const IngestFuncMap = {
     ous: NewIngestion.buildOuJsonNew,
     gpos: NewIngestion.buildGpoJsonNew,
     containers: NewIngestion.buildContainerJsonNew,
-    azdevices: NewIngestion.buildAzureDevices,
-    azusers: NewIngestion.buildAzureUsers,
-    azgroups: NewIngestion.buildAzureGroups,
-    aztenants: NewIngestion.buildAzureTenants,
-    azsubscriptions: NewIngestion.buildAzureSubscriptions,
-    azresourcegroups: NewIngestion.buildAzureResourceGroups,
-    azvms: NewIngestion.buildAzureVMs,
-    azkeyvaults: NewIngestion.buildAzureKeyVaults,
-    azgroupowners: NewIngestion.buildAzureGroupOwners,
-    azgroupmembers: NewIngestion.buildAzureGroupMembers,
-    azvmpermissions: NewIngestion.buildAzureVmPerms,
-    azrgpermissions: NewIngestion.buildAzureRGPermissions,
-    azkvpermissions: NewIngestion.buildAzureKVPermissions,
-    azkvaccesspolicies: NewIngestion.buildAzureKVAccessPolicies,
-    azpwresetrights: NewIngestion.buildAzurePWResetRights,
-    azgroupsrights: NewIngestion.buildAzureGroupRights,
-    azglobaladminrights: NewIngestion.buildAzureGlobalAdminRights,
-    azprivroleadminrights: NewIngestion.buildAzurePrivRileAdminRights,
-    azapplicationadmins: NewIngestion.buildAzureApplicationAdmins,
-    azcloudappadmins: NewIngestion.buildAzureCloudApplicationAdmins,
-    azapplicationowners: NewIngestion.buildAzureAppOwners,
-    azapplicationtosp: NewIngestion.buildAzureAppToSP,
+    azure: NewIngestion.convertAzureData
 };
 
 const MenuContainer = () => {
@@ -270,14 +249,49 @@ const MenuContainer = () => {
                 count += data.length
 
                 let processedData = processor(data)
-                for (let key in processedData){
-                    let props = processedData[key].props;
-                    if (props.length === 0) continue
-                    let chunked = props.chunk();
-                    let statement = processedData[key].statement;
+                if (file.type === 'azure') {
+                    for (let item of processedData.AzurePropertyMaps) {
+                        let props = item.Props
+                        if (props.length === 0) continue
+                        let chunked = props.chunk()
+                        let statement = item.Statement
 
-                    for (let chunk of chunked){
-                        await uploadData(statement, chunk)
+                        for (let chunk of chunked){
+                            await uploadData(statement, chunk)
+                        }
+                    }
+
+                    for (let item of processedData.OnPremPropertyMaps) {
+                        let props = item.Props
+                        if (props.length === 0) continue
+                        let chunked = props.chunk()
+                        let statement = item.Statement
+
+                        for (let chunk of chunked){
+                            await uploadData(statement, chunk)
+                        }
+                    }
+
+                    for (let item of processedData.RelPropertyMaps) {
+                        let props = item.Props
+                        if (props.length === 0) continue
+                        let chunked = props.chunk()
+                        let statement = item.Statement
+
+                        for (let chunk of chunked){
+                            await uploadData(statement, chunk)
+                        }
+                    }
+                }else{
+                    for (let key in processedData){
+                        let props = processedData[key].props;
+                        if (props.length === 0) continue
+                        let chunked = props.chunk();
+                        let statement = processedData[key].statement;
+
+                        for (let chunk of chunked){
+                            await uploadData(statement, chunk)
+                        }
                     }
                 }
 

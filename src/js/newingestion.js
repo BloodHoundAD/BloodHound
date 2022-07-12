@@ -1,4 +1,4 @@
-import { groupBy } from 'lodash/collection';
+import {groupBy} from 'lodash/collection';
 
 const LABEL_GROUP = 'Group';
 const LABEL_USER = 'User';
@@ -7,10 +7,6 @@ const LABEL_OU = 'OU';
 const LABEL_GPO = 'GPO';
 const LABEL_DOMAIN = 'Domain';
 const LABEL_CONTAINER = 'Container';
-
-const LABEL_AZBASE = 'AZBase';
-const LABEL_AZAPP = 'AZApp';
-const LABEL_AZTENANT = 'AZTenant';
 
 const EDGE_MEMBER_OF = 'MemberOf';
 const EDGE_ALLOWED_TO_DELEGATE = 'AllowedToDelegate';
@@ -41,6 +37,7 @@ const GROUP_SERVICE = 'Service';
 const ADLabels = {
     Base: 'Base',
     Group: 'Group',
+    User: 'User',
 };
 
 const AzureApplicationAdministratorRoleId =
@@ -73,7 +70,50 @@ const AzureLabels = {
     AppAdmin: 'AZAppAdmin',
     CloudAppAdmin: 'AZCloudAppAdmin',
     RunsAs: 'AZRunsAs',
+    VirtualMachine: 'AZVM',
+    ManagedIdentity: 'AZManagedIdentity',
+    AdminLogin: 'AZVMAdminLogin',
+    AvereContributor: 'AZAvereContributor',
+    VMContributor: 'AZVMContributor'
 };
+
+const AzurehoundKindLabels = {
+    KindAZApp                            : "AZApp",
+    KindAZAppMember                      : "AZAppMember",
+    KindAZAppOwner                       : "AZAppOwner",
+    KindAZDevice                         : "AZDevice",
+    KindAZDeviceOwner                    : "AZDeviceOwner",
+    KindAZGroup                          : "AZGroup",
+    KindAZGroupMember                    : "AZGroupMember",
+    KindAZGroupOwner                     : "AZGroupOwner",
+    KindAZKeyVault                       : "AZKeyVault",
+    KindAZKeyVaultAccessPolicy           : "AZKeyVaultAccessPolicy",
+    KindAZKeyVaultContributor            : "AZKeyVaultContributor",
+    KindAZKeyVaultOwner                  : "AZKeyVaultOwner",
+    KindAZKeyVaultUserAccessAdmin        : "AZKeyVaultUserAccessAdmin",
+    KindAZManagementGroup                : "AZManagementGroup",
+    KindAZManagementGroupOwner           : "AZManagementGroupOwner",
+    KindAZManagementGroupDescendant      : "AZManagementGroupDescendant",
+    KindAZManagementGroupUserAccessAdmin : "AZManagementGroupUserAccessAdmin",
+    KindAZResourceGroup                  : "AZResourceGroup",
+    KindAZResourceGroupOwner             : "AZResourceGroupOwner",
+    KindAZResourceGroupUserAccessAdmin   : "AZResourceGroupUserAccessAdmin",
+    KindAZRole                           : "AZRole",
+    KindAZRoleAssignment                 : "AZRoleAssignment",
+    KindAZServicePrincipal               : "AZServicePrincipal",
+    KindAZServicePrincipalOwner          : "AZServicePrincipalOwner",
+    KindAZSubscription                   : "AZSubscription",
+    KindAZSubscriptionOwner              : "AZSubscriptionOwner",
+    KindAZSubscriptionUserAccessAdmin    : "AZSubscriptionUserAccessAdmin",
+    KindAZTenant                         : "AZTenant",
+    KindAZUser                           : "AZUser",
+    KindAZVM                             : "AZVM",
+    KindAZVMAdminLogin                   : "AZVMAdminLogin",
+    KindAZVMAvereContributor             : "AZVMAvereContributor",
+    KindAZVMContributor                  : "AZVMContributor",
+    KindAZVMOwner                        : "AZVMOwner",
+    KindAZVMUserAccessAdmin              : "AZVMUserAccessAdmin",
+}
 
 const DirectoryObjectEntityTypes = {
     User: '#microsoft.graph.user',
@@ -99,7 +139,7 @@ export function buildGroupJsonNew(chunk) {
         let aces = group.Aces;
         let members = group.Members;
 
-        queries.properties.props.push({ source: identifier, map: properties });
+        queries.properties.props.push({source: identifier, map: properties});
 
         processAceArrayNew(aces, identifier, LABEL_GROUP, queries);
 
@@ -110,7 +150,7 @@ export function buildGroupJsonNew(chunk) {
         for (let objectType in grouped) {
             format[0] = objectType;
             let props = grouped[objectType].map((member) => {
-                return { source: member.ObjectIdentifier, target: identifier };
+                return {source: member.ObjectIdentifier, target: identifier};
             });
 
             insertNew(queries, format, props);
@@ -145,7 +185,7 @@ export function buildComputerJsonNew(chunk) {
         let regSessions = computer.RegistrySessions.Results;
         let aces = computer.Aces;
 
-        queries.properties.props.push({ source: identifier, map: properties });
+        queries.properties.props.push({source: identifier, map: properties});
 
         processAceArrayNew(aces, identifier, LABEL_COMPUTER, queries);
 
@@ -170,7 +210,7 @@ export function buildComputerJsonNew(chunk) {
         ];
 
         let props = allowedToDelegate.map((delegate) => {
-            return { source: identifier, target: delegate.ObjectIdentifier };
+            return {source: identifier, target: delegate.ObjectIdentifier};
         });
 
         insertNew(queries, format, props);
@@ -195,7 +235,7 @@ export function buildComputerJsonNew(chunk) {
             '{isacl:false, source:"netsessionenum"}',
         ];
         props = sessions.map((session) => {
-            return { source: session.ComputerSID, target: session.UserSID };
+            return {source: session.ComputerSID, target: session.UserSID};
         });
         insertNew(queries, format, props);
 
@@ -206,7 +246,7 @@ export function buildComputerJsonNew(chunk) {
             '{isacl:false, source:"netwkstauserenum"}',
         ];
         props = privSessions.map((session) => {
-            return { source: session.ComputerSID, target: session.UserSID };
+            return {source: session.ComputerSID, target: session.UserSID};
         });
         insertNew(queries, format, props);
 
@@ -217,7 +257,7 @@ export function buildComputerJsonNew(chunk) {
             '{isacl:false, source:"registry"}',
         ];
         props = regSessions.map((session) => {
-            return { source: session.ComputerSID, target: session.UserSID };
+            return {source: session.ComputerSID, target: session.UserSID};
         });
         insertNew(queries, format, props);
 
@@ -340,7 +380,7 @@ export function buildUserJsonNew(chunk) {
             NON_ACL_PROPS,
         ];
         let props = allowedToDelegate.map((principal) => {
-            return { source: identifier, target: principal.ObjectIdentifier };
+            return {source: identifier, target: principal.ObjectIdentifier};
         });
 
         insertNew(queries, format, props);
@@ -380,7 +420,7 @@ export function buildGpoJsonNew(chunk) {
         let aces = gpo.Aces;
         let properties = gpo.Properties;
 
-        queries.properties.props.push({ source: identifier, map: properties });
+        queries.properties.props.push({source: identifier, map: properties});
         processAceArrayNew(aces, identifier, LABEL_GPO, queries);
     }
 
@@ -404,7 +444,7 @@ export function buildContainerJsonNew(chunk) {
         let properties = container.Properties;
         let children = container.ChildObjects;
 
-        queries.properties.props.push({ source: identifier, map: properties });
+        queries.properties.props.push({source: identifier, map: properties});
         processAceArrayNew(aces, identifier, LABEL_CONTAINER, queries);
 
         let format = [LABEL_CONTAINER, '', EDGE_CONTAINS, NON_ACL_PROPS];
@@ -413,7 +453,7 @@ export function buildContainerJsonNew(chunk) {
         for (let objectType in grouped) {
             format[1] = objectType;
             let props = grouped[objectType].map((child) => {
-                return { source: identifier, target: child.ObjectIdentifier };
+                return {source: identifier, target: child.ObjectIdentifier};
             });
 
             insertNew(queries, format, props);
@@ -445,7 +485,7 @@ export function buildOuJsonNew(chunk) {
 
         processAceArrayNew(aces, identifier, 'OU', queries);
 
-        queries.properties.props.push({ source: identifier, map: properties });
+        queries.properties.props.push({source: identifier, map: properties});
 
         let format = [LABEL_OU, '', EDGE_CONTAINS, NON_ACL_PROPS];
         let grouped = groupBy(children, GROUP_OBJECT_TYPE);
@@ -453,7 +493,7 @@ export function buildOuJsonNew(chunk) {
         for (let objectType in grouped) {
             format[1] = objectType;
             let props = grouped[objectType].map((child) => {
-                return { source: identifier, target: child.ObjectIdentifier };
+                return {source: identifier, target: child.ObjectIdentifier};
             });
 
             insertNew(queries, format, props);
@@ -596,7 +636,7 @@ export function buildDomainJsonNew(chunk) {
         for (let objectType in grouped) {
             format[1] = objectType;
             let props = grouped[objectType].map((child) => {
-                return { source: identifier, target: child.ObjectIdentifier };
+                return {source: identifier, target: child.ObjectIdentifier};
             });
 
             insertNew(queries, format, props);
@@ -726,7 +766,7 @@ export function buildDomainJsonNew(chunk) {
 
             queries.properties.props.push({
                 source: target,
-                map: { name: targetName },
+                map: {name: targetName},
             });
 
             if (
@@ -877,6 +917,125 @@ function processSPNTargetArrayNew(
 
 /**
  *
+ * @param {Array.<AzureBase>} chunk
+ */
+export function convertAzureData(chunk) {
+    let data = {}
+    for (let item of chunk) {
+        switch (item.kind) {
+            case AzurehoundKindLabels.KindAZApp:
+                convertAzureApp(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZAppOwner:
+                convertAzureAppOwner(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZDevice:
+                convertAzureDevice(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZDeviceOwner:
+                convertAzureDeviceOwners(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZGroup:
+                convertAzureGroup(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZGroupMember:
+                convertAzureGroupMembers(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZGroupOwner:
+                convertAzureGroupOwners(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZKeyVault:
+                convertAzureKeyVault(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZKeyVaultAccessPolicy:
+                convertAzureKeyVaultAccessPolicy(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZKeyVaultContributor:
+                convertAzureKeyVaultContributors(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZKeyVaultOwner:
+                convertAzureKeyVaultOwners(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZKeyVaultUserAccessAdmin:
+                convertAzureKeyVaultUserAccessAdmins(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZManagementGroup:
+                convertAzureManagementGroup(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZManagementGroupOwner:
+                convertAzureManagementGroupOwners(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZManagementGroupDescendant:
+                convertAzureManagementGroupDescendant(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZManagementGroupUserAccessAdmin:
+                convertAzureManagementGroupUserAccessAdmins(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZResourceGroup:
+                convertAzureResourceGroup(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZResourceGroupOwner:
+                convertAzureResourceGroupOwners(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZResourceGroupUserAccessAdmin:
+                convertAzureResourceGroupUserAccessAdmins(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZRole:
+                convertAzureRole(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZRoleAssignment:
+                convertAzureRoleAssignment(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZServicePrincipal:
+                convertAzureServicePrincipal(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZServicePrincipalOwner:
+                convertAzureServicePrincipalOwners(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZSubscription:
+                convertAzureSubscription(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZSubscriptionOwner:
+                convertAzureSubscriptionOwners(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZSubscriptionUserAccessAdmin:
+                convertAzureSubscriptionUserAccessAdmins(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZTenant:
+                convertAzureTenant(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZUser:
+                convertAzureUser(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZVM:
+                convertAzureVirtualMachine(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZVMAdminLogin:
+                convertAzureVirtualMachineAdminLogins(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZVMAvereContributor:
+                convertAzureVirtualMachineAvereContributors(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZVMContributor:
+                convertAzureVirtualMachineContributors(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZVMOwner:
+                convertAzureVirtualMachineOwners(item.data, data)
+                break
+            case AzurehoundKindLabels.KindAZVMUserAccessAdmin:
+                convertAzureVirtualMachineUserAccessAdmins(item.data, data)
+                break
+            default:
+                console.error(`invalid azure type detected: ${item.kind}`)
+                break
+        }
+    }
+
+    return data
+}
+
+/**
+ *
  * @param {AzureIngestionData} ingestionData
  * @param {AzureApp} data
  */
@@ -959,7 +1118,7 @@ export function convertAzureDevice(data, ingestionData) {
     insertNewAzureRel(
         ingestionData,
         fProps(AzureLabels.Tenant, AzureLabels.Device, AzureLabels.Contains),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
 }
 
@@ -1026,7 +1185,7 @@ export function convertAzureGroup(data, ingestionData) {
     insertNewAzureRel(
         ingestionData,
         fProps(AzureLabels.Tenant, AzureLabels.Group, AzureLabels.Contains),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
 }
 
@@ -1088,7 +1247,7 @@ export function convertAzureKeyVault(data, ingestionData) {
             map: {
                 name: data.name.toUpperCase(),
                 enablerbacauthorization:
-                    data.properties.enableRbacAuthorization,
+                data.properties.enableRbacAuthorization,
                 tenantid: data.tenantId.toUpperCase(),
             },
         },
@@ -1102,7 +1261,7 @@ export function convertAzureKeyVault(data, ingestionData) {
             AzureLabels.KeyVault,
             AzureLabels.Contains
         ),
-        { source: data.resourceGroup.toString(), target: data.id.toUpperCase() }
+        {source: data.resourceGroup.toString(), target: data.id.toUpperCase()}
     );
 }
 
@@ -1310,7 +1469,7 @@ export function convertAzureManagementGroup(data, ingestionData) {
             AzureLabels.ManagementGroup,
             AzureLabels.Contains
         ),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
 }
 
@@ -1418,7 +1577,7 @@ export function convertAzureRole(data, ingestionData) {
     insertNewAzureRel(
         ingestionData,
         fProps(AzureLabels.Tenant, AzureLabels.Role, AzureLabels.Contains),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
 }
 
@@ -1431,9 +1590,9 @@ export function convertAzureRoleAssignment(data, ingestionData) {
     for (let roleAssignment of data.roleAssignments) {
         if (
             roleAssignment.roleDefinitionId ===
-                AzureApplicationAdministratorRoleId ||
+            AzureApplicationAdministratorRoleId ||
             roleAssignment.roleDefinitionId ===
-                AzureCloudApplicationAdministratorRoleId
+            AzureCloudApplicationAdministratorRoleId
         ) {
             if (roleAssignment.directoryScopeId === '/') {
                 insertNewAzureRel(
@@ -1522,7 +1681,7 @@ export function convertAzureServicePrincipal(data, ingestionData) {
             AzureLabels.ServicePrincipal,
             AzureLabels.RunsAs
         ),
-        { source: data.appId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.appId.toUpperCase(), target: data.id.toUpperCase()}
     );
 
     insertNewAzureRel(
@@ -1532,8 +1691,302 @@ export function convertAzureServicePrincipal(data, ingestionData) {
             AzureLabels.ServicePrincipal,
             AzureLabels.Contains
         ),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
+}
+
+/**
+ *
+ * @param {AzureServicePrincipalOwners} data
+ * @param ingestionData
+ */
+export function convertAzureServicePrincipalOwners(data, ingestionData) {
+    for (let owner of data.owners) {
+        insertNewAzureRel(ingestionData, fProps(getTypeFromDirectoryObject(owner.owner), AzureLabels.ServicePrincipal, AzureLabels.Owns), {source: owner.owner.id.toUpperCase(), target: data.servicePrincipalId.toUpperCase()})
+    }
+}
+
+/**
+ *
+ * @param {AzureSubscription} data
+ * @param ingestionData
+ */
+export function convertAzureSubscription(data, ingestionData) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.Subscription,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                displayname: data.displayName,
+                id: data.subscriptionId,
+                name: data.displayName.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.Tenant,
+            AzureLabels.Subscription,
+            AzureLabels.Contains
+        ),
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
+    );
+}
+
+/**
+ *
+ * @param {AzureSubscriptionOwners} data
+ * @param ingestionData
+ */
+export function convertAzureSubscriptionOwners(data, ingestionData) {
+    for (let owner of data.owners) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.Subscription,
+                AzureLabels.Owns
+            ),
+            {
+                source: owner.owner.properties.principalId.toUpperCase(),
+                target: data.subscriptionId.toUpperCase(),
+            }
+        );
+    }
+}
+
+/**
+ *
+ * @param {AzureSubscriptionUserAccessAdmins} data
+ * @param ingestionData
+ */
+export function convertAzureSubscriptionUserAccessAdmins(data, ingestionData) {
+    for (let userAccessAdmin of data.userAccessAdmins) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.Subscription,
+                AzureLabels.UserAccessAdministrator
+            ),
+            {
+                source: userAccessAdmin.userAccessAdmin.properties.principalId.toUpperCase(),
+                target: data.subscriptionId.toUpperCase(),
+            }
+        );
+    }
+}
+
+/**
+ *
+ * @param {AzureTenant} data
+ * @param ingestionData
+ */
+export function convertAzureTenant(data, ingestionData) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.Tenant,
+        {
+            objectid: data.tenantId.toUpperCase(),
+            map: {
+                displayname: data.displayName,
+                id: data.id,
+                name: data.displayName.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+            },
+        },
+        false
+    );
+}
+
+/**
+ *
+ * @param {AzureUser} data
+ * @param ingestionData
+ */
+export function convertAzureUser(data, ingestionData) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.User,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                enabled: data.accountEnabled,
+                whencreated: data.createdDateTime,
+                displayname: data.displayName,
+                title: data.jobTitle,
+                pwdlastset: data.lastPasswordChangeDateTime,
+                mail: data.mail,
+                onpremisesecurityidentifier: data.onPremisesSecurityIdentifier,
+                onpremisesyncenabled: data.onPremisesSyncEnabled,
+                userprincipalname: data.userPrincipalName,
+                usertype: data.userType,
+                name: data.userPrincipalName.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+            },
+        },
+        false
+    );
+
+    if (data.onPremisesSecurityIdentifier !== '') {
+        insertNewAzureNodeProp(
+            ingestionData,
+            ADLabels.User,
+            {
+                objectid: data.onPremisesSecurityIdentifier.toUpperCase(),
+                map: {},
+            },
+            true
+        );
+    }
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.User, AzureLabels.Contains),
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
+    );
+}
+
+/**
+ *
+ * @param {AzureVirtualMachine} data
+ * @param ingestionData
+ */
+export function convertAzureVirtualMachine(data, ingestionData) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.VirtualMachine,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                id: data.properties.vmId,
+                operatingsystem: data.properties.storageProfile.osDisk.osType,
+                tenantid: data.tenantId.toUpperCase(),
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.VirtualMachine,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    if (data.identity.principalId !== '') {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.VirtualMachine,
+                AzureLabels.ServicePrincipal,
+                AzureLabels.ManagedIdentity
+            ),
+            {
+                source: data.id.toUpperCase(),
+                target: data.identity.principalId.toUpperCase(),
+            }
+        );
+    }
+
+    for (let user of data.identity.userAssignedEntities) {
+        if (user.clientId !== '') {
+            insertNewAzureRel(
+                ingestionData,
+                fProps(
+                    AzureLabels.VirtualMachine,
+                    AzureLabels.ServicePrincipal,
+                    AzureLabels.ManagedIdentity
+                ),
+                {
+                    source: data.id.toUpperCase(),
+                    target: user.principalId.toUpperCase(),
+                }
+            );
+        }
+    }
+}
+
+/**
+ *
+ * @param {AzureVirtualMachineAdminLogins} data
+ * @param ingestionData
+ */
+export function convertAzureVirtualMachineAdminLogins(data, ingestionData) {
+    for (let admin of data.adminLogins) {
+        insertNewAzureRel(ingestionData, fProps(AzureLabels.Base, AzureLabels.VirtualMachine, AzureLabels.AdminLogin), {
+            source: admin.adminLogin.properties.principalId.toUpperCase(),
+            target: data.virtualMachineId.toUpperCase()
+        })
+    }
+}
+
+/**
+ *
+ * @param {AzureVirtualMachineAvereContributors} data
+ * @param ingestionData
+ */
+export function convertAzureVirtualMachineAvereContributors(data, ingestionData) {
+    for (let contributor of data.avereContributors) {
+        insertNewAzureRel(ingestionData, fProps(AzureLabels.Base, AzureLabels.VirtualMachine, AzureLabels.AvereContributor), {
+            source: contributor.avereContributor.properties.principalId.toUpperCase(),
+            target: data.virtualMachineId.toUpperCase()
+        })
+    }
+}
+
+/**
+ *
+ * @param {AzureVirtualMachineContributors} data
+ * @param ingestionData
+ */
+export function convertAzureVirtualMachineContributors(data, ingestionData) {
+    for (let contributor of data.contributors) {
+        insertNewAzureRel(ingestionData, fProps(AzureLabels.Base, AzureLabels.VirtualMachine, AzureLabels.VMContributor), {
+            source: contributor.contributor.properties.principalId.toUpperCase(),
+            target: data.virtualMachineId.toUpperCase()
+        })
+    }
+}
+
+/**
+ *
+ * @param {AzureVirtualMachineOwners} data
+ * @param ingestionData
+ */
+export function convertAzureVirtualMachineOwners(data, ingestionData) {
+    for (let owner of data.owners) {
+        insertNewAzureRel(ingestionData, fProps(AzureLabels.Base, AzureLabels.VirtualMachine, AzureLabels.Owns), {
+            source: owner.owner.properties.principalId.toUpperCase(),
+            target: data.virtualMachineId.toUpperCase()
+        })
+    }
+}
+
+/**
+ *
+ * @param {AzureVirtualUserAccessAdmins} data
+ * @param ingestionData
+ */
+export function convertAzureVirtualMachineUserAccessAdmins(data, ingestionData) {
+    for (let admin of data.userAccessAdmins) {
+        insertNewAzureRel(ingestionData, fProps(AzureLabels.Base, AzureLabels.VirtualMachine, AzureLabels.UserAccessAdministrator), {
+            source: admin.owner.properties.principalId.toUpperCase(),
+            target: data.virtualMachineId.toUpperCase()
+        })
+    }
 }
 
 /**
@@ -1584,7 +2037,7 @@ function insertNewAzureNodeProp(Queries, Type, QueryProp, OnPrem) {
         } else {
             Queries.OnPremPropertyMaps[Type] = {};
             Queries.OnPremPropertyMaps[Type].Statement =
-                AZURE_PROP_QUERY.format(Type);
+                PROP_QUERY.format(Type);
             Queries.OnPremPropertyMaps[Type].Props = [];
             Queries.OnPremPropertyMaps[Type].Props.push(QueryProp);
         }

@@ -544,10 +544,17 @@
  */
 
 /**
+ * @typedef {Object} UserAssignedEntity
+ * @property {string} clientId
+ * @property {string} principalId
+ */
+
+/**
  * @typedef {Object} AzureVirtualMachineIdentity
  * @property {string} principalId
  * @property {string} tenantId
  * @property {string} type
+ * @property {Object.<string,UserAssignedEntity>} userAssignedEntities
  */
 
 /**
@@ -562,15 +569,15 @@
  */
 
 /**
- * @typedef {Object} AzureVirtualMachineLogin
+ * @typedef {Object} AzureVirtualMachineAdminLogin
  * @property {string} virtualMachineId
  * @property {AzureRoleAssignment} adminLogin
  */
 
 /**
- * @typedef {Object} AzureVirtualMachineLogins
+ * @typedef {Object} AzureVirtualMachineAdminLogins
  * @property {string} virtualMachineId
- * @property {Array.<AzureVirtualMachineLogin>} adminLogins
+ * @property {Array.<AzureVirtualMachineAdminLogin>} adminLogins
  */
 
 /**
