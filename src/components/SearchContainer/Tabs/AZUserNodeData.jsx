@@ -199,7 +199,7 @@ const AZUserNodeData = () => {
                                     property='Unrolled Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns|AZResetPassword]->(g2:AZUser {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                        'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZResetPassword]->(g2:AZUser {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
                                     }
                                     end={label}
                                     distinct

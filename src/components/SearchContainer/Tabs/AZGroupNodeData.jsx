@@ -53,7 +53,7 @@ const AZGroupNodeData = () => {
     const displayMap = {
         objectid: 'Object ID',
         description: 'Description',
-        admincount: 'Admin Count',
+        isAssignableToRole: 'Is Role Eligible'
     };
 
     return objectid === null ? (
