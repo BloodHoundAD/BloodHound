@@ -78,18 +78,18 @@ const AZDeviceNodeData = () => {
                             <thead></thead>
                             <tbody className='searchable'>
                                 <NodeCypherLink
-                                    property='Owners'
+                                    property='Explicit Execution Principals'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
+                                        'MATCH p = (n)-[r:AZOwns|AZExecuteCommand]->(g:AZDevice {objectid: $objectid})'
                                     }
                                     end={label}
                                 />
                                 <NodeCypherLink
-                                    property='InTune Admins'
+                                    property='Unrolled Execution Principals'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:AZOwns]->(g:AZDevice {objectid: $objectid})'
+                                        'MATCH p = (m)-[:MemberOf]->(n)-[r:AZOwns|AZExecuteCommand]->(g:AZDevice {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
