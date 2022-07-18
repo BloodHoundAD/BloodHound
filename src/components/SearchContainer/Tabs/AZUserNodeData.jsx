@@ -121,7 +121,7 @@ const AZUserNodeData = () => {
                                     property='First Degree Group Membership'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(m:AZUser {objectid: $objectid})-[r:MemberOf]->(n)'
+                                        'MATCH p=(m:AZUser {objectid: $objectid})-[r:AZMemberOf]->(n)'
                                     }
                                     start={label}
                                     distinct
@@ -130,7 +130,7 @@ const AZUserNodeData = () => {
                                     property='Unrolled Member Of'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (m:AZUser {objectid: $objectid})-[r:MemberOf*1..]->(n)'
+                                        'MATCH p = (m:AZUser {objectid: $objectid})-[r:AZMemberOf*1..]->(n)'
                                     }
                                     start={label}
                                     distinct
@@ -190,7 +190,7 @@ const AZUserNodeData = () => {
                                     property='Explicit Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:AZOwns|AZResetPassword]->(g:AZUser {objectid: $objectid})'
+                                        'MATCH p = (n)-[r:AZResetPassword]->(g:AZUser {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -199,7 +199,7 @@ const AZUserNodeData = () => {
                                     property='Unrolled Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZResetPassword]->(g2:AZUser {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                        'MATCH p = (n)-[r:AZMemberOf]->(g1)-[r1:AZResetPassword]->(g2:AZUser {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
                                     }
                                     end={label}
                                     distinct
