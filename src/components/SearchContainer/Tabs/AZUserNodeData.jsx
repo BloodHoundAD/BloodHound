@@ -151,7 +151,7 @@ const AZUserNodeData = () => {
                                     property='First Degree Object Control'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (g:AZUser {objectid: $objectid})-[r:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor|AZOwns]->(n)'
+                                        'MATCH p = (g:AZUser {objectid: $objectid})-[r:AZCloudAppAdmin|AZAppAdmin|AZResetPassword|AZAddMembers|AZOwns|AZUserAccessAdministrator|AZAvereContributor|AZVMContributor|AZContributor|AZVMAdminLogin|AZGetSecrets|AZGetKeys|AZGetCertificates|AZGlobalAdmin|AZPrivilegedRoleAdmin|AZPrivilegedAuthAdmin]->(n)'
                                     }
                                     start={label}
                                     distinct
@@ -160,7 +160,7 @@ const AZUserNodeData = () => {
                                     property='Group Delegated Object Control'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (g1:AZUser {objectid: $objectid})-[r1:MemberOf*1..]->(g2)-[r2:AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor|AZOwns]->(n)'
+                                        'MATCH p = (g1:AZUser {objectid: $objectid})-[r1:AZMemberOf*1..]->(g2)-[r2:AZCloudAppAdmin|AZAppAdmin|AZResetPassword|AZAddMembers|AZOwns|AZUserAccessAdministrator|AZAvereContributor|AZVMContributor|AZContributor|AZVMAdminLogin|AZGetSecrets|AZGetKeys|AZGetCertificates|AZGlobalAdmin|AZPrivilegedRoleAdmin|AZPrivilegedAuthAdmin]->(n)'
                                     }
                                     start={label}
                                     distinct
@@ -169,7 +169,7 @@ const AZUserNodeData = () => {
                                     property='Transitive Object Control'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((g:AZUser {objectid: $objectid})-[r:AZMemberOf|AZResetPassword|AZAddMembers|AZOwnsAZAvereContributor|AZVMContributor|AZContributor|AZOwns*1..]->(n))'
+                                        'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((g:AZUser {objectid: $objectid})-[r*1..]->(n))'
                                     }
                                     start={label}
                                     distinct
