@@ -151,7 +151,7 @@ const AZUserNodeData = () => {
                                     property='First Degree Object Control'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (g:AZUser {objectid: $objectid})-[r:AZCloudAppAdmin|AZAppAdmin|AZResetPassword|AZAddMembers|AZOwns|AZUserAccessAdministrator|AZAvereContributor|AZVMContributor|AZContributor|AZVMAdminLogin|AZGetSecrets|AZGetKeys|AZGetCertificates|AZGlobalAdmin|AZPrivilegedRoleAdmin|AZPrivilegedAuthAdmin]->(n)'
+                                        'MATCH p = (g:AZUser {objectid: $objectid})-[r:AZPrivilegedAuthAdmin|AZPrivilegedRoleAdmin|AZGlobalAdmin|AZGetCertificates|AZGetKeys|AZGetSecrets|AZVMAdminLogin|AZContributor|AZAvereContributor|AZUserAccessAdministrator|AZOwns|AZAddMembers|AZResetPassword|AZAppAdmin|AZCloudAppAdmin|AZVMContributor|AZAddSecret]->(n)'
                                     }
                                     start={label}
                                     distinct
@@ -160,7 +160,7 @@ const AZUserNodeData = () => {
                                     property='Group Delegated Object Control'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (g1:AZUser {objectid: $objectid})-[r1:AZMemberOf*1..]->(g2)-[r2:AZCloudAppAdmin|AZAppAdmin|AZResetPassword|AZAddMembers|AZOwns|AZUserAccessAdministrator|AZAvereContributor|AZVMContributor|AZContributor|AZVMAdminLogin|AZGetSecrets|AZGetKeys|AZGetCertificates|AZGlobalAdmin|AZPrivilegedRoleAdmin|AZPrivilegedAuthAdmin]->(n)'
+                                        'MATCH p = (g1:AZUser {objectid: $objectid})-[r1:AZMemberOf*1..]->(g2)-[r2:AZPrivilegedAuthAdmin|AZPrivilegedRoleAdmin|AZGlobalAdmin|AZGetCertificates|AZGetKeys|AZGetSecrets|AZVMAdminLogin|AZContributor|AZAvereContributor|AZUserAccessAdministrator|AZOwns|AZAddMembers|AZResetPassword|AZAppAdmin|AZCloudAppAdmin|AZVMContributor|AZAddSecret]->(n)'
                                     }
                                     start={label}
                                     distinct
