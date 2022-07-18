@@ -259,7 +259,7 @@ const MenuContainer = () => {
                 count += data.length;
 
                 let processedData = processor(data);
-                if (file.type === 'azure') {;
+                if (file.type === 'azure') {
                     for (let value of Object.values(
                         processedData.AzurePropertyMaps
                     )) {

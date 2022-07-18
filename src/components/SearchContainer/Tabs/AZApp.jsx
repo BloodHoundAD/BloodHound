@@ -37,7 +37,7 @@ const AZAppNodeData = () => {
             let loadData = async () => {
                 let session = driver.session();
                 let results = await session.run(
-                    `MATCH (n:AZApp {objectid: $objectid}) OPTIONAL MATCH (n)-[:AZRunsAs]->(m:ServicePrincipal) RETURN n AS node, m AS serviceprincipal`,
+                    `MATCH (n:AZApp {objectid: $objectid}) OPTIONAL MATCH (n)-[:AZRunsAs]->(m:AZServicePrincipal) RETURN n AS node, m AS serviceprincipal`,
                     {
                         objectid: id,
                     }
