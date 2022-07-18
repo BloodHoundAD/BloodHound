@@ -77,7 +77,7 @@ const AZGroupNodeData = () => {
                                     property='Sessions'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH (m:AZGroup {objectid: $objectid}),(n),p = ((n)-[r:HasSession*1..]->(u)-[:MemberOf*1..]->(m))'
+                                        'MATCH (m:AZGroup {objectid: $objectid}),(n),p = ((n)-[r:HasSession*1..]->(u)-[:AZMemberOf*1..]->(m))'
                                     }
                                     start={label}
                                 />
@@ -121,7 +121,7 @@ const AZGroupNodeData = () => {
                                     property='Direct Members'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n)-[b:MemberOf]->(c:AZGroup {objectid: $objectid}) WHERE n:AZUser OR n:AZGroup OR n:AZDevice'
+                                        'MATCH p=(n)-[b:AZMemberOf]->(c:AZGroup {objectid: $objectid}) WHERE n:AZUser OR n:AZGroup OR n:AZDevice'
                                     }
                                     end={label}
                                 />
@@ -129,7 +129,7 @@ const AZGroupNodeData = () => {
                                     property='Unrolled Members'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p =(n)-[r:MemberOf*1..]->(g:AZGroup {objectid: $objectid}) WHERE n:AZUser OR n:AZGroup OR n:AZDevice'
+                                        'MATCH p =(n)-[r:AZMemberOf*1..]->(g:AZGroup {objectid: $objectid}) WHERE n:AZUser OR n:AZGroup OR n:AZDevice'
                                     }
                                     end={label}
                                     distinct
@@ -159,7 +159,7 @@ const AZGroupNodeData = () => {
                                     property='First Degree Group Membership'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(g1:AZGroup {objectid: $objectid})-[r:MemberOf]->(n:AZGroup)'
+                                        'MATCH p=(g1:AZGroup {objectid: $objectid})-[r:AZMemberOf]->(n:AZGroup)'
                                     }
                                     start={label}
                                     distinct
@@ -168,7 +168,7 @@ const AZGroupNodeData = () => {
                                     property='Unrolled Member Of'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (g1:AZGroup {objectid: $objectid})-[r:MemberOf*1..]->(n:AZGroup)'
+                                        'MATCH p = (g1:AZGroup {objectid: $objectid})-[r:AZMemberOf*1..]->(n:AZGroup)'
                                     }
                                     start={label}
                                     distinct
