@@ -186,7 +186,7 @@ const AZVMNodeData = () => {
                                     property='Explicit Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n)-[r:AZAvereContributor|AZVMContributor|AZContributor]->(c:AZVM {objectid:$objectid})'
+                                        'MATCH p=(n)-[r:AZAvereContributor|AZVMContributor|AZContributor|AZUserAccessAdministrator|AZOwns]->(c:AZVM {objectid:$objectid})'
                                     }
                                     end={label}
                                     distinct
