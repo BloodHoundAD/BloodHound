@@ -162,7 +162,7 @@
 /**
  * @typedef {Object} AzureDirectoryObject
  * @property {string} id
- * @property {string} type
+ * @property {string} @odata.type
  */
 
 /**

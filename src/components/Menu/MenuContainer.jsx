@@ -137,14 +137,17 @@ const MenuContainer = () => {
             }).on('data', (chunk) => {
                 let type, version, count;
                 try {
-                    type = /"type.?:\s?"(\w*)"/g.exec(chunk)[1];
-                    count = parseInt(/"count.?:\s?(\d*)/g.exec(chunk)[1]);
+                    let search = [...chunk.matchAll(/"type.?:\s?"(\w*)"/g)];
+                    type = search[search.length - 1][1];
+                    search = [...chunk.matchAll(/"count.?:\s?(\d*)/g)];
+                    count = parseInt(search[search.length - 1][1]);
                 } catch (e) {
                     type = null;
                     count = null;
                 }
                 try {
-                    version = parseInt(/"version.?:\s?(\d*)/g.exec(chunk)[1]);
+                    let search = [...chunk.matchAll(/"version.?:\s?(\d*)/g)];
+                    version = parseInt(search[search.length - 1][1]);
                 } catch (e) {
                     version = null;
                 }
@@ -256,8 +259,23 @@ const MenuContainer = () => {
                 count += data.length;
 
                 let processedData = processor(data);
-                if (file.type === 'azure') {
-                    for (let item of processedData.AzurePropertyMaps) {
+                if (file.type === 'azure') {;
+                    for (let value of Object.values(
+                        processedData.AzurePropertyMaps
+                    )) {
+                        let props = value.Props;
+                        if (props.length === 0) continue;
+                        let chunked = props.chunk();
+                        let statement = value.Statement;
+
+                        for (let chunk of chunked) {
+                            await uploadData(statement, chunk);
+                        }
+                    }
+
+                    for (let item of Object.values(
+                        processedData.OnPremPropertyMaps
+                    )) {
                         let props = item.Props;
                         if (props.length === 0) continue;
                         let chunked = props.chunk();
@@ -268,18 +286,9 @@ const MenuContainer = () => {
                         }
                     }
 
-                    for (let item of processedData.OnPremPropertyMaps) {
-                        let props = item.Props;
-                        if (props.length === 0) continue;
-                        let chunked = props.chunk();
-                        let statement = item.Statement;
-
-                        for (let chunk of chunked) {
-                            await uploadData(statement, chunk);
-                        }
-                    }
-
-                    for (let item of processedData.RelPropertyMaps) {
+                    for (let item of Object.values(
+                        processedData.RelPropertyMaps
+                    )) {
                         let props = item.Props;
                         if (props.length === 0) continue;
                         let chunked = props.chunk();
@@ -392,10 +401,10 @@ const MenuContainer = () => {
                     }
                 }
 
+                setNeedsPostProcess(false);
                 postProcessUpload().then((_) => {
                     postProcessAzure().then((_) => {
                         console.log('post-processing complete');
-                        setNeedsPostProcess(false);
                     });
                 });
             }
@@ -434,155 +443,304 @@ const MenuContainer = () => {
         console.log('Running azure post-processing queries');
         let session = driver.session();
 
-        await session.run('WITH ["c4e39bd9-1100-46d3-8c65-fb160da0071f","62e90394-69f5-4237-9190-012177145e10","729827e3-9c14-49f7-bb1b-9608f156bbb8","966707d0-3269-4727-9be2-8c3a10f19b9d","7be44c8a-adaf-4e2a-84d6-ab2649e08a13","fe930be7-5e62-47db-91af-98c3a49a38b1","9980e02c-c2be-4d73-94e8-173b1dc7cf3c"] AS pwResetRoles\n' +
-            'MATCH (n:AZUser)-[:AZHasRole]->(m)\n' +
-            'WHERE m.templateid IN pwResetRoles\n' +
-            'WITH n\n' +
-            'MATCH (at:AZTenant)-[:AZContains]->(n)\n' +
-            'WITH at,n\n' +
-            'MATCH (at)-[:AZContains]->(u:AZUser)\n' +
-            'WHERE NOT (u)-[:AZHasRole]->()\n' +
-            'MERGE (n)-[:AZResetPassword]->(u)\n', null).catch((err) => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `
+            MATCH (n:AZUser)-[:AZHasRole]->(m)
+            WHERE m.templateid IN $pwResetRoles
+            WITH n
+            MATCH (at:AZTenant)-[:AZContains]->(n)
+            WITH at,n
+            MATCH (at)-[:AZContains]->(u:AZUser)
+            WHERE NOT (u)-[:AZHasRole]->()
+            MERGE (n)-[:AZResetPassword]->(u)`,
+                {
+                    pwResetRoles: [
+                        'c4e39bd9-1100-46d3-8c65-fb160da0071f',
+                        '62e90394-69f5-4237-9190-012177145e10',
+                        '729827e3-9c14-49f7-bb1b-9608f156bbb8',
+                        '966707d0-3269-4727-9be2-8c3a10f19b9d',
+                        '7be44c8a-adaf-4e2a-84d6-ab2649e08a13',
+                        'fe930be7-5e62-47db-91af-98c3a49a38b1',
+                        '9980e02c-c2be-4d73-94e8-173b1dc7cf3c',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('WITH ["62e90394-69f5-4237-9190-012177145e10","7be44c8a-adaf-4e2a-84d6-ab2649e08a13"] AS GAandPAA\n' +
-            'MATCH (n:AZUser)-[:AZHasRole]->(m)\n' +
-            'WHERE m.templateid IN GAandPAA\n' +
-            'WITH n\n' +
-            'MATCH (at:AZTenant)-[:AZContains]->(n)\n' +
-            'WITH at,n\n' +
-            'MATCH (at)-[:AZContains]->(u:AZUser)\n' +
-            'MERGE (n)-[:AZResetPassword]->(u)\n', null).catch((err) => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `
+            MATCH (n:AZUser)-[:AZHasRole]->(m)
+            WHERE m.templateid IN $GAandPAA
+            WITH n
+            MATCH (at:AZTenant)-[:AZContains]->(n)
+            WITH at,n
+            MATCH (at)-[:AZContains]->(u:AZUser)
+            MERGE (n)-[:AZResetPassword]->(u)`,
+                {
+                    GAandPAA: [
+                        '62e90394-69f5-4237-9190-012177145e10',
+                        '7be44c8a-adaf-4e2a-84d6-ab2649e08a13',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('MATCH (at:AZTenant)-[:AZContains]->(AuthAdmin:AZUser)-[:AZHasRole]->(AuthAdminRole:AZRole {roleTemplateId:"c4e39bd9-1100-46d3-8c65-fb160da0071f"})\n' +
-            'WITH [\'c4e39bd9-1100-46d3-8c65-fb160da0071f\',\'88d8e3e3-8f55-4a1e-953a-9b9898b8876b\',\'95e79109-95c0-4d8e-aee3-d01accf2d47b\',\'729827e3-9c14-49f7-bb1b-9608f156bbb8\',\'790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b\',\'4a5d8f65-41da-4de4-8968-e035b65339cf\',\'966707d0-3269-4727-9be2-8c3a10f19b9d\'] AS AuthAdminTargetRoles,AuthAdmin,at\n' +
-            'MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)\n' +
-            'WHERE NOT ar.templateid IN AuthAdminTargetRoles\n' +
-            'WITH COLLECT(NonTargets) AS NonTargets,at,AuthAdmin,AuthAdminTargetRoles\n' +
-            'MATCH (at)-[:AZContains]->(AuthAdminTargets:AZUser)-[:AZHasRole]->(arTargets)\n' +
-            'WHERE NOT AuthAdminTargets IN NonTargets AND arTargets.templateid IN AuthAdminTargetRoles\n' +
-            'MERGE (AuthAdmin)-[:AZResetPassword]->(AuthAdminTargets)\n', null).catch((err) => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `MATCH (at:AZTenant)-[:AZContains]->(AuthAdmin:AZUser)-[:AZHasRole]->(AuthAdminRole:AZRole {roleTemplateId:"c4e39bd9-1100-46d3-8c65-fb160da0071f"})
+            MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
+            WHERE NOT ar.templateid IN $AuthAdminTargetRoles
+            WITH COLLECT(NonTargets) AS NonTargets,at,AuthAdmin
+            MATCH (at)-[:AZContains]->(AuthAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
+            WHERE NOT AuthAdminTargets IN NonTargets AND arTargets.templateid IN $AuthAdminTargetRoles
+            MERGE (AuthAdmin)-[:AZResetPassword]->(AuthAdminTargets)`,
+                {
+                    AuthAdminTargetRoles: [
+                        'c4e39bd9-1100-46d3-8c65-fb160da0071f',
+                        '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
+                        '95e79109-95c0-4d8e-aee3-d01accf2d47b',
+                        '729827e3-9c14-49f7-bb1b-9608f156bbb8',
+                        '790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b',
+                        '4a5d8f65-41da-4de4-8968-e035b65339cf',
+                        '966707d0-3269-4727-9be2-8c3a10f19b9d',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('MATCH (at:AZTenant)-[:AZContains]->(HelpdeskAdmin:AZUser)-[:AZHasRole]->(HelpdeskAdminRole:AZRole {roleTemplateId:"c4e39bd9-1100-46d3-8c65-fb160da0071f"})\n' +
-            'WITH [\'c4e39bd9-1100-46d3-8c65-fb160da0071f\',\'88d8e3e3-8f55-4a1e-953a-9b9898b8876b\',\'95e79109-95c0-4d8e-aee3-d01accf2d47b\',\'729827e3-9c14-49f7-bb1b-9608f156bbb8\',\'790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b\',\'4a5d8f65-41da-4de4-8968-e035b65339cf\',\'966707d0-3269-4727-9be2-8c3a10f19b9d\'] AS HelpdeskAdminTargetRoles,HelpdeskAdmin,at\n' +
-            'MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)\n' +
-            'WHERE NOT ar.templateid IN HelpdeskAdminTargetRoles\n' +
-            'WITH COLLECT(NonTargets) AS NonTargets,at,HelpdeskAdmin,HelpdeskAdminTargetRoles\n' +
-            'MATCH (at)-[:AZContains]->(HelpdeskAdminTargets:AZUser)-[:AZHasRole]->(arTargets)\n' +
-            'WHERE NOT HelpdeskAdminTargets IN NonTargets AND arTargets.templateid IN HelpdeskAdminTargetRoles\n' +
-            'MERGE (HelpdeskAdmin)-[:AZResetPassword]->(HelpdeskAdminTargets)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `MATCH (at:AZTenant)-[:AZContains]->(HelpdeskAdmin:AZUser)-[:AZHasRole]->(HelpdeskAdminRole:AZRole {roleTemplateId:"c4e39bd9-1100-46d3-8c65-fb160da0071f"})
+            MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
+            WHERE NOT ar.templateid IN $HelpdeskAdminTargetRoles
+            WITH COLLECT(NonTargets) AS NonTargets,at,HelpdeskAdmin
+            MATCH (at)-[:AZContains]->(HelpdeskAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
+            WHERE NOT HelpdeskAdminTargets IN NonTargets AND arTargets.templateid IN $HelpdeskAdminTargetRoles
+            MERGE (HelpdeskAdmin)-[:AZResetPassword]->(HelpdeskAdminTargets)`,
+                {
+                    HelpdeskAdminTargetRoles: [
+                        'c4e39bd9-1100-46d3-8c65-fb160da0071f',
+                        '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
+                        '95e79109-95c0-4d8e-aee3-d01accf2d47b',
+                        '729827e3-9c14-49f7-bb1b-9608f156bbb8',
+                        '790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b',
+                        '4a5d8f65-41da-4de4-8968-e035b65339cf',
+                        '966707d0-3269-4727-9be2-8c3a10f19b9d',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('MATCH (at:AZTenant)-[:AZContains]->(PasswordAdmin:AZUser)-[:AZHasRole]->(PasswordAdminRole:AZRole {roleTemplateId:"966707d0-3269-4727-9be2-8c3a10f19b9d"})\n' +
-            'WITH [\'88d8e3e3-8f55-4a1e-953a-9b9898b8876b\',\'95e79109-95c0-4d8e-aee3-d01accf2d47b\',\'966707d0-3269-4727-9be2-8c3a10f19b9d\'] AS PasswordAdminTargetRoles,PasswordAdmin,at\n' +
-            'MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)\n' +
-            'WHERE NOT ar.templateid IN PasswordAdminTargetRoles\n' +
-            'WITH COLLECT(NonTargets) AS NonTargets,at,PasswordAdmin,PasswordAdminTargetRoles\n' +
-            'MATCH (at)-[:AZContains]->(PasswordAdminTargets:AZUser)-[:AZHasRole]->(arTargets)\n' +
-            'WHERE NOT PasswordAdminTargets IN NonTargets AND arTargets.templateid IN PasswordAdminTargetRoles\n' +
-            'MERGE (PasswordAdmin)-[:AZResetPassword]->(PasswordAdminTargets)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `MATCH (at:AZTenant)-[:AZContains]->(PasswordAdmin:AZUser)-[:AZHasRole]->(PasswordAdminRole:AZRole {roleTemplateId:"966707d0-3269-4727-9be2-8c3a10f19b9d"})
+            MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
+            WHERE NOT ar.templateid IN $PasswordAdminTargetRoles
+            WITH COLLECT(NonTargets) AS NonTargets,at,PasswordAdmin
+            MATCH (at)-[:AZContains]->(PasswordAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
+            WHERE NOT PasswordAdminTargets IN NonTargets AND arTargets.templateid IN $PasswordAdminTargetRoles
+            MERGE (PasswordAdmin)-[:AZResetPassword]->(PasswordAdminTargets)`,
+                {
+                    PasswordAdminTargetRoles: [
+                        '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
+                        '95e79109-95c0-4d8e-aee3-d01accf2d47b',
+                        '966707d0-3269-4727-9be2-8c3a10f19b9d',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('MATCH (at:AZTenant)-[:AZContains]->(UserAccountAdmin:AZUser)-[:AZHasRole]->(UserAccountAdminRole:AZRole {roleTemplateId:"fe930be7-5e62-47db-91af-98c3a49a38b1"})\n' +
-            'WITH [\'88d8e3e3-8f55-4a1e-953a-9b9898b8876b\',\'95e79109-95c0-4d8e-aee3-d01accf2d47b\',\'729827e3-9c14-49f7-bb1b-9608f156bbb8\',\'790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b\',\'4a5d8f65-41da-4de4-8968-e035b65339cf\',\'fe930be7-5e62-47db-91af-98c3a49a38b1\'] AS UserAccountAdminTargetRoles,UserAccountAdmin,at\n' +
-            'MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)\n' +
-            'WHERE NOT ar.templateid IN UserAccountAdminTargetRoles\n' +
-            'WITH COLLECT(NonTargets) AS NonTargets,at,UserAccountAdmin,UserAccountAdminTargetRoles\n' +
-            'MATCH (at)-[:AZContains]->(UserAccountAdminTargets:AZUser)-[:AZHasRole]->(arTargets)\n' +
-            'WHERE NOT UserAccountAdminTargets IN NonTargets AND arTargets.templateid IN UserAccountAdminTargetRoles\n' +
-            'MERGE (UserAccountAdmin)-[:AZResetUserAccount]->(UserAccountAdminTargets)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `MATCH (at:AZTenant)-[:AZContains]->(UserAccountAdmin:AZUser)-[:AZHasRole]->(UserAccountAdminRole:AZRole {roleTemplateId:"fe930be7-5e62-47db-91af-98c3a49a38b1"})
+            MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
+            WHERE NOT ar.templateid IN $UserAccountAdminTargetRoles
+            WITH COLLECT(NonTargets) AS NonTargets,at,UserAccountAdmin
+            MATCH (at)-[:AZContains]->(UserAccountAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
+            WHERE NOT UserAccountAdminTargets IN NonTargets AND arTargets.templateid IN $UserAccountAdminTargetRoles
+            MERGE (UserAccountAdmin)-[:AZResetUserAccount]->(UserAccountAdminTargets)`,
+                {
+                    UserAccountAdminTargetRoles: [
+                        '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
+                        '95e79109-95c0-4d8e-aee3-d01accf2d47b',
+                        '729827e3-9c14-49f7-bb1b-9608f156bbb8',
+                        '790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b',
+                        '4a5d8f65-41da-4de4-8968-e035b65339cf',
+                        'fe930be7-5e62-47db-91af-98c3a49a38b1',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('MATCH (at:AZTenant)\n' +
-            'MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {roleTemplateId:\'9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3\'})-[:AZScopedTo]->(at)\n' +
-            'MATCH (at)-[:AZContains]->(app:AZApp)\n' +
-            'MERGE (AppAdmin)-[:AZAddSecret]->(app)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `MATCH (at:AZTenant)
+            MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {roleTemplateId:\'9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3\'})-[:AZScopedTo]->(at)
+            MATCH (at)-[:AZContains]->(app:AZApp)
+            MERGE (AppAdmin)-[:AZAddSecret]->(app)`,
+                null
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('MATCH (at:AZTenant)\n' +
-            'MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {roleTemplateId:\'158c047a-c907-4556-b7ef-446551a6b5f7\'})-[:AZScopedTo]->(at)\n' +
-            'MATCH (at)-[:AZContains]->(app:AZApp)\n' +
-            'MERGE (AppAdmin)-[:AZAddSecret]->(app)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `MATCH (at:AZTenant)
+            MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {roleTemplateId:\'158c047a-c907-4556-b7ef-446551a6b5f7\'})-[:AZScopedTo]->(at)
+            MATCH (at)-[:AZContains]->(app:AZApp)
+            MERGE (AppAdmin)-[:AZAddSecret]->(app)`,
+                null
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('MATCH (at:AZTenant)\n' +
-            'MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {roleTemplateId:\'9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3\'})-[:AZScopedTo]->(app)\n' +
-            'MERGE (AppAdmin)-[:AZAddSecret]->(app)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `MATCH (at:AZTenant)
+            MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {roleTemplateId:\'9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3\'})-[:AZScopedTo]->(app)
+            MERGE (AppAdmin)-[:AZAddSecret]->(app)`,
+                null
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('MATCH (at:AZTenant)\n' +
-            'MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {roleTemplateId:\'158c047a-c907-4556-b7ef-446551a6b5f7\'})-[:AZScopedTo]->(app)\n' +
-            'MERGE (AppAdmin)-[:AZAddSecret]->(app)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `MATCH (at:AZTenant)
+            MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {roleTemplateId:\'158c047a-c907-4556-b7ef-446551a6b5f7\'})-[:AZScopedTo]->(app)
+            MERGE (AppAdmin)-[:AZAddSecret]->(app)`,
+                null
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('MATCH (AppOwner)-[:AZOwns]->(app:AZApp)\n' +
-            'MERGE (AppOwner)-[:AZAddSecret]-(app)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `MATCH (AppOwner)-[:AZOwns]->(app:AZApp)
+            MERGE (AppOwner)-[:AZAddSecret]-(app)`,
+                null
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('MATCH (azt:AZTenant)\n' +
-            'MATCH (azt)-[:AZContains]->(InTuneAdmin)-[:AZHasRole]->(azr:AZRole {roleTemplateId:\'3a2c62db-5318-420d-8d74-23affee5d9d5\'})\n' +
-            'MATCH (azt)-[:AZContains]->(azd:AZDevice)\n' +
-            'WHERE toUpper(azd.operatingsystem) CONTAINS "WINDOWS"\n' +
-            'MERGE (InTuneAdmin)-[:AZExecuteCommand]->(azd)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `MATCH (azt:AZTenant)
+            MATCH (azt)-[:AZContains]->(InTuneAdmin)-[:AZHasRole]->(azr:AZRole {roleTemplateId:\'3a2c62db-5318-420d-8d74-23affee5d9d5\'})
+            MATCH (azt)-[:AZContains]->(azd:AZDevice)
+            WHERE toUpper(azd.operatingsystem) CONTAINS "WINDOWS"
+            MERGE (InTuneAdmin)-[:AZExecuteCommand]->(azd)`,
+                null
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('WITH ["fdd7a751-b60b-444a-984c-02652fe8fa1c”, “62e90394-69f5-4237-9190-012177145e10”, “e8611ab8-c189-46e8-94e1-60213ab1f814”, “9360feb5-f418-4baa-8175-e2a00bac4301”, “45d8d3c5-c802-45c6-b32a-1d70b5e1e86e”, “fe930be7-5e62-47db-91af-98c3a49a38b1”, “3a2c62db-5318-420d-8d74-23affee5d9d5”, “b5a8dcf3-09d5-43a9-a639-8e29ef291470”, “744ec460-397e-42ad-a462-8b3f9747a02c"] AS addGroupMembersRoles\n' +
-            'MATCH (n)-[:AZHasRole]->(m)\n' +
-            'WHERE m.templateid IN pwResetRoles\n' +
-            'WITH n\n' +
-            'MATCH (at:AZTenant)-[:AZContains]->(n)\n' +
-            'WITH at,n\n' +
-            'MATCH (at)-[:AZContains]->(azg:AZGroup {isAssignableToRole: false})\n' +
-            'MERGE (n)-[:AZAddMembers]->(azg)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `
+            MATCH (n)-[:AZHasRole]->(m)
+            WHERE m.templateid IN $addGroupMembersRoles
+            WITH n
+            MATCH (at:AZTenant)-[:AZContains]->(n)
+            WITH at,n
+            MATCH (at)-[:AZContains]->(azg:AZGroup {isAssignableToRole: false})
+            MERGE (n)-[:AZAddMembers]->(azg)`,
+                {
+                    addGroupMembersRoles: [
+                        'fdd7a751-b60b-444a-984c-02652fe8fa1c”, “62e90394-69f5-4237-9190-012177145e10”, “e8611ab8-c189-46e8-94e1-60213ab1f814”, “9360feb5-f418-4baa-8175-e2a00bac4301”, “45d8d3c5-c802-45c6-b32a-1d70b5e1e86e”, “fe930be7-5e62-47db-91af-98c3a49a38b1”, “3a2c62db-5318-420d-8d74-23affee5d9d5”, “b5a8dcf3-09d5-43a9-a639-8e29ef291470”, “744ec460-397e-42ad-a462-8b3f9747a02c',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('WITH [“62e90394-69f5-4237-9190-012177145e10”, “e8611ab8-c189-46e8-94e1-60213ab1f814”] AS addGroupMembersRoles\n' +
-            'MATCH (n)-[:AZHasRole]->(m)\n' +
-            'WHERE m.templateid IN pwResetRoles\n' +
-            'WITH n\n' +
-            'MATCH (at:AZTenant)-[:AZContains]->(n)\n' +
-            'WITH at,n\n' +
-            'MATCH (at)-[:AZContains]->(azg:AZGroup {isAssignableToRole: true})\n' +
-            'MERGE (n)-[:AZAddMembers]->(azg)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `
+            MATCH (n)-[:AZHasRole]->(m)
+            WHERE m.templateid IN $addGroupMembersRoles
+            WITH n
+            MATCH (at:AZTenant)-[:AZContains]->(n)
+            WITH at,n
+            MATCH (at)-[:AZContains]->(azg:AZGroup {isAssignableToRole: true})
+            MERGE (n)-[:AZAddMembers]->(azg)`,
+                {
+                    addGroupMembersRoles: [
+                        '62e90394-69f5-4237-9190-012177145e10',
+                        'e8611ab8-c189-46e8-94e1-60213ab1f814',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('WITH ["8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2","4ba39ca4-527c-499a-b93d-d9b492c50246","e00e864a-17c5-4a4b-9c06-f5b95a8d5bd8","d29b2b05-8046-44ba-8758-1e26182fcf32"] AS addOwnerRoles\n' +
-            'MATCH (n)-[:AZHasRole]->(m)\n' +
-            'WHERE m.templateid IN pwResetRoles\n' +
-            'WITH n\n' +
-            'MATCH (at:AZTenant)-[:AZContains]->(n)\n' +
-            'WITH at,n\n' +
-            'MATCH (at)-[:AZContains]->(aza:AZApp)\n' +
-            'MERGE (n)-[:AZAddOwner]->(aza)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `
+            MATCH (n)-[:AZHasRole]->(m)
+            WHERE m.templateid IN $addOwnerRoles
+            WITH n
+            MATCH (at:AZTenant)-[:AZContains]->(n)
+            WITH at,n
+            MATCH (at)-[:AZContains]->(aza:AZApp)
+            MERGE (n)-[:AZAddOwner]->(aza)`,
+                {
+                    addOwnerRoles: [
+                        '8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2',
+                        '4ba39ca4-527c-499a-b93d-d9b492c50246',
+                        'e00e864a-17c5-4a4b-9c06-f5b95a8d5bd8',
+                        'd29b2b05-8046-44ba-8758-1e26182fcf32',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
 
-        await session.run('WITH ["8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2","4ba39ca4-527c-499a-b93d-d9b492c50246","e00e864a-17c5-4a4b-9c06-f5b95a8d5bd8","d29b2b05-8046-44ba-8758-1e26182fcf32"] AS addOwnerRoles\n' +
-            'MATCH (n)-[:AZHasRole]->(m)\n' +
-            'WHERE m.templateid IN pwResetRoles\n' +
-            'WITH n\n' +
-            'MATCH (at:AZTenant)-[:AZContains]->(n)\n' +
-            'WITH at,n\n' +
-            'MATCH (at)-[:AZContains]->(azsp:AZServicePrincipal)\n' +
-            'MERGE (n)-[:AZAddOwner]->(aza)\n', null).catch(err => {
-                console.log(err)
-        })
+        await session
+            .run(
+                `
+            MATCH (n)-[:AZHasRole]->(m)
+            WHERE m.templateid IN $addOwnerRoles
+            WITH n
+            MATCH (at:AZTenant)-[:AZContains]->(n)
+            WITH at,n
+            MATCH (at)-[:AZContains]->(azsp:AZServicePrincipal)
+            MERGE (n)-[:AZAddOwner]->(aza)`,
+                {
+                    addOwnerRoles: [
+                        '8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2',
+                        '4ba39ca4-527c-499a-b93d-d9b492c50246',
+                        'e00e864a-17c5-4a4b-9c06-f5b95a8d5bd8',
+                        'd29b2b05-8046-44ba-8758-1e26182fcf32',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     /**
