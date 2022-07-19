@@ -570,7 +570,7 @@ const MenuContainer = () => {
             WITH COLLECT(NonTargets) AS NonTargets,at,UserAccountAdmin
             MATCH (at)-[:AZContains]->(UserAccountAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
             WHERE NOT UserAccountAdminTargets IN NonTargets AND arTargets.templateid IN $UserAccountAdminTargetRoles
-            MERGE (UserAccountAdmin)-[:AZResetUserAccount]->(UserAccountAdminTargets)`,
+            MERGE (UserAccountAdmin)-[:AZResetPassword]->(UserAccountAdminTargets)`,
                 {
                     UserAccountAdminTargetRoles: [
                         '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
