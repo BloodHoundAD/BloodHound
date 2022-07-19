@@ -71,11 +71,15 @@ const HelpModal = () => {
 
     const openModal = (edge, source, target) => {
         setSourceName(encode(source.label));
-        setSourceType(source.type);
+        setSourceType(encode(source.type));
         setTargetName(encode(target.label));
-        setTargetType(target.type);
-        settargetId(target.objectid);
-        setHaslaps(target.haslaps);
+        setTargetType(encode(target.type));
+        settargetId(encode(target.objectid));
+        if (!typeof(target.haslaps) === 'boolean') {
+            setHaslaps(false)
+        }else{
+            setHaslaps(target.haslaps)
+        }
         setEdge(edge.etype);
         setOpen(true);
     };
