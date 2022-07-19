@@ -42,7 +42,7 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
         }
         if (type === 'number') {
             temp.push(
-                <td align='left' key={`${propName}a`}>
+                <td align='left' className={'col-md-2'} key={`${propName}a`}>
                     {displayProp}
                 </td>
             );
@@ -55,7 +55,7 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
         }
         if (type === 'boolean') {
             temp.push(
-                <td align='left' key={`${propName}a`}>
+                <td align='left' className={'col-md-2'} key={`${propName}a`}>
                     {displayProp}
                 </td>
             );
@@ -68,7 +68,7 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
         }
         if (type === 'string') {
             temp.push(
-                <td align='left' key={`${propName}a`}>
+                <td align='left' className={'col-md-2'} key={`${propName}a`}>
                     {displayProp}
                 </td>
             );
@@ -81,7 +81,7 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
         }
         if (Array.isArray(property) && property.length > 0) {
             temp.push(
-                <td align='left' key={`${propName}k`}>
+                <td align='left' className={'col-md-2'} key={`${propName}k`}>
                     {displayProp}
                 </td>
             );
@@ -112,7 +112,6 @@ const MappedNodeProps = ({ label, properties, displayMap }) => {
         <CollapsibleSection header={'NODE PROPERTIES'}>
             <div className={styles.itemlist}>
                 <Table>
-                    <thead></thead>
                     <tbody>
                         {Object.keys(elements).map((key) => {
                             return <tr key={key}>{elements[key]}</tr>;

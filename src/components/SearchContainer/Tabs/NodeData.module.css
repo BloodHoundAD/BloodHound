@@ -110,6 +110,10 @@ hr {
     font-weight: bold;
 }
 
+.dl table {
+    word-break: break-word;
+}
+
 .dark > .dl > h5 {
     color: white !important;
 }
