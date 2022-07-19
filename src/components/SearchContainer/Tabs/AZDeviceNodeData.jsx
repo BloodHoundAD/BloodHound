@@ -50,6 +50,8 @@ const AZDeviceNodeData = () => {
 
     const displayMap = {
         objectid: 'Object ID',
+        operatingsystem: 'OS',
+        operatingsystemversion: 'OS Version'
     };
 
     return objectid === null ? (
