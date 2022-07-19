@@ -160,6 +160,12 @@ global.appStore = {
                 scale: 1.25,
                 color: '#34D2EB',
             },
+            AZRole: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf2d2',
+                scale: 1.25,
+                color: '#ED8537',
+            },
             AZGroup: {
                 font: "'Font Awesome 5 Free'",
                 content: '\uF0C0',

@@ -17,6 +17,8 @@ const labels = [
     'AZTenant',
     'AZUser',
     'AZVM',
+    'AZRole',
+    'AZManagementGroup'
 ];
 
 export function generateUniqueId(sigmaInstance, isNode) {

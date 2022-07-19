@@ -79,6 +79,9 @@ const SearchRow = ({ item, search }) => {
         case 'AZServicePrincipal':
             icon.className = 'fa fa-robot';
             break;
+        case 'AZRole':
+            icon.className = 'fa fa-window-restore'
+            break
         default:
             icon.className = 'fa fa-question';
             type = 'Base';

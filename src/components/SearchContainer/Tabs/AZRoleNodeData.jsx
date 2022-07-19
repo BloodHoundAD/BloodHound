@@ -12,7 +12,7 @@ import ExtraNodeProps from "./Components/ExtraNodeProps";
 import NodePlayCypherLink from "./Components/NodePlayCypherLink";
 import {withAlert} from "react-alert";
 
-const AZManagementGroupNodeData = ({}) => {
+const AZRoleNodeData = ({}) => {
     const [visible, setVisible] = useState(false);
     const [objectid, setobjectid] = useState(null);
     const [label, setLabel] = useState(null);
@@ -29,14 +29,14 @@ const AZManagementGroupNodeData = ({}) => {
     }, []);
 
     const nodeClickEvent = (type, id, blocksinheritance, domain) => {
-        if (type === 'AZManagementGroup') {
+        if (type === 'AZRole') {
             setVisible(true);
             setobjectid(id);
             setDomain(domain);
             let loadData = async () => {
                 let session = driver.session();
                 let results = await session.run(
-                    `MATCH (n:AZManagementGroup {objectid: $objectid}) RETURN n AS node`,
+                    `MATCH (n:AZRole {objectid: $objectid}) RETURN n AS node`,
                     {
                         objectid: id,
                     }
@@ -56,6 +56,10 @@ const AZManagementGroupNodeData = ({}) => {
 
     const displayMap = {
         objectid: 'Object ID',
+        displayname: 'Display Name',
+        enabled: 'Enabled',
+        description: 'Description',
+        templateid: 'Template ID'
     };
 
     return objectid === null ? (
@@ -80,7 +84,7 @@ const AZManagementGroupNodeData = ({}) => {
                                 property='Reachable High Value Targets'
                                 target={objectid}
                                 baseQuery={
-                                    'MATCH (m:AZManagementGroup {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                    'MATCH (m:AZRole {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
                                 }
                                 start={label}
                             />
@@ -116,7 +120,7 @@ const AZManagementGroupNodeData = ({}) => {
                                 property='Explicit Object Controllers'
                                 target={objectid}
                                 baseQuery={
-                                    'MATCH p = (n)-[r:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g:AZManagementGroup {objectid: $objectid})'
+                                    'MATCH p = (n)-[r:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g:AZRole {objectid: $objectid})'
                                 }
                                 end={label}
                                 distinct
@@ -125,7 +129,7 @@ const AZManagementGroupNodeData = ({}) => {
                                 property='Unrolled Object Controllers'
                                 target={objectid}
                                 baseQuery={
-                                    'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g2:AZManagementGroup {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                    'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g2:AZRole {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
                                 }
                                 end={label}
                                 distinct
@@ -134,7 +138,7 @@ const AZManagementGroupNodeData = ({}) => {
                                 property='Transitive Object Controllers'
                                 target={objectid}
                                 baseQuery={
-                                    'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZManagementGroup {objectid: $objectid}))'
+                                    'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZRole {objectid: $objectid}))'
                                 }
                                 end={label}
                                 distinct
@@ -148,4 +152,4 @@ const AZManagementGroupNodeData = ({}) => {
     )
 }
 
-export default withAlert()(AZManagementGroupNodeData);
+export default withAlert()(AZRoleNodeData);
