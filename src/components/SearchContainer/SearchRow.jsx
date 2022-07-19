@@ -61,6 +61,9 @@ const SearchRow = ({ item, search }) => {
         case 'AZResourceGroup':
             icon.className = 'fa fa-cube';
             break;
+        case 'AZManagementGroup':
+            icon.className = 'fa fa-cube';
+            break;
         case 'AZVM':
             icon.className = 'fa fa-desktop';
             break;

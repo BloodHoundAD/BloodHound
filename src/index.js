@@ -184,6 +184,12 @@ global.appStore = {
                 scale: 1.25,
                 color: '#FFE066',
             },
+            AZManagementGroup: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf1b2',
+                scale: 1.25,
+                color: '#BD93D8',
+            },
             AZVM: {
                 font: "'Font Awesome 5 Free'",
                 content: '\uf108',
