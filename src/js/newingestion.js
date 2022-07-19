@@ -1935,8 +1935,9 @@ export function convertAzureVirtualMachine(data, ingestionData) {
         );
     }
 
-    if (data.identity.userAssignedEntities){
-        for (let user of data.identity.userAssignedEntities) {
+    if (data.identity.userAssignedIdentities){
+        for (let key in data.identity.userAssignedIdentities) {
+            let user = data.identity.userAssignedIdentities[key]
             if (user.clientId !== '') {
                 insertNewAzureRel(
                     ingestionData,

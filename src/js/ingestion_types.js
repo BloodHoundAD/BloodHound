@@ -544,7 +544,7 @@
  */
 
 /**
- * @typedef {Object} UserAssignedEntity
+ * @typedef {Object} UserAssignedIdentity
  * @property {string} clientId
  * @property {string} principalId
  */
@@ -554,7 +554,7 @@
  * @property {string} principalId
  * @property {string} tenantId
  * @property {string} type
- * @property {Object.<string,UserAssignedEntity>} userAssignedEntities
+ * @property {Object.<string,UserAssignedIdentity>} userAssignedIdentities
  */
 
 /**
