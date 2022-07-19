@@ -47,7 +47,7 @@
                 },
                 {
                     "final": true,
-                    "query": "MATCH (n1)-[:MemberOf|GetChanges*1..]->(u:Domain {name: $result}) WITH n1,u MATCH (n1)-[:MemberOf|GetChangesAll*1..]->(u) WITH n1,u MATCH p = (n1)-[:MemberOf|GetChanges|GetChangesAll*1..]->(u) RETURN p",
+                    "query": "MATCH p=()-[:DCSync|AllExtendedRights|GenericAll]->(:Domain {name: $result}) RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
                 }

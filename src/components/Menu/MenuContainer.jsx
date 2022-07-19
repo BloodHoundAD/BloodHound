@@ -436,12 +436,43 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
+        await postDcSync(session)
+
         await session.close();
     };
+
+    const postDcSync = async (session) => {
+        await session.run("MATCH (n:Domain) RETURN n.objectid AS domainid").catch(err => {
+            console.log(err)
+        }).then(async res => {
+            for (let domain of res.records) {
+                let domainId = domain.get('domainid');
+                let getChangesResult = await session.run("MATCH (n)-[:MemberOf|GetChanges*1..]->(:Domain {objectid: $objectid}) RETURN n", { objectid: domainId })
+                let getChangesPrincipals = []
+                for (let principal of getChangesResult.records) {
+                    getChangesPrincipals.push(principal.get('n').properties.objectid)
+                }
+                let getChangesAllPrincipals = []
+                let getChangesAllResult = await session.run("MATCH (n)-[:MemberOf|GetChangesAll*1..]->(:Domain {objectid: $objectid}) RETURN n", { objectid: domainId })
+                for (let principal of getChangesAllResult.records) {
+                    getChangesAllPrincipals.push(principal.get('n').properties.objectid)
+                }
+
+                let dcSyncPrincipals = getChangesPrincipals.filter(principal => getChangesAllPrincipals.includes(principal))
+
+                if (dcSyncPrincipals.length > 0) {
+                    console.log("Found DC Sync principals: " + dcSyncPrincipals.join(", ") + " in domain " + domainId)
+                    await session.run("UNWIND $syncers AS sync MATCH (n:Base {objectid: sync}) MATCH (m:Domain {objectid: $domainid}) MERGE (n)-[:DCSync]->(m)", { syncers: dcSyncPrincipals, domainid: domainId })
+                }
+            }
+        })
+    }
 
     const postProcessAzure = async () => {
         console.log('Running azure post-processing queries');
         let session = driver.session();
+
+        await session.run('MATCH (n:AZTenant) SET n.highvalue=TRUE')
 
         await session
             .run(
