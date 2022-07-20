@@ -1,32 +1,11 @@
-import { groupBy } from 'lodash/collection';
-
-const LABEL_GROUP = 'Group';
-const LABEL_USER = 'User';
-const LABEL_COMPUTER = 'Computer';
-const LABEL_OU = 'OU';
-const LABEL_GPO = 'GPO';
-const LABEL_DOMAIN = 'Domain';
-const LABEL_CONTAINER = 'Container';
-
-const EDGE_MEMBER_OF = 'MemberOf';
-const EDGE_ALLOWED_TO_DELEGATE = 'AllowedToDelegate';
-const EDGE_ALLOWED_TO_ACT = 'AllowedToAct';
-const EDGE_HAS_SESSION = 'HasSession';
-const EDGE_ADMIN_TO = 'AdminTo';
-const EDGE_CAN_RDP = 'CanRDP';
-const EDGE_EXECUTE_DCOM = 'ExecuteDCOM';
-const EDGE_CAN_PSREMOTE = 'CanPSRemote';
-const EDGE_HAS_SID_HISTORY = 'HasSIDHistory';
-const EDGE_CONTAINS = 'Contains';
-const EDGE_GP_LINK = 'GpLink';
-const EDGE_TRUSTED_BY = 'TrustedBy';
+import {groupBy} from 'lodash/collection';
 
 const TRUST_DIRECTION_INBOUND = 'Inbound';
 const TRUST_DIRECTION_OUTBOUND = 'Outbound';
 const TRUST_DIRECTION_BIDIRECTIONAL = 'Bidirectional';
 
 const PROP_QUERY =
-    'UNWIND $props AS prop MERGE (n:Base {objectid:prop.source}) SET n:{} SET n += prop.map';
+    'UNWIND $props AS prop MERGE (n:Base {objectid:prop.objectid}) SET n:{} SET n += prop.map';
 const AZURE_PROP_QUERY =
     'UNWIND $props AS prop MERGE (n:AZBase {objectid:prop.objectid}) SET n:{} SET n += prop.map';
 const NON_ACL_PROPS = '{isacl:false}';
@@ -38,6 +17,23 @@ const ADLabels = {
     Base: 'Base',
     Group: 'Group',
     User: 'User',
+    Computer: 'Computer',
+    OU: 'OU',
+    GPO: 'GPO',
+    Domain: 'Domain',
+    Container: 'Container',
+    MemberOf: 'MemberOf',
+    AllowedToDelegate: 'AllowedToDelegate',
+    AllowedToAct: 'AllowedToAct',
+    HasSession: 'HasSession',
+    AdminTo: 'AdminTo',
+    CanRDP: 'CanRDP',
+    ExecuteDCOM: 'ExecuteDCOM',
+    CanPSRemote: 'CanPSRemote',
+    HasSIDHistory: 'HasSIDHistory',
+    Contains: 'Contains',
+    GPLink: 'GpLink',
+    TrustedBy: 'TrustedBy',
 };
 
 const AzureApplicationAdministratorRoleId =
@@ -130,7 +126,7 @@ const DirectoryObjectEntityTypes = {
 export function buildGroupJsonNew(chunk) {
     let queries = {};
     queries.properties = {};
-    queries.properties.statement = PROP_QUERY.format(LABEL_GROUP);
+    queries.properties.statement = PROP_QUERY.format(ADLabels.Group);
     queries.properties.props = [];
 
     for (let group of chunk) {
@@ -139,18 +135,18 @@ export function buildGroupJsonNew(chunk) {
         let aces = group.Aces;
         let members = group.Members;
 
-        queries.properties.props.push({ source: identifier, map: properties });
+        queries.properties.props.push({objectid: identifier, map: properties});
 
-        processAceArrayNew(aces, identifier, LABEL_GROUP, queries);
+        processAceArrayNew(aces, identifier, ADLabels.Group, queries);
 
-        let format = ['', LABEL_GROUP, EDGE_MEMBER_OF, NON_ACL_PROPS];
+        let format = ['', ADLabels.Group, ADLabels.MemberOf, NON_ACL_PROPS];
 
         let grouped = groupBy(members, GROUP_OBJECT_TYPE);
 
         for (let objectType in grouped) {
             format[0] = objectType;
             let props = grouped[objectType].map((member) => {
-                return { source: member.ObjectIdentifier, target: identifier };
+                return {source: member.ObjectIdentifier, target: identifier};
             });
 
             insertNew(queries, format, props);
@@ -167,7 +163,7 @@ export function buildGroupJsonNew(chunk) {
 export function buildComputerJsonNew(chunk) {
     let queries = {};
     queries.properties = {};
-    queries.properties.statement = PROP_QUERY.format(LABEL_COMPUTER);
+    queries.properties.statement = PROP_QUERY.format(ADLabels.Computer);
     queries.properties.props = [];
 
     for (let computer of chunk) {
@@ -185,14 +181,14 @@ export function buildComputerJsonNew(chunk) {
         let regSessions = computer.RegistrySessions.Results;
         let aces = computer.Aces;
 
-        queries.properties.props.push({ source: identifier, map: properties });
+        queries.properties.props.push({objectid: identifier, map: properties});
 
-        processAceArrayNew(aces, identifier, LABEL_COMPUTER, queries);
+        processAceArrayNew(aces, identifier, ADLabels.Computer, queries);
 
         let format = [
-            LABEL_COMPUTER,
-            LABEL_GROUP,
-            EDGE_MEMBER_OF,
+            ADLabels.Computer,
+            ADLabels.Group,
+            ADLabels.MemberOf,
             NON_ACL_PROPS,
         ];
         if (primaryGroup !== null) {
@@ -203,19 +199,19 @@ export function buildComputerJsonNew(chunk) {
         }
 
         format = [
-            LABEL_COMPUTER,
-            LABEL_COMPUTER,
-            EDGE_ALLOWED_TO_DELEGATE,
+            ADLabels.Computer,
+            ADLabels.Computer,
+            ADLabels.AllowedToDelegate,
             NON_ACL_PROPS,
         ];
 
         let props = allowedToDelegate.map((delegate) => {
-            return { source: identifier, target: delegate.ObjectIdentifier };
+            return {source: identifier, target: delegate.ObjectIdentifier};
         });
 
         insertNew(queries, format, props);
 
-        format = ['', LABEL_COMPUTER, EDGE_ALLOWED_TO_ACT, NON_ACL_PROPS];
+        format = ['', ADLabels.Computer, ADLabels.AllowedToAct, NON_ACL_PROPS];
         let grouped = groupBy(allowedToAct, GROUP_OBJECT_TYPE);
         for (let objectType in grouped) {
             format[0] = objectType;
@@ -229,42 +225,42 @@ export function buildComputerJsonNew(chunk) {
         }
 
         format = [
-            LABEL_COMPUTER,
-            LABEL_USER,
-            EDGE_HAS_SESSION,
+            ADLabels.Computer,
+            ADLabels.User,
+            ADLabels.HasSession,
             '{isacl:false, source:"netsessionenum"}',
         ];
         props = sessions.map((session) => {
-            return { source: session.ComputerSID, target: session.UserSID };
+            return {source: session.ComputerSID, target: session.UserSID};
         });
         insertNew(queries, format, props);
 
         format = [
-            LABEL_COMPUTER,
-            LABEL_USER,
-            EDGE_HAS_SESSION,
+            ADLabels.Computer,
+            ADLabels.User,
+            ADLabels.HasSession,
             '{isacl:false, source:"netwkstauserenum"}',
         ];
         props = privSessions.map((session) => {
-            return { source: session.ComputerSID, target: session.UserSID };
+            return {source: session.ComputerSID, target: session.UserSID};
         });
         insertNew(queries, format, props);
 
         format = [
-            LABEL_COMPUTER,
-            LABEL_USER,
-            EDGE_HAS_SESSION,
+            ADLabels.Computer,
+            ADLabels.User,
+            ADLabels.HasSession,
             '{isacl:false, source:"registry"}',
         ];
         props = regSessions.map((session) => {
-            return { source: session.ComputerSID, target: session.UserSID };
+            return {source: session.ComputerSID, target: session.UserSID};
         });
         insertNew(queries, format, props);
 
         format = [
             '',
-            LABEL_COMPUTER,
-            EDGE_ADMIN_TO,
+            ADLabels.Computer,
+            ADLabels.AdminTo,
             '{isacl:false, fromgpo: false}',
         ];
         grouped = groupBy(localAdmins, GROUP_OBJECT_TYPE);
@@ -281,8 +277,8 @@ export function buildComputerJsonNew(chunk) {
 
         format = [
             '',
-            LABEL_COMPUTER,
-            EDGE_CAN_RDP,
+            ADLabels.Computer,
+            ADLabels.CanRDP,
             '{isacl:false, fromgpo: false}',
         ];
         grouped = groupBy(rdp, GROUP_OBJECT_TYPE);
@@ -299,8 +295,8 @@ export function buildComputerJsonNew(chunk) {
 
         format = [
             '',
-            LABEL_COMPUTER,
-            EDGE_EXECUTE_DCOM,
+            ADLabels.Computer,
+            ADLabels.ExecuteDCOM,
             '{isacl:false, fromgpo: false}',
         ];
         grouped = groupBy(dcom, GROUP_OBJECT_TYPE);
@@ -317,8 +313,8 @@ export function buildComputerJsonNew(chunk) {
 
         format = [
             '',
-            LABEL_COMPUTER,
-            EDGE_CAN_PSREMOTE,
+            ADLabels.Computer,
+            ADLabels.CanPSRemote,
             '{isacl:false, fromgpo: false}',
         ];
         grouped = groupBy(psremote || [], GROUP_OBJECT_TYPE);
@@ -345,7 +341,7 @@ export function buildUserJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement:
-            'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:User SET n += prop.map',
+            PROP_QUERY.format(ADLabels.User),
         props: [],
     };
 
@@ -358,14 +354,14 @@ export function buildUserJsonNew(chunk) {
         let sidHistory = user.HasSIDHistory;
         let aces = user.Aces;
 
-        processAceArrayNew(aces, identifier, LABEL_USER, queries);
+        processAceArrayNew(aces, identifier, ADLabels.User, queries);
 
         queries.properties.props.push({
-            source: identifier,
+            objectid: identifier,
             map: properties,
         });
 
-        let format = [LABEL_USER, LABEL_GROUP, EDGE_MEMBER_OF, NON_ACL_PROPS];
+        let format = [ADLabels.User, ADLabels.Group, ADLabels.MemberOf, NON_ACL_PROPS];
         if (primaryGroup !== null) {
             insertNew(queries, format, {
                 source: identifier,
@@ -374,18 +370,18 @@ export function buildUserJsonNew(chunk) {
         }
 
         format = [
-            LABEL_USER,
-            LABEL_COMPUTER,
-            EDGE_ALLOWED_TO_DELEGATE,
+            ADLabels.User,
+            ADLabels.Computer,
+            ADLabels.AllowedToDelegate,
             NON_ACL_PROPS,
         ];
         let props = allowedToDelegate.map((principal) => {
-            return { source: identifier, target: principal.ObjectIdentifier };
+            return {source: identifier, target: principal.ObjectIdentifier};
         });
 
         insertNew(queries, format, props);
 
-        format = [LABEL_USER, '', EDGE_HAS_SID_HISTORY, NON_ACL_PROPS];
+        format = [ADLabels.User, '', ADLabels.HasSIDHistory, NON_ACL_PROPS];
         let grouped = groupBy(sidHistory, GROUP_OBJECT_TYPE);
         for (let objectType in grouped) {
             format[1] = objectType;
@@ -411,7 +407,7 @@ export function buildUserJsonNew(chunk) {
 export function buildGpoJsonNew(chunk) {
     let queries = {};
     queries.properties = {
-        statement: PROP_QUERY.format(LABEL_GPO),
+        statement: PROP_QUERY.format(ADLabels.GPO),
         props: [],
     };
 
@@ -420,8 +416,8 @@ export function buildGpoJsonNew(chunk) {
         let aces = gpo.Aces;
         let properties = gpo.Properties;
 
-        queries.properties.props.push({ source: identifier, map: properties });
-        processAceArrayNew(aces, identifier, LABEL_GPO, queries);
+        queries.properties.props.push({objectid: identifier, map: properties});
+        processAceArrayNew(aces, identifier, ADLabels.GPO, queries);
     }
 
     return queries;
@@ -434,7 +430,7 @@ export function buildGpoJsonNew(chunk) {
 export function buildContainerJsonNew(chunk) {
     let queries = {};
     queries.properties = {
-        statement: PROP_QUERY.format(LABEL_CONTAINER),
+        statement: PROP_QUERY.format(ADLabels.Container),
         props: [],
     };
 
@@ -444,16 +440,16 @@ export function buildContainerJsonNew(chunk) {
         let properties = container.Properties;
         let children = container.ChildObjects;
 
-        queries.properties.props.push({ source: identifier, map: properties });
-        processAceArrayNew(aces, identifier, LABEL_CONTAINER, queries);
+        queries.properties.props.push({objectid: identifier, map: properties});
+        processAceArrayNew(aces, identifier, ADLabels.Container, queries);
 
-        let format = [LABEL_CONTAINER, '', EDGE_CONTAINS, NON_ACL_PROPS];
+        let format = [ADLabels.Container, '', ADLabels.Contains, NON_ACL_PROPS];
         let grouped = groupBy(children, GROUP_OBJECT_TYPE);
 
         for (let objectType in grouped) {
             format[1] = objectType;
             let props = grouped[objectType].map((child) => {
-                return { source: identifier, target: child.ObjectIdentifier };
+                return {source: identifier, target: child.ObjectIdentifier};
             });
 
             insertNew(queries, format, props);
@@ -470,7 +466,7 @@ export function buildContainerJsonNew(chunk) {
 export function buildOuJsonNew(chunk) {
     let queries = {};
     queries.properties = {
-        statement: PROP_QUERY.format(LABEL_OU),
+        statement: PROP_QUERY.format(ADLabels.OU),
         props: [],
     };
 
@@ -485,24 +481,24 @@ export function buildOuJsonNew(chunk) {
 
         processAceArrayNew(aces, identifier, 'OU', queries);
 
-        queries.properties.props.push({ source: identifier, map: properties });
+        queries.properties.props.push({objectid: identifier, map: properties});
 
-        let format = [LABEL_OU, '', EDGE_CONTAINS, NON_ACL_PROPS];
+        let format = [ADLabels.OU, '', ADLabels.Contains, NON_ACL_PROPS];
         let grouped = groupBy(children, GROUP_OBJECT_TYPE);
 
         for (let objectType in grouped) {
             format[1] = objectType;
             let props = grouped[objectType].map((child) => {
-                return { source: identifier, target: child.ObjectIdentifier };
+                return {source: identifier, target: child.ObjectIdentifier};
             });
 
             insertNew(queries, format, props);
         }
 
         format = [
-            LABEL_GPO,
-            LABEL_OU,
-            EDGE_GP_LINK,
+            ADLabels.GPO,
+            ADLabels.OU,
+            ADLabels.GPLink,
             '{isacl: false, enforced: prop.enforced}',
         ];
         let props = links.map((link) => {
@@ -518,8 +514,8 @@ export function buildOuJsonNew(chunk) {
 
         format = [
             '',
-            LABEL_COMPUTER,
-            EDGE_ADMIN_TO,
+            ADLabels.Computer,
+            ADLabels.AdminTo,
             '{isacl: false, fromgpo: true}',
         ];
         grouped = groupBy(ou.GPOChanges.LocalAdmins, GROUP_OBJECT_TYPE);
@@ -539,8 +535,8 @@ export function buildOuJsonNew(chunk) {
 
         format = [
             '',
-            LABEL_COMPUTER,
-            EDGE_CAN_RDP,
+            ADLabels.Computer,
+            ADLabels.CanRDP,
             '{isacl: false, fromgpo: true}',
         ];
         grouped = groupBy(ou.GPOChanges.RemoteDesktopUsers, GROUP_OBJECT_TYPE);
@@ -560,8 +556,8 @@ export function buildOuJsonNew(chunk) {
 
         format = [
             '',
-            LABEL_COMPUTER,
-            EDGE_EXECUTE_DCOM,
+            ADLabels.Computer,
+            ADLabels.ExecuteDCOM,
             '{isacl: false, fromgpo: true}',
         ];
         grouped = groupBy(ou.GPOChanges.DcomUsers, GROUP_OBJECT_TYPE);
@@ -581,8 +577,8 @@ export function buildOuJsonNew(chunk) {
 
         format = [
             '',
-            LABEL_COMPUTER,
-            EDGE_CAN_PSREMOTE,
+            ADLabels.Computer,
+            ADLabels.CanPSRemote,
             '{isacl: false, fromgpo: true}',
         ];
         grouped = groupBy(ou.GPOChanges.PSRemoteUsers, GROUP_OBJECT_TYPE);
@@ -611,7 +607,7 @@ export function buildOuJsonNew(chunk) {
 export function buildDomainJsonNew(chunk) {
     let queries = {};
     queries.properties = {
-        statement: PROP_QUERY.format(LABEL_DOMAIN),
+        statement: PROP_QUERY.format(ADLabels.Domain),
         props: [],
     };
 
@@ -626,26 +622,26 @@ export function buildDomainJsonNew(chunk) {
         processAceArrayNew(aces, identifier, 'Domain', queries);
 
         queries.properties.props.push({
-            source: identifier,
+            objectid: identifier,
             map: properties,
         });
 
-        let format = [LABEL_DOMAIN, '', EDGE_CONTAINS, NON_ACL_PROPS];
+        let format = [ADLabels.Domain, '', ADLabels.Contains, NON_ACL_PROPS];
         let grouped = groupBy(children, GROUP_OBJECT_TYPE);
 
         for (let objectType in grouped) {
             format[1] = objectType;
             let props = grouped[objectType].map((child) => {
-                return { source: identifier, target: child.ObjectIdentifier };
+                return {source: identifier, target: child.ObjectIdentifier};
             });
 
             insertNew(queries, format, props);
         }
 
         format = [
-            LABEL_GPO,
-            LABEL_DOMAIN,
-            EDGE_GP_LINK,
+            ADLabels.GPO,
+            ADLabels.Domain,
+            ADLabels.GPLink,
             '{isacl: false, enforced: prop.enforced}',
         ];
         let props = links.map((link) => {
@@ -661,8 +657,8 @@ export function buildDomainJsonNew(chunk) {
 
         format = [
             '',
-            LABEL_COMPUTER,
-            EDGE_ADMIN_TO,
+            ADLabels.Computer,
+            ADLabels.AdminTo,
             '{isacl: false, fromgpo: true}',
         ];
         grouped = groupBy(domain.GPOChanges.LocalAdmins, GROUP_OBJECT_TYPE);
@@ -682,8 +678,8 @@ export function buildDomainJsonNew(chunk) {
 
         format = [
             '',
-            LABEL_COMPUTER,
-            EDGE_CAN_RDP,
+            ADLabels.Computer,
+            ADLabels.CanRDP,
             '{isacl: false, fromgpo: true}',
         ];
         grouped = groupBy(
@@ -706,8 +702,8 @@ export function buildDomainJsonNew(chunk) {
 
         format = [
             '',
-            LABEL_COMPUTER,
-            EDGE_EXECUTE_DCOM,
+            ADLabels.Computer,
+            ADLabels.ExecuteDCOM,
             '{isacl: false, fromgpo: true}',
         ];
         grouped = groupBy(domain.GPOChanges.DcomUsers, GROUP_OBJECT_TYPE);
@@ -727,8 +723,8 @@ export function buildDomainJsonNew(chunk) {
 
         format = [
             '',
-            LABEL_COMPUTER,
-            EDGE_CAN_PSREMOTE,
+            ADLabels.Computer,
+            ADLabels.CanPSRemote,
             '{isacl: false, fromgpo: true}',
         ];
         grouped = groupBy(domain.GPOChanges.PSRemoteUsers, GROUP_OBJECT_TYPE);
@@ -750,9 +746,9 @@ export function buildDomainJsonNew(chunk) {
         "UNWIND $props AS prop MERGE (n:Domain {name: prop.a}) MERGE (m:Domain {name: prop.b}) MERGE (n)-[:TrustedBy {trusttype : prop.trusttype, transitive: prop.transitive, isacl:false}]->(m)",
         */
         format = [
-            LABEL_DOMAIN,
-            LABEL_DOMAIN,
-            EDGE_TRUSTED_BY,
+            ADLabels.Domain,
+            ADLabels.Domain,
+            ADLabels.TrustedBy,
             '{sidfiltering: prop.sidfiltering, trusttype: prop.trusttype, transitive: prop.transitive, isacl: false}',
         ];
 
@@ -765,8 +761,8 @@ export function buildDomainJsonNew(chunk) {
             let targetName = trust.TargetDomainName;
 
             queries.properties.props.push({
-                source: target,
-                map: { name: targetName },
+                objectid: target,
+                map: {name: targetName},
             });
 
             if (
@@ -898,8 +894,8 @@ function processSPNTargetArrayNew(
     queries
 ) {
     let format = [
-        LABEL_USER,
-        LABEL_COMPUTER,
+        ADLabels.User,
+        ADLabels.Computer,
         '',
         '{isacl: false, port: prop.port}',
     ];
@@ -1127,7 +1123,7 @@ export function convertAzureDevice(data, ingestionData) {
     insertNewAzureRel(
         ingestionData,
         fProps(AzureLabels.Tenant, AzureLabels.Device, AzureLabels.Contains),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
 }
 
@@ -1180,6 +1176,7 @@ export function convertAzureGroup(data, ingestionData) {
         false
     );
 
+
     if (data.onPremisesSecurityIdentifier) {
         insertNewAzureNodeProp(
             ingestionData,
@@ -1195,8 +1192,10 @@ export function convertAzureGroup(data, ingestionData) {
     insertNewAzureRel(
         ingestionData,
         fProps(AzureLabels.Tenant, AzureLabels.Group, AzureLabels.Contains),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
+
+    console.log(ingestionData)
 }
 
 /**
@@ -1259,7 +1258,7 @@ export function convertAzureKeyVault(data, ingestionData) {
             map: {
                 name: data.name.toUpperCase(),
                 enablerbacauthorization:
-                    data.properties.enableRbacAuthorization,
+                data.properties.enableRbacAuthorization,
                 tenantid: data.tenantId.toUpperCase(),
             },
         },
@@ -1273,7 +1272,7 @@ export function convertAzureKeyVault(data, ingestionData) {
             AzureLabels.KeyVault,
             AzureLabels.Contains
         ),
-        { source: data.resourceGroup.toString(), target: data.id.toUpperCase() }
+        {source: data.resourceGroup.toString(), target: data.id.toUpperCase()}
     );
 }
 
@@ -1284,7 +1283,7 @@ export function convertAzureKeyVault(data, ingestionData) {
  */
 export function convertAzureKeyVaultAccessPolicy(data, ingestionData) {
     const get = (ele) => ele === 'Get';
-    if (data.permissions.keys.some(get)) {
+    if (data.permissions.keys !== null && data.permissions.keys.some(get)) {
         insertNewAzureRel(
             ingestionData,
             fProps(AzureLabels.Base, AzureLabels.KeyVault, AzureLabels.GetKeys),
@@ -1295,7 +1294,7 @@ export function convertAzureKeyVaultAccessPolicy(data, ingestionData) {
         );
     }
 
-    if (data.permissions.secrets.some(get)) {
+    if (data.permissions.secrets !== null && data.permissions.secrets.some(get)) {
         insertNewAzureRel(
             ingestionData,
             fProps(
@@ -1310,7 +1309,7 @@ export function convertAzureKeyVaultAccessPolicy(data, ingestionData) {
         );
     }
 
-    if (data.permissions.certificates.some(get)) {
+    if (data.permissions.certificates !== null && data.permissions.certificates.some(get)) {
         insertNewAzureRel(
             ingestionData,
             fProps(
@@ -1486,7 +1485,7 @@ export function convertAzureManagementGroup(data, ingestionData) {
             AzureLabels.ManagementGroup,
             AzureLabels.Contains
         ),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
 }
 
@@ -1596,7 +1595,7 @@ export function convertAzureRole(data, ingestionData) {
     insertNewAzureRel(
         ingestionData,
         fProps(AzureLabels.Tenant, AzureLabels.Role, AzureLabels.Contains),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
 }
 
@@ -1610,9 +1609,9 @@ export function convertAzureRoleAssignment(data, ingestionData) {
     for (let roleAssignment of data.roleAssignments) {
         if (
             roleAssignment.roleDefinitionId ===
-                AzureApplicationAdministratorRoleId ||
+            AzureApplicationAdministratorRoleId ||
             roleAssignment.roleDefinitionId ===
-                AzureCloudApplicationAdministratorRoleId
+            AzureCloudApplicationAdministratorRoleId
         ) {
             if (roleAssignment.directoryScopeId === '/') {
                 insertNewAzureRel(
@@ -1701,7 +1700,7 @@ export function convertAzureServicePrincipal(data, ingestionData) {
             AzureLabels.ServicePrincipal,
             AzureLabels.RunsAs
         ),
-        { source: data.appId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.appId.toUpperCase(), target: data.id.toUpperCase()}
     );
 
     insertNewAzureRel(
@@ -1711,7 +1710,7 @@ export function convertAzureServicePrincipal(data, ingestionData) {
             AzureLabels.ServicePrincipal,
             AzureLabels.Contains
         ),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
 }
 
@@ -1766,7 +1765,7 @@ export function convertAzureSubscription(data, ingestionData) {
             AzureLabels.Subscription,
             AzureLabels.Contains
         ),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
 }
 
@@ -1882,7 +1881,7 @@ export function convertAzureUser(data, ingestionData) {
     insertNewAzureRel(
         ingestionData,
         fProps(AzureLabels.Tenant, AzureLabels.User, AzureLabels.Contains),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
+        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
 }
 
@@ -1935,7 +1934,7 @@ export function convertAzureVirtualMachine(data, ingestionData) {
         );
     }
 
-    if (data.identity.userAssignedIdentities){
+    if (data.identity.userAssignedIdentities) {
         for (let key in data.identity.userAssignedIdentities) {
             let user = data.identity.userAssignedIdentities[key]
             if (user.clientId !== '') {
