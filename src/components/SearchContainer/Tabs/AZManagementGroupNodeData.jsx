@@ -56,6 +56,7 @@ const AZManagementGroupNodeData = ({}) => {
 
     const displayMap = {
         objectid: 'Object ID',
+        tenantid: 'Tenant ID'
     };
 
     return objectid === null ? (

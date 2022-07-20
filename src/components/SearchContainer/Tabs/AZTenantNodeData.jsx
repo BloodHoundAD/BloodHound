@@ -52,6 +52,7 @@ const AZTenantNodeData = () => {
 
     const displayMap = {
         objectid: 'Object ID',
+        displayname: 'Display Name',
     };
 
     return objectid === null ? (

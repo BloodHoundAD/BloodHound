@@ -51,6 +51,8 @@ const AZKeyVaultNodeData = () => {
 
     const displayMap = {
         objectid: 'Object ID',
+        enablerbacauthorization: 'Enable RBAC Authorization',
+        tenantid: 'Tenant ID'
     };
 
     return objectid === null ? (

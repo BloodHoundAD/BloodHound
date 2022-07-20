@@ -54,6 +54,13 @@ const AZUserNodeData = () => {
     const displayMap = {
         displayname: 'Display Name',
         objectid: 'Object ID',
+        enabled: 'Enabled',
+        whencreated: 'Creation Time',
+        title: 'Job Title',
+        pwdlastset: 'Password Last Set',
+        mail: 'Email',
+        usertype: 'User Type',
+        tenantid: 'Tenant ID',
     };
 
     return objectid === null ? (

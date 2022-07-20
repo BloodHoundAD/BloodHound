@@ -54,6 +54,13 @@ const AZServicePrincipalNodeData = () => {
     const displayMap = {
         displayname: 'Display Name',
         objectid: 'Object ID',
+        enabled: 'Enabled',
+        descripton: 'Description',
+        appdescription: 'App Description',
+        appdisplayname: 'App Display Name',
+        appownerorganizationid: 'App Owner Organization ID',
+        serviceprincipaltype: 'Service Principal Type',
+        tenantid: 'Tenant ID',
     };
 
     return objectid === null ? (

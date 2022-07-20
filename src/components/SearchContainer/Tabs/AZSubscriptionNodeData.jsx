@@ -54,6 +54,8 @@ const AZSubscriptionNodeData = () => {
 
     const displayMap = {
         objectid: 'Object ID',
+        tenantid: 'Tenant ID',
+        displayname: 'Display Name'
     };
 
     return objectid === null ? (

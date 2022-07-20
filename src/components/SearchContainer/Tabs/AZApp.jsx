@@ -62,6 +62,12 @@ const AZAppNodeData = () => {
     const displayMap = {
         displayname: 'Display Name',
         objectid: 'Object ID',
+        description: 'Description',
+        whencreated: 'Creation Time',
+        appid: 'App ID',
+        publisherdomain: 'Publisher Domain',
+        signinaudience: 'Sign In Audience',
+        tenantid: 'Tenant ID'
     };
 
     return objectid === null ? (
