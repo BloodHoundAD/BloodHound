@@ -76,6 +76,7 @@ const AZVMNodeData = () => {
                                     property='See VM within Tenant'
                                     query='MATCH p = (d:AZTenant)-[r:AZContains*1..]->(u:AZVM {objectid: $objectid}) RETURN p'
                                 />
+                            <NodeCypherLink baseQuery={'MATCH p=(:AZVM {objectid:$objectid})-[:AZManagedIdentity]->(n)'} property={'Managed Identities'} target={objectid} />
                             </tbody>
                         </Table>
                     </div>
