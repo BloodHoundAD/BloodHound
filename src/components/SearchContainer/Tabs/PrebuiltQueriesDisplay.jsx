@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { remote } from 'electron';
-
-const { app } = remote;
 import path from 'path';
 import fs from 'fs';
-import { platform } from 'process';
-import { exec } from 'child_process';
 import PrebuiltQueryNode from './PrebuiltQueryNode';
 import styles from './PrebuiltQueries.module.css';
-import { useContext } from 'react';
 import { AppContext } from '../../../AppContext';
 import { Table } from 'react-bootstrap';
 import CollapsibleSection from './Components/CollapsibleSection';
+
+const { app } = remote;
 
 const PrebuiltQueriesDisplay = () => {
     const [queries, setQueries] = useState([]);
@@ -85,25 +82,25 @@ const PrebuiltQueriesDisplay = () => {
         });
     };
 
-    const getCommandLine = () => {
-        switch (platform) {
-            case 'darwin':
-                return 'open';
-            case 'win32':
-                return '';
-            default:
-                return 'xdg-open';
-        }
-    };
-
-    const editCustom = () => {
-        exec(
-            getCommandLine() +
-                ' "' +
-                join(app.getPath('userData'), '/customqueries.json') +
-                '"'
-        );
-    };
+    // const getCommandLine = () => {
+    //     switch (platform) {
+    //         case 'darwin':
+    //             return 'open';
+    //         case 'win32':
+    //             return '';
+    //         default:
+    //             return 'xdg-open';
+    //     }
+    // };
+    //
+    // const editCustom = () => {
+    //     exec(
+    //         getCommandLine() +
+    //             ' "' +
+    //             join(app.getPath('userData'), '/customqueries.json') +
+    //             '"'
+    //     );
+    // };
 
     const refreshCustom = () => {
         readCustom();

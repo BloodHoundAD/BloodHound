@@ -156,8 +156,9 @@ const QueryCustomCreate = () => {
                                     onChange={setSingleSelections}
                                     options={categories}
                                     selected={singleSelections}
-                                    maxHeight={100}
+                                    maxHeight={"100"}
                                     onBlur={event => setSelectedCategory(event.target.defaultValue)}
+                                    id={'query-category-select'}
                                 />
                             </Col>
                         </Row>
