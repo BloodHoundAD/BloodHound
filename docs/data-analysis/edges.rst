@@ -1033,6 +1033,41 @@ References
 ----
 
 |
+DCSync
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+This edge represents the combination of GetChanges and GetChangesAll. The combination of both these privileges grants a principal the ability to perform the DCSync attack.
+
+Abuse Info
+---------
+
+With both GetChanges and GetChangesAll privileges in BloodHound, you may perform a dcsync attack to
+get the password hash of an arbitrary principal using mimikatz:
+
+::
+
+  lsadump::dcsync /domain:testlab.local /user:Administrator
+
+You can also perform the more complicated ExtraSids attack to hop domain trusts. For information on
+this see the blog post by harmj0y in the references tab.
+
+Opsec Considerations
+--------------------
+
+For detailed information on detection of DCSync as well as opsec considerations, see the ADSecurity
+post in the references section below.
+
+References
+----------
+
+* https://adsecurity.org/?p=1729
+* http://www.harmj0y.net/blog/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/
+
+|
+
+----
+
+|
 
 GetChanges/GetChangesAll
 ^^^^^^^^^^^^^^^^^^^^^^^^
