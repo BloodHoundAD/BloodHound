@@ -66,6 +66,31 @@ const AZDeviceNodeData = () => {
             <div className={clsx(styles.dl)}>
                 <h5>{label || objectid}</h5>
 
+                <CollapsibleSection header='OVERVIEW'>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                            <NodeCypherLink
+                                baseQuery={
+                                    'MATCH p=(:AZDevice {objectid: $objectid})-[:AZMemberOf|AZHasRole*1..]->(n:AZRole)'
+                                }
+                                property={'Azure AD Admin Roles'}
+                                target={objectid}
+                            />
+                            <NodeCypherLink
+                                property='Reachable High Value Targets'
+                                target={objectid}
+                                baseQuery={
+                                    'MATCH (m:AZDevice {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                }
+                                start={label}
+                            />
+                            </tbody>
+                        </Table>
+                    </div>
+                </CollapsibleSection>
+
                 <MappedNodeProps
                     displayMap={displayMap}
                     properties={nodeProps}

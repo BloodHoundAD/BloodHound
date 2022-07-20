@@ -1,14 +1,14 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 import NodeCypherLink from './Components/NodeCypherLink';
 import MappedNodeProps from './Components/MappedNodeProps';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import NodePlayCypherLink from './Components/NodePlayCypherLink';
-import {withAlert} from 'react-alert';
-import {Table} from 'react-bootstrap';
+import { withAlert } from 'react-alert';
+import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
-import {AppContext} from '../../../AppContext';
+import { AppContext } from '../../../AppContext';
 
 const AZServicePrincipalNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -73,6 +73,13 @@ const AZServicePrincipalNodeData = () => {
                         <Table>
                             <thead></thead>
                             <tbody className='searchable'>
+                                <NodeCypherLink
+                                    baseQuery={
+                                        'MATCH p=(:AZServicePrincipal {objectid: $objectid})-[:AZMemberOf|AZHasRole*1..]->(n:AZRole)'
+                                    }
+                                    property={'Azure AD Admin Roles'}
+                                    target={objectid}
+                                />
                                 <NodeCypherLink
                                     property='Reachable High Value Targets'
                                     target={objectid}

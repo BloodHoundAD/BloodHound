@@ -1,13 +1,13 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 import NodeCypherLink from './Components/NodeCypherLink';
 import MappedNodeProps from './Components/MappedNodeProps';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import NodePlayCypherLink from './Components/NodePlayCypherLink';
-import {Table} from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
-import {AppContext} from '../../../AppContext';
+import { AppContext } from '../../../AppContext';
 
 const AZGroupNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -53,7 +53,7 @@ const AZGroupNodeData = () => {
     const displayMap = {
         objectid: 'Object ID',
         description: 'Description',
-        isAssignableToRole: 'Is Role Eligible'
+        isAssignableToRole: 'Is Role Eligible',
     };
 
     return objectid === null ? (
@@ -80,6 +80,13 @@ const AZGroupNodeData = () => {
                                         'MATCH (m:AZGroup {objectid: $objectid}),(n),p = ((n)-[r:HasSession*1..]->(u)-[:AZMemberOf*1..]->(m))'
                                     }
                                     start={label}
+                                />
+                                <NodeCypherLink
+                                    baseQuery={
+                                        'MATCH p=(:AZGroup {objectid: $objectid})-[:AZMemberOf|AZHasRole*1..]->(n:AZRole)'
+                                    }
+                                    property={'Azure AD Admin Roles'}
+                                    target={objectid}
                                 />
                                 <NodeCypherLink
                                     property='Reachable High Value Targets'
