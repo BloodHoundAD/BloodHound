@@ -150,8 +150,13 @@ const Login = () => {
                     .then((result) => {
                         let record = result.records[0];
                         global.neoVersion = record.get('version');
-                        session.close();
+                        session.run("MATCH (n:GPO)-[r:GpLink]->(m) CREATE (n)-[:GPLink {isacl: false, enforced:r.enforced}]->(m) DELETE r").then(() => {
+                            session.close()
+                        }).catch(err => {
+                            console.error(err)
+                        })
                     });
+
 
                 setTimeout(() => {
                     setVisible(false);
