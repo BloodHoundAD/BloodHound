@@ -11,6 +11,7 @@ import MappedNodeProps from "./Components/MappedNodeProps";
 import ExtraNodeProps from "./Components/ExtraNodeProps";
 import NodePlayCypherLink from "./Components/NodePlayCypherLink";
 import {withAlert} from "react-alert";
+import CollapsibleSectionTable from "./Components/CollapsibleSectionNew";
 
 const AZRoleNodeData = ({}) => {
     const [visible, setVisible] = useState(false);
@@ -111,42 +112,42 @@ const AZRoleNodeData = ({}) => {
 
                 <hr></hr>
 
-                <CollapsibleSection header='INBOUND OBJECT CONTROL'>
-                    <div className={styles.itemlist}>
-                        <Table>
-                            <thead></thead>
-                            <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Explicit Object Controllers'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (n)-[r:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g:AZRole {objectid: $objectid})'
-                                }
-                                end={label}
-                                distinct
-                            />
-                            <NodeCypherLink
-                                property='Unrolled Object Controllers'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g2:AZRole {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
-                                }
-                                end={label}
-                                distinct
-                            />
-                            <NodePlayCypherLink
-                                property='Transitive Object Controllers'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZRole {objectid: $objectid}))'
-                                }
-                                end={label}
-                                distinct
-                            />
-                            </tbody>
-                        </Table>
-                    </div>
-                </CollapsibleSection>
+                <CollapsibleSectionTable header={'ASSIGNMENTS'}>
+                    <NodeCypherLink baseQuery={'MATCH p=(n)-[:HasRole|AZMemberOf]->(:AZRole {objectid:$objectid})'} property={'Active Assignments'} target={objectid} />
+                    <NodeCypherLink baseQuery={'MATCH p=(n)-[:AZGrant|AZGrantSelf|AZMemberOf]->(:AZRole {objectid:$objectid})'} property={'PIM Assignments'} target={objectid} />
+                </CollapsibleSectionTable>
+
+                <hr></hr>
+
+                <CollapsibleSectionTable header='INBOUND OBJECT CONTROL'>
+                    <NodeCypherLink
+                        property='Explicit Object Controllers'
+                        target={objectid}
+                        baseQuery={
+                            'MATCH p = (n)-[r:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g:AZRole {objectid: $objectid})'
+                        }
+                        end={label}
+                        distinct
+                    />
+                    <NodeCypherLink
+                        property='Unrolled Object Controllers'
+                        target={objectid}
+                        baseQuery={
+                            'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g2:AZRole {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                        }
+                        end={label}
+                        distinct
+                    />
+                    <NodePlayCypherLink
+                        property='Transitive Object Controllers'
+                        target={objectid}
+                        baseQuery={
+                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZRole {objectid: $objectid}))'
+                        }
+                        end={label}
+                        distinct
+                    />
+                </CollapsibleSectionTable>
             </div>
         </div>
     )
