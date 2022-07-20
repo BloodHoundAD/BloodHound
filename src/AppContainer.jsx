@@ -53,7 +53,7 @@ const fullEdgeList = [
     'AZRunsAs',
     'AZKeyVaultContributor',
     'Contains',
-    'GpLink',
+    'GPLink',
     'AllExtendedRights',
     'AddMember',
     'ForceChangePassword',

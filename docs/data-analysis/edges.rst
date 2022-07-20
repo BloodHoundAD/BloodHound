@@ -1776,7 +1776,7 @@ https://www.youtube.com/watch?v=z8thoG7gPd0
 
 |
 
-GpLink
+GPLink
 ^^^^^^
 
 A linked GPO applies its settings to objects in the linked container.

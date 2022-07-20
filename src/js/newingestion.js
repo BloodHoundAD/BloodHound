@@ -32,7 +32,7 @@ const ADLabels = {
     CanPSRemote: 'CanPSRemote',
     HasSIDHistory: 'HasSIDHistory',
     Contains: 'Contains',
-    GPLink: 'GpLink',
+    GPLink: 'GPLink',
     TrustedBy: 'TrustedBy',
 };
 

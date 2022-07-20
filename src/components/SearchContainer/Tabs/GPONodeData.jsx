@@ -111,7 +111,7 @@ const GPONodeData = () => {
                                     property='Directly Affected OUs'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (m:GPO {objectid: $objectid})-[r:GpLink]->(n)'
+                                        'MATCH p = (m:GPO {objectid: $objectid})-[r:GPLink]->(n)'
                                     }
                                     start={label}
                                 />
@@ -119,7 +119,7 @@ const GPONodeData = () => {
                                     property='Affected OUs'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (m:GPO {objectid: $objectid})-[r:GpLink|Contains*1..]->(n) WHERE n:OU OR n:Domain'
+                                        'MATCH p = (m:GPO {objectid: $objectid})-[r:GPLink|Contains*1..]->(n) WHERE n:OU OR n:Domain'
                                     }
                                     start={label}
                                 />
@@ -127,20 +127,20 @@ const GPONodeData = () => {
                                     property='Computer Objects'
                                     target={objectid}
                                     countQuery={
-                                        "MATCH (g:GPO {objectid: $objectid}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:Computer) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:Computer) RETURN count(n1) + count(n2)"
+                                        "MATCH (g:GPO {objectid: $objectid}) OPTIONAL MATCH (g)-[r1:GPLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GPLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GPLink]->(container1)-[r2:Contains*1..]->(n1:Computer) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GPLink]->(container2)-[r2:Contains*1..]->(n2:Computer) RETURN count(n1) + count(n2)"
                                     }
                                     graphQuery={
-                                        "MATCH (g:GPO {objectid: $objectid}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:Computer) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:Computer) RETURN p1,p2"
+                                        "MATCH (g:GPO {objectid: $objectid}) OPTIONAL MATCH (g)-[r1:GPLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GPLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GPLink]->(container1)-[r2:Contains*1..]->(n1:Computer) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GPLink]->(container2)-[r2:Contains*1..]->(n2:Computer) RETURN p1,p2"
                                     }
                                 />
                                 <NodeCypherLinkComplex
                                     property='User Objects'
                                     target={objectid}
                                     countQuery={
-                                        "MATCH (g:GPO {objectid: $objectid}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:User) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:User) RETURN count(n1) + count(n2)"
+                                        "MATCH (g:GPO {objectid: $objectid}) OPTIONAL MATCH (g)-[r1:GPLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GPLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GPLink]->(container1)-[r2:Contains*1..]->(n1:User) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GPLink]->(container2)-[r2:Contains*1..]->(n2:User) RETURN count(n1) + count(n2)"
                                     }
                                     graphQuery={
-                                        "MATCH (g:GPO {objectid: $objectid}) OPTIONAL MATCH (g)-[r1:GpLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GpLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GpLink]->(container1)-[r2:Contains*1..]->(n1:User) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GpLink]->(container2)-[r2:Contains*1..]->(n2:User) RETURN p1,p2"
+                                        "MATCH (g:GPO {objectid: $objectid}) OPTIONAL MATCH (g)-[r1:GPLink {enforced:false}]->(container1) WITH g,container1 OPTIONAL MATCH (g)-[r2:GPLink {enforced:true}]->(container2) WITH g,container1,container2 OPTIONAL MATCH p1 = (g)-[r1:GPLink]->(container1)-[r2:Contains*1..]->(n1:User) WHERE NONE(x in NODES(p1) WHERE x.blocksinheritance = true AND LABELS(x) = 'OU') WITH g,p1,container2,n1 OPTIONAL MATCH p2 = (g)-[r1:GPLink]->(container2)-[r2:Contains*1..]->(n2:User) RETURN p1,p2"
                                     }
                                 />
                             </tbody>

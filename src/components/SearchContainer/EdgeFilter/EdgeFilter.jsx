@@ -78,10 +78,10 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterSection
                         title='Containers'
                         sectionName='container'
-                        edges={['Contains', 'GpLink']}
+                        edges={['Contains', 'GPLink']}
                     />
                     <EdgeFilterCheck name='Contains' />
-                    <EdgeFilterCheck name='GpLink' />
+                    <EdgeFilterCheck name='GPLink' />
                     <EdgeFilterSection
                         title='Special'
                         sectionName='special'

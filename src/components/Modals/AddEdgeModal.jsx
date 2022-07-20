@@ -289,7 +289,7 @@ const AddEdgeModal = () => {
                                 ReadLAPSPassword
                             </option>
                             <option value='Contains'>Contains</option>
-                            <option value='GpLink'>GpLink</option>
+                            <option value='GPLink'>GPLink</option>
                             <option value='CanRDP'>CanRDP</option>
                             <option value='CanPSRemote'>CanPSRemote</option>
                             <option value='ExecuteDCOM'>ExecuteDCOM</option>

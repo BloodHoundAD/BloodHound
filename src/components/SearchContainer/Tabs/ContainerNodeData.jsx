@@ -104,14 +104,14 @@ const ContainerNodeData = ({}) => {
                                 property='GPOs Directly Affecting This Container'
                                 target={objectid}
                                 baseQuery={
-                                    'MATCH p=(n:GPO)-[r:GpLink]->(o:Container {objectid: $objectid})'
+                                    'MATCH p=(n:GPO)-[r:GPLink]->(o:Container {objectid: $objectid})'
                                 }
                             />
                             <NodeCypherLink
                                 property='GPOs Affecting This Container'
                                 target={objectid}
                                 baseQuery={
-                                    'MATCH p=(n:GPO)-[r:GpLink|Contains*1..]->(o:Container {objectid: $objectid})'
+                                    'MATCH p=(n:GPO)-[r:GPLink|Contains*1..]->(o:Container {objectid: $objectid})'
                                 }
                             />
                             </tbody>
