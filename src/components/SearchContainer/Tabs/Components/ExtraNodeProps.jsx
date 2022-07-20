@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import CollapsibleSection from './CollapsibleSection';
 import styles from '../NodeData.module.css';
-import {Table} from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 
 const ExtraNodeProps = ({ label, properties, displayMap }) => {
     const [elements, setElements] = useState([]);
@@ -90,7 +90,7 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
                 d += `${createValue(val)}\n`;
             });
             temp.push(
-                <td align='right' style={{ whiteSpace: 'pre' }}>
+                <td align='right' style={{ whiteSpace: 'pre' }} key={d}>
                     {d}
                 </td>
             );
