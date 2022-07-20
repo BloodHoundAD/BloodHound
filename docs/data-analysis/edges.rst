@@ -1651,6 +1651,114 @@ https://posts.specterops.io/shadow-credentials-abusing-key-trust-account-mapping
 
 |
 
+ReadLAPSPassword
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+This privilege allows you to read the LAPS password from a computer
+
+Abuse Info
+---------
+You may need to authenticate to the Domain Controller as the user with full control over the target
+user if you are not running a process as that user. To do this in conjunction with Get-DomainObject,
+first create a PSCredential object (these examples comes from the PowerView help documentation):
+
+::
+
+  $SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+  $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)
+
+Then, use Get-DomainObject, optionally specifying $Cred if you are not already running a process as
+the user with full control over the target user.
+
+::
+
+  Get-DomainObject -Credential $Cred -Identity windows10 -Properties "ms-mcs-AdmPwd",name
+
+
+Opsec Considerations
+--------------------
+
+Reading properties from LDAP is extremely low risk, and can only be found using monitoring of LDAP queries.
+
+References
+----------
+
+* https://www.specterops.io/assets/resources/an_ace_up_the_sleeve.pdf
+* https://adsecurity.org/?p=3164
+
+|
+
+----
+
+|
+
+ReadGMSAPassword
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+This privilege allows you to read the password for a Group Managed Service Account (GMSA).
+Group Managed Service Accounts are a special type of Active Directory object, where the password
+for that object is mananaged by and automatically changed by Domain Controllers on a set interval
+(check the MSDS-ManagedPasswordInterval attribute).
+
+The intended use of a GMSA is to allow certain computer accounts to retrieve the password for the GMSA,
+then run local services as the GMSA. An attacker with control of an authorized principal may abuse that
+privilege to impersonate the GMSA.`;
+
+Abuse Info
+---------
+There are several ways to abuse the ability to read the GMSA password.
+The most straight forward abuse is possible when the GMSA is currently logged on to a computer, which is the intended behavior for a GMSA.
+
+If the GMSA is logged on to the computer account which is granted the ability to retrieve the GMSA's password,
+simply steal the token from the process running as the GMSA, or inject into that process.
+
+If the GMSA is not logged onto the computer, you may create a scheduled task or service set to run as the GMSA.
+The computer account will start the sheduled task or service as the GMSA, and then you may abuse the GMSA
+logon in the same fashion you would a standard user running processes on the machine (see the "HasSession" help modal for more details).
+Finally, it is possible to remotely retrieve the password for the GMSA and convert that password to its equivalent NT hash,
+then perform overpass-the-hash to retrieve a Kerberos ticket for the GMSA:
+
+1. Build GMSAPasswordReader.exe from its source: https://github.com/rvazarkar/GMSAPasswordReader
+
+2. Drop GMSAPasswordReader.exe to disk. If using Cobalt Strike, load and run this binary using execute-assembly
+
+3. Use GMSAPasswordReader.exe to retrieve the NT hash for the GMSA. You may have more than one NT hash come back, one for the
+"old" password and one for the "current" password. It is possible that either value is valid:
+
+::
+
+  gmsapasswordreader.exe --accountname gmsa-jkohler
+
+At this point you are ready to use the NT hash the same way you would with a regular user account.
+You can perform pass-the-hash, overpass-the-hash, or any other technique that takes an NT hash as an input.
+
+
+Opsec Considerations
+--------------------
+
+When abusing a GMSA that is already logged onto a system, you will have the same opsec considerations as when
+abusing a standard user logon. For more information about that, see the "HasSession" modal's opsec considerations tab.
+
+When retrieving the GMSA password from Active Directory, you may generate a 4662 event on the Domain Controller;
+however, that event will likely perfectly resemble a legitimate event if you request the password from the same
+context as a computer account that is already authorized to read the GMSA password.
+
+References
+----------
+
+* https://www.dsinternals.com/en/retrieving-cleartext-gmsa-passwords-from-active-directory/
+* https://www.powershellgallery.com/packages/DSInternals/
+* https://github.com/markgamache/gMSA/tree/master/PSgMSAPwd
+* https://adsecurity.org/?p=36
+* https://adsecurity.org/?p=2535
+* https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4662
+
+|
+
+----
+
+|
+
 Contains
 ^^^^^^^^
 
