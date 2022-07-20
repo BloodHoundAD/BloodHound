@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 import NodeCypherLinkComplex from './Components/NodeCypherLinkComplex';
@@ -7,9 +7,9 @@ import NodeCypherNoNumberLink from './Components/NodeCypherNoNumberLink';
 import MappedNodeProps from './Components/MappedNodeProps';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import NodePlayCypherLink from './Components/NodePlayCypherLink';
-import {Table} from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
-import {AppContext} from '../../../AppContext';
+import { AppContext } from '../../../AppContext';
 
 const AZVMNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -76,7 +76,13 @@ const AZVMNodeData = () => {
                                     property='See VM within Tenant'
                                     query='MATCH p = (d:AZTenant)-[r:AZContains*1..]->(u:AZVM {objectid: $objectid}) RETURN p'
                                 />
-                            <NodeCypherLink baseQuery={'MATCH p=(:AZVM {objectid:$objectid})-[:AZManagedIdentity]->(n)'} property={'Managed Identities'} target={objectid} />
+                                <NodeCypherLink
+                                    baseQuery={
+                                        'MATCH p=(:AZVM {objectid:$objectid})-[:AZManagedIdentity]->(n)'
+                                    }
+                                    property={'Managed Identities'}
+                                    target={objectid}
+                                />
                             </tbody>
                         </Table>
                     </div>

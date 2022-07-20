@@ -1,11 +1,11 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 import NodeCypherLink from './Components/NodeCypherLink';
 import MappedNodeProps from './Components/MappedNodeProps';
-import {Table} from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
-import {AppContext} from '../../../AppContext';
+import { AppContext } from '../../../AppContext';
 
 const AZDeviceNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -54,7 +54,7 @@ const AZDeviceNodeData = () => {
         operatingsystemversion: 'OS Version',
         deviceid: 'Device ID',
         displayname: 'Display Name',
-        tenantid: 'Tenant ID'
+        tenantid: 'Tenant ID',
     };
 
     return objectid === null ? (
@@ -74,21 +74,21 @@ const AZDeviceNodeData = () => {
                         <Table>
                             <thead></thead>
                             <tbody className='searchable'>
-                            <NodeCypherLink
-                                baseQuery={
-                                    'MATCH p=(:AZDevice {objectid: $objectid})-[:AZMemberOf|AZHasRole*1..]->(n:AZRole)'
-                                }
-                                property={'Azure AD Admin Roles'}
-                                target={objectid}
-                            />
-                            <NodeCypherLink
-                                property='Reachable High Value Targets'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH (m:AZDevice {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
-                                }
-                                start={label}
-                            />
+                                <NodeCypherLink
+                                    baseQuery={
+                                        'MATCH p=(:AZDevice {objectid: $objectid})-[:AZMemberOf|AZHasRole*1..]->(n:AZRole)'
+                                    }
+                                    property={'Azure AD Admin Roles'}
+                                    target={objectid}
+                                />
+                                <NodeCypherLink
+                                    property='Reachable High Value Targets'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH (m:AZDevice {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                    }
+                                    start={label}
+                                />
                             </tbody>
                         </Table>
                     </div>

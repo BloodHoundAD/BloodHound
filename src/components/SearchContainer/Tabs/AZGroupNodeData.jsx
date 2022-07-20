@@ -56,7 +56,7 @@ const AZGroupNodeData = () => {
         isassignabletorole: 'Is Role Eligible',
         displayname: 'Display Name',
         whencreated: 'Creation Time',
-        securityenabled: 'Security Enabled'
+        securityenabled: 'Security Enabled',
     };
 
     return objectid === null ? (

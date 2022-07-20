@@ -67,7 +67,7 @@ const AZAppNodeData = () => {
         appid: 'App ID',
         publisherdomain: 'Publisher Domain',
         signinaudience: 'Sign In Audience',
-        tenantid: 'Tenant ID'
+        tenantid: 'Tenant ID',
     };
 
     return objectid === null ? (

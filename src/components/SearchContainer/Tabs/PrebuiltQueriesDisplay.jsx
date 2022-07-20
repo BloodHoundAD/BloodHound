@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { remote } from 'electron';
+
 const { app } = remote;
 import path from 'path';
 import fs from 'fs';
@@ -33,19 +34,21 @@ const PrebuiltQueriesDisplay = () => {
             let y = [];
             j.queries.forEach((query) => {
                 try {
-                    if (query.category === undefined || query.category === "") {
-                        query.category = "Uncategorized Query";
+                    if (query.category === undefined || query.category === '') {
+                        query.category = 'Uncategorized Query';
                     }
-                    if (query.name === "") {
-                        query.name = "Unnamed Query"
+                    if (query.name === '') {
+                        query.name = 'Unnamed Query';
                     }
                     if (!(query.category in y)) {
-                            y[query.category] = [];
+                        y[query.category] = [];
                     }
 
                     y[query.category].push(query);
                 } catch (e) {
-                    alert("Custom Queries Category Array Exception: " + e.message);
+                    alert(
+                        'Custom Queries Category Array Exception: ' + e.message
+                    );
                 }
             });
 
@@ -62,18 +65,18 @@ const PrebuiltQueriesDisplay = () => {
 
                 $.each(response.queries, function (_, el) {
                     try {
-                        if (el.category === undefined || el.category === "") {
-                            el.category = "Uncategorized Query";
+                        if (el.category === undefined || el.category === '') {
+                            el.category = 'Uncategorized Query';
                         }
-                        if (el.name === "") {
-                            el.name = "Unnamed Query"
+                        if (el.name === '') {
+                            el.name = 'Unnamed Query';
                         }
                         if (!(el.category in y)) {
                             y[el.category] = [];
                         }
                         y[el.category].push(el);
-                    } catch (e){
-                        alert("Queries Category Array Exception: "+e.message);
+                    } catch (e) {
+                        alert('Queries Category Array Exception: ' + e.message);
                     }
                 });
 
@@ -108,28 +111,41 @@ const PrebuiltQueriesDisplay = () => {
 
     const createQuerieSections = (queryArray) => {
         let finalQueryElement = [];
-        
+
         for (let queryCategory in queryArray) {
             try {
                 finalQueryElement.push(
-                    <CollapsibleSection header={queryCategory} key={queryCategory}>
+                    <CollapsibleSection
+                        header={queryCategory}
+                        key={queryCategory}
+                    >
                         <div className={styles.itemlist}>
                             <Table>
-                                <thead/>
+                                <thead />
                                 <tbody className='searchable'>
-                                    {queryArray[queryCategory].map(function (a) { return <PrebuiltQueryNode key={a.name} info={a} />; })}
+                                    {queryArray[queryCategory].map(function (
+                                        a
+                                    ) {
+                                        return (
+                                            <PrebuiltQueryNode
+                                                key={a.name}
+                                                info={a}
+                                            />
+                                        );
+                                    })}
                                 </tbody>
                             </Table>
                         </div>
-                    </CollapsibleSection>);
+                    </CollapsibleSection>
+                );
             } catch (e) {
                 //alert("Create Query Section Exception: " + e.message + "\nqueryCategory: " + queryCategory);
             }
         }
 
-        emitter.emit('registerQueryCategories',queryArray);
+        emitter.emit('registerQueryCategories', queryArray);
         return finalQueryElement;
-    }
+    };
 
     const settingsClick = () => {
         emitter.emit('openQueryCreate');
@@ -140,10 +156,10 @@ const PrebuiltQueriesDisplay = () => {
             <div className={styles.dl}>
                 <h5>Pre-Built Analytics Queries</h5>
 
-                {createQuerieSections(queries).map((a) => { return a })}
+                {createQuerieSections(queries).map((a) => {
+                    return a;
+                })}
 
-
-            
                 <hr />
                 <h5>
                     Custom Queries
@@ -161,10 +177,13 @@ const PrebuiltQueriesDisplay = () => {
                         title='Refresh Queries'
                     />
                 </h5>
-                    {Object.keys(custom).length === 0 && <div>No user defined queries.</div>}
-                    {Object.keys(custom).length > 0 && (
-                        createQuerieSections(custom).map((a) => { return a })
-                    )}
+                {Object.keys(custom).length === 0 && (
+                    <div>No user defined queries.</div>
+                )}
+                {Object.keys(custom).length > 0 &&
+                    createQuerieSections(custom).map((a) => {
+                        return a;
+                    })}
             </div>
         </div>
     );

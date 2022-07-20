@@ -1,17 +1,16 @@
-
-import React, {useEffect, useState, useRef, useContext} from 'react';
-import {AppContext} from "../../../AppContext";
-import clsx from "clsx";
-import styles from "./NodeData.module.css";
-import CollapsibleSection from "./Components/CollapsibleSection";
-import {Table} from "react-bootstrap";
-import NodeCypherLink from "./Components/NodeCypherLink";
-import NodeDisplayLink from "./Components/NodeDisplayLink";
-import MappedNodeProps from "./Components/MappedNodeProps";
-import ExtraNodeProps from "./Components/ExtraNodeProps";
-import NodePlayCypherLink from "./Components/NodePlayCypherLink";
-import {withAlert} from "react-alert";
-import CollapsibleSectionTable from "./Components/CollapsibleSectionNew";
+import React, { useEffect, useState, useRef, useContext } from 'react';
+import { AppContext } from '../../../AppContext';
+import clsx from 'clsx';
+import styles from './NodeData.module.css';
+import CollapsibleSection from './Components/CollapsibleSection';
+import { Table } from 'react-bootstrap';
+import NodeCypherLink from './Components/NodeCypherLink';
+import NodeDisplayLink from './Components/NodeDisplayLink';
+import MappedNodeProps from './Components/MappedNodeProps';
+import ExtraNodeProps from './Components/ExtraNodeProps';
+import NodePlayCypherLink from './Components/NodePlayCypherLink';
+import { withAlert } from 'react-alert';
+import CollapsibleSectionTable from './Components/CollapsibleSectionNew';
 
 const AZRoleNodeData = ({}) => {
     const [visible, setVisible] = useState(false);
@@ -20,12 +19,12 @@ const AZRoleNodeData = ({}) => {
     const [domain, setDomain] = useState(null);
     const [nodeProps, setNodeProps] = useState({});
 
-    const context = useContext(AppContext)
+    const context = useContext(AppContext);
 
     useEffect(() => {
-        emitter.on('nodeClicked', nodeClickEvent)
+        emitter.on('nodeClicked', nodeClickEvent);
         return () => {
-            emitter.removeListener('nodeClicked', nodeClickEvent)
+            emitter.removeListener('nodeClicked', nodeClickEvent);
         };
     }, []);
 
@@ -60,12 +59,11 @@ const AZRoleNodeData = ({}) => {
         displayname: 'Display Name',
         enabled: 'Enabled',
         description: 'Description',
-        templateid: 'Template ID'
+        templateid: 'Template ID',
     };
 
     return objectid === null ? (
-        <div>
-        </div>
+        <div></div>
     ) : (
         <div
             className={clsx(
@@ -81,14 +79,14 @@ const AZRoleNodeData = ({}) => {
                         <Table>
                             <thead></thead>
                             <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Reachable High Value Targets'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH (m:AZRole {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
-                                }
-                                start={label}
-                            />
+                                <NodeCypherLink
+                                    property='Reachable High Value Targets'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH (m:AZRole {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                    }
+                                    start={label}
+                                />
                             </tbody>
                         </Table>
                     </div>
@@ -113,8 +111,20 @@ const AZRoleNodeData = ({}) => {
                 <hr></hr>
 
                 <CollapsibleSectionTable header={'ASSIGNMENTS'}>
-                    <NodeCypherLink baseQuery={'MATCH p=(n)-[:HasRole|AZMemberOf]->(:AZRole {objectid:$objectid})'} property={'Active Assignments'} target={objectid} />
-                    <NodeCypherLink baseQuery={'MATCH p=(n)-[:AZGrant|AZGrantSelf|AZMemberOf]->(:AZRole {objectid:$objectid})'} property={'PIM Assignments'} target={objectid} />
+                    <NodeCypherLink
+                        baseQuery={
+                            'MATCH p=(n)-[:HasRole|AZMemberOf]->(:AZRole {objectid:$objectid})'
+                        }
+                        property={'Active Assignments'}
+                        target={objectid}
+                    />
+                    <NodeCypherLink
+                        baseQuery={
+                            'MATCH p=(n)-[:AZGrant|AZGrantSelf|AZMemberOf]->(:AZRole {objectid:$objectid})'
+                        }
+                        property={'PIM Assignments'}
+                        target={objectid}
+                    />
                 </CollapsibleSectionTable>
 
                 <hr></hr>
@@ -150,7 +160,7 @@ const AZRoleNodeData = ({}) => {
                 </CollapsibleSectionTable>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default withAlert()(AZRoleNodeData);

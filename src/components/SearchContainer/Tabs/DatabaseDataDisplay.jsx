@@ -1,8 +1,8 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styles from './DatabaseDataDisplay.module.css';
-import {Table} from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import DatabaseDataLabel from './Components/DatabaseDataLabel';
-import {AppContext} from '../../../AppContext';
+import { AppContext } from '../../../AppContext';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 

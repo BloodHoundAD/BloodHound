@@ -1,16 +1,15 @@
-
-import React, {useEffect, useState, useRef, useContext} from 'react';
-import {AppContext} from "../../../AppContext";
-import clsx from "clsx";
-import styles from "./NodeData.module.css";
-import CollapsibleSection from "./Components/CollapsibleSection";
-import {Table} from "react-bootstrap";
-import NodeCypherLink from "./Components/NodeCypherLink";
-import NodeDisplayLink from "./Components/NodeDisplayLink";
-import MappedNodeProps from "./Components/MappedNodeProps";
-import ExtraNodeProps from "./Components/ExtraNodeProps";
-import NodePlayCypherLink from "./Components/NodePlayCypherLink";
-import {withAlert} from "react-alert";
+import React, { useEffect, useState, useRef, useContext } from 'react';
+import { AppContext } from '../../../AppContext';
+import clsx from 'clsx';
+import styles from './NodeData.module.css';
+import CollapsibleSection from './Components/CollapsibleSection';
+import { Table } from 'react-bootstrap';
+import NodeCypherLink from './Components/NodeCypherLink';
+import NodeDisplayLink from './Components/NodeDisplayLink';
+import MappedNodeProps from './Components/MappedNodeProps';
+import ExtraNodeProps from './Components/ExtraNodeProps';
+import NodePlayCypherLink from './Components/NodePlayCypherLink';
+import { withAlert } from 'react-alert';
 
 const AZManagementGroupNodeData = ({}) => {
     const [visible, setVisible] = useState(false);
@@ -19,12 +18,12 @@ const AZManagementGroupNodeData = ({}) => {
     const [domain, setDomain] = useState(null);
     const [nodeProps, setNodeProps] = useState({});
 
-    const context = useContext(AppContext)
+    const context = useContext(AppContext);
 
     useEffect(() => {
-        emitter.on('nodeClicked', nodeClickEvent)
+        emitter.on('nodeClicked', nodeClickEvent);
         return () => {
-            emitter.removeListener('nodeClicked', nodeClickEvent)
+            emitter.removeListener('nodeClicked', nodeClickEvent);
         };
     }, []);
 
@@ -56,12 +55,11 @@ const AZManagementGroupNodeData = ({}) => {
 
     const displayMap = {
         objectid: 'Object ID',
-        tenantid: 'Tenant ID'
+        tenantid: 'Tenant ID',
     };
 
     return objectid === null ? (
-        <div>
-        </div>
+        <div></div>
     ) : (
         <div
             className={clsx(
@@ -77,14 +75,14 @@ const AZManagementGroupNodeData = ({}) => {
                         <Table>
                             <thead></thead>
                             <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Reachable High Value Targets'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH (m:AZManagementGroup {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
-                                }
-                                start={label}
-                            />
+                                <NodeCypherLink
+                                    property='Reachable High Value Targets'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH (m:AZManagementGroup {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
+                                    }
+                                    start={label}
+                                />
                             </tbody>
                         </Table>
                     </div>
@@ -113,40 +111,40 @@ const AZManagementGroupNodeData = ({}) => {
                         <Table>
                             <thead></thead>
                             <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Explicit Object Controllers'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (n)-[r:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g:AZManagementGroup {objectid: $objectid})'
-                                }
-                                end={label}
-                                distinct
-                            />
-                            <NodeCypherLink
-                                property='Unrolled Object Controllers'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g2:AZManagementGroup {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
-                                }
-                                end={label}
-                                distinct
-                            />
-                            <NodePlayCypherLink
-                                property='Transitive Object Controllers'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZManagementGroup {objectid: $objectid}))'
-                                }
-                                end={label}
-                                distinct
-                            />
+                                <NodeCypherLink
+                                    property='Explicit Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p = (n)-[r:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g:AZManagementGroup {objectid: $objectid})'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Unrolled Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g2:AZManagementGroup {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                                <NodePlayCypherLink
+                                    property='Transitive Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZManagementGroup {objectid: $objectid}))'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
                             </tbody>
                         </Table>
                     </div>
                 </CollapsibleSection>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default withAlert()(AZManagementGroupNodeData);
