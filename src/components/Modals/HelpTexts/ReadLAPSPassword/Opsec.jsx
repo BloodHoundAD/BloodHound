@@ -1,6 +1,9 @@
+import React from 'react';
+
 const Opsec = () => {
-    let text = `Reading properties from LDAP is an extremely low risk operation.`;
-    return { __html: text };
+    return (
+        <p>Reading properties from LDAP is an extremely low risk operation.</p>
+    );
 };
 
 export default Opsec;

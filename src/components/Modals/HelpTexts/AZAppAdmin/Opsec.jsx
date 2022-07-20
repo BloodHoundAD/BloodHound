@@ -1,6 +1,12 @@
+import React from 'react';
+
 const Opsec = () => {
-    let text = `The Azure portal will create a log even whenever a new credential is created for a service principal.`;
-    return { __html: text };
+    return (
+        <p>
+            The Azure portal will create a log even whenever a new credential is
+            created for a service principal.
+        </p>
+    );
 };
 
 export default Opsec;

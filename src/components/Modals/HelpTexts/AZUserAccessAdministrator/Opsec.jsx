@@ -1,6 +1,7 @@
+import React from 'react';
+
 const Opsec = () => {
-    let text = `Azure will log any role activation event for any object type.`;
-    return { __html: text };
+    return <p>Azure will log any role activation event for any object type.</p>;
 };
 
 export default Opsec;

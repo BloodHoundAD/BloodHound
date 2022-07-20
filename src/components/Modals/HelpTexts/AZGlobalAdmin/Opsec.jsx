@@ -1,6 +1,12 @@
+import React from 'react';
+
 const Opsec = () => {
-    let text = `This depends on exactly what you do, but in general Azure will log each abuse action.`;
-    return { __html: text };
+    return (
+        <p>
+            This depends on exactly what you do, but in general Azure will log
+            each abuse action.
+        </p>
+    );
 };
 
 export default Opsec;

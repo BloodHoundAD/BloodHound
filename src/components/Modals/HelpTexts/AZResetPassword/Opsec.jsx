@@ -1,6 +1,12 @@
+import React from 'react';
+
 const Opsec = () => {
-    let text = `Azure will log each password reset event, including who performed the reset, against which account, and at what date and time.`;
-    return { __html: text };
+    return (
+        <p>
+            Azure will log each password reset event, including who performed
+            the reset, against which account, and at what date and time.
+        </p>
+    );
 };
 
 export default Opsec;

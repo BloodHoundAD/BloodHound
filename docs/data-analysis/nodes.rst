@@ -251,7 +251,7 @@ Local Admin Rights
 * **Derivative Local Admin Rights**: This query does not run by default because
   it’s a very expensive query for neo4j to run. If you press the play button here,
   neo4j will run the query and return the number of computers this group has
-  “derivative” local admin rights on. For more info about this concept, see
+  "derivative" local admin rights on. For more info about this concept, see
   http://www.sixdub.net/?p=591
 
 Execution Privileges
@@ -328,7 +328,7 @@ Node Properties
   style of kerberos delegation. For information about the abuse related to this
   configuration, see https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 * **Compromised**: Whether the computer is marked as Owned. You can mark any computer in
-  the BloodHound GUI as Owned by right-clicking it and clicking “Mark Computer as Owned”.
+  the BloodHound GUI as Owned by right-clicking it and clicking "Mark Computer as Owned".
 * **LAPS Enabled**: Whether LAPS is running on the computer. This is determined by
   checking whether the associated MS LAPS properties are populated on the computer
   object
@@ -399,7 +399,7 @@ Local Admin Rights
   deep those group nestings may go
 * **Derivative Local Admin Rights**: This query does not run by default because it’s a very
   expensive query for neo4j to run. If you press the play button here, neo4j will run the
-  query and return the number of computers this computer has “derivative” local admin rights
+  query and return the number of computers this computer has "derivative" local admin rights
   on. For more info about this concept, see http://www.sixdub.net/?p=591
 
 Outbound Execution Privileges

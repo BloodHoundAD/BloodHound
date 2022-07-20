@@ -701,7 +701,7 @@ PowerShell code.  If specifying a COM object by its CLSID:
 :: 
 
   $ComputerName = <target computer name>              # Remote computer
-  $clsid = “{fbae34e8-bf95-4da8-bf98-6c6e580aa348}”   # GUID of the COM object
+  $clsid = "{fbae34e8-bf95-4da8-bf98-6c6e580aa348}"   # GUID of the COM object
   $Type = [Type]::GetTypeFromCLSID($clsid, $ComputerName)
   $ComObject = [Activator]::CreateInstance($Type)
 
@@ -710,7 +710,7 @@ If specifying a COM object by its ProgID:
 ::
 
   $ComputerName = <target computer name>              # Remote computer
-  $ProgId = “<NAME>”                                  # GUID of the COM object
+  $ProgId = "<NAME>"                                  # GUID of the COM object
   $Type = [Type]::GetTypeFromProgID($ProgId, $ComputerName)
   $ComObject = [Activator]::CreateInstance($Type)
 
@@ -727,9 +727,9 @@ etc.) will be generated when using DCOM.
 Processes may be spawned as the user authenticating to the remote system, as a user already
 logged into the system, or may take advantage of an already spawned process.  
 
-Many DCOM servers spawn under the process “svchost.exe -k DcomLaunch” and typically have a
-command line containing the string “ -Embedding” or are executing inside of the DLL hosting
-process “DllHost.exe /Processid:{<AppId>}“ (where AppId is the AppId the COM object is
+Many DCOM servers spawn under the process "svchost.exe -k DcomLaunch" and typically have a
+command line containing the string " -Embedding" or are executing inside of the DLL hosting
+process "DllHost.exe /Processid:{<AppId>}" (where AppId is the AppId the COM object is
 registered to use).  Certain COM services are implemented as service executables; consequently,
 service-related event logs may be generated.
 
@@ -810,7 +810,7 @@ Search columns and data for keywords:
 
 ::
 
-  Get-SQLColumnSampleDataThreaded –Verbose -Instance sqlserver\instance –Threads 10 –Keyword “card, password” –SampleSize 2 –ValidateCC -NoDefaults | ft -AutoSize
+  Get-SQLColumnSampleDataThreaded –Verbose -Instance sqlserver\instance –Threads 10 –Keyword "card, password" –SampleSize 2 –ValidateCC -NoDefaults | ft -AutoSize
 
 **Executing Commands**
 
@@ -989,7 +989,7 @@ revoked.
 An issue exists in the constrained delegation where the service name (sname) of the resulting
 ticket is not a part of the protected ticket information, meaning that an attacker can modify
 the target service name to any service of their choice. For example, if msds-AllowedToDelegateTo
-is “HTTP/host.domain.com”, tickets can be modified for LDAP/HOST/etc. service names, resulting
+is "HTTP/host.domain.com", tickets can be modified for LDAP/HOST/etc. service names, resulting
 in complete server compromise, regardless of the specific service listed.
 
 Abuse Info
@@ -1948,10 +1948,10 @@ Abuse Info
 Via the Azure portal:
 1. Find the group in your tenant (Azure Active Directory -> Groups -> Find Group in list)
 2. Click the group from the list
-3. In the left pane, click “Members”
-4. At the top, click “Add members”
-5. Find the principals you want to add to the group and click them, then click “select” at the bottom
-6. You should see a message in the top right saying “Member successfully added”
+3. In the left pane, click "Members"
+4. At the top, click "Add members"
+5. Find the principals you want to add to the group and click them, then click "select" at the bottom
+6. You should see a message in the top right saying "Member successfully added"
     
 Via PowerZure: Add-AzureADGroup -User [UPN] -Group [Group name]
 
@@ -2033,7 +2033,7 @@ AZContains
 ^^^^^^^^^^
 
 This indicates that the parent object contains the child object, such as a resource
-group containing a virtual machine, or a tenant “containing” a subscription.
+group containing a virtual machine, or a tenant "containing" a subscription.
 
 |
 
@@ -2247,7 +2247,7 @@ The ability to change another user’s password without knowing their current pa
 Abuse Info
 ----------
 
-Find the user in the Azure portal, then click “Reset Password”, or use PowerZure’s
+Find the user in the Azure portal, then click "Reset Password", or use PowerZure’s
 Set-AzureUserPassword cmdlet. If password write-back is enabled, this password will
 also be set for a synced on-prem user.
 
