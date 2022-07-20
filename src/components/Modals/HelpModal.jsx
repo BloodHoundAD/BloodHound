@@ -47,6 +47,7 @@ import Default from './HelpTexts/Default/Default';
 import WriteSPN from "./HelpTexts/WriteSPN/WriteSPN";
 import AddSelf from "./HelpTexts/AddSelf/AddSelf";
 import AddKeyCredentialLink from "./HelpTexts/AddKeyCredentialLink/AddKeyCredentialLink";
+import DCSync from "./HelpTexts/DCSync/DCSync";
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -103,7 +104,7 @@ const HelpModal = () => {
         GetChangesAll: GetChangesAll,
         ReadLAPSPassword: ReadLAPSPassword,
         Contains: Contains,
-        GpLink: GpLink,
+        GPLink: GpLink,
         AddAllowedToAct: AddAllowedToAct,
         AllowedToAct: AllowedToAct,
         SQLAdmin: SQLAdmin,
@@ -128,7 +129,8 @@ const HelpModal = () => {
         AZVMContributor: AZVMContributor,
         WriteSPN: WriteSPN,
         AddSelf: AddSelf,
-        AddKeyCredentialLink: AddKeyCredentialLink
+        AddKeyCredentialLink: AddKeyCredentialLink,
+        DCSync: DCSync
     };
 
     const Component = edge in components ? components[edge] : Default;

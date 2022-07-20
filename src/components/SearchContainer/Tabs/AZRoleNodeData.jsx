@@ -60,6 +60,7 @@ const AZRoleNodeData = ({}) => {
         enabled: 'Enabled',
         description: 'Description',
         templateid: 'Template ID',
+        tenantid: 'Tenant ID'
     };
 
     return objectid === null ? (
