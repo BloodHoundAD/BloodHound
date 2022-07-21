@@ -1,12 +1,12 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 import NodeCypherLink from './Components/NodeCypherLink';
 import MappedNodeProps from './Components/MappedNodeProps';
 import NodePlayCypherLink from './Components/NodePlayCypherLink';
-import {Table} from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
-import {AppContext} from '../../../AppContext';
+import { AppContext } from '../../../AppContext';
 
 const AZResourceGroupNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -51,6 +51,7 @@ const AZResourceGroupNodeData = () => {
 
     const displayMap = {
         objectid: 'Object ID',
+        tenantid: 'Tenant ID',
     };
 
     return objectid === null ? (

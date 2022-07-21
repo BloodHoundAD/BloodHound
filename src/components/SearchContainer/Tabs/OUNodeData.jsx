@@ -109,14 +109,14 @@ const OUNodeData = () => {
                                     property='GPOs Directly Affecting This OU'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n:GPO)-[r:GpLink]->(o:OU {objectid: $objectid})'
+                                        'MATCH p=(n:GPO)-[r:GPLink]->(o:OU {objectid: $objectid})'
                                     }
                                 />
                                 <NodeCypherLink
                                     property='GPOs Affecting This OU'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n:GPO)-[r:GpLink|Contains*1..]->(o:OU {objectid: $objectid})'
+                                        'MATCH p=(n:GPO)-[r:GPLink|Contains*1..]->(o:OU {objectid: $objectid})'
                                     }
                                 />
                             </tbody>

@@ -76,7 +76,7 @@ const AddEdgeModal = () => {
         for (let record of result.records) {
             let node = record.get(0)
             let properties = node.properties;
-            let fType = node.labels.filter((w) => w !== 'Base');
+            let fType = node.labels.filter((w) => w !== 'Base' && w !== 'AZBase');
             properties.type = fType.length > 0 ? fType[0] : 'Base';
             data.push(properties);
         }
@@ -289,7 +289,7 @@ const AddEdgeModal = () => {
                                 ReadLAPSPassword
                             </option>
                             <option value='Contains'>Contains</option>
-                            <option value='GpLink'>GpLink</option>
+                            <option value='GPLink'>GPLink</option>
                             <option value='CanRDP'>CanRDP</option>
                             <option value='CanPSRemote'>CanPSRemote</option>
                             <option value='ExecuteDCOM'>ExecuteDCOM</option>

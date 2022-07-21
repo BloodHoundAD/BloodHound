@@ -61,6 +61,9 @@ const SearchRow = ({ item, search }) => {
         case 'AZResourceGroup':
             icon.className = 'fa fa-cube';
             break;
+        case 'AZManagementGroup':
+            icon.className = 'fa fa-cube';
+            break;
         case 'AZVM':
             icon.className = 'fa fa-desktop';
             break;
@@ -76,6 +79,9 @@ const SearchRow = ({ item, search }) => {
         case 'AZServicePrincipal':
             icon.className = 'fa fa-robot';
             break;
+        case 'AZRole':
+            icon.className = 'fa fa-window-restore'
+            break
         default:
             icon.className = 'fa fa-question';
             type = 'Base';

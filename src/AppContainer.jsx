@@ -62,7 +62,7 @@ const fullEdgeList = [
     'AZKeyVaultContributor',
     'AZVMAdminLogin',
     'Contains',
-    'GpLink',
+    'GPLink',
     'AllExtendedRights',
     'AddMember',
     'ForceChangePassword',

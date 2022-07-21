@@ -5,7 +5,7 @@ export default class PrebuiltQueryNode extends Component {
     render() {
         let c;
 
-        c = function() {
+        c = function () {
             if (appStore.prebuiltQuery.length === 0) {
                 appStore.prebuiltQuery = JSON.parse(
                     JSON.stringify(this.props.info.queryList)
@@ -15,10 +15,10 @@ export default class PrebuiltQueryNode extends Component {
         }.bind(this);
 
         return (
-                <tr style={{ cursor: 'pointer' }} onClick={c}>
-                    <td align='left'>{this.props.info.name}</td>
-                    <td align='right'/>
-                </tr>
+            <tr style={{ cursor: 'pointer' }} onClick={c}>
+                <td align='left'>{this.props.info.name}</td>
+                <td align='right' />
+            </tr>
         );
     }
 }

@@ -1,22 +1,22 @@
-import React, {useEffect, useState, useRef} from 'react';
-import {remote} from 'electron';
+import React, { useEffect, useState, useRef } from 'react';
+import { remote } from 'electron';
 
-const {dialog, app} = remote;
-import {useAlert} from 'react-alert';
+const { dialog, app } = remote;
+import { useAlert } from 'react-alert';
 import MenuButton from './MenuButton';
-import {isZipSync} from 'is-zip-file';
+import { isZipSync } from 'is-zip-file';
 import sanitize from 'sanitize-filename';
-import {pick} from 'stream-json/filters/Pick';
-import {chain} from 'stream-chain';
+import { pick } from 'stream-json/filters/Pick';
+import { chain } from 'stream-chain';
 import fs from 'fs';
 import path from 'path';
-import {parser} from 'stream-json';
+import { parser } from 'stream-json';
 
-const {batch} = require('stream-json/utils/Batch');
-import AdmZip from 'adm-zip'
+const { batch } = require('stream-json/utils/Batch');
+import AdmZip from 'adm-zip';
 import * as NewIngestion from '../../js/newingestion';
 import UploadStatusContainer from '../Float/UploadStatusContainer';
-import {streamArray} from "stream-json/streamers/StreamArray";
+import { streamArray } from 'stream-json/streamers/StreamArray';
 
 const FileStatus = Object.freeze({
     ParseError: 0,
@@ -25,7 +25,7 @@ const FileStatus = Object.freeze({
     Waiting: 3,
     Processing: 4,
     Done: 5,
-    NoData: 6
+    NoData: 6,
 });
 
 const IngestFuncMap = {
@@ -36,28 +36,7 @@ const IngestFuncMap = {
     ous: NewIngestion.buildOuJsonNew,
     gpos: NewIngestion.buildGpoJsonNew,
     containers: NewIngestion.buildContainerJsonNew,
-    azdevices: NewIngestion.buildAzureDevices,
-    azusers: NewIngestion.buildAzureUsers,
-    azgroups: NewIngestion.buildAzureGroups,
-    aztenants: NewIngestion.buildAzureTenants,
-    azsubscriptions: NewIngestion.buildAzureSubscriptions,
-    azresourcegroups: NewIngestion.buildAzureResourceGroups,
-    azvms: NewIngestion.buildAzureVMs,
-    azkeyvaults: NewIngestion.buildAzureKeyVaults,
-    azgroupowners: NewIngestion.buildAzureGroupOwners,
-    azgroupmembers: NewIngestion.buildAzureGroupMembers,
-    azvmpermissions: NewIngestion.buildAzureVmPerms,
-    azrgpermissions: NewIngestion.buildAzureRGPermissions,
-    azkvpermissions: NewIngestion.buildAzureKVPermissions,
-    azkvaccesspolicies: NewIngestion.buildAzureKVAccessPolicies,
-    azpwresetrights: NewIngestion.buildAzurePWResetRights,
-    azgroupsrights: NewIngestion.buildAzureGroupRights,
-    azglobaladminrights: NewIngestion.buildAzureGlobalAdminRights,
-    azprivroleadminrights: NewIngestion.buildAzurePrivRileAdminRights,
-    azapplicationadmins: NewIngestion.buildAzureApplicationAdmins,
-    azcloudappadmins: NewIngestion.buildAzureCloudApplicationAdmins,
-    azapplicationowners: NewIngestion.buildAzureAppOwners,
-    azapplicationtosp: NewIngestion.buildAzureAppToSP,
+    azure: NewIngestion.convertAzureData,
 };
 
 const MenuContainer = () => {
@@ -83,7 +62,7 @@ const MenuContainer = () => {
     const inputUsed = (e) => {
         let fileNames = [];
         $.each(e.target.files, function (_, file) {
-            fileNames.push({path: file.path, name: file.name});
+            fileNames.push({ path: file.path, name: file.name });
         });
         unzipFiles(fileNames);
     };
@@ -91,7 +70,7 @@ const MenuContainer = () => {
     const filesDropped = (e) => {
         let fileNames = [];
         $.each(e.dataTransfer.files, function (_, file) {
-            fileNames.push({path: file.path, name: file.name});
+            fileNames.push({ path: file.path, name: file.name });
         });
         unzipFiles(fileNames);
     };
@@ -105,12 +84,19 @@ const MenuContainer = () => {
 
             if (isZipSync(fPath)) {
                 alert.info(`Unzipping file ${name}`);
-                const zip = new AdmZip(fPath)
-                const zipEntries = zip.getEntries()
-                for (let entry of zipEntries){
+                const zip = new AdmZip(fPath);
+                const zipEntries = zip.getEntries();
+                for (let entry of zipEntries) {
                     let sanitizedPath = sanitize(entry.entryName);
                     let output = path.join(tempPath, sanitizedPath);
-                    zip.extractEntryTo(entry.entryName, tempPath, false, true, false, sanitizedPath)
+                    zip.extractEntryTo(
+                        entry.entryName,
+                        tempPath,
+                        false,
+                        true,
+                        false,
+                        sanitizedPath
+                    );
 
                     finalFiles.push({
                         path: output,
@@ -151,14 +137,17 @@ const MenuContainer = () => {
             }).on('data', (chunk) => {
                 let type, version, count;
                 try {
-                    type = /"type.?:\s?"(\w*)"/g.exec(chunk)[1];
-                    count = parseInt(/"count.?:\s?(\d*)/g.exec(chunk)[1]);
+                    let search = [...chunk.matchAll(/"type.?:\s?"(\w*)"/g)];
+                    type = search[search.length - 1][1];
+                    search = [...chunk.matchAll(/"count.?:\s?(\d*)/g)];
+                    count = parseInt(search[search.length - 1][1]);
                 } catch (e) {
                     type = null;
                     count = null;
                 }
                 try {
-                    version = parseInt(/"version.?:\s?(\d*)/g.exec(chunk)[1]);
+                    let search = [...chunk.matchAll(/"version.?:\s?(\d*)/g)];
+                    version = parseInt(search[search.length - 1][1]);
                 } catch (e) {
                     version = null;
                 }
@@ -241,74 +230,115 @@ const MenuContainer = () => {
         }
         setUploadVisible(true);
         setFileQueue((state) => {
-            return {...state, ...filteredFiles};
+            return { ...state, ...filteredFiles };
         });
     };
 
     const processJson = async (file) => {
         file.status = FileStatus.Processing;
         setFileQueue((state) => {
-            return {...state, [file.id]: file};
+            return { ...state, [file.id]: file };
         });
         console.log(`Processing ${file.name} with ${file.count} entries`);
         console.time('IngestTime');
 
         const pipeline = chain([
-            fs.createReadStream(file.path, {encoding: 'utf8'}),
+            fs.createReadStream(file.path, { encoding: 'utf8' }),
             parser(),
-            pick({filter: 'data'}),
+            pick({ filter: 'data' }),
             streamArray(),
-            data => data.value,
-            batch({batchSize: 200})
+            (data) => data.value,
+            batch({ batchSize: 200 }),
         ]);
 
         let count = 0;
         let processor = IngestFuncMap[file.type];
         pipeline.on('data', async (data) => {
-            try{
-                pipeline.pause()
-                count += data.length
+            try {
+                pipeline.pause();
+                count += data.length;
 
-                let processedData = processor(data)
-                for (let key in processedData){
-                    let props = processedData[key].props;
-                    if (props.length === 0) continue
-                    let chunked = props.chunk();
-                    let statement = processedData[key].statement;
+                let processedData = processor(data);
+                if (file.type === 'azure') {
+                    for (let value of Object.values(
+                        processedData.AzurePropertyMaps
+                    )) {
+                        let props = value.Props;
+                        if (props.length === 0) continue;
+                        let chunked = props.chunk();
+                        let statement = value.Statement;
 
-                    for (let chunk of chunked){
-                        await uploadData(statement, chunk)
+                        for (let chunk of chunked) {
+                            await uploadData(statement, chunk);
+                        }
+                    }
+
+                    for (let item of Object.values(
+                        processedData.OnPremPropertyMaps
+                    )) {
+                        let props = item.Props;
+                        if (props.length === 0) continue;
+                        let chunked = props.chunk();
+                        let statement = item.Statement;
+
+                        for (let chunk of chunked) {
+                            await uploadData(statement, chunk);
+                        }
+                    }
+
+                    for (let item of Object.values(
+                        processedData.RelPropertyMaps
+                    )) {
+                        let props = item.Props;
+                        if (props.length === 0) continue;
+                        let chunked = props.chunk();
+                        let statement = item.Statement;
+
+                        for (let chunk of chunked) {
+                            await uploadData(statement, chunk);
+                        }
+                    }
+                } else {
+                    for (let key in processedData) {
+                        let props = processedData[key].props;
+                        if (props.length === 0) continue;
+                        let chunked = props.chunk();
+                        let statement = processedData[key].statement;
+
+                        for (let chunk of chunked) {
+                            await uploadData(statement, chunk);
+                        }
                     }
                 }
 
-                file.progress = count
+                file.progress = count;
                 setFileQueue((state) => {
-                    return {...state, [file.id]: file};
+                    return { ...state, [file.id]: file };
                 });
 
-                pipeline.resume()
-            }catch (e){
-                console.error(e)
+                pipeline.resume();
+            } catch (e) {
+                console.error(e);
             }
 
-            return null
-        })
+            return null;
+        });
 
         pipeline.on('end', () => {
-            setUploading(false)
+            setUploading(false);
             file.status = FileStatus.Done;
             if (file.delete) {
-                fs.unlinkSync(file.path)
+                fs.unlinkSync(file.path);
             }
             setFileQueue((state) => {
-                return {...state, [file.id]: file};
+                return { ...state, [file.id]: file };
             });
 
-            console.timeEnd('IngestTime')
-            emitter.emit('refreshDBData')
+            console.timeEnd('IngestTime');
+            emitter.emit('refreshDBData');
 
-            return null
-        })
+            return null;
+        });
     };
 
     const sleep_test = (ms) => {
@@ -317,16 +347,15 @@ const MenuContainer = () => {
 
     const uploadData = async (statement, props) => {
         let session = driver.session();
-        await session.run(statement, {props: props}).catch((err) => {
+        await session.run(statement, { props: props }).catch((err) => {
             console.log(statement);
             console.log(err);
-
         });
         await session.close();
     };
 
     const clearFinished = () => {
-        let temp = {...fileQueue};
+        let temp = { ...fileQueue };
 
         if (Object.keys(temp).length === 0) {
             alert.error('Really?');
@@ -360,59 +389,402 @@ const MenuContainer = () => {
             }
 
             if (f !== undefined) {
-                setNeedsPostProcess(true)
+                setNeedsPostProcess(true);
                 setUploading(true);
                 processJson(f);
             }
 
-            if (f === undefined && needsPostProcess){
-                for (let file of Object.values(fileQueue)){
-                    if (!fileIsComplete(file.status)){
-                        return
+            if (f === undefined && needsPostProcess) {
+                for (let file of Object.values(fileQueue)) {
+                    if (!fileIsComplete(file.status)) {
+                        return;
                     }
                 }
 
-                postProcessUpload()
+                setNeedsPostProcess(false);
+                postProcessUpload().then((_) => {
+                    postProcessAzure().then((_) => {
+                        console.log('post-processing complete');
+                    });
+                });
             }
-
         }
     }, [fileQueue]);
 
     const postProcessUpload = async () => {
-        console.log("Running post processing queries")
-        setNeedsPostProcess(false)
+        console.log('Running post processing queries');
         let session = driver.session();
 
-        const baseOwnedStatement = "MATCH (n) WHERE n:User or n:Computer AND NOT EXISTS(n.owned) SET n.owned = false"
+        const baseOwnedStatement =
+            'MATCH (n) WHERE n:User or n:Computer AND NOT EXISTS(n.owned) SET n.owned = false';
         await session.run(baseOwnedStatement, null).catch((err) => {
             console.log(err);
         });
 
-        const baseHighValueStatement = "MATCH (n:Base) WHERE NOT EXISTS(n.highvalue) SET n.highvalue = false"
+        const baseHighValueStatement =
+            'MATCH (n:Base) WHERE NOT EXISTS(n.highvalue) SET n.highvalue = false';
         await session.run(baseHighValueStatement, null).catch((err) => {
             console.log(err);
         });
 
-        const dUsersSids = ["S-1-1-0", "S-1-5-11"]
-        const domainUsersAssociationStatement = "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' OR n.objectid ENDS WITH '-515' WITH n UNWIND $sids AS sid MATCH (m:Group) WHERE m.objectid ENDS WITH sid MERGE (n)-[:MemberOf]->(m)"
-        await session.run(domainUsersAssociationStatement, {sids: dUsersSids}).catch((err) => {
-            console.log(err);
-        });
+        const dUsersSids = ['S-1-1-0', 'S-1-5-11'];
+        const domainUsersAssociationStatement =
+            "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' OR n.objectid ENDS WITH '-515' WITH n UNWIND $sids AS sid MATCH (m:Group) WHERE m.objectid ENDS WITH sid MERGE (n)-[:MemberOf]->(m)";
+        await session
+            .run(domainUsersAssociationStatement, { sids: dUsersSids })
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await postDcSync(session)
 
         await session.close();
-        console.log("Post processing done")
+    };
+
+    const postDcSync = async (session) => {
+        await session.run("MATCH (n:Domain) RETURN n.objectid AS domainid").catch(err => {
+            console.log(err)
+        }).then(async res => {
+            for (let domain of res.records) {
+                let domainId = domain.get('domainid');
+                let getChangesResult = await session.run("MATCH (n)-[:MemberOf|GetChanges*1..]->(:Domain {objectid: $objectid}) RETURN n", { objectid: domainId })
+                let getChangesPrincipals = []
+                for (let principal of getChangesResult.records) {
+                    getChangesPrincipals.push(principal.get('n').properties.objectid)
+                }
+                let getChangesAllPrincipals = []
+                let getChangesAllResult = await session.run("MATCH (n)-[:MemberOf|GetChangesAll*1..]->(:Domain {objectid: $objectid}) RETURN n", { objectid: domainId })
+                for (let principal of getChangesAllResult.records) {
+                    getChangesAllPrincipals.push(principal.get('n').properties.objectid)
+                }
+
+                let dcSyncPrincipals = getChangesPrincipals.filter(principal => getChangesAllPrincipals.includes(principal))
+
+                if (dcSyncPrincipals.length > 0) {
+                    console.log("Found DC Sync principals: " + dcSyncPrincipals.join(", ") + " in domain " + domainId)
+                    await session.run("UNWIND $syncers AS sync MATCH (n:Base {objectid: sync}) MATCH (m:Domain {objectid: $domainid}) MERGE (n)-[:DCSync]->(m)", { syncers: dcSyncPrincipals, domainid: domainId })
+                }
+            }
+        })
     }
+
+    const postProcessAzure = async () => {
+        console.log('Running azure post-processing queries');
+        let session = driver.session();
+
+        await session.run('MATCH (n:AZTenant) SET n.highvalue=TRUE')
+
+        await session
+            .run(
+                `
+            MATCH (n:AZUser)-[:AZHasRole]->(m)
+            WHERE m.templateid IN $pwResetRoles
+            WITH n
+            MATCH (at:AZTenant)-[:AZContains]->(n)
+            WITH at,n
+            MATCH (at)-[:AZContains]->(u:AZUser)
+            WHERE NOT (u)-[:AZHasRole]->()
+            MERGE (n)-[:AZResetPassword]->(u)`,
+                {
+                    pwResetRoles: [
+                        'c4e39bd9-1100-46d3-8c65-fb160da0071f',
+                        '62e90394-69f5-4237-9190-012177145e10',
+                        '729827e3-9c14-49f7-bb1b-9608f156bbb8',
+                        '966707d0-3269-4727-9be2-8c3a10f19b9d',
+                        '7be44c8a-adaf-4e2a-84d6-ab2649e08a13',
+                        'fe930be7-5e62-47db-91af-98c3a49a38b1',
+                        '9980e02c-c2be-4d73-94e8-173b1dc7cf3c',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `
+            MATCH (n:AZUser)-[:AZHasRole]->(m)
+            WHERE m.templateid IN $GAandPAA
+            WITH n
+            MATCH (at:AZTenant)-[:AZContains]->(n)
+            WITH at,n
+            MATCH (at)-[:AZContains]->(u:AZUser)
+            MERGE (n)-[:AZResetPassword]->(u)`,
+                {
+                    GAandPAA: [
+                        '62e90394-69f5-4237-9190-012177145e10',
+                        '7be44c8a-adaf-4e2a-84d6-ab2649e08a13',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `MATCH (at:AZTenant)-[:AZContains]->(AuthAdmin:AZUser)-[:AZHasRole]->(AuthAdminRole:AZRole {roleTemplateId:"c4e39bd9-1100-46d3-8c65-fb160da0071f"})
+            MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
+            WHERE NOT ar.templateid IN $AuthAdminTargetRoles
+            WITH COLLECT(NonTargets) AS NonTargets,at,AuthAdmin
+            MATCH (at)-[:AZContains]->(AuthAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
+            WHERE NOT AuthAdminTargets IN NonTargets AND arTargets.templateid IN $AuthAdminTargetRoles
+            MERGE (AuthAdmin)-[:AZResetPassword]->(AuthAdminTargets)`,
+                {
+                    AuthAdminTargetRoles: [
+                        'c4e39bd9-1100-46d3-8c65-fb160da0071f',
+                        '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
+                        '95e79109-95c0-4d8e-aee3-d01accf2d47b',
+                        '729827e3-9c14-49f7-bb1b-9608f156bbb8',
+                        '790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b',
+                        '4a5d8f65-41da-4de4-8968-e035b65339cf',
+                        '966707d0-3269-4727-9be2-8c3a10f19b9d',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `MATCH (at:AZTenant)-[:AZContains]->(HelpdeskAdmin:AZUser)-[:AZHasRole]->(HelpdeskAdminRole:AZRole {roleTemplateId:"c4e39bd9-1100-46d3-8c65-fb160da0071f"})
+            MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
+            WHERE NOT ar.templateid IN $HelpdeskAdminTargetRoles
+            WITH COLLECT(NonTargets) AS NonTargets,at,HelpdeskAdmin
+            MATCH (at)-[:AZContains]->(HelpdeskAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
+            WHERE NOT HelpdeskAdminTargets IN NonTargets AND arTargets.templateid IN $HelpdeskAdminTargetRoles
+            MERGE (HelpdeskAdmin)-[:AZResetPassword]->(HelpdeskAdminTargets)`,
+                {
+                    HelpdeskAdminTargetRoles: [
+                        'c4e39bd9-1100-46d3-8c65-fb160da0071f',
+                        '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
+                        '95e79109-95c0-4d8e-aee3-d01accf2d47b',
+                        '729827e3-9c14-49f7-bb1b-9608f156bbb8',
+                        '790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b',
+                        '4a5d8f65-41da-4de4-8968-e035b65339cf',
+                        '966707d0-3269-4727-9be2-8c3a10f19b9d',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `MATCH (at:AZTenant)-[:AZContains]->(PasswordAdmin:AZUser)-[:AZHasRole]->(PasswordAdminRole:AZRole {roleTemplateId:"966707d0-3269-4727-9be2-8c3a10f19b9d"})
+            MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
+            WHERE NOT ar.templateid IN $PasswordAdminTargetRoles
+            WITH COLLECT(NonTargets) AS NonTargets,at,PasswordAdmin
+            MATCH (at)-[:AZContains]->(PasswordAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
+            WHERE NOT PasswordAdminTargets IN NonTargets AND arTargets.templateid IN $PasswordAdminTargetRoles
+            MERGE (PasswordAdmin)-[:AZResetPassword]->(PasswordAdminTargets)`,
+                {
+                    PasswordAdminTargetRoles: [
+                        '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
+                        '95e79109-95c0-4d8e-aee3-d01accf2d47b',
+                        '966707d0-3269-4727-9be2-8c3a10f19b9d',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `MATCH (at:AZTenant)-[:AZContains]->(UserAccountAdmin:AZUser)-[:AZHasRole]->(UserAccountAdminRole:AZRole {roleTemplateId:"fe930be7-5e62-47db-91af-98c3a49a38b1"})
+            MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
+            WHERE NOT ar.templateid IN $UserAccountAdminTargetRoles
+            WITH COLLECT(NonTargets) AS NonTargets,at,UserAccountAdmin
+            MATCH (at)-[:AZContains]->(UserAccountAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
+            WHERE NOT UserAccountAdminTargets IN NonTargets AND arTargets.templateid IN $UserAccountAdminTargetRoles
+            MERGE (UserAccountAdmin)-[:AZResetPassword]->(UserAccountAdminTargets)`,
+                {
+                    UserAccountAdminTargetRoles: [
+                        '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
+                        '95e79109-95c0-4d8e-aee3-d01accf2d47b',
+                        '729827e3-9c14-49f7-bb1b-9608f156bbb8',
+                        '790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b',
+                        '4a5d8f65-41da-4de4-8968-e035b65339cf',
+                        'fe930be7-5e62-47db-91af-98c3a49a38b1',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `MATCH (at:AZTenant)
+            MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {roleTemplateId:\'9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3\'})-[:AZScopedTo]->(at)
+            MATCH (at)-[:AZContains]->(app:AZApp)
+            MERGE (AppAdmin)-[:AZAddSecret]->(app)`,
+                null
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `MATCH (at:AZTenant)
+            MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {roleTemplateId:\'158c047a-c907-4556-b7ef-446551a6b5f7\'})-[:AZScopedTo]->(at)
+            MATCH (at)-[:AZContains]->(app:AZApp)
+            MERGE (AppAdmin)-[:AZAddSecret]->(app)`,
+                null
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `MATCH (at:AZTenant)
+            MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {roleTemplateId:\'9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3\'})-[:AZScopedTo]->(app)
+            MERGE (AppAdmin)-[:AZAddSecret]->(app)`,
+                null
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `MATCH (at:AZTenant)
+            MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {roleTemplateId:\'158c047a-c907-4556-b7ef-446551a6b5f7\'})-[:AZScopedTo]->(app)
+            MERGE (AppAdmin)-[:AZAddSecret]->(app)`,
+                null
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `MATCH (AppOwner)-[:AZOwns]->(app:AZApp)
+            MERGE (AppOwner)-[:AZAddSecret]-(app)`,
+                null
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `MATCH (azt:AZTenant)
+            MATCH (azt)-[:AZContains]->(InTuneAdmin)-[:AZHasRole]->(azr:AZRole {roleTemplateId:\'3a2c62db-5318-420d-8d74-23affee5d9d5\'})
+            MATCH (azt)-[:AZContains]->(azd:AZDevice)
+            WHERE toUpper(azd.operatingsystem) CONTAINS "WINDOWS"
+            MERGE (InTuneAdmin)-[:AZExecuteCommand]->(azd)`,
+                null
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `
+            MATCH (n)-[:AZHasRole]->(m)
+            WHERE m.templateid IN $addGroupMembersRoles
+            WITH n
+            MATCH (at:AZTenant)-[:AZContains]->(n)
+            WITH at,n
+            MATCH (at)-[:AZContains]->(azg:AZGroup {isAssignableToRole: false})
+            MERGE (n)-[:AZAddMembers]->(azg)`,
+                {
+                    addGroupMembersRoles: [
+                        'fdd7a751-b60b-444a-984c-02652fe8fa1c”, “62e90394-69f5-4237-9190-012177145e10”, “e8611ab8-c189-46e8-94e1-60213ab1f814”, “9360feb5-f418-4baa-8175-e2a00bac4301”, “45d8d3c5-c802-45c6-b32a-1d70b5e1e86e”, “fe930be7-5e62-47db-91af-98c3a49a38b1”, “3a2c62db-5318-420d-8d74-23affee5d9d5”, “b5a8dcf3-09d5-43a9-a639-8e29ef291470”, “744ec460-397e-42ad-a462-8b3f9747a02c',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `
+            MATCH (n)-[:AZHasRole]->(m)
+            WHERE m.templateid IN $addGroupMembersRoles
+            WITH n
+            MATCH (at:AZTenant)-[:AZContains]->(n)
+            WITH at,n
+            MATCH (at)-[:AZContains]->(azg:AZGroup {isAssignableToRole: true})
+            MERGE (n)-[:AZAddMembers]->(azg)`,
+                {
+                    addGroupMembersRoles: [
+                        '62e90394-69f5-4237-9190-012177145e10',
+                        'e8611ab8-c189-46e8-94e1-60213ab1f814',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `
+            MATCH (n)-[:AZHasRole]->(m)
+            WHERE m.templateid IN $addOwnerRoles
+            WITH n
+            MATCH (at:AZTenant)-[:AZContains]->(n)
+            WITH at,n
+            MATCH (at)-[:AZContains]->(aza:AZApp)
+            MERGE (n)-[:AZAddOwner]->(aza)`,
+                {
+                    addOwnerRoles: [
+                        '8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2',
+                        '4ba39ca4-527c-499a-b93d-d9b492c50246',
+                        'e00e864a-17c5-4a4b-9c06-f5b95a8d5bd8',
+                        'd29b2b05-8046-44ba-8758-1e26182fcf32',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        await session
+            .run(
+                `
+            MATCH (n)-[:AZHasRole]->(m)
+            WHERE m.templateid IN $addOwnerRoles
+            WITH n
+            MATCH (at:AZTenant)-[:AZContains]->(n)
+            WITH at,n
+            MATCH (at)-[:AZContains]->(azsp:AZServicePrincipal)
+            MERGE (n)-[:AZAddOwner]->(aza)`,
+                {
+                    addOwnerRoles: [
+                        '8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2',
+                        '4ba39ca4-527c-499a-b93d-d9b492c50246',
+                        'e00e864a-17c5-4a4b-9c06-f5b95a8d5bd8',
+                        'd29b2b05-8046-44ba-8758-1e26182fcf32',
+                    ],
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     /**
      *
      * @param {FileStatus} status
      */
     const fileIsComplete = (status) => {
-        return status !== FileStatus.Waiting && status !== FileStatus.Processing
-    }
-
-    const cancelUpload = () => {
+        return (
+            status !== FileStatus.Waiting && status !== FileStatus.Processing
+        );
     };
+
+    const cancelUpload = () => {};
 
     const aboutClick = () => {
         emitter.emit('showAbout');

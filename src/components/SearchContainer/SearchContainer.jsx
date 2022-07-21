@@ -88,7 +88,7 @@ const SearchContainer = () => {
                 if (labels.length === 1){
                     properties.type = labels[0];
                 }else{
-                    properties.type = labels.filter(x => {return x !== "Base"})[0]
+                    properties.type = labels.filter(x => {return x !== "Base" && x !== "AZBase"})[0]
                 }
 
                 data.push(properties);

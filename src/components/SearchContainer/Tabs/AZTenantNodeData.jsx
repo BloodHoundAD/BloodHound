@@ -1,13 +1,13 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 import NodeCypherLink from './Components/NodeCypherLink';
 import MappedNodeProps from './Components/MappedNodeProps';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import NodePlayCypherLink from './Components/NodePlayCypherLink';
-import {Table} from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
-import {AppContext} from '../../../AppContext';
+import { AppContext } from '../../../AppContext';
 
 const AZTenantNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -52,6 +52,7 @@ const AZTenantNodeData = () => {
 
     const displayMap = {
         objectid: 'Object ID',
+        displayname: 'Display Name',
     };
 
     return objectid === null ? (

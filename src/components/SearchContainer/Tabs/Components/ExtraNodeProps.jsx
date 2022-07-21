@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import CollapsibleSection from './CollapsibleSection';
 import styles from '../NodeData.module.css';
-import {Table} from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 
 const ExtraNodeProps = ({ label, properties, displayMap }) => {
     const [elements, setElements] = useState([]);
@@ -42,7 +42,7 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
         }
         if (type === 'number') {
             temp.push(
-                <td align='left' key={`${propName}a`}>
+                <td align='left' className={'col-md-2'} key={`${propName}a`}>
                     {displayProp}
                 </td>
             );
@@ -55,7 +55,7 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
         }
         if (type === 'boolean') {
             temp.push(
-                <td align='left' key={`${propName}a`}>
+                <td align='left' className={'col-md-2'} key={`${propName}a`}>
                     {displayProp}
                 </td>
             );
@@ -68,7 +68,7 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
         }
         if (type === 'string') {
             temp.push(
-                <td align='left' key={`${propName}a`}>
+                <td align='left' className={'col-md-2'} key={`${propName}a`}>
                     {displayProp}
                 </td>
             );
@@ -81,7 +81,7 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
         }
         if (Array.isArray(property) && property.length > 0) {
             temp.push(
-                <td align='left' key={`${propName}k`}>
+                <td align='left' className={'col-md-2'} key={`${propName}k`}>
                     {displayProp}
                 </td>
             );
@@ -90,7 +90,7 @@ const ExtraNodeProps = ({ label, properties, displayMap }) => {
                 d += `${createValue(val)}\n`;
             });
             temp.push(
-                <td align='right' style={{ whiteSpace: 'pre' }}>
+                <td align='right' style={{ whiteSpace: 'pre' }} key={d}>
                     {d}
                 </td>
             );
