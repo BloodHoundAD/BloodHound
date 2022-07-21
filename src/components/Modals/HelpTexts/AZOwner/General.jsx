@@ -1,7 +1,5 @@
-import { groupSpecialFormat} from '../Formatter';
-
 const General = (sourceName, sourceType, targetName, targetType) => {
-    let text = ``;
+    let text = `Object ownership means almost all abuses are possible against the target object.`;
     return { __html: text };
 };
 
