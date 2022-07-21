@@ -29,11 +29,19 @@ import HasSIDHistory from './HelpTexts/HasSIDHistory/HasSIDHistory';
 import TrustedBy from './HelpTexts/TrustedBy/TrustedBy';
 import CanPSRemote from './HelpTexts/CanPSRemote/CanPSRemote';
 import AZAddMembers from './HelpTexts/AZAddMembers/AZAddMembers';
+import AZAddSecret from './HelpTexts/AZAddSecret/AZAddSecret';
+import AZAvereContributor from './HelpTexts/AZAvereContributor/AZAvereContributor';
 import AZContains from './HelpTexts/AZContains/AZContains';
 import AZContributor from './HelpTexts/AZContributor/AZContributor';
+import AZExecuteCommand from './HelpTexts/AZExecuteCommand/AZExecuteCommand';
 import AZGetCertificates from './HelpTexts/AZGetCertificates/AZGetCertificates';
 import AZGetKeys from './HelpTexts/AZGetKeys/AZGetKeys';
 import AZGetSecrets from './HelpTexts/AZGetSecrets/AZGetSecrets';
+import AZGrant from './HelpTexts/AZGrant/AZGrant';
+import AZGrantSelf from './HelpTexts/AZGrantSelf/AZGrantSelf';
+import AZHasRole from './HelpTexts/AZHasRole/AZHasRole';
+import AZMemberOf from './HelpTexts/AZMemberOf/AZMemberOf';
+import AZOwner from './HelpTexts/AZOwner/AZOwner';
 import AZOwns from './HelpTexts/AZOwns/AZOwns';
 import AZPrivilegedRoleAdmin from './HelpTexts/AZPrivilegedRoleAdmin/AZPrivilegedRoleAdmin';
 import AZResetPassword from './HelpTexts/AZResetPassword/AZResetPassword';
@@ -42,6 +50,7 @@ import AZGlobalAdmin from './HelpTexts/AZGlobalAdmin/AZGlobalAdmin';
 import AZAppAdmin from './HelpTexts/AZAppAdmin/AZAppAdmin';
 import AZCloudAppAdmin from './HelpTexts/AZCloudAppAdmin/AZCloudAppAdmin';
 import AZRunsAs from './HelpTexts/AZRunsAs/AZRunsAs';
+import AZVMAdminLogin from './HelpTexts/AZVMAdminLogin/AZVMAdminLogin';
 import AZVMContributor from './HelpTexts/AZVMContributor/AZVMContributor';
 import Default from './HelpTexts/Default/Default';
 import WriteSPN from "./HelpTexts/WriteSPN/WriteSPN";
@@ -113,11 +122,19 @@ const HelpModal = () => {
         TrustedBy: TrustedBy,
         CanPSRemote: CanPSRemote,
         AZAddMembers: AZAddMembers,
+        AZAddSecret: AZAddSecret,
+        AZAvereContributor: AZAvereContributor,
         AZContains: AZContains,
         AZContributor: AZContributor,
+        AZExecuteCommand: AZExecuteCommand,
         AZGetCertificates: AZGetCertificates,
         AZGetKeys: AZGetKeys,
         AZGetSecrets: AZGetSecrets,
+        AZGrant: AZGrant,
+        AZGrantSelf: AZGrantSelf,
+        AZHasRole: AZHasRole,
+        AZMemberOf: AZMemberOf,
+        AZOwner: AZOwner,
         AZOwns: AZOwns,
         AZPrivilegedRoleAdmin: AZPrivilegedRoleAdmin,
         AZResetPassword: AZResetPassword,
@@ -126,6 +143,7 @@ const HelpModal = () => {
         AZAppAdmin: AZAppAdmin,
         AZCloudAppAdmin: AZCloudAppAdmin,
         AZRunsAs: AZRunsAs,
+        AZVMAdminLogin: AZVMAdminLogin,
         AZVMContributor: AZVMContributor,
         WriteSPN: WriteSPN,
         AddSelf: AddSelf,
