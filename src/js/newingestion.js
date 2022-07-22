@@ -13,7 +13,7 @@ const NON_ACL_PROPS = '{isacl:false}';
 const GROUP_OBJECT_TYPE = 'ObjectType';
 const GROUP_SERVICE = 'Service';
 
-const ADLabels = {
+export const ADLabels = {
     Base: 'Base',
     Group: 'Group',
     User: 'User',
@@ -41,7 +41,7 @@ const AzureApplicationAdministratorRoleId =
 const AzureCloudApplicationAdministratorRoleId =
     '158c047a-c907-4556-b7ef-446551a6b5f7';
 
-const AzureLabels = {
+export const AzureLabels = {
     Base: 'AZBase',
     App: 'AZApp',
     Tenant: 'AZTenant',
@@ -71,6 +71,13 @@ const AzureLabels = {
     AdminLogin: 'AZVMAdminLogin',
     AvereContributor: 'AZAvereContributor',
     VMContributor: 'AZVMContributor',
+    AddSecret: 'AZAddSecret',
+    ExecuteCommand: 'AZExecuteCommand',
+    ResetPassword: "AZResetPassword",
+    AddMembers: "AZAddMembers",
+    GlobalAdmin: "AZGlobalAdmin",
+    PrivilegedRoleAdmin: "AZPrivilegedRoleAdmin",
+    PrivilegedAuthAdmin: "AZPrivilegedAuthAdmin",
 };
 
 const AzurehoundKindLabels = {
@@ -2158,7 +2165,7 @@ function getTypeFromDirectoryObject(directoryObject) {
         case DirectoryObjectEntityTypes.ServicePrincipal:
             return AzureLabels.ServicePrincipal;
         default:
-            console.error(`unexpected entity type: ${directoryObject.type}`);
+            console.error(`unexpected entity type: ${directoryObject['@odata.type']}`);
             console.log(directoryObject);
             return AzureLabels.Base;
     }
