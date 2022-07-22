@@ -1,21 +1,21 @@
-import "core-js/stable";
-import "regenerator-runtime/runtime"; // generators
+import 'core-js/stable';
+import 'regenerator-runtime/runtime'; // generators
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import AppContainer from './AppContainer';
 import Login from './components/Float/Login';
-import {positions, Provider as AlertProvider, transitions} from 'react-alert';
+import { positions, Provider as AlertProvider, transitions } from 'react-alert';
 import AlertTemplate from 'react-alert-template-basic';
 
-import {remote, shell} from 'electron';
-import {join} from 'path';
-import {existsSync, mkdirSync, writeFileSync} from 'fs';
+import { remote, shell } from 'electron';
+import { join } from 'path';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
 
 import ConfigStore from 'electron-store';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import {EventEmitter2 as e} from 'eventemitter2';
+import { EventEmitter2 as e } from 'eventemitter2';
 
 const { app } = remote;
 
@@ -263,7 +263,7 @@ global.appStore = {
             CanPSRemote: 'tapered',
             AddSelf: 'tapered',
             WriteSPN: 'tapered',
-            AddKeyCredentialLink: 'tapered'
+            AddKeyCredentialLink: 'tapered',
         },
     },
     lowResPalette: {
@@ -411,7 +411,7 @@ const alertOptions = {
     transitions: transitions.FADE,
     containerStyle: {
         zIndex: 100,
-        width: '25%',
+        width: '100%',
     },
 };
 
