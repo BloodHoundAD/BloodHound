@@ -523,13 +523,13 @@ const MenuContainer = () => {
         await session
             .run(
                 `MATCH (n:AZUser)-[:AZHasRole]->(m)
-                    WHERE m.templateid IN pwResetRoles
+                    WHERE m.templateid IN $pwResetRoles
                     WITH n
                     MATCH (at:AZTenant)-[:AZContains]->(n)
                     WITH at,n
                     MATCH (at)-[:AZContains]->(u:AZUser)
                     WHERE NOT (u)-[:AZHasRole]->()
-                    {
+                    CALL {
                         WITH n, u
                         MERGE (n)-[:AZResetPassword]->(u)
                     } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
@@ -812,8 +812,8 @@ const MenuContainer = () => {
             MATCH (at:AZTenant)-[:AZContains]->(n)
             MATCH (at)-[:AZContains]->(azsp:AZServicePrincipal)
             CALL {
-                WITH n, aza
-                MERGE (n)-[:AZAddOwner]->(aza)
+                WITH n, azsp
+                MERGE (n)-[:AZAddOwner]->(azsp)
             } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
                 {
                     addOwnerRoles: [
