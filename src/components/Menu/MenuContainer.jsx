@@ -689,7 +689,7 @@ const MenuContainer = () => {
         // Application Admin and Cloud App Admin can add secret to any tenant-resident app or service principal
         await session
             .run(
-                `:auto MATCH (at:AZTenant)
+                `MATCH (at:AZTenant)
                 MATCH p = (at)-[:AZContains]->(Principal)-[:AZHasRole]->(Role)<-[:AZContains]-(at)
                 WHERE Role.templateid IN ['9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3','158c047a-c907-4556-b7ef-446551a6b5f7']
                 MATCH (at)-[:AZContains]->(target)
