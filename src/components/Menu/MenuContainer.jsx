@@ -555,7 +555,7 @@ const MenuContainer = () => {
         // Global Admins and Privileged Authentication Admins can reset the password for any user in the same tenant:
         await session
             .run(
-                `MATCH (n:AZUser)-[:AZHasRole]->(m)
+                `MATCH (n)-[:AZHasRole]->(m)
             WHERE m.templateid IN $GAandPAA
             MATCH (at:AZTenant)-[:AZContains]->(n)
             MATCH (at)-[:AZContains]->(u:AZUser)
@@ -578,7 +578,7 @@ const MenuContainer = () => {
         // Authentication admin template id: c4e39bd9-1100-46d3-8c65-fb160da0071f
         await session
             .run(
-                `MATCH (at:AZTenant)-[:AZContains]->(AuthAdmin:AZUser)-[:AZHasRole]->(AuthAdminRole:AZRole {templateid:"c4e39bd9-1100-46d3-8c65-fb160da0071f"})
+                `MATCH (at:AZTenant)-[:AZContains]->(AuthAdmin)-[:AZHasRole]->(AuthAdminRole:AZRole {templateid:"c4e39bd9-1100-46d3-8c65-fb160da0071f"})
             MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
             WHERE NOT ar.templateid IN $AuthAdminTargetRoles
             WITH COLLECT(NonTargets) AS NonTargets,at,AuthAdmin
@@ -608,7 +608,7 @@ const MenuContainer = () => {
         // Helpdesk Admin template id: 729827e3-9c14-49f7-bb1b-9608f156bbb8
         await session
             .run(
-                `MATCH (at:AZTenant)-[:AZContains]->(HelpdeskAdmin:AZUser)-[:AZHasRole]->(HelpdeskAdminRole:AZRole {templateid:"729827e3-9c14-49f7-bb1b-9608f156bbb8"})
+                `MATCH (at:AZTenant)-[:AZContains]->(HelpdeskAdmin)-[:AZHasRole]->(HelpdeskAdminRole:AZRole {templateid:"729827e3-9c14-49f7-bb1b-9608f156bbb8"})
             MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
             WHERE NOT ar.templateid IN $HelpdeskAdminTargetRoles
             WITH COLLECT(NonTargets) AS NonTargets,at,HelpdeskAdmin
@@ -638,7 +638,7 @@ const MenuContainer = () => {
         // Password Admin template id: 966707d0-3269-4727-9be2-8c3a10f19b9d
         await session
             .run(
-                `MATCH (at:AZTenant)-[:AZContains]->(PasswordAdmin:AZUser)-[:AZHasRole]->(PasswordAdminRole:AZRole {templateid:"966707d0-3269-4727-9be2-8c3a10f19b9d"})
+                `MATCH (at:AZTenant)-[:AZContains]->(PasswordAdmin)-[:AZHasRole]->(PasswordAdminRole:AZRole {templateid:"966707d0-3269-4727-9be2-8c3a10f19b9d"})
             MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
             WHERE NOT ar.templateid IN $PasswordAdminTargetRoles
             WITH COLLECT(NonTargets) AS NonTargets,at,PasswordAdmin
@@ -664,7 +664,7 @@ const MenuContainer = () => {
         // User Account Admin template id: fe930be7-5e62-47db-91af-98c3a49a38b1
         await session
             .run(
-                `MATCH (at:AZTenant)-[:AZContains]->(UserAccountAdmin:AZUser)-[:AZHasRole]->(UserAccountAdminRole:AZRole {templateid:"fe930be7-5e62-47db-91af-98c3a49a38b1"})
+                `MATCH (at:AZTenant)-[:AZContains]->(UserAccountAdmin)-[:AZHasRole]->(UserAccountAdminRole:AZRole {templateid:"fe930be7-5e62-47db-91af-98c3a49a38b1"})
             MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
             WHERE NOT ar.templateid IN $UserAccountAdminTargetRoles
             WITH COLLECT(NonTargets) AS NonTargets,at,UserAccountAdmin
