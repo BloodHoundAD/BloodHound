@@ -689,75 +689,19 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        // Application Admin can add secret to any tenant-resident app
+        // Application Admin and Cloud App Admin can add secret to any tenant-resident app or service principal
         await session
             .run(
-                `MATCH (at:AZTenant)
-                    MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {templateid:'9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3'})-[:AZScopedTo]->(at)
-                    MATCH (at)-[:AZContains]->(app:AZApp)
-                    CALL {
-                        WITH AppAdmin, app
-                        MERGE (AppAdmin)-[:AZAddSecret]->(app)
-                    } IN TRANSACTIONS OF {} ROWS`.format(batchSize)
-            )
-            .catch((err) => {
-                console.log(err);
-            });
-
-        // Cloud App Admin can add secret to any tenant-resident app
-        await session
-            .run(
-                `MATCH (at:AZTenant)
-                    MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {templateid:'158c047a-c907-4556-b7ef-446551a6b5f7'})-[:AZScopedTo]->(at)
-                    MATCH (at)-[:AZContains]->(app:AZApp)
-                    CALL {
-                        WITH AppAdmin, app
-                        MERGE (AppAdmin)-[:AZAddSecret]->(app)
-                    } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
-                null
-            )
-            .catch((err) => {
-                console.log(err);
-            });
-
-        // App-level Application Admin can add a secret to its scoped app
-        await session
-            .run(
-                `MATCH (at:AZTenant)
-                        MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {templateid:'9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3'})-[:AZScopedTo]->(app)
-                        CALL {
-                            WITH AppAdmin, app
-                            MERGE (AppAdmin)-[:AZAddSecret]->(app)
-                        } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
-                null
-            )
-            .catch((err) => {
-                console.log(err);
-            });
-
-        // Cloud App Admin can add a secret to its scoped app
-        await session
-            .run(
-                `MATCH (at:AZTenant)
-                MATCH (at)-[:AZContains]->(AppAdmin)-[:AZHasRole]->(AppAdminRole {templateid:'158c047a-c907-4556-b7ef-446551a6b5f7'})-[:AZScopedTo]->(app)
+                `:auto MATCH (at:AZTenant)
+                MATCH p = (at)-[:AZContains]->(Principal)-[:AZHasRole]->(Role)<-[:AZContains]-(at)
+                WHERE Role.templateid IN ['9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3','158c047a-c907-4556-b7ef-446551a6b5f7']
+                MATCH (at)-[:AZContains]->(target)
+                WHERE target:AZApp OR target:AZServicePrincipal
+                WITH Principal, target
                 CALL {
-                    WITH AppAdmin, app
-                    MERGE (AppAdmin)-[:AZAddSecret]->(app)
-                } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
-                null
-            )
-            .catch((err) => {
-                console.log(err);
-            });
-
-        // App owner can add a secret to its scoped app
-        await session
-            .run(
-                `MATCH (AppOwner)-[:AZOwns]->(app:AZApp)
-                    CALL {
-                        MERGE (AppOwner)-[:AZAddSecret]-(app)
-                    } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
-                null
+                    WITH Principal, target
+                    MERGE (Principal)-[:AZAddSecret]->(target)
+                } IN TRANSACTIONS OF 10000 ROWS`
             )
             .catch((err) => {
                 console.log(err);
