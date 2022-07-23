@@ -516,10 +516,7 @@ const MenuContainer = () => {
 
         //Blow away all existing post-processed relationships
         await session.run(
-            `MATCH (:AZBase)-[r:{0}]->() CALL { WITH r DELETE r} IN TRANSACTIONS OF {1} ROWS`.format(
-                postProcessedRels.join('|'),
-                batchSize
-            )
+            `MATCH (:AZBase)-[r:{}]->() CALL { WITH r DELETE r} IN TRANSACTIONS OF 10000 ROWS`.format(postProcessedRels.join('|'))
         );
 
         // Any user with a password reset role can reset the password of other cloud-resident, non-external users in the same tenant:
