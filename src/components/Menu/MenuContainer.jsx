@@ -516,7 +516,7 @@ const MenuContainer = () => {
 
         //Blow away all existing post-processed relationships
         await session.run(
-            'MATCH (:AZBase)-[r:{0}]->() CALL { WITH r DELETE r} IN TRANSACTIONS OF {1} ROWS'.format(
+            `MATCH (:AZBase)-[r:{0}]->() CALL { WITH r DELETE r} IN TRANSACTIONS OF {1} ROWS`.format(
                 postProcessedRels.join('|'),
                 batchSize
             )
