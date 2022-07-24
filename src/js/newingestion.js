@@ -1645,7 +1645,7 @@ export function convertAzureRoleAssignment(data, ingestionData) {
                     fProps(AzureLabels.Base, AzureLabels.Base, relType),
                     {
                         source: roleAssignment.principalId.toUpperCase(),
-                        target: roleAssignment.directoryScopeId.substring(1),
+                        target: roleAssignment.directoryScopeId.substring(1).toUpperCase(),
                     }
                 );
             }
