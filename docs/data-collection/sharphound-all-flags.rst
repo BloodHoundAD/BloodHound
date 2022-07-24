@@ -118,10 +118,15 @@ OU, do this:
 ExcludeDomainControllers
 ------------------------
 
-This will instruct SharpHound to not touch domain controllers. By not touching
+`--ExcludeDCs` will instruct SharpHound to not touch domain controllers. By not touching
 domain controllers, you will not be able to collect anything specified in the
 `DCOnly` collection method, but you will also likely avoid detection by Microsoft
 ATA.
+
+::
+
+   C:\> SharpHound.exe -d contoso.local --ExcludeDCs
+   
 
 RealDNSName
 -----------
