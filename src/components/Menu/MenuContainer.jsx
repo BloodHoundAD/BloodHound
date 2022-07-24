@@ -710,26 +710,12 @@ const MenuContainer = () => {
                 `MATCH (azt:AZTenant)
             MATCH (azt)-[:AZContains]->(InTuneAdmin)-[:AZHasRole]->(azr:AZRole {templateid:'3a2c62db-5318-420d-8d74-23affee5d9d5'})
             MATCH (azt)-[:AZContains]->(azd:AZDevice)
-            WHERE toUpper(azd.operatingsystem) CONTAINS "WINDOWS"
+            WHERE toUpper(azd.operatingsystem) CONTAINS "WINDOWS" AND azd.mdmAppId IN ['54b943f8-d761-4f8d-951e-9cea1846db5a','0000000a-0000-0000-c000-000000000000']
             CALL {
                 WITH InTuneAdmin, azd
                 MERGE (InTuneAdmin)-[:AZExecuteCommand]->(azd)
             } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
                 null
-            )
-            .catch((err) => {
-                console.log(err);
-            });
-
-        // Device owners can execute commands as SYSTEM on Windows-type devices:
-        await session
-            .run(
-                `MATCH (DeviceOwner)-[:AZOwns]->(azd:AZDevice)
-                    WHERE toUpper(azd.operatingsystem) CONTAINS "WINDOWS"
-                    CALL {
-                        WITH DeviceOwner, azd
-                        MERGE (DeviceOwner)-[:AZExecuteCommand]->(azd)
-                    } IN TRANSACTIONS OF {} ROWS`.format(batchSize)
             )
             .catch((err) => {
                 console.log(err);
