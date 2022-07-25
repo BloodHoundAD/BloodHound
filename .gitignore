@@ -6,3 +6,4 @@ npm-debug.log
 *.csv
 graph.json
 .DS_Store
+.idea

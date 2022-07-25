@@ -165,12 +165,7 @@ async function dropConstraints() {
 
     for (let record of result.records){
         let constraint = record.get(0)
-        let query;
-        if (neoVersion.startsWith('3.')){
-            query = 'DROP ' + constraint
-        }else{
-            query = 'DROP CONSTRAINT ' + constraint
-        }
+        let query = 'DROP CONSTRAINT ' + constraint;
 
         constraints.push(query)
     }
@@ -192,12 +187,7 @@ async function dropIndexes() {
 
     for (let record of result.records){
         let constraint = record.get(0)
-        let query;
-        if (neoVersion.startsWith('3.')){
-            query = 'DROP ' + constraint
-        }else{
-            query = 'DROP INDEX ' + constraint
-        }
+        let query = 'DROP INDEX ' + constraint;
 
         indexes.push(query)
     }
