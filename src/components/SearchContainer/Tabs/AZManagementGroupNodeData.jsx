@@ -106,6 +106,50 @@ const AZManagementGroupNodeData = ({}) => {
 
                 <hr></hr>
 
+                <CollapsibleSection header='DESCENDENT OBJECTS'>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherLink
+                                    property='Total Subscriptions'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:AZManagementGroup {objectid: $objectid})-[r:AZContains*1..]->(n:AZSubscription)'
+                                    }
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Total Resource Groups'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:AZManagementGroup {objectid: $objectid})-[r:AZContains*1..]->(n:AZResourceGroup)'
+                                    }
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Total VM Objects'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:AZManagementGroup {objectid: $objectid})-[r:AZContains*1..]->(n:AZVM)'
+                                    }
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Total Key Vault Objects'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:AZManagementGroup {objectid: $objectid})-[r:AZContains*1..]->(n:AZKeyVault)'
+                                    }
+                                    distinct
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
+                </CollapsibleSection>
+
+                <hr></hr>
+
                 <CollapsibleSection header='INBOUND OBJECT CONTROL'>
                     <div className={styles.itemlist}>
                         <Table>
