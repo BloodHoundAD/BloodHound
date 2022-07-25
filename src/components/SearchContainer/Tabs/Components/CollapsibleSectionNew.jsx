@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import {Col, Grid, Row, Table} from 'react-bootstrap';
 import {motion} from 'framer-motion';
 import {AppContext} from '../../../../AppContext';
+import {string, node} from "prop-types";
 
 const CollapsibleSectionTable = ({ header, children }) => {
     const [open, setOpen] = useState(true);
@@ -50,7 +51,7 @@ const CollapsibleSectionTable = ({ header, children }) => {
                 animate={open ? 'open' : 'closed'}
                 transition={{ duration: 0.0 }}
             >
-                <div className={styles.itemlist}>
+                <div className={clsx(styles.itemlist, context.darkMode ? styles.dark : styles.light)}>
                     <Table>
                         <tbody className='searchable'>
                         {children}
@@ -62,5 +63,8 @@ const CollapsibleSectionTable = ({ header, children }) => {
     );
 };
 
-CollapsibleSectionTable.propTypes = {};
+CollapsibleSectionTable.propTypes = {
+    header: string,
+    children: node.isRequired
+};
 export default CollapsibleSectionTable;

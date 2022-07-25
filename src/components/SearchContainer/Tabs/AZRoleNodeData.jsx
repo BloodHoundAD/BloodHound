@@ -1,14 +1,10 @@
-import React, { useEffect, useState, useRef, useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../../AppContext';
 import clsx from 'clsx';
 import styles from './NodeData.module.css';
-import CollapsibleSection from './Components/CollapsibleSection';
-import { Table } from 'react-bootstrap';
 import NodeCypherLink from './Components/NodeCypherLink';
-import NodeDisplayLink from './Components/NodeDisplayLink';
 import MappedNodeProps from './Components/MappedNodeProps';
 import ExtraNodeProps from './Components/ExtraNodeProps';
-import NodePlayCypherLink from './Components/NodePlayCypherLink';
 import { withAlert } from 'react-alert';
 import CollapsibleSectionTable from './Components/CollapsibleSectionNew';
 

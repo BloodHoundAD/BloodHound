@@ -40,3 +40,16 @@
     font-size: 12px;
     border-style: none;
 }
+
+.dark > .dl > h5 {
+    color: white !important;
+}
+
+.light > .dl > h5 {
+    color: black;
+}
+
+.dark td {
+    color: white !important;
+    opacity: 1;
+}

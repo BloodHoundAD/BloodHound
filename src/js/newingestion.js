@@ -1218,8 +1218,6 @@ export function convertAzureGroup(data, ingestionData) {
         fProps(AzureLabels.Tenant, AzureLabels.Group, AzureLabels.Contains),
         {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
     );
-
-    console.log(ingestionData)
 }
 
 /**
