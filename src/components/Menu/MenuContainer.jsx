@@ -506,11 +506,39 @@ const MenuContainer = () => {
         await session.run(
             `MATCH (:AZBase)-[r:{}]->() CALL { WITH r DELETE r} IN TRANSACTIONS OF 10000 ROWS`.format(postProcessedRels.join('|'))
         );
-
-        // Any user with a password reset role can reset the password of other cloud-resident, non-external users in the same tenant:
+        
+        // Global Admins get a direct edge to the AZTenant object they have that role assignment in:
         await session
             .run(
-                `MATCH (n:AZUser)-[:AZHasRole]->(m)
+                `MATCH (n)-[:AZHasRole]->(m)<-[:AZContains]-(t:AZTenant)
+                 WHERE m.templateid IN ['62e90394-69f5-4237-9190-012177145e10']
+                 CALL {
+                     WITH n,t
+                     MERGE (n)-[:AZGlobalAdmin]->(t)
+                 } IN TRANSACTIONS OF {} ROWS`.format(batchSize)
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+        
+        // Privileged Role Admins get a direct edge to the AZTenant object they have that role assignment in:
+        await session
+            .run(
+                `MATCH (n)-[:AZHasRole]->(m)<-[:AZContains]-(t:AZTenant)
+                 WHERE m.templateid IN ['e8611ab8-c189-46e8-94e1-60213ab1f814']
+                 CALL {
+                     WITH n,t
+                     MERGE (n)-[:AZPrivilegedRoleAdmin]->(t)
+                 } IN TRANSACTIONS OF {} ROWS`.format(batchSize)
+            )
+            .catch((err) => {
+                console.log(err);
+            });
+
+        // Any principal with a password reset role can reset the password of other cloud-resident, non-external users in the same tenant, where those users do not have ANY AzureAD admin role assignment:
+        await session
+            .run(
+                `MATCH (n)-[:AZHasRole]->(m)
                     WHERE m.templateid IN $pwResetRoles
                     WITH n
                     MATCH (at:AZTenant)-[:AZContains]->(n)

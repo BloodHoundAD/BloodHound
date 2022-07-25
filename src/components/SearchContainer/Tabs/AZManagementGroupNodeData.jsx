@@ -106,6 +106,50 @@ const AZManagementGroupNodeData = ({}) => {
 
                 <hr></hr>
 
+                <CollapsibleSection header='DESCENDENT OBJECTS'>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherLink
+                                    property='Total Subscriptions'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:AZManagementGroup {objectid: $objectid})-[r:AZContains*1..]->(n:AZSubscription)'
+                                    }
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Total Resource Groups'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:AZManagementGroup {objectid: $objectid})-[r:AZContains*1..]->(n:AZResourceGroup)'
+                                    }
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Total VM Objects'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:AZManagementGroup {objectid: $objectid})-[r:AZContains*1..]->(n:AZVM)'
+                                    }
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Total Key Vault Objects'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:AZManagementGroup {objectid: $objectid})-[r:AZContains*1..]->(n:AZKeyVault)'
+                                    }
+                                    distinct
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
+                </CollapsibleSection>
+
+                <hr></hr>
+
                 <CollapsibleSection header='INBOUND OBJECT CONTROL'>
                     <div className={styles.itemlist}>
                         <Table>
@@ -115,7 +159,7 @@ const AZManagementGroupNodeData = ({}) => {
                                     property='Explicit Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g:AZManagementGroup {objectid: $objectid})'
+                                        'MATCH p = (n)-[r:AZOwns|AZUserAccessAdministrator]->(g:AZManagementGroup {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -124,7 +168,7 @@ const AZManagementGroupNodeData = ({}) => {
                                     property='Unrolled Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g2:AZManagementGroup {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                        'MATCH p = (n)-[r:AZMemberOf]->(g1)-[r1:AZOwns|AZUserAccessAdministrator]->(g2:AZManagementGroup {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
                                     }
                                     end={label}
                                     distinct
