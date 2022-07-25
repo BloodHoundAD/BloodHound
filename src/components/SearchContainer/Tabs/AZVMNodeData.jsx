@@ -123,7 +123,7 @@ const AZVMNodeData = () => {
                                     property='Unrolled Admins'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n)-[r:MemberOf|AdminTo*1..]->(m:AZVM {objectid: $objectid}) WHERE NOT n:Group'
+                                        'MATCH p=(n)-[r:MemberOf|AdminTo*1..]->(m:AZVM {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -172,7 +172,7 @@ const AZVMNodeData = () => {
                                     property='Group Delegated Execution Rights'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n)-[r1:MemberOf*1..]->(g)-[r:AZAvereContributor|AZVMContributor|AZContributor]->(m:AZVM {objectid: $objectid})'
+                                        'MATCH p=(n)-[r1:AZMemberOf]->(g)-[r:AZAvereContributor|AZVMContributor|AZContributor]->(m:AZVM {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -202,7 +202,7 @@ const AZVMNodeData = () => {
                                     property='Unrolled Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n)-[r:MemberOf*1..]->(g)-[r1:AZAvereContributor|AZVMContributor|AZContributor|AZUserAccessAdministrator|AZOwns]->(c:AZVM {objectid:$objectid})'
+                                        'MATCH p=(n)-[r:AZMemberOf]->(g)-[r1:AZAvereContributor|AZVMContributor|AZContributor|AZUserAccessAdministrator|AZOwns]->(c:AZVM {objectid:$objectid})'
                                     }
                                     end={label}
                                     distinct
