@@ -74,7 +74,7 @@ const AZResourceGroupNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header='Descendent Objects'>
+                <CollapsibleSection header='DESCENDENT OBJECTS'>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
@@ -103,7 +103,7 @@ const AZResourceGroupNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header='Inbound Object Control'>
+                <CollapsibleSection header='INBOUND OBJECT CONTROL'>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
