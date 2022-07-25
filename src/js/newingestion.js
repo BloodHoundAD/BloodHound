@@ -5,9 +5,17 @@ const TRUST_DIRECTION_OUTBOUND = 'Outbound';
 const TRUST_DIRECTION_BIDIRECTIONAL = 'Bidirectional';
 
 const PROP_QUERY =
-    'UNWIND $props AS prop MERGE (n:Base {objectid:prop.objectid}) SET n:{} SET n += prop.map';
+    `UNWIND $props AS prop
+        CALL {
+            WITH prop
+            MERGE (n:Base {objectid:prop.objectid}) SET n:{} SET n += prop.map
+        } IN TRANSACTIONS OF 500 ROWS`;
 const AZURE_PROP_QUERY =
-    'UNWIND $props AS prop MERGE (n:AZBase {objectid:prop.objectid}) SET n:{} SET n += prop.map';
+    `UNWIND $props AS prop 
+    CALL {
+        WITH prop
+        MERGE (n:AZBase {objectid:prop.objectid}) SET n:{} SET n += prop.map
+    } IN TRANSACTIONS OF 500 ROWS`;
 const NON_ACL_PROPS = '{isacl:false}';
 
 const GROUP_OBJECT_TYPE = 'ObjectType';
@@ -804,10 +812,18 @@ export function buildDomainJsonNew(chunk) {
 }
 
 const baseInsertStatement =
-    'UNWIND $props AS prop MERGE (n:Base {objectid: prop.source}) SET n:{0} MERGE (m:Base {objectid: prop.target}) SET m:{1} MERGE (n)-[r:{2} {3}]->(m)';
+    `UNWIND $props AS prop
+        CALL {
+            WITH prop
+            MERGE (n:Base {objectid: prop.source}) SET n:{0} MERGE (m:Base {objectid: prop.target}) SET m:{1} MERGE (n)-[r:{2} {3}]->(m)
+        } IN TRANSACTIONS OF 500 ROWS`;
 
 const azureInsertStatement =
-    'UNWIND $props AS prop MERGE (n:AZBase {objectid: prop.source}) SET n:{0} MERGE (m:AZBase {objectid: prop.target}) SET m:{1} MERGE (n)-[r:{2} {3}]->(m)';
+    `UNWIND $props AS prop
+        CALL {
+            WITH prop
+            MERGE (n:AZBase {objectid: prop.source}) SET n:{0} MERGE (m:AZBase {objectid: prop.target}) SET m:{1} MERGE (n)-[r:{2} {3}]->(m)
+        } IN TRANSACTIONS OF 500 ROWS`;
 
 /**
  * Inserts a query into the queries table
