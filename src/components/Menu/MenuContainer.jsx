@@ -507,10 +507,10 @@ const MenuContainer = () => {
             `MATCH (:AZBase)-[r:{}]->() CALL { WITH r DELETE r} IN TRANSACTIONS OF 10000 ROWS`.format(postProcessedRels.join('|'))
         );
 
-        // Any user with a password reset role can reset the password of other cloud-resident, non-external users in the same tenant:
+        // Any principal with a password reset role can reset the password of other cloud-resident, non-external users in the same tenant, where those users do not have ANY AzureAD admin role assignment:
         await session
             .run(
-                `MATCH (n:AZUser)-[:AZHasRole]->(m)
+                `MATCH (n)-[:AZHasRole]->(m)
                     WHERE m.templateid IN $pwResetRoles
                     WITH n
                     MATCH (at:AZTenant)-[:AZContains]->(n)
