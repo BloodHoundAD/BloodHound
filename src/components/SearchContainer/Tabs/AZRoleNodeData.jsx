@@ -75,26 +75,6 @@ const AZRoleNodeData = ({}) => {
             <div className={clsx(styles.dl)}>
                 <h5>{label || objectid}</h5>
 
-                <CollapsibleSection header='OVERVIEW'>
-                    <div className={styles.itemlist}>
-                        <Table>
-                            <thead></thead>
-                            <tbody className='searchable'>
-                                <NodeCypherLink
-                                    property='Reachable High Value Targets'
-                                    target={objectid}
-                                    baseQuery={
-                                        'MATCH (m:AZRole {objectid: $objectid}),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= "GetChanges") AND NONE (r in relationships(p) WHERE type(r)="GetChangesAll") AND NOT m=n'
-                                    }
-                                    start={label}
-                                />
-                            </tbody>
-                        </Table>
-                    </div>
-                </CollapsibleSection>
-
-                <hr></hr>
-
                 <MappedNodeProps
                     displayMap={displayMap}
                     properties={nodeProps}
@@ -114,51 +94,20 @@ const AZRoleNodeData = ({}) => {
                 <CollapsibleSectionTable header={'ASSIGNMENTS'}>
                     <NodeCypherLink
                         baseQuery={
-                            'MATCH p=(n)-[:HasRole|AZMemberOf]->(:AZRole {objectid:$objectid})'
+                            'MATCH p=(n)-[:AZHasRole|AZMemberOf]->(:AZRole {objectid:$objectid})'
                         }
                         property={'Active Assignments'}
                         target={objectid}
                     />
                     <NodeCypherLink
                         baseQuery={
-                            'MATCH p=(n)-[:AZGrant|AZGrantSelf|AZMemberOf]->(:AZRole {objectid:$objectid})'
+                            'MATCH p=(n)-[:AZCanGrant|AZGrantSelf|AZMemberOf]->(:AZRole {objectid:$objectid})'
                         }
                         property={'PIM Assignments'}
                         target={objectid}
                     />
                 </CollapsibleSectionTable>
 
-                <hr></hr>
-
-                <CollapsibleSectionTable header='INBOUND OBJECT CONTROL'>
-                    <NodeCypherLink
-                        property='Explicit Object Controllers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n)-[r:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g:AZRole {objectid: $objectid})'
-                        }
-                        end={label}
-                        distinct
-                    />
-                    <NodeCypherLink
-                        property='Unrolled Object Controllers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g2:AZRole {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
-                        }
-                        end={label}
-                        distinct
-                    />
-                    <NodePlayCypherLink
-                        property='Transitive Object Controllers'
-                        target={objectid}
-                        baseQuery={
-                            'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r*1..]->(g:AZRole {objectid: $objectid}))'
-                        }
-                        end={label}
-                        distinct
-                    />
-                </CollapsibleSectionTable>
             </div>
         </div>
     );
