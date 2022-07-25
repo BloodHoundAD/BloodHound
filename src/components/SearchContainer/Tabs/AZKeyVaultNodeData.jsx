@@ -75,7 +75,7 @@ const AZKeyVaultNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header='Vault Readers'>
+                <CollapsibleSection header='VAULT READERS'>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
@@ -122,7 +122,7 @@ const AZKeyVaultNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header='Inbound Object Control'>
+                <CollapsibleSection header='INBOUND OBJECT CONTROL'>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
