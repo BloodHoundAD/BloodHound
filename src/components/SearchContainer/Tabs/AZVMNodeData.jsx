@@ -106,7 +106,7 @@ const AZVMNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header={'Local Admins'}>
+                <CollapsibleSection header={'LOCAL ADMINS'}>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
@@ -154,7 +154,7 @@ const AZVMNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header={'Inbound Execution Privileges'}>
+                <CollapsibleSection header={'INBOUND EXECUTION PRIVILEGES'}>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
@@ -184,7 +184,7 @@ const AZVMNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header={'Inbound Object Control'}>
+                <CollapsibleSection header={'INBOUND OBJECT CONTROL'}>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
