@@ -94,6 +94,7 @@ const AZUserNodeData = () => {
                                     }
                                     property={'Azure AD Admin Roles'}
                                     target={objectid}
+                                    distinct
                                 />
                                 <NodeCypherLink
                                     property='Reachable High Value Targets'
