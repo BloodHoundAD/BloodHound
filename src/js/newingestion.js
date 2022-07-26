@@ -1500,15 +1500,17 @@ export function convertAzureManagementGroup(data, ingestionData) {
         false
     );
 
-    insertNewAzureRel(
-        ingestionData,
-        fProps(
-            AzureLabels.Tenant,
-            AzureLabels.ManagementGroup,
-            AzureLabels.Contains
-        ),
-        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
-    );
+    if (data.id.toUpperCase().endsWith(data.tenantId.toUpperCase())){
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Tenant,
+                AzureLabels.ManagementGroup,
+                AzureLabels.Contains
+            ),
+            {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
+        );
+    }
 }
 
 /**
@@ -1780,15 +1782,15 @@ export function convertAzureSubscription(data, ingestionData) {
         false
     );
 
-    insertNewAzureRel(
-        ingestionData,
-        fProps(
-            AzureLabels.Tenant,
-            AzureLabels.Subscription,
-            AzureLabels.Contains
-        ),
-        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
-    );
+    // insertNewAzureRel(
+    //     ingestionData,
+    //     fProps(
+    //         AzureLabels.Tenant,
+    //         AzureLabels.Subscription,
+    //         AzureLabels.Contains
+    //     ),
+    //     {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
+    // );
 }
 
 /**

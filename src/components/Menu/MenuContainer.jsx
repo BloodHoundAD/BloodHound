@@ -48,6 +48,7 @@ const MenuContainer = () => {
     const fileId = useRef(0);
     const [uploadVisible, setUploadVisible] = useState(false);
     const [needsPostProcess, setNeedsPostProcess] = useState(false);
+    const [postProcessRunning, setPostProcessRunning] = useState(false);
 
     useEffect(() => {
         emitter.on('cancelUpload', cancelUpload);
@@ -368,36 +369,43 @@ const MenuContainer = () => {
     };
 
     useEffect(() => {
-        if (!uploading) {
-            let f;
-            for (let file of Object.values(fileQueue)) {
-                if (file.status === FileStatus.Waiting) {
-                    f = file;
-                    break;
-                }
+        const eff = async () => {
+            if (postProcessRunning) {
+                return
             }
-
-            if (f !== undefined) {
-                setNeedsPostProcess(true);
-                setUploading(true);
-                processJson(f);
-            }
-
-            if (f === undefined && needsPostProcess) {
+            if (!uploading) {
+                let f;
                 for (let file of Object.values(fileQueue)) {
-                    if (!fileIsComplete(file.status)) {
-                        return;
+                    if (file.status === FileStatus.Waiting) {
+                        f = file;
+                        break;
                     }
                 }
 
-                setNeedsPostProcess(false);
-                postProcessUpload().then((_) => {
-                    postProcessAzure().then((_) => {
-                        console.log('post-processing complete');
-                    });
-                });
+                if (f !== undefined) {
+                    setNeedsPostProcess(true);
+                    setUploading(true);
+                    await processJson(f);
+                }
+
+                if (f === undefined && needsPostProcess) {
+                    for (let file of Object.values(fileQueue)) {
+                        if (!fileIsComplete(file.status)) {
+                            return;
+                        }
+                    }
+
+                    setNeedsPostProcess(false);
+                    setPostProcessRunning(true)
+                    await postProcessUpload().catch(console.error)
+                    await postProcessAzure().catch(console.error)
+                    console.log('Post-processing complete')
+                    setPostProcessRunning(false)
+                }
             }
         }
+
+        eff().catch(console.error)
     }, [fileQueue]);
 
     const postProcessUpload = async () => {
@@ -503,12 +511,14 @@ const MenuContainer = () => {
         await session.run('MATCH (n:AZTenant) SET n.highvalue=TRUE');
 
         //Blow away all existing post-processed relationships
-        await session.run(
-            `MATCH (:AZBase)-[r:{}]->() CALL { WITH r DELETE r} IN TRANSACTIONS OF 10000 ROWS`.format(postProcessedRels.join('|'))
+        let result = await session.run(
+            `MATCH (:AZBase)-[r:{0}]->() CALL { WITH r DELETE r } IN TRANSACTIONS OF {1} ROWS`.formatn(postProcessedRels.join('|'), batchSize)
         );
+
+        console.log(`Deleted ${result.summary.counters.updates().relationshipsDeleted} post-processed rels`)
         
         // Global Admins get a direct edge to the AZTenant object they have that role assignment in:
-        await session
+        result = await session
             .run(
                 `MATCH (n)-[:AZHasRole]->(m)<-[:AZContains]-(t:AZTenant)
                  WHERE m.templateid IN ['62e90394-69f5-4237-9190-012177145e10']
@@ -520,9 +530,11 @@ const MenuContainer = () => {
             .catch((err) => {
                 console.log(err);
             });
+
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZGlobalAdmin Edges`)
         
         // Privileged Role Admins get a direct edge to the AZTenant object they have that role assignment in:
-        await session
+        result = await session
             .run(
                 `MATCH (n)-[:AZHasRole]->(m)<-[:AZContains]-(t:AZTenant)
                  WHERE m.templateid IN ['e8611ab8-c189-46e8-94e1-60213ab1f814']
@@ -535,8 +547,10 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZPrivilegedRoleAdmin Edges`)
+
         // Any principal with a password reset role can reset the password of other cloud-resident, non-external users in the same tenant, where those users do not have ANY AzureAD admin role assignment:
-        await session
+        result = await session
             .run(
                 `MATCH (n)-[:AZHasRole]->(m)
                     WHERE m.templateid IN $pwResetRoles
@@ -565,8 +579,10 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZResetPassword Edges`)
+
         // Global Admins and Privileged Authentication Admins can reset the password for any user in the same tenant:
-        await session
+        result = await session
             .run(
                 `MATCH (n)-[:AZHasRole]->(m)
             WHERE m.templateid IN $GAandPAA
@@ -587,9 +603,11 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZResetPassword Edges`)
+
         // Authentication Admins can reset the password for other users with one or more of the following roles: Auth Admins, Helpdesk Admins, Password Admins, Directory Readers, Guest Inviters, Message Center Readers, and Reports Readers:
         // Authentication admin template id: c4e39bd9-1100-46d3-8c65-fb160da0071f
-        await session
+        result = await session
             .run(
                 `MATCH (at:AZTenant)-[:AZContains]->(AuthAdmin)-[:AZHasRole]->(AuthAdminRole:AZRole {templateid:"c4e39bd9-1100-46d3-8c65-fb160da0071f"})
             MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
@@ -617,9 +635,11 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZResetPassword Edges`)
+
         // Helpdesk Admins can reset the password for other users with one or more of the following roles: Auth Admin, Directory Readers, Guest Inviter, Helpdesk Administrator, Message Center Reader, Reports Reader:
         // Helpdesk Admin template id: 729827e3-9c14-49f7-bb1b-9608f156bbb8
-        await session
+        result = await session
             .run(
                 `MATCH (at:AZTenant)-[:AZContains]->(HelpdeskAdmin)-[:AZHasRole]->(HelpdeskAdminRole:AZRole {templateid:"729827e3-9c14-49f7-bb1b-9608f156bbb8"})
             MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
@@ -647,9 +667,11 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZResetPassword Edges`)
+
         // Password Admins can reset the password for other users with one or more of the following roles: Directory Readers, Guest Inviter, Password Administrator:
         // Password Admin template id: 966707d0-3269-4727-9be2-8c3a10f19b9d
-        await session
+        result = await session
             .run(
                 `MATCH (at:AZTenant)-[:AZContains]->(PasswordAdmin)-[:AZHasRole]->(PasswordAdminRole:AZRole {templateid:"966707d0-3269-4727-9be2-8c3a10f19b9d"})
             MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
@@ -673,9 +695,11 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZResetPassword Edges`)
+
         // User Account Admins can reset the password for other users with one or more of the following roles: Directory Readers, Guest Inviter, Helpdesk Administrator, Message Center Reader, Reports Reader, User Account Administrator:
         // User Account Admin template id: fe930be7-5e62-47db-91af-98c3a49a38b1
-        await session
+        result = await session
             .run(
                 `MATCH (at:AZTenant)-[:AZContains]->(UserAccountAdmin)-[:AZHasRole]->(UserAccountAdminRole:AZRole {templateid:"fe930be7-5e62-47db-91af-98c3a49a38b1"})
             MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
@@ -702,8 +726,10 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZResetPassword Edges`)
+
         // Application Admin and Cloud App Admin can add secret to any tenant-resident app or service principal
-        await session
+        result = await session
             .run(
                 `MATCH (at:AZTenant)
                 MATCH p = (at)-[:AZContains]->(Principal)-[:AZHasRole]->(Role)<-[:AZContains]-(at)
@@ -720,8 +746,10 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZAddSecret Edges`)
+
         // InTune Administrators and device owners have the ability to execute SYSTEM commands on a Windows device by abusing Endpoint Manager
-        await session
+        result = await session
             .run(
                 `MATCH (azt:AZTenant)
             MATCH (azt)-[:AZContains]->(InTuneAdmin)-[:AZHasRole]->(azr:AZRole {templateid:'3a2c62db-5318-420d-8d74-23affee5d9d5'})
@@ -737,10 +765,12 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZExecuteCommand Edges`)
+
         // These roles can alter memberships of non-role assignable security groups:
         // GROUPS ADMIN, GLOBAL ADMIN, PRIV ROLE ADMIN, DIRECTORY WRITER, IDENTITY GOVERNANCE ADMIN, USER ADMINISTRATOR,
         // INTUNE ADMINISTRATOR, KNOWLEDGE ADMINISTRATOR, KNOWLEDGE MANAGER
-        await session
+        result = await session
             .run(
                 `MATCH (n)-[:AZHasRole]->(m)
             WHERE m.templateid IN $addGroupMembersRoles
@@ -760,8 +790,10 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZAddMembers Edges`)
+
         // These roles can alter memberships of role assignable security groups: GLOBAL ADMIN, PRIV ROLE ADMIN
-        await session
+        result = await session
             .run(
                 `MATCH (n)-[:AZHasRole]->(m)
             WHERE m.templateid IN $addGroupMembersRoles
@@ -782,8 +814,10 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZAddMembers Edges`)
+
         // These roles can update the owner of any AZApp: HYBRID IDENTITY ADMINISTRATOR, PARTNER TIER1 SUPPORT, PARTNER TIER2 SUPPORT, DIRECTORY SYNCHRONIZATION ACCOUNTS
-        await session
+        result = await session
             .run(
                 `MATCH (n)-[:AZHasRole]->(m)
             WHERE m.templateid IN $addOwnerRoles
@@ -804,10 +838,13 @@ const MenuContainer = () => {
             )
             .catch((err) => {
                 console.log(err);
-            });
+            })
+
+
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZAddOwner Edges`)
 
         // These roles can update the owner of any AZServicePrincipal: HYBRID IDENTITY ADMINISTRATOR, PARTNER TIER1 SUPPORT, PARTNER TIER2 SUPPORT, DIRECTORY SYNCHRONIZATION ACCOUNTS
-        await session
+        result = await session
             .run(
                 `MATCH (n)-[:AZHasRole]->(m)
             WHERE m.templateid IN $addOwnerRoles
@@ -829,6 +866,8 @@ const MenuContainer = () => {
             .catch((err) => {
                 console.log(err);
             });
+
+        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZAddOwner Edges`)
     };
 
     /**

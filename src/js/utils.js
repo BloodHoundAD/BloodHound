@@ -126,37 +126,44 @@ async function deleteSessions() {
 
 export async function clearDatabase() {
     emitter.emit('openClearingModal');
-    await deleteEdges();
+    await deleteDb();
 }
 
-async function deleteEdges() {
-    let session = driver.session();
-    let results = await session.run('MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)')
-    emitter.emit('refreshDBData')
-    let count = results.records[0].get(0)
-    await session.close()
-
-    if (count === 0){
-        await deleteNodes()
-    }else{
-        await deleteEdges()
-    }
-
+async function deleteDb() {
+    let session = driver.session()
+    let results = await session.run('MATCH (n) CALL { WITH n DETACH DELETE n} IN TRANSACTIONS OF 500 ROWS')
+    console.log(results.summary.counters)
+    await dropConstraints()
 }
-
-async function deleteNodes() {
-    let session = driver.session();
-    let results = await session.run('MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)')
-    emitter.emit('refreshDBData')
-    let count = results.records[0].get(0)
-    await session.close()
-
-    if (count === 0){
-        await dropConstraints()
-    }else{
-        await deleteNodes()
-    }
-}
+//
+// async function deleteEdges() {
+//     let session = driver.session();
+//     let results = await session.run('MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)')
+//     emitter.emit('refreshDBData')
+//     let count = results.records[0].get(0)
+//     await session.close()
+//
+//     if (count === 0){
+//         await deleteNodes()
+//     }else{
+//         await deleteEdges()
+//     }
+//
+// }
+//
+// async function deleteNodes() {
+//     let session = driver.session();
+//     let results = await session.run('MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)')
+//     emitter.emit('refreshDBData')
+//     let count = results.records[0].get(0)
+//     await session.close()
+//
+//     if (count === 0){
+//         await dropConstraints()
+//     }else{
+//         await deleteNodes()
+//     }
+// }
 
 async function dropConstraints() {
     let session = driver.session();
