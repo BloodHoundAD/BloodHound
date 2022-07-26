@@ -267,9 +267,12 @@ const MenuContainer = () => {
                     )) {
                         let props = value.Props;
                         if (props.length === 0) continue;
+                        let chunked = props.chunk();
                         let statement = value.Statement;
 
-                        await uploadData(statement, props)
+                        for (let chunk of chunked) {
+                            await uploadData(statement, chunk);
+                        }
                     }
 
                     for (let item of Object.values(
@@ -277,9 +280,12 @@ const MenuContainer = () => {
                     )) {
                         let props = item.Props;
                         if (props.length === 0) continue;
+                        let chunked = props.chunk();
                         let statement = item.Statement;
 
-                        await uploadData(statement, props)
+                        for (let chunk of chunked) {
+                            await uploadData(statement, chunk);
+                        }
                     }
 
                     for (let item of Object.values(
@@ -287,17 +293,23 @@ const MenuContainer = () => {
                     )) {
                         let props = item.Props;
                         if (props.length === 0) continue;
+                        let chunked = props.chunk();
                         let statement = item.Statement;
 
-                        await uploadData(statement, props)
+                        for (let chunk of chunked) {
+                            await uploadData(statement, chunk);
+                        }
                     }
                 } else {
                     for (let key in processedData) {
                         let props = processedData[key].props;
                         if (props.length === 0) continue;
-                        
-                        let statement = processedData[key].statement
-                        await uploadData(statement, props)
+                        let chunked = props.chunk();
+                        let statement = processedData[key].statement;
+
+                        for (let chunk of chunked) {
+                            await uploadData(statement, chunk);
+                        }
                     }
                 }
 
