@@ -19,7 +19,7 @@ const { dialog, app } = remote;
 
 const { batch } = require('stream-json/utils/Batch');
 
-const FileStatus = Object.freeze({
+export const FileStatus = Object.freeze({
     ParseError: 0,
     InvalidVersion: 1,
     BadType: 2,
@@ -40,6 +40,8 @@ const IngestFuncMap = {
     azure: NewIngestion.convertAzureData,
 };
 
+const TotalPostProcessingQueries = 24;
+
 const MenuContainer = () => {
     const [fileQueue, setFileQueue] = useState({});
     const alert = useAlert();
@@ -49,6 +51,8 @@ const MenuContainer = () => {
     const [uploadVisible, setUploadVisible] = useState(false);
     const [needsPostProcess, setNeedsPostProcess] = useState(false);
     const [postProcessRunning, setPostProcessRunning] = useState(false);
+    const [postProcessStep, setPostProcessStep] = useState(0);
+    const [postProcessVisible, setPostProcessVisible] = useState(false);
 
     useEffect(() => {
         emitter.on('cancelUpload', cancelUpload);
@@ -231,6 +235,8 @@ const MenuContainer = () => {
             };
         }
         setUploadVisible(true);
+        setPostProcessStep(0);
+        setPostProcessVisible(true);
         setFileQueue((state) => {
             return { ...state, ...filteredFiles };
         });
@@ -261,6 +267,7 @@ const MenuContainer = () => {
                 count += data.length;
 
                 let processedData = processor(data);
+
                 if (file.type === 'azure') {
                     for (let value of Object.values(
                         processedData.AzurePropertyMaps
@@ -365,15 +372,15 @@ const MenuContainer = () => {
         }
 
         for (let key of Object.keys(temp)) {
-            if (
-                temp[key].status !== FileStatus.Processing &&
-                temp[key].status !== FileStatus.Waiting
-            ) {
-                delete temp[key];
-            }
+            if (fileIsComplete(temp[key].status)) delete temp[key];
         }
 
         setFileQueue(temp);
+
+        if (postProcessStep === TotalPostProcessingQueries) {
+            setPostProcessVisible(false);
+            setPostProcessStep(0);
+        }
     };
 
     const closeUpload = () => {
@@ -383,7 +390,7 @@ const MenuContainer = () => {
     useEffect(() => {
         const eff = async () => {
             if (postProcessRunning) {
-                return
+                return;
             }
             if (!uploading) {
                 let f;
@@ -408,34 +415,37 @@ const MenuContainer = () => {
                     }
 
                     setNeedsPostProcess(false);
-                    setPostProcessRunning(true)
-                    await postProcessUpload().catch(console.error)
-                    await postProcessAzure().catch(console.error)
-                    console.log('Post-processing complete')
-                    setPostProcessRunning(false)
+                    setPostProcessRunning(true);
+                    await postProcessUpload().catch(console.error);
+                    await postProcessAzure().catch(console.error);
+                    console.log('Post-processing complete');
+                    setPostProcessRunning(false);
                 }
             }
-        }
+        };
 
-        eff().catch(console.error)
+        eff().catch(console.error);
     }, [fileQueue]);
 
     const postProcessUpload = async () => {
         console.log('Running post processing queries');
         let session = driver.session();
 
+        setPostProcessStep(1);
         const baseOwnedStatement =
             'MATCH (n) WHERE n:User or n:Computer AND NOT EXISTS(n.owned) CALL {WITH n SET n.owned = false} IN TRANSACTIONS OF 500 ROWS';
         await session.run(baseOwnedStatement, null).catch((err) => {
             console.log(err);
         });
 
+        setPostProcessStep(2);
         const baseHighValueStatement =
             'MATCH (n:Base) WHERE NOT EXISTS(n.highvalue) CALL { WITH n SET n.highvalue = false} IN TRANSACTIONS OF 500 ROWS';
         await session.run(baseHighValueStatement, null).catch((err) => {
             console.log(err);
         });
 
+        setPostProcessStep(3);
         const dUsersSids = ['S-1-1-0', 'S-1-5-11'];
         const domainUsersAssociationStatement =
             "MATCH (n:Group) WHERE n.objectid ENDS WITH '-513' OR n.objectid ENDS WITH '-515' WITH n UNWIND $sids AS sid MATCH (m:Group) WHERE m.objectid ENDS WITH sid MERGE (n)-[:MemberOf]->(m)";
@@ -451,6 +461,7 @@ const MenuContainer = () => {
     };
 
     const postDcSync = async (session) => {
+        setPostProcessStep(4);
         await session
             .run('MATCH (n:Domain) RETURN n.objectid AS domainid')
             .catch((err) => {
@@ -459,6 +470,7 @@ const MenuContainer = () => {
             .then(async (res) => {
                 for (let domain of res.records) {
                     let domainId = domain.get('domainid');
+                    setPostProcessStep(5);
                     let getChangesResult = await session.run(
                         'MATCH (n)-[:MemberOf|GetChanges*1..]->(:Domain {objectid: $objectid}) RETURN n',
                         { objectid: domainId }
@@ -470,6 +482,7 @@ const MenuContainer = () => {
                         );
                     }
                     let getChangesAllPrincipals = [];
+                    setPostProcessStep(6);
                     let getChangesAllResult = await session.run(
                         'MATCH (n)-[:MemberOf|GetChangesAll*1..]->(:Domain {objectid: $objectid}) RETURN n',
                         { objectid: domainId }
@@ -485,6 +498,7 @@ const MenuContainer = () => {
                             getChangesAllPrincipals.includes(principal)
                     );
 
+                    setPostProcessStep(7);
                     if (dcSyncPrincipals.length > 0) {
                         console.log(
                             'Found DC Sync principals: ' +
@@ -519,16 +533,26 @@ const MenuContainer = () => {
             AzureLabels.PrivilegedRoleAdmin,
         ];
 
+        setPostProcessStep(8);
         //Mark all tenants as High Value
         await session.run('MATCH (n:AZTenant) SET n.highvalue=TRUE');
 
+        setPostProcessStep(9);
         //Blow away all existing post-processed relationships
         let result = await session.run(
-            `MATCH (:AZBase)-[r:{0}]->() CALL { WITH r DELETE r } IN TRANSACTIONS OF {1} ROWS`.formatn(postProcessedRels.join('|'), batchSize)
+            `MATCH (:AZBase)-[r:{0}]->() CALL { WITH r DELETE r } IN TRANSACTIONS OF {1} ROWS`.formatn(
+                postProcessedRels.join('|'),
+                batchSize
+            )
         );
 
-        console.log(`Deleted ${result.summary.counters.updates().relationshipsDeleted} post-processed rels`)
-        
+        console.log(
+            `Deleted ${
+                result.summary.counters.updates().relationshipsDeleted
+            } post-processed rels`
+        );
+
+        setPostProcessStep(10);
         // Global Admins get a direct edge to the AZTenant object they have that role assignment in:
         result = await session
             .run(
@@ -543,8 +567,13 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZGlobalAdmin Edges`)
-        
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZGlobalAdmin Edges`
+        );
+
+        setPostProcessStep(11);
         // Privileged Role Admins get a direct edge to the AZTenant object they have that role assignment in:
         result = await session
             .run(
@@ -559,8 +588,13 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZPrivilegedRoleAdmin Edges`)
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZPrivilegedRoleAdmin Edges`
+        );
 
+        setPostProcessStep(12);
         // Any principal with a password reset role can reset the password of other cloud-resident, non-external users in the same tenant, where those users do not have ANY AzureAD admin role assignment:
         result = await session
             .run(
@@ -591,8 +625,13 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZResetPassword Edges`)
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZResetPassword Edges`
+        );
 
+        setPostProcessStep(13);
         // Global Admins and Privileged Authentication Admins can reset the password for any user in the same tenant:
         result = await session
             .run(
@@ -615,8 +654,13 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZResetPassword Edges`)
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZResetPassword Edges`
+        );
 
+        setPostProcessStep(14);
         // Authentication Admins can reset the password for other users with one or more of the following roles: Auth Admins, Helpdesk Admins, Password Admins, Directory Readers, Guest Inviters, Message Center Readers, and Reports Readers:
         // Authentication admin template id: c4e39bd9-1100-46d3-8c65-fb160da0071f
         result = await session
@@ -647,8 +691,13 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZResetPassword Edges`)
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZResetPassword Edges`
+        );
 
+        setPostProcessStep(15);
         // Helpdesk Admins can reset the password for other users with one or more of the following roles: Auth Admin, Directory Readers, Guest Inviter, Helpdesk Administrator, Message Center Reader, Reports Reader:
         // Helpdesk Admin template id: 729827e3-9c14-49f7-bb1b-9608f156bbb8
         result = await session
@@ -679,8 +728,13 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZResetPassword Edges`)
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZResetPassword Edges`
+        );
 
+        setPostProcessStep(16);
         // Password Admins can reset the password for other users with one or more of the following roles: Directory Readers, Guest Inviter, Password Administrator:
         // Password Admin template id: 966707d0-3269-4727-9be2-8c3a10f19b9d
         result = await session
@@ -707,8 +761,13 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZResetPassword Edges`)
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZResetPassword Edges`
+        );
 
+        setPostProcessStep(17);
         // User Account Admins can reset the password for other users with one or more of the following roles: Directory Readers, Guest Inviter, Helpdesk Administrator, Message Center Reader, Reports Reader, User Account Administrator:
         // User Account Admin template id: fe930be7-5e62-47db-91af-98c3a49a38b1
         result = await session
@@ -738,8 +797,13 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZResetPassword Edges`)
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZResetPassword Edges`
+        );
 
+        setPostProcessStep(18);
         // Application Admin and Cloud App Admin can add secret to any tenant-resident app or service principal
         result = await session
             .run(
@@ -758,8 +822,13 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZAddSecret Edges`)
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZAddSecret Edges`
+        );
 
+        setPostProcessStep(19);
         // InTune Administrators and device owners have the ability to execute SYSTEM commands on a Windows device by abusing Endpoint Manager
         result = await session
             .run(
@@ -777,8 +846,13 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZExecuteCommand Edges`)
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZExecuteCommand Edges`
+        );
 
+        setPostProcessStep(20);
         // These roles can alter memberships of non-role assignable security groups:
         // GROUPS ADMIN, GLOBAL ADMIN, PRIV ROLE ADMIN, DIRECTORY WRITER, IDENTITY GOVERNANCE ADMIN, USER ADMINISTRATOR,
         // INTUNE ADMINISTRATOR, KNOWLEDGE ADMINISTRATOR, KNOWLEDGE MANAGER
@@ -802,8 +876,13 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZAddMembers Edges`)
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZAddMembers Edges`
+        );
 
+        setPostProcessStep(21);
         // These roles can alter memberships of role assignable security groups: GLOBAL ADMIN, PRIV ROLE ADMIN
         result = await session
             .run(
@@ -826,8 +905,13 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZAddMembers Edges`)
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZAddMembers Edges`
+        );
 
+        setPostProcessStep(22);
         // These roles can update the owner of any AZApp: HYBRID IDENTITY ADMINISTRATOR, PARTNER TIER1 SUPPORT, PARTNER TIER2 SUPPORT, DIRECTORY SYNCHRONIZATION ACCOUNTS
         result = await session
             .run(
@@ -850,11 +934,15 @@ const MenuContainer = () => {
             )
             .catch((err) => {
                 console.log(err);
-            })
+            });
 
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZAddOwner Edges`
+        );
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZAddOwner Edges`)
-
+        setPostProcessStep(23);
         // These roles can update the owner of any AZServicePrincipal: HYBRID IDENTITY ADMINISTRATOR, PARTNER TIER1 SUPPORT, PARTNER TIER2 SUPPORT, DIRECTORY SYNCHRONIZATION ACCOUNTS
         result = await session
             .run(
@@ -879,7 +967,12 @@ const MenuContainer = () => {
                 console.log(err);
             });
 
-        console.log(`Created ${result.summary.counters.updates().relationshipsCreated} AZAddOwner Edges`)
+        console.log(
+            `Created ${
+                result.summary.counters.updates().relationshipsCreated
+            } AZAddOwner Edges`
+        );
+        setPostProcessStep(24);
     };
 
     /**
@@ -1013,6 +1106,8 @@ const MenuContainer = () => {
                 clearFinished={clearFinished}
                 open={uploadVisible}
                 close={closeUpload}
+                postProcessStep={postProcessStep}
+                postProcessVisible={postProcessVisible}
             />
         </div>
     );

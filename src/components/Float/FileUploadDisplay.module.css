@@ -17,6 +17,10 @@
     font-weight: bold;
 }
 
+.invisible {
+    visibility: hidden;
+}
+
 .status {
     font-family: Helvetica;
     font-size: 15px;
