@@ -1294,7 +1294,7 @@ export function convertAzureKeyVault(data, ingestionData) {
             AzureLabels.KeyVault,
             AzureLabels.Contains
         ),
-        {source: data.resourceGroup.toString(), target: data.id.toUpperCase()}
+        {source: data.resourceGroup.toUpperCase(), target: data.id.toUpperCase()}
     );
 }
 

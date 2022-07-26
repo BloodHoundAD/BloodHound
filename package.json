@@ -11,7 +11,9 @@
     },
     "keywords": [
         "Graph",
-        "Active Directory"
+        "Active Directory",
+        "Azure",
+        "Security"
     ],
     "homepage": "https://github.com/BloodHoundAD/Bloodhound",
     "repository": {
