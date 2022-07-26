@@ -1,6 +1,7 @@
-const Abuse = (sourceName, sourceType, targetName, targetType) => {
-    let text = ``;
-    return { __html: text };
+import React from 'react';
+
+const Abuse = () => {
+    return <></>
 };
 
 export default Abuse;
