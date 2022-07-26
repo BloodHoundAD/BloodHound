@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+If this is a SharpHound bug, please file the bug in the SharpHound repo [here](https://github.com/BloodHoundAD/SharpHound)
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
