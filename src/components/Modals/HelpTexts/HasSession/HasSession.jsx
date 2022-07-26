@@ -9,35 +9,18 @@ import References from './References';
 const HasSession = ({ sourceName, sourceType, targetName, targetType }) => {
     return (
         <Tabs defaultActiveKey={1} id='tab-style' bsStyle='pills' justified>
-            <Tab
-                eventKey={1}
-                title='GENERAL'
-                dangerouslySetInnerHTML={General(
-                    sourceName,
-                    sourceType,
-                    targetName,
-                    targetType
-                )}
-                className='helptab'
-            />
-            <Tab
-                eventKey={2}
-                title='ABUSE'
-                dangerouslySetInnerHTML={Abuse()}
-                className='helptab'
-            />
-            <Tab
-                eventKey={3}
-                title='OPSEC'
-                dangerouslySetInnerHTML={Opsec()}
-                className='helptab'
-            />
-            <Tab
-                eventKey={4}
-                title='REFERENCES'
-                dangerouslySetInnerHTML={References()}
-                className='helptab'
-            />
+            <Tab eventKey={1} title='GENERAL' className='helptab'>
+                <General sourceName={sourceName} targetName={targetName} />
+            </Tab>
+            <Tab eventKey={2} title='ABUSE' className='helptab'>
+                <Abuse />
+            </Tab>
+            <Tab eventKey={3} title='OPSEC' className='helptab'>
+                <Opsec />
+            </Tab>
+            <Tab eventKey={4} title='REFERENCES' className='helptab'>
+                <References />
+            </Tab>
         </Tabs>
     );
 };

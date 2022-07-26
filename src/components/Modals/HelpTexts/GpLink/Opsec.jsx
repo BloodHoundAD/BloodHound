@@ -1,6 +1,7 @@
+import React from 'react';
+
 const Opsec = () => {
-    let text = `There are no opsec considerations related to this edge.`;
-    return { __html: text };
+    return <p>There are no opsec considerations related to this edge.</p>;
 };
 
 export default Opsec;

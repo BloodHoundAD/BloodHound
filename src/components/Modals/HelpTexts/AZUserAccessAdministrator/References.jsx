@@ -1,6 +1,11 @@
+import React from 'react';
+
 const References = () => {
-    let text = `<a href="https://blog.netspi.com/maintaining-azure-persistence-via-automation-accounts/">https://blog.netspi.com/maintaining-azure-persistence-via-automation-accounts/</a>`;
-    return { __html: text };
+    return (
+        <a href='https://blog.netspi.com/maintaining-azure-persistence-via-automation-accounts/'>
+            https://blog.netspi.com/maintaining-azure-persistence-via-automation-accounts/
+        </a>
+    );
 };
 
 export default References;

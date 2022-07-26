@@ -1,6 +1,7 @@
-const General = (sourceName, sourceType, targetName, targetType) => {
-    let text = `The ability to read secrets from key vaults`;
-    return { __html: text };
+import React from 'react';
+
+const General = () => {
+    return <p>The ability to read secrets from key vaults</p>;
 };
 
 export default General;

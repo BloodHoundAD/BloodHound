@@ -1,12 +1,12 @@
 AzureHound
 ==========
 
-AzureHound uses the “Az” Azure PowerShell module and “Azure AD” PowerShell
+AzureHound uses the "Az" Azure PowerShell module and "Azure AD" PowerShell
 module for gathering data within Azure and Azure AD. 
 
 If the modules are not installed, you can use the the following commands to installed them. 
 The modules require PowerShell version 5.1 and greater. To check your PowerShell version,
-use “$PSVersionTable.PSVersion”. 
+use "$PSVersionTable.PSVersion". 
 
 :: 
 
@@ -72,11 +72,11 @@ stolen using the command:
 You can then decode this JWT token to gather the UserPrincipalName and TenantID by
 copy and pasting it into the JWT decoder.
 
-To use AzureHound, you can invoke it using the command “Invoke-AzureHound”
+To use AzureHound, you can invoke it using the command "Invoke-AzureHound"
 
-By default, AzureHound will output the results to a file called “[timestamp]-azurecollection.zip”
-in the directory that AzureHound is run from. This can be changed using the “-OutputDirectory”
-switch, e.g. “Invoke-AzureHound -OutputDirectory “C:\temp\results””
+By default, AzureHound will output the results to a file called "[timestamp]-azurecollection.zip"
+in the directory that AzureHound is run from. This can be changed using the "-OutputDirectory"
+switch, e.g. "Invoke-AzureHound -OutputDirectory "C:\temp\results""
 
 AzureHound supports a few switches, as shown below:
 
@@ -84,4 +84,4 @@ AzureHound supports a few switches, as shown below:
 
     -Install | Installs the PowerShell modules
     -TenantId xxxx-xxxx-xxxx-xxxx | Gather using a specific tenant Id instead of using the current one
-    -OutputDirectory “C:\path\to\destination\folder” | Outputs the results to a custom directory
+    -OutputDirectory "C:\path\to\destination\folder" | Outputs the results to a custom directory
