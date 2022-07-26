@@ -1,8 +1,7 @@
-import { groupSpecialFormat} from '../Formatter';
+import React from 'react';
 
-const General = (sourceName, sourceType, targetName, targetType) => {
-    let text = ``;
-    return { __html: text };
+const General = () => {
+    return <></>;
 };
 
 export default General;
