@@ -1283,7 +1283,7 @@ function Invoke-AzureHound {
     Write-Info "Processing Privileged Role Admin role"
     $PrivRoleColl = New-Object System.Collections.ArrayList
     $PrivilegedRoleAdmins = $UserRoles | ? { $_.RoleID -Contains 'e8611ab8-c189-46e8-94e1-60213ab1f814' }
-    $PrivilegedRoleAdminRights = ForEach ($User in $PrivilegedRoleAdmins) { 
+    ForEach ($User in $PrivilegedRoleAdmins) { 
 
         $PrivilegedRoleAdminRight = [PSCustomObject]@{
             UserName            = $User.UserName
@@ -1359,12 +1359,12 @@ function Invoke-AzureHound {
    $SPOS = Get-AzADApplication | Get-AzADServicePrincipal | %{
 
     $ServicePrincipals = [PSCustomObject]@{
-        AppId                   = $_.ApplicationId
+        AppId                   = $_.AppId
         AppName                 = $_.DisplayName
         ServicePrincipalId      = $_.Id
-        ServicePrincipalType    = $_.ObjectType
+        ServicePrincipalType    = $_.ServicePrincipalType
     }
-
+    $ServicePrincipals
     $null = $Coll.Add($ServicePrincipals)
 
     }
@@ -1393,12 +1393,12 @@ function Invoke-AzureHound {
     # Application Admins - Can create new secrets for application service principals
     # Write to appadmins.json
     $AppAdmins = $UserRoles | Where-Object {$_.RoleID -match '9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3'}
-    $SPsWithAzureAppAdminRole = $UserRoles | Where-Object {$_.RoleID -match '9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3' -and $_.UserType -match 'serviceprincipal' }
+    $SPsWithAzureAppAdminRole = $UserRoles | Where-Object {$_.ObjectType -match 'serviceprincipal' }
     $AppsWithAppAdminRole = ForEach ($SP in $SPsWithAzureAppAdminRole) {
-        $AppWithRole = $SPOS | ?{$_.ServicePrincipalID -Match $SP.UserID}
+        $AppWithRole = $SPOS | Where-Object {$_.ServicePrincipalID -Match $SP.UserID}
         $AppWithRole
     }
-    $AppAdminsRights = ForEach ($Principal in $AppAdmins) {
+    ForEach ($Principal in $AppAdmins) {
             
         $TargetApps = $AppsWithAppAdminRole
             
@@ -1406,7 +1406,7 @@ function Invoke-AzureHound {
 
             $AppRight = [PSCustomObject]@{
                 AppAdminID          = $Principal.UserID
-                AppAdminType        = $Principal.UserType
+                AppAdminType        = $Principal.ObjectType
                 AppAdminOnPremID    = $Principal.UserOnPremID
                 TargetAppID         = $TargetApp.AppID
             }
@@ -1419,7 +1419,7 @@ function Invoke-AzureHound {
 
             $AppRight = [PSCustomObject]@{
                 AppAdminID          = $Principal.UserID
-                AppAdminType        = $Principal.UserType
+                AppAdminType        = $Principal.ObjectType
                 AppAdminOnPremID    = $Principal.UserOnPremID
                 TargetAppID         = $TargetApp.AppID
             }
@@ -1436,12 +1436,12 @@ function Invoke-AzureHound {
 	Write-Info "Processing Cloud Application Admins"
     $Coll = New-Object System.Collections.ArrayList
     $CloudAppAdmins = $UserRoles | Where-Object {$_.RoleID -match '158c047a-c907-4556-b7ef-446551a6b5f7'}
-    $SPsWithAzureAppAdminRole = $UserRoles | Where-Object {$_.RoleID -match '158c047a-c907-4556-b7ef-446551a6b5f7' -and $_.UserType -match 'serviceprincipal' }
+    $SPsWithAzureAppAdminRole = $UserRoles | Where-Object {$_.ObjectType -match 'serviceprincipal'}
     $AppsWithAppAdminRole = ForEach ($SP in $SPsWithAzureAppAdminRole) {
-        $AppWithRole = $SPOS | ?{$_.ServicePrincipalID -Match $SP.UserID}
+        $AppWithRole = $SPOS | Where-Object {$_.ServicePrincipalID -Match $SP.UserID}
         $AppWithRole
     }
-    $CloudAppAdminRights = ForEach ($Principal in $AppAdmins) {
+    ForEach ($Principal in $CloudAppAdmins) {
             
         $TargetApps = $AppsWithAppAdminRole
             
@@ -1449,7 +1449,7 @@ function Invoke-AzureHound {
 
             $AppRight = [PSCustomObject]@{
                 AppAdminID          = $Principal.UserID
-                AppAdminType        = $Principal.UserType
+                AppAdminType        = $Principal.ObjectType
                 AppAdminOnPremID    = $Principal.UserOnPremID
                 TargetAppID         = $TargetApp.AppID
             }
@@ -1462,7 +1462,7 @@ function Invoke-AzureHound {
 
             $AppRight = [PSCustomObject]@{
                 AppAdminID          = $Principal.UserID
-                AppAdminType        = $Principal.UserType
+                AppAdminType        = $Principal.ObjectType
                 AppAdminOnPremID    = $Principal.UserOnPremID
                 TargetAppID         = $TargetApp.AppID
             }
