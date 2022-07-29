@@ -43,11 +43,11 @@ const IngestFuncMap = {
 const TotalPostProcessingQueries = 24;
 
 const MenuContainer = () => {
-    const [fileQueue, setFileQueue] = useState({});
     const alert = useAlert();
-    const input = useRef(null);
-    const [uploading, setUploading] = useState(false);
     const fileId = useRef(0);
+    const input = useRef(null);
+    const [fileQueue, setFileQueue] = useState({});
+    const [uploading, setUploading] = useState(false);
     const [uploadVisible, setUploadVisible] = useState(false);
     const [needsPostProcess, setNeedsPostProcess] = useState(false);
     const [postProcessRunning, setPostProcessRunning] = useState(false);

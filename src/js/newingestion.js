@@ -1,4 +1,4 @@
-import {groupBy} from 'lodash/collection';
+import { groupBy } from 'lodash/collection';
 
 const TRUST_DIRECTION_INBOUND = 'Inbound';
 const TRUST_DIRECTION_OUTBOUND = 'Outbound';
@@ -73,11 +73,11 @@ export const AzureLabels = {
     VMContributor: 'AZVMContributor',
     AddSecret: 'AZAddSecret',
     ExecuteCommand: 'AZExecuteCommand',
-    ResetPassword: "AZResetPassword",
-    AddMembers: "AZAddMembers",
-    GlobalAdmin: "AZGlobalAdmin",
-    PrivilegedRoleAdmin: "AZPrivilegedRoleAdmin",
-    PrivilegedAuthAdmin: "AZPrivilegedAuthAdmin",
+    ResetPassword: 'AZResetPassword',
+    AddMembers: 'AZAddMembers',
+    GlobalAdmin: 'AZGlobalAdmin',
+    PrivilegedRoleAdmin: 'AZPrivilegedRoleAdmin',
+    PrivilegedAuthAdmin: 'AZPrivilegedAuthAdmin',
 };
 
 const AzurehoundKindLabels = {
@@ -142,7 +142,10 @@ export function buildGroupJsonNew(chunk) {
         let aces = group.Aces;
         let members = group.Members;
 
-        queries.properties.props.push({objectid: identifier, map: properties});
+        queries.properties.props.push({
+            objectid: identifier,
+            map: properties,
+        });
 
         processAceArrayNew(aces, identifier, ADLabels.Group, queries);
 
@@ -153,7 +156,7 @@ export function buildGroupJsonNew(chunk) {
         for (let objectType in grouped) {
             format[0] = objectType;
             let props = grouped[objectType].map((member) => {
-                return {source: member.ObjectIdentifier, target: identifier};
+                return { source: member.ObjectIdentifier, target: identifier };
             });
 
             insertNew(queries, format, props);
@@ -188,7 +191,10 @@ export function buildComputerJsonNew(chunk) {
         let regSessions = computer.RegistrySessions.Results;
         let aces = computer.Aces;
 
-        queries.properties.props.push({objectid: identifier, map: properties});
+        queries.properties.props.push({
+            objectid: identifier,
+            map: properties,
+        });
 
         processAceArrayNew(aces, identifier, ADLabels.Computer, queries);
 
@@ -213,7 +219,7 @@ export function buildComputerJsonNew(chunk) {
         ];
 
         let props = allowedToDelegate.map((delegate) => {
-            return {source: identifier, target: delegate.ObjectIdentifier};
+            return { source: identifier, target: delegate.ObjectIdentifier };
         });
 
         insertNew(queries, format, props);
@@ -238,7 +244,7 @@ export function buildComputerJsonNew(chunk) {
             '{isacl:false, source:"netsessionenum"}',
         ];
         props = sessions.map((session) => {
-            return {source: session.ComputerSID, target: session.UserSID};
+            return { source: session.ComputerSID, target: session.UserSID };
         });
         insertNew(queries, format, props);
 
@@ -249,7 +255,7 @@ export function buildComputerJsonNew(chunk) {
             '{isacl:false, source:"netwkstauserenum"}',
         ];
         props = privSessions.map((session) => {
-            return {source: session.ComputerSID, target: session.UserSID};
+            return { source: session.ComputerSID, target: session.UserSID };
         });
         insertNew(queries, format, props);
 
@@ -260,7 +266,7 @@ export function buildComputerJsonNew(chunk) {
             '{isacl:false, source:"registry"}',
         ];
         props = regSessions.map((session) => {
-            return {source: session.ComputerSID, target: session.UserSID};
+            return { source: session.ComputerSID, target: session.UserSID };
         });
         insertNew(queries, format, props);
 
@@ -347,8 +353,7 @@ export function buildComputerJsonNew(chunk) {
 export function buildUserJsonNew(chunk) {
     let queries = {};
     queries.properties = {
-        statement:
-            PROP_QUERY.format(ADLabels.User),
+        statement: PROP_QUERY.format(ADLabels.User),
         props: [],
     };
 
@@ -368,7 +373,12 @@ export function buildUserJsonNew(chunk) {
             map: properties,
         });
 
-        let format = [ADLabels.User, ADLabels.Group, ADLabels.MemberOf, NON_ACL_PROPS];
+        let format = [
+            ADLabels.User,
+            ADLabels.Group,
+            ADLabels.MemberOf,
+            NON_ACL_PROPS,
+        ];
         if (primaryGroup !== null) {
             insertNew(queries, format, {
                 source: identifier,
@@ -383,7 +393,7 @@ export function buildUserJsonNew(chunk) {
             NON_ACL_PROPS,
         ];
         let props = allowedToDelegate.map((principal) => {
-            return {source: identifier, target: principal.ObjectIdentifier};
+            return { source: identifier, target: principal.ObjectIdentifier };
         });
 
         insertNew(queries, format, props);
@@ -423,7 +433,10 @@ export function buildGpoJsonNew(chunk) {
         let aces = gpo.Aces;
         let properties = gpo.Properties;
 
-        queries.properties.props.push({objectid: identifier, map: properties});
+        queries.properties.props.push({
+            objectid: identifier,
+            map: properties,
+        });
         processAceArrayNew(aces, identifier, ADLabels.GPO, queries);
     }
 
@@ -447,7 +460,10 @@ export function buildContainerJsonNew(chunk) {
         let properties = container.Properties;
         let children = container.ChildObjects;
 
-        queries.properties.props.push({objectid: identifier, map: properties});
+        queries.properties.props.push({
+            objectid: identifier,
+            map: properties,
+        });
         processAceArrayNew(aces, identifier, ADLabels.Container, queries);
 
         let format = [ADLabels.Container, '', ADLabels.Contains, NON_ACL_PROPS];
@@ -456,7 +472,7 @@ export function buildContainerJsonNew(chunk) {
         for (let objectType in grouped) {
             format[1] = objectType;
             let props = grouped[objectType].map((child) => {
-                return {source: identifier, target: child.ObjectIdentifier};
+                return { source: identifier, target: child.ObjectIdentifier };
             });
 
             insertNew(queries, format, props);
@@ -488,7 +504,10 @@ export function buildOuJsonNew(chunk) {
 
         processAceArrayNew(aces, identifier, 'OU', queries);
 
-        queries.properties.props.push({objectid: identifier, map: properties});
+        queries.properties.props.push({
+            objectid: identifier,
+            map: properties,
+        });
 
         let format = [ADLabels.OU, '', ADLabels.Contains, NON_ACL_PROPS];
         let grouped = groupBy(children, GROUP_OBJECT_TYPE);
@@ -496,7 +515,7 @@ export function buildOuJsonNew(chunk) {
         for (let objectType in grouped) {
             format[1] = objectType;
             let props = grouped[objectType].map((child) => {
-                return {source: identifier, target: child.ObjectIdentifier};
+                return { source: identifier, target: child.ObjectIdentifier };
             });
 
             insertNew(queries, format, props);
@@ -639,7 +658,7 @@ export function buildDomainJsonNew(chunk) {
         for (let objectType in grouped) {
             format[1] = objectType;
             let props = grouped[objectType].map((child) => {
-                return {source: identifier, target: child.ObjectIdentifier};
+                return { source: identifier, target: child.ObjectIdentifier };
             });
 
             insertNew(queries, format, props);
@@ -769,7 +788,7 @@ export function buildDomainJsonNew(chunk) {
 
             queries.properties.props.push({
                 objectid: target,
-                map: {name: targetName},
+                map: { name: targetName },
             });
 
             if (
@@ -1131,7 +1150,7 @@ export function convertAzureDevice(data, ingestionData) {
     insertNewAzureRel(
         ingestionData,
         fProps(AzureLabels.Tenant, AzureLabels.Device, AzureLabels.Contains),
-        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
+        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
     );
 }
 
@@ -1184,7 +1203,6 @@ export function convertAzureGroup(data, ingestionData) {
         false
     );
 
-
     if (data.onPremisesSecurityIdentifier) {
         insertNewAzureNodeProp(
             ingestionData,
@@ -1200,7 +1218,7 @@ export function convertAzureGroup(data, ingestionData) {
     insertNewAzureRel(
         ingestionData,
         fProps(AzureLabels.Tenant, AzureLabels.Group, AzureLabels.Contains),
-        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
+        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
     );
 }
 
@@ -1264,7 +1282,7 @@ export function convertAzureKeyVault(data, ingestionData) {
             map: {
                 name: data.name.toUpperCase(),
                 enablerbacauthorization:
-                data.properties.enableRbacAuthorization,
+                    data.properties.enableRbacAuthorization,
                 tenantid: data.tenantId.toUpperCase(),
             },
         },
@@ -1278,7 +1296,10 @@ export function convertAzureKeyVault(data, ingestionData) {
             AzureLabels.KeyVault,
             AzureLabels.Contains
         ),
-        {source: data.resourceGroup.toUpperCase(), target: data.id.toUpperCase()}
+        {
+            source: data.resourceGroup.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
     );
 }
 
@@ -1300,7 +1321,10 @@ export function convertAzureKeyVaultAccessPolicy(data, ingestionData) {
         );
     }
 
-    if (data.permissions.secrets !== null && data.permissions.secrets.some(get)) {
+    if (
+        data.permissions.secrets !== null &&
+        data.permissions.secrets.some(get)
+    ) {
         insertNewAzureRel(
             ingestionData,
             fProps(
@@ -1315,7 +1339,10 @@ export function convertAzureKeyVaultAccessPolicy(data, ingestionData) {
         );
     }
 
-    if (data.permissions.certificates !== null && data.permissions.certificates.some(get)) {
+    if (
+        data.permissions.certificates !== null &&
+        data.permissions.certificates.some(get)
+    ) {
         insertNewAzureRel(
             ingestionData,
             fProps(
@@ -1484,7 +1511,7 @@ export function convertAzureManagementGroup(data, ingestionData) {
         false
     );
 
-    if (data.id.toUpperCase().endsWith(data.tenantId.toUpperCase())){
+    if (data.id.toUpperCase().endsWith(data.tenantId.toUpperCase())) {
         insertNewAzureRel(
             ingestionData,
             fProps(
@@ -1492,7 +1519,10 @@ export function convertAzureManagementGroup(data, ingestionData) {
                 AzureLabels.ManagementGroup,
                 AzureLabels.Contains
             ),
-            {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
+            {
+                source: data.tenantId.toUpperCase(),
+                target: data.id.toUpperCase(),
+            }
         );
     }
 }
@@ -1586,13 +1616,13 @@ export function convertAzureRole(data, ingestionData) {
         ingestionData,
         AzureLabels.Role,
         {
-            objectid: data.id.toUpperCase(),
+            objectid: `${data.id}@${data.tenantId}`.toUpperCase(),
             map: {
                 description: data.description,
                 displayname: data.displayName,
                 isbuiltin: data.isBuiltIn,
                 enabled: data.isEnabled,
-                templateid: data.templateId,
+                templateid: data.templateId.toUpperCase(),
                 name: `${data.displayName}@${data.tenantName}`.toUpperCase(),
                 tenantid: data.tenantId.toUpperCase(),
             },
@@ -1603,7 +1633,10 @@ export function convertAzureRole(data, ingestionData) {
     insertNewAzureRel(
         ingestionData,
         fProps(AzureLabels.Tenant, AzureLabels.Role, AzureLabels.Contains),
-        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
+        {
+            source: data.tenantId.toUpperCase(),
+            target: `${data.id}@${data.tenantId}`.toUpperCase(),
+        }
     );
 }
 
@@ -1617,9 +1650,9 @@ export function convertAzureRoleAssignment(data, ingestionData) {
     for (let roleAssignment of data.roleAssignments) {
         if (
             roleAssignment.roleDefinitionId ===
-            AzureApplicationAdministratorRoleId ||
+                AzureApplicationAdministratorRoleId ||
             roleAssignment.roleDefinitionId ===
-            AzureCloudApplicationAdministratorRoleId
+                AzureCloudApplicationAdministratorRoleId
         ) {
             if (roleAssignment.directoryScopeId === '/') {
                 insertNewAzureRel(
@@ -1631,7 +1664,7 @@ export function convertAzureRoleAssignment(data, ingestionData) {
                     ),
                     {
                         source: roleAssignment.principalId.toUpperCase(),
-                        target: roleAssignment.roleDefinitionId.toUpperCase(),
+                        target: `${roleAssignment.roleDefinitionId}@${data.tenantId}`.toUpperCase(),
                     }
                 );
             } else {
@@ -1645,7 +1678,9 @@ export function convertAzureRoleAssignment(data, ingestionData) {
                     fProps(AzureLabels.Base, AzureLabels.Base, relType),
                     {
                         source: roleAssignment.principalId.toUpperCase(),
-                        target: roleAssignment.directoryScopeId.substring(1).toUpperCase(),
+                        target: roleAssignment.directoryScopeId
+                            .substring(1)
+                            .toUpperCase(),
                     }
                 );
             }
@@ -1655,7 +1690,7 @@ export function convertAzureRoleAssignment(data, ingestionData) {
                 fProps(AzureLabels.Base, AzureLabels.Role, AzureLabels.HasRole),
                 {
                     source: roleAssignment.principalId.toUpperCase(),
-                    target: roleAssignment.roleDefinitionId.toUpperCase(),
+                    target: `${roleAssignment.roleDefinitionId}@${data.tenantId}`.toUpperCase(),
                 }
             );
         }
@@ -1708,7 +1743,7 @@ export function convertAzureServicePrincipal(data, ingestionData) {
             AzureLabels.ServicePrincipal,
             AzureLabels.RunsAs
         ),
-        {source: data.appId.toUpperCase(), target: data.id.toUpperCase()}
+        { source: data.appId.toUpperCase(), target: data.id.toUpperCase() }
     );
 
     insertNewAzureRel(
@@ -1718,7 +1753,7 @@ export function convertAzureServicePrincipal(data, ingestionData) {
             AzureLabels.ServicePrincipal,
             AzureLabels.Contains
         ),
-        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
+        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
     );
 }
 
@@ -1889,7 +1924,7 @@ export function convertAzureUser(data, ingestionData) {
     insertNewAzureRel(
         ingestionData,
         fProps(AzureLabels.Tenant, AzureLabels.User, AzureLabels.Contains),
-        {source: data.tenantId.toUpperCase(), target: data.id.toUpperCase()}
+        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
     );
 }
 
@@ -1944,7 +1979,7 @@ export function convertAzureVirtualMachine(data, ingestionData) {
 
     if (data.identity.userAssignedIdentities) {
         for (let key in data.identity.userAssignedIdentities) {
-            let user = data.identity.userAssignedIdentities[key]
+            let user = data.identity.userAssignedIdentities[key];
             if (user.clientId !== '') {
                 insertNewAzureRel(
                     ingestionData,
@@ -2166,7 +2201,9 @@ function getTypeFromDirectoryObject(directoryObject) {
         case DirectoryObjectEntityTypes.ServicePrincipal:
             return AzureLabels.ServicePrincipal;
         default:
-            console.error(`unexpected entity type: ${directoryObject['@odata.type']}`);
+            console.error(
+                `unexpected entity type: ${directoryObject['@odata.type']}`
+            );
             console.log(directoryObject);
             return AzureLabels.Base;
     }
