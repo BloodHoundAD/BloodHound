@@ -149,7 +149,8 @@ const AddEdgeModal = () => {
             edgeValue === 'ReadLAPSPassword' ||
             edgeValue === 'WriteSPN' ||
             edgeValue === 'AddKeyCredentialLink' ||
-            edgeValue === 'AddSelf'
+            edgeValue === 'AddSelf' ||
+            edgeValue === 'SyncLAPSPassword'
         ) {
             edgepart = `[r:${edgeValue} {isacl: true}]`;
         } else if (edgeValue === 'SQLAdmin') {
@@ -311,6 +312,7 @@ const AddEdgeModal = () => {
                             </option>
                             <option value='SQLAdmin'>SQLAdmin</option>
                             <option value='HasSIDHistory'>HasSIDHistory</option>
+                            <option value='SyncLAPSPassword'>SyncLAPSPassword</option>
                         </FormControl>
                         {errors.edgeErrors.length > 0 && (
                             <span className={styles.error}>

@@ -47,6 +47,7 @@ import Default from './HelpTexts/Default/Default';
 import WriteSPN from "./HelpTexts/WriteSPN/WriteSPN";
 import AddSelf from "./HelpTexts/AddSelf/AddSelf";
 import AddKeyCredentialLink from "./HelpTexts/AddKeyCredentialLink/AddKeyCredentialLink";
+import SyncLAPSPassword from "./HelpTexts/SyncLAPSPassword/SyncLAPSPassword";
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -124,7 +125,8 @@ const HelpModal = () => {
         AZVMContributor: AZVMContributor,
         WriteSPN: WriteSPN,
         AddSelf: AddSelf,
-        AddKeyCredentialLink: AddKeyCredentialLink
+        AddKeyCredentialLink: AddKeyCredentialLink,
+        SyncLAPSPassword: SyncLAPSPassword
     };
 
     const Component = edge in components ? components[edge] : Default;

@@ -58,7 +58,8 @@ const EdgeFilter = ({ open }) => {
                             'ReadGMSAPassword',
                             'AddKeyCredentialLink',
                             'WriteSPN',
-                            'AddSelf'
+                            'AddSelf',
+                            'SyncLAPSPassword'
                         ]}
                         sectionName='ACL'
                     />
@@ -75,6 +76,7 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterCheck name='AddKeyCredentialLink' />
                     <EdgeFilterCheck name='WriteSPN' />
                     <EdgeFilterCheck name='AddSelf' />
+                    <EdgeFilterCheck name='SyncLAPSPassword' />
                     <EdgeFilterSection
                         title='Containers'
                         sectionName='container'

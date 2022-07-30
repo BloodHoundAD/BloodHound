@@ -399,6 +399,16 @@ const MenuContainer = () => {
             console.log(err);
         });
 
+        const createSyncLAPSPasswordStatement = "MATCH (n)-[:GetChangesInFilteredSet]->(m:Domain) WHERE (n)-[:GetChanges]->(m) AND NOT (n)-[:GetChangesAll]->(m) AND NOT n.objectid ENDS WITH '-S-1-5-9' MATCH (o:Computer {haslaps: true, domainsid: m.domainsid}) CREATE (n)-[:SyncLAPSPassword {isacl: true, isinherited: false}]->(o)"
+        await session.run(createSyncLAPSPasswordStatement, null).catch((err) => {
+            console.log(err);
+        });
+
+        const deleteGetChangesInFilteredSetStatement = "MATCH ()-[r:GetChangesInFilteredSet]->(:Domain) DELETE r"
+        await session.run(deleteGetChangesInFilteredSetStatement, null).catch((err) => {
+            console.log(err);
+        });
+
         await session.close();
         console.log("Post processing done")
     }
