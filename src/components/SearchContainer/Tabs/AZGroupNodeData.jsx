@@ -231,7 +231,7 @@ const AZGroupNodeData = () => {
 
                 <CollapsibleSection header='INBOUND OBJECT CONTROL'>
                     <div className={styles.itemlist}>
-                        <Table class='table table-hover table-striped table-borderless table-responsive'>
+                        <Table>
                             <thead></thead>
                             <tbody className='searchable'>
                                 <NodeCypherLink

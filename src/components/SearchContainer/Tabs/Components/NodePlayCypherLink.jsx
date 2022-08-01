@@ -63,6 +63,15 @@ const NodePlayCypherLink = ({
                 setValue(result.records[0].get(0));
                 setReady(true);
             })
+            .then(() => {
+                emitter.emit(
+                    'query',
+                    `${baseQuery} RETURN p`,
+                    { objectid: target, domain: domain },
+                    start,
+                    end
+                );
+            })
             .catch((error) => {
                 if (
                     !error.message.includes(
@@ -77,13 +86,8 @@ const NodePlayCypherLink = ({
     };
 
     return (
-        <tr
-            onClick={onClick}
-            style={{ cursor: 'pointer' }}
-        >
-            <td align='left'>
-                {property}
-            </td>
+        <tr onClick={onClick} style={{ cursor: 'pointer' }}>
+            <td align='left'>{property}</td>
             <td align='right'>
                 {!played && <Icon glyph='play' extraClass={styles.icon} />}
                 {played && <NodeALink ready={ready} value={value} />}

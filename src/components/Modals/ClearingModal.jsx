@@ -32,9 +32,12 @@ export default class ClearingModal extends Component {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id='ClearingModalHeader'>
-                        Clearing Data
+                        Clear Database
                     </Modal.Title>
                 </Modal.Header>
+                <Modal.Body>
+                    <p>Clearing data. This modal will close once finished.</p>
+                </Modal.Body>
             </BaseModal>
         );
     }
