@@ -823,7 +823,7 @@ const MenuContainer = () => {
         },
         {
             step: 'createAZExecuteCommandEdges',
-            description: `InTune Administrators and device owners have the ability to execute SYSTEM commands on a Windows device by abusing Endpoint Manager`,
+            description: `InTune Administrators have the ability to execute SYSTEM commands on a Windows device by abusing Endpoint Manager`,
             type: 'query',
             statement: `MATCH (azt:AZTenant)
                         MATCH (azt)-[:AZContains]->(InTuneAdmin)-[:AZHasRole]->(azr:AZRole {templateid:'3a2c62db-5318-420d-8d74-23affee5d9d5'})
