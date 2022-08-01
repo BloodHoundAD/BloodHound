@@ -7,10 +7,6 @@ const Abuse = () => {
                 The Virtual Machine Contributor role allows you to run SYSTEM
                 commands on the VM
             </p>
-            <p>
-                <strong>Resource Group</strong>: NOT abusable, and not collected
-                by AzureHound
-            </p>
 
             <p>Via PowerZure:</p>
             <a href='http://Invoke-AzureRunCommand'>Invoke-AzureRunCommand</a>
