@@ -434,7 +434,7 @@ const MenuContainer = () => {
         setPostProcessStep((postProcessStep) => postProcessStep + 1);
     };
 
-    const postDcSync = async (session) => {
+    const postGetChanges = async (session) => {
         await session
             .run('MATCH (n:Domain) RETURN n.objectid AS domainid')
             .catch((err) => {
@@ -466,6 +466,17 @@ const MenuContainer = () => {
                         );
                     }
 
+                    let getChangesFilteredResult = await session.run(
+                        'MATCH (n)-[:MemberOf|GetChangesInFilteredSet*1..]->(:Domain {objectid: $objectid}) RETURN n',
+                        { objectid: domainId }
+                    );
+                    let getChangesFilteredSetPrincipals = [];
+                    for (let principal of getChangesFilteredResult.records) {
+                        getChangesFilteredSetPrincipals.push(
+                            principal.get('n').properties.objectid
+                        );
+                    }
+
                     let dcSyncPrincipals = getChangesPrincipals.filter(
                         (principal) =>
                             getChangesAllPrincipals.includes(principal)
@@ -482,6 +493,26 @@ const MenuContainer = () => {
                             'UNWIND $syncers AS sync MATCH (n:Base {objectid: sync}) MATCH (m:Domain {objectid: $domainid}) MERGE (n)-[:DCSync]->(m)',
                             {
                                 syncers: dcSyncPrincipals,
+                                domainid: domainId,
+                            }
+                        );
+                    }
+
+                    let syncsLapsPrincipals = getChangesPrincipals.filter(
+                        (principal) => getChangesFilteredSetPrincipals.includes(principal)
+                    )
+
+                    if (syncsLapsPrincipals.length > 0 ){
+                        console.log(
+                            'Found SyncLAPSPassword principals: ' +
+                            dcSyncPrincipals.join(', ') +
+                            ' in domain ' +
+                            domainId
+                        );
+                        await session.run(
+                            'UNWIND $syncers AS sync MATCH (n:Base {objectid: sync}) MATCH (m:Domain {objectid: $domainid}) MERGE (n)-[:SyncLAPSPassword]->(m)',
+                            {
+                                syncers: syncsLapsPrincipals,
                                 domainid: domainId,
                             }
                         );
@@ -515,7 +546,7 @@ const MenuContainer = () => {
         {
             step: 'postDCSync',
             type: 'callback',
-            callback: postDcSync,
+            callback: postGetChanges,
         },
     ];
 
@@ -933,16 +964,6 @@ const MenuContainer = () => {
         let session = driver.session();
 
         await executePostProcessSteps(ADPostProcessSteps, session);
-
-        const createSyncLAPSPasswordStatement = "MATCH (n)-[:GetChangesInFilteredSet]->(m:Domain) WHERE (n)-[:GetChanges]->(m) AND NOT (n)-[:GetChangesAll]->(m) AND NOT n.objectid ENDS WITH '-S-1-5-9' MATCH (o:Computer {haslaps: true, domainsid: m.domainsid}) CREATE (n)-[:SyncLAPSPassword {isacl: true, isinherited: false}]->(o)"
-        await session.run(createSyncLAPSPasswordStatement, null).catch((err) => {
-            console.log(err);
-        });
-
-        const deleteGetChangesInFilteredSetStatement = "MATCH ()-[r:GetChangesInFilteredSet]->(:Domain) DELETE r"
-        await session.run(deleteGetChangesInFilteredSetStatement, null).catch((err) => {
-            console.log(err);
-        });
 
         await session.close();
     };
