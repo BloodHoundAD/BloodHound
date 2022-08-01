@@ -5,18 +5,21 @@ import { motion } from 'framer-motion';
 import { AppContext } from '../../AppContext';
 import clsx from 'clsx';
 
-const PostProcessDisplay = ({ step, visible }) => {
+const PostProcessDisplay = ({
+    step,
+    visible,
+    adPostProcessCount,
+    azPostProcessCount,
+}) => {
     const [progress, setProgress] = useState(0);
-
-    const totalActiveDirectoryQueries = 7;
-    const totalAzureQueries = 17;
-    const totalQueries = totalActiveDirectoryQueries + totalAzureQueries;
 
     const context = useContext(AppContext);
 
+    const totalQueries = adPostProcessCount + azPostProcessCount;
+
     const getStatusText = () => {
         if (step === 0) return 'Awaiting Post Processing';
-        else if (step <= totalActiveDirectoryQueries)
+        else if (step <= adPostProcessCount)
             return 'Post Processing Active Directory';
         else if (step < totalQueries) return 'Post Processing Azure';
         else if (step === totalQueries) return 'Post Processing Complete';
