@@ -57,6 +57,7 @@ import WriteSPN from "./HelpTexts/WriteSPN/WriteSPN";
 import AddSelf from "./HelpTexts/AddSelf/AddSelf";
 import AddKeyCredentialLink from "./HelpTexts/AddKeyCredentialLink/AddKeyCredentialLink";
 import DCSync from "./HelpTexts/DCSync/DCSync";
+import SyncLAPSPassword from "./HelpTexts/SyncLAPSPassword/SyncLAPSPassword";
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -148,7 +149,8 @@ const HelpModal = () => {
         WriteSPN: WriteSPN,
         AddSelf: AddSelf,
         AddKeyCredentialLink: AddKeyCredentialLink,
-        DCSync: DCSync
+        DCSync: DCSync,
+        SyncLAPSPassword: SyncLAPSPassword
     };
 
     const Component = edge in components ? components[edge] : Default;

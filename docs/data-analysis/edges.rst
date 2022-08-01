@@ -2080,6 +2080,42 @@ http://www.harmj0y.net/blog/redteaming/the-trustpocalypse/
 
 |
 
+SyncLAPSPassword
+^^^^^^^^^^^^^^^^^^^^
+
+A principal with this signifies the capability of retrieving, through a directory 
+synchronization, the value of confidential and RODC filtered attributes, such as 
+LAPS' *ms-Mcs-AdmPwd*.
+
+Abuse Info
+----------
+
+To abuse these privileges, use DirSync:
+    
+::
+
+    Sync-LAPS -LDAPFilter '(samaccountname=TargetComputer$)'
+    
+For other optional parameters, view the DirSync documentation.
+
+Opsec Considerations
+--------------------
+
+Executing the attack will generate a 4662 (An operation was performed on an object) 
+event at the domain controller if an appropriate SACL is in place on the target object.
+
+References
+----------
+
+* https://github.com/simondotsh/DirSync
+* https://simondotsh.com/infosec/2022/07/11/dirsync.html
+
+|
+
+----
+
+|
+
 AZAddMembers
 ^^^^^^^^^^^^
 

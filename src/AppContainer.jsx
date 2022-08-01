@@ -78,7 +78,8 @@ const fullEdgeList = [
     'AdminTo',
     'AddSelf',
     'WriteSPN',
-    'AddKeyCredentialLink'
+    'AddKeyCredentialLink',
+    'SyncLAPSPassword'
 ];
 
 export default class AppContainer extends Component {

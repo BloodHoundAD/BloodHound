@@ -264,6 +264,7 @@ global.appStore = {
             AddSelf: 'tapered',
             WriteSPN: 'tapered',
             AddKeyCredentialLink: 'tapered',
+            SyncLAPSPassword: 'tapered',
         },
     },
     lowResPalette: {
@@ -304,6 +305,7 @@ global.appStore = {
             ReadGMSAPassword: 'line',
             HasSIDHistory: 'line',
             CanPSRemote: 'line',
+            SyncLAPSPassword: 'line'
         },
     },
     highResStyle: {
@@ -401,6 +403,7 @@ if (typeof conf.get('edgeincluded') === 'undefined') {
         ReadGMSAPassword: true,
         HasSIDHistory: true,
         CanPSRemote: true,
+        SyncLAPSPassword: true,
     });
 }
 

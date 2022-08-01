@@ -61,6 +61,7 @@ const EdgeFilter = ({ open }) => {
                             'AddSelf',
                             'AddAllowedToAct',
                             'DCSync',
+                            'SyncLAPSPassword'
                         ]}
                         sectionName='ACL'
                     />
@@ -79,6 +80,7 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterCheck name='AddSelf' />
                     <EdgeFilterCheck name='AddAllowedToAct' />
                     <EdgeFilterCheck name='DCSync' />
+                    <EdgeFilterCheck name='SyncLAPSPassword' />
                     <EdgeFilterSection
                         title='Containers'
                         sectionName='container'
