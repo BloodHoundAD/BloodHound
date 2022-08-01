@@ -151,6 +151,9 @@ const NodeEditor = () => {
                             </thead>
                             <tbody>
                                 {Object.keys(properties).map(function (key) {
+                                    if (key === 'lastseen'){
+                                        return null
+                                    }
                                     let val = properties[key];
                                     return (
                                         <NodeEditorRow
@@ -161,7 +164,7 @@ const NodeEditor = () => {
                                             updateHandler={updateAttribute}
                                         />
                                     );
-                                })}
+                                }).filter(x => x !== null)}
                             </tbody>
                         </Table>
                     </div>
