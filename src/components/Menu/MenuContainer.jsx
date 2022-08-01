@@ -490,7 +490,7 @@ const MenuContainer = () => {
                                 domainId
                         );
                         await session.run(
-                            'UNWIND $syncers AS sync MATCH (n:Base {objectid: sync}) MATCH (m:Domain {objectid: $domainid}) MERGE (n)-[:DCSync]->(m)',
+                            'UNWIND $syncers AS sync MATCH (n:Base {objectid: sync}) MATCH (m:Domain {objectid: $domainid}) MERGE (n)-[:DCSync {isacl: true, isinherited: false}]->(m)',
                             {
                                 syncers: dcSyncPrincipals,
                                 domainid: domainId,
@@ -510,7 +510,11 @@ const MenuContainer = () => {
                             domainId
                         );
                         await session.run(
-                            'UNWIND $syncers AS sync MATCH (n:Base {objectid: sync}) MATCH (m:Domain {objectid: $domainid}) MERGE (n)-[:SyncLAPSPassword]->(m)',
+                            `UNWIND $syncers AS sync MATCH (n:Base {objectid: sync}) MATCH (n:Computer {domainsid: $domainid, haslaps:true}) 
+                                CALL {
+                                    WITH n, m
+                                    MERGE (n)-[:SyncLAPSPassword {isacl: true, isinherited: false}]->(m)
+                                } IN TRANSACTIONS OF 500 ROWS`,
                             {
                                 syncers: syncsLapsPrincipals,
                                 domainid: domainId,
