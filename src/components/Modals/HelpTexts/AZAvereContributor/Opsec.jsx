@@ -3,8 +3,10 @@ import React from 'react';
 const Opsec = () => {
     return (
         <p>
-            Azure will log each password reset event, including who performed
-            the reset, against which account, and at what date and time.
+            Because you'll be running a command as the SYSTEM user on the
+            Virtual Machine, the same opsec considerations for running malicious
+            commands on any system should be taken into account: command line
+            logging, PowerShell script block logging, EDR, etc.
         </p>
     );
 };
