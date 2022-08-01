@@ -7,8 +7,8 @@ const References = () => {
                 MITRE: Execution
             </a>
             <br />
-            <a href='https://blog.netspi.com/attacking-azure-with-custom-script-extensions/'>
-                Attacking Azure with custom script extensions
+            <a href='https://posts.specterops.io/death-from-above-lateral-movement-from-azure-to-on-prem-ad-d18cb3959d4d'>
+                Death from Above: Lateral Movement from Azure to On-Prem AD
             </a>
         </>
     );
