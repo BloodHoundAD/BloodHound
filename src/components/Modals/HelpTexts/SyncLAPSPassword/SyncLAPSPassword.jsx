@@ -17,33 +17,26 @@ const SyncLAPSPassword = ({
             <Tab
                 eventKey={1}
                 title='Info'
-                dangerouslySetInnerHTML={General(
-                    sourceName,
-                    sourceType,
-                    targetName,
-                    targetType
-                )}
-            />
+            >
+                <General
+                    sourceName={sourceName}
+                    sourceType={sourceType}
+                    targetName={targetName}
+                    targetType={targetType}
+                />
+            </Tab>
             <Tab
                 eventKey={2}
                 title='Abuse Info'
-                dangerouslySetInnerHTML={Abuse(
-                    sourceName,
-                    sourceType,
-                    targetName,
-                    targetType
-                )}
-            />
-            <Tab
-                eventKey={3}
-                title='Opsec Considerations'
-                dangerouslySetInnerHTML={Opsec()}
-            />
-            <Tab
-                eventKey={4}
-                title='References'
-                dangerouslySetInnerHTML={References()}
-            />
+            >
+                <Abuse sourceName={sourceName} sourceType={sourceType} targetName={targetName} />
+            </Tab>
+            <Tab eventKey={3} title='Opsec Considerations'>
+                <Opsec />
+            </Tab>
+            <Tab eventKey={4} title='References'>
+                <References />
+            </Tab>
         </Tabs>
     );
 };
