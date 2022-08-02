@@ -567,7 +567,7 @@ const MenuContainer = () => {
             step: 'setGlobalAdminHighValue',
             description: 'Mark all global admins as High Value',
             type: 'query',
-            statement: `MATCH (n:AZRole {templateid:"62e90394-69f5-4237-9190-012177145e10"})
+            statement: `MATCH (n:AZRole {templateid:"62E90394-69F5-4237-9190-012177145E10"})
                 OPTIONAL MATCH (g:AZGroup)-[:AZHasRole]->(n)
                 OPTIONAL MATCH (i)-[:AZMemberOf]->(g) WHERE n:AZUser OR n:AZServicePrincipal OR n:AZDevice
                 OPTIONAL MATCH (p)-[:AZHasRole]->(n) WHERE n:AZUser OR n:AZServicePrincipal OR n:AZDevice
@@ -581,7 +581,7 @@ const MenuContainer = () => {
             step: 'setPrivRoleAdminHighValue',
             description: 'Mark all privileged role admins as High Value',
             type: 'query',
-            statement: `MATCH (n:AZRole {templateid:"e8611ab8-c189-46e8-94e1-60213ab1f814"})
+            statement: `MATCH (n:AZRole {templateid:"E8611AB8-C189-46E8-94E1-60213AB1F814"})
                 OPTIONAL MATCH (g:AZGroup)-[:AZHasRole]->(n)
                 OPTIONAL MATCH (i)-[:AZMemberOf]->(g) WHERE n:AZUser OR n:AZServicePrincipal OR n:AZDevice
                 OPTIONAL MATCH (p)-[:AZHasRole]->(n) WHERE n:AZUser OR n:AZServicePrincipal OR n:AZDevice
@@ -620,7 +620,7 @@ const MenuContainer = () => {
                 'Global Admins get a direct edge to the AZTenant object they have that role assignment in',
             type: 'query',
             statement: `MATCH (n)-[:AZHasRole]->(m)<-[:AZContains]-(t:AZTenant)
-                        WHERE m.templateid IN ['62e90394-69f5-4237-9190-012177145e10']
+                        WHERE m.templateid IN ['62E90394-69F5-4237-9190-012177145E10']
                         CALL {
                             WITH n,t
                             MERGE (n)-[:AZGlobalAdmin]->(t)
@@ -637,7 +637,7 @@ const MenuContainer = () => {
                 'Privileged Role Admins get a direct edge to the AZTenant object they have that role assignment in',
             type: 'query',
             statement: `MATCH (n)-[:AZHasRole]->(m)<-[:AZContains]-(t:AZTenant)
-                        WHERE m.templateid IN ['e8611ab8-c189-46e8-94e1-60213ab1f814']
+                        WHERE m.templateid IN ['E8611AB8-C189-46E8-94E1-60213AB1F814']
                         CALL {
                             WITH n,t
                             MERGE (n)-[:AZPrivilegedRoleAdmin]->(t)
@@ -666,13 +666,13 @@ const MenuContainer = () => {
                         } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
             params: {
                 pwResetRoles: [
-                    'c4e39bd9-1100-46d3-8c65-fb160da0071f',
-                    '62e90394-69f5-4237-9190-012177145e10',
-                    '729827e3-9c14-49f7-bb1b-9608f156bbb8',
-                    '966707d0-3269-4727-9be2-8c3a10f19b9d',
-                    '7be44c8a-adaf-4e2a-84d6-ab2649e08a13',
-                    'fe930be7-5e62-47db-91af-98c3a49a38b1',
-                    '9980e02c-c2be-4d73-94e8-173b1dc7cf3c',
+                    'C4E39BD9-1100-46D3-8C65-FB160DA0071F',
+                    '62E90394-69F5-4237-9190-012177145E10',
+                    '729827E3-9C14-49F7-BB1B-9608F156BBB8',
+                    '966707D0-3269-4727-9BE2-8C3A10F19B9D',
+                    '7BE44C8A-ADAF-4E2A-84D6-AB2649E08A13',
+                    'FE930BE7-5E62-47DB-91AF-98C3A49A38B1',
+                    '9980E02C-C2BE-4D73-94E8-173B1DC7CF3C',
                 ],
             },
             log: (result) =>
@@ -695,8 +695,8 @@ const MenuContainer = () => {
                         } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
             params: {
                 GAandPAA: [
-                    '62e90394-69f5-4237-9190-012177145e10',
-                    '7be44c8a-adaf-4e2a-84d6-ab2649e08a13',
+                    '62E90394-69F5-4237-9190-012177145E10',
+                    '7BE44C8A-ADAF-4E2A-84D6-AB2649E08A13',
                 ],
             },
             log: (result) =>
@@ -711,7 +711,7 @@ const MenuContainer = () => {
         Authentication admin template id: c4e39bd9-1100-46d3-8c65-fb160da0071f`,
             type: 'query',
             statement:
-                `MATCH (at:AZTenant)-[:AZContains]->(AuthAdmin)-[:AZHasRole]->(AuthAdminRole:AZRole {templateid:"c4e39bd9-1100-46d3-8c65-fb160da0071f"})
+                `MATCH (at:AZTenant)-[:AZContains]->(AuthAdmin)-[:AZHasRole]->(AuthAdminRole:AZRole {templateid:"C4E39BD9-1100-46D3-8C65-FB160DA0071F"})
                 MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
                 WHERE NOT ar.templateid IN $AuthAdminTargetRoles
                 WITH COLLECT(NonTargets) AS NonTargets,at,AuthAdmin
@@ -723,13 +723,13 @@ const MenuContainer = () => {
                 } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
             params: {
                 AuthAdminTargetRoles: [
-                    'c4e39bd9-1100-46d3-8c65-fb160da0071f',
-                    '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
-                    '95e79109-95c0-4d8e-aee3-d01accf2d47b',
-                    '729827e3-9c14-49f7-bb1b-9608f156bbb8',
-                    '790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b',
-                    '4a5d8f65-41da-4de4-8968-e035b65339cf',
-                    '966707d0-3269-4727-9be2-8c3a10f19b9d',
+                    'C4E39BD9-1100-46D3-8C65-FB160DA0071F',
+                    '88D8E3E3-8F55-4A1E-953A-9B9898B8876B',
+                    '95E79109-95C0-4D8E-AEE3-D01ACCF2D47B',
+                    '729827E3-9C14-49F7-BB1B-9608F156BBB8',
+                    '790C1FB9-7F7D-4F88-86A1-EF1F95C05C1B',
+                    '4A5D8F65-41DA-4DE4-8968-E035B65339CF',
+                    '966707D0-3269-4727-9BE2-8C3A10F19B9D',
                 ],
             },
             log: (result) =>
@@ -744,7 +744,7 @@ const MenuContainer = () => {
         Helpdesk Admin template id: 729827e3-9c14-49f7-bb1b-9608f156bbb8`,
             type: 'query',
             statement:
-                `MATCH (at:AZTenant)-[:AZContains]->(HelpdeskAdmin)-[:AZHasRole]->(HelpdeskAdminRole:AZRole {templateid:"729827e3-9c14-49f7-bb1b-9608f156bbb8"})
+                `MATCH (at:AZTenant)-[:AZContains]->(HelpdeskAdmin)-[:AZHasRole]->(HelpdeskAdminRole:AZRole {templateid:"729827E3-9C14-49F7-BB1B-9608F156BBB8"})
                 MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
                 WHERE NOT ar.templateid IN $HelpdeskAdminTargetRoles
                 WITH COLLECT(NonTargets) AS NonTargets,at,HelpdeskAdmin
@@ -756,13 +756,13 @@ const MenuContainer = () => {
                 } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
             params: {
                 HelpdeskAdminTargetRoles: [
-                    'c4e39bd9-1100-46d3-8c65-fb160da0071f',
-                    '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
-                    '95e79109-95c0-4d8e-aee3-d01accf2d47b',
-                    '729827e3-9c14-49f7-bb1b-9608f156bbb8',
-                    '790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b',
-                    '4a5d8f65-41da-4de4-8968-e035b65339cf',
-                    '966707d0-3269-4727-9be2-8c3a10f19b9d',
+                    'C4E39BD9-1100-46D3-8C65-FB160DA0071F',
+                    '88D8E3E3-8F55-4A1E-953A-9B9898B8876B',
+                    '95E79109-95C0-4D8E-AEE3-D01ACCF2D47B',
+                    '729827E3-9C14-49F7-BB1B-9608F156BBB8',
+                    '790C1FB9-7F7D-4F88-86A1-EF1F95C05C1B',
+                    '4A5D8F65-41DA-4DE4-8968-E035B65339CF',
+                    '966707D0-3269-4727-9BE2-8C3A10F19B9D',
                 ],
             },
             log: (result) =>
@@ -776,7 +776,7 @@ const MenuContainer = () => {
         Password Admin template id: 966707d0-3269-4727-9be2-8c3a10f19b9d`,
             type: 'query',
             statement:
-                `MATCH (at:AZTenant)-[:AZContains]->(PasswordAdmin)-[:AZHasRole]->(PasswordAdminRole:AZRole {templateid:"966707d0-3269-4727-9be2-8c3a10f19b9d"})
+                `MATCH (at:AZTenant)-[:AZContains]->(PasswordAdmin)-[:AZHasRole]->(PasswordAdminRole:AZRole {templateid:"966707D0-3269-4727-9BE2-8C3A10F19B9D"})
                 MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
                 WHERE NOT ar.templateid IN $PasswordAdminTargetRoles
                 WITH COLLECT(NonTargets) AS NonTargets,at,PasswordAdmin
@@ -788,9 +788,9 @@ const MenuContainer = () => {
                 } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
             params: {
                 PasswordAdminTargetRoles: [
-                    '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
-                    '95e79109-95c0-4d8e-aee3-d01accf2d47b',
-                    '966707d0-3269-4727-9be2-8c3a10f19b9d',
+                    '88D8E3E3-8F55-4A1E-953A-9B9898B8876B',
+                    '95E79109-95C0-4D8E-AEE3-D01ACCF2D47B',
+                    '966707D0-3269-4727-9BE2-8C3A10F19B9D',
                 ],
             },
             log: (result) =>
@@ -805,7 +805,7 @@ const MenuContainer = () => {
         User Account Admin template id: fe930be7-5e62-47db-91af-98c3a49a38b1`,
             type: 'query',
             statement:
-                `MATCH (at:AZTenant)-[:AZContains]->(UserAccountAdmin)-[:AZHasRole]->(UserAccountAdminRole:AZRole {templateid:"fe930be7-5e62-47db-91af-98c3a49a38b1"})
+                `MATCH (at:AZTenant)-[:AZContains]->(UserAccountAdmin)-[:AZHasRole]->(UserAccountAdminRole:AZRole {templateid:"FE930BE7-5E62-47DB-91AF-98C3A49A38B1"})
                 MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
                 WHERE NOT ar.templateid IN $UserAccountAdminTargetRoles
                 WITH COLLECT(NonTargets) AS NonTargets,at,UserAccountAdmin
@@ -817,12 +817,12 @@ const MenuContainer = () => {
                 } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
             params: {
                 UserAccountAdminTargetRoles: [
-                    '88d8e3e3-8f55-4a1e-953a-9b9898b8876b',
-                    '95e79109-95c0-4d8e-aee3-d01accf2d47b',
-                    '729827e3-9c14-49f7-bb1b-9608f156bbb8',
-                    '790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b',
-                    '4a5d8f65-41da-4de4-8968-e035b65339cf',
-                    'fe930be7-5e62-47db-91af-98c3a49a38b1',
+                    '88D8E3E3-8F55-4A1E-953A-9B9898B8876B',
+                    '95E79109-95C0-4D8E-AEE3-D01ACCF2D47B',
+                    '729827E3-9C14-49F7-BB1B-9608F156BBB8',
+                    '790C1FB9-7F7D-4F88-86A1-EF1F95C05C1B',
+                    '4A5D8F65-41DA-4DE4-8968-E035B65339CF',
+                    'FE930BE7-5E62-47DB-91AF-98C3A49A38B1',
                 ],
             },
             log: (result) =>
@@ -836,14 +836,14 @@ const MenuContainer = () => {
             type: 'query',
             statement: `MATCH (at:AZTenant)
                         MATCH p = (at)-[:AZContains]->(Principal)-[:AZHasRole]->(Role)<-[:AZContains]-(at)
-                        WHERE Role.templateid IN ['9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3','158c047a-c907-4556-b7ef-446551a6b5f7']
+                        WHERE Role.templateid IN ['9B895D92-2CD3-44C7-9D02-A6AC2D5EA5C3','158C047A-C907-4556-B7EF-446551A6B5F7']
                         MATCH (at)-[:AZContains]->(target)
                         WHERE target:AZApp OR target:AZServicePrincipal
                         WITH Principal, target
                         CALL {
                             WITH Principal, target
                             MERGE (Principal)-[:AZAddSecret]->(target)
-                        } IN TRANSACTIONS OF 10000 ROWS`,
+                        } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
             params: null,
             log: (result) =>
                 `Created ${
@@ -855,9 +855,9 @@ const MenuContainer = () => {
             description: `InTune Administrators have the ability to execute SYSTEM commands on a Windows device by abusing Endpoint Manager`,
             type: 'query',
             statement: `MATCH (azt:AZTenant)
-                        MATCH (azt)-[:AZContains]->(InTuneAdmin)-[:AZHasRole]->(azr:AZRole {templateid:'3a2c62db-5318-420d-8d74-23affee5d9d5'})
+                        MATCH (azt)-[:AZContains]->(InTuneAdmin)-[:AZHasRole]->(azr:AZRole {templateid:'3A2C62DB-5318-420D-8D74-23AFFEE5D9D5'})
                         MATCH (azt)-[:AZContains]->(azd:AZDevice)
-                        WHERE toUpper(azd.operatingsystem) CONTAINS "WINDOWS" AND azd.mdmAppId IN ['54b943f8-d761-4f8d-951e-9cea1846db5a','0000000a-0000-0000-c000-000000000000']
+                        WHERE toUpper(azd.operatingsystem) CONTAINS "WINDOWS" AND azd.mdmAppId IN ['54B943F8-D761-4F8D-951E-9CEA1846DB5A','0000000A-0000-0000-C000-000000000000']
                         CALL {
                             WITH InTuneAdmin, azd
                             MERGE (InTuneAdmin)-[:AZExecuteCommand]->(azd)
@@ -884,7 +884,7 @@ const MenuContainer = () => {
                         } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
             params: {
                 addGroupMembersRoles: [
-                    'fdd7a751-b60b-444a-984c-02652fe8fa1c”, “62e90394-69f5-4237-9190-012177145e10”, “e8611ab8-c189-46e8-94e1-60213ab1f814”, “9360feb5-f418-4baa-8175-e2a00bac4301”, “45d8d3c5-c802-45c6-b32a-1d70b5e1e86e”, “fe930be7-5e62-47db-91af-98c3a49a38b1”, “3a2c62db-5318-420d-8d74-23affee5d9d5”, “b5a8dcf3-09d5-43a9-a639-8e29ef291470”, “744ec460-397e-42ad-a462-8b3f9747a02c',
+                    'FDD7A751-B60B-444A-984C-02652FE8FA1C”, “62E90394-69F5-4237-9190-012177145E10”, “E8611AB8-C189-46E8-94E1-60213AB1F814”, “9360FEB5-F418-4BAA-8175-E2A00BAC4301”, “45D8D3C5-C802-45C6-B32A-1D70B5E1E86E”, “FE930BE7-5E62-47DB-91AF-98C3A49A38B1”, “3A2C62DB-5318-420D-8D74-23AFFEE5D9D5”, “B5A8DCF3-09D5-43A9-A639-8E29EF291470”, “744EC460-397E-42AD-A462-8B3F9747A02C',
                 ],
             },
             log: (result) =>
@@ -906,8 +906,8 @@ const MenuContainer = () => {
                         } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
             params: {
                 addGroupMembersRoles: [
-                    '62e90394-69f5-4237-9190-012177145e10',
-                    'e8611ab8-c189-46e8-94e1-60213ab1f814',
+                    '62E90394-69F5-4237-9190-012177145E10',
+                    'E8611AB8-C189-46E8-94E1-60213AB1F814',
                 ],
             },
             log: (result) =>
@@ -929,10 +929,10 @@ const MenuContainer = () => {
                         } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
             params: {
                 addOwnerRoles: [
-                    '8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2',
-                    '4ba39ca4-527c-499a-b93d-d9b492c50246',
-                    'e00e864a-17c5-4a4b-9c06-f5b95a8d5bd8',
-                    'd29b2b05-8046-44ba-8758-1e26182fcf32',
+                    '8AC3FC64-6ECA-42EA-9E69-59F4C7B60EB2',
+                    '4BA39CA4-527C-499A-B93D-D9B492C50246',
+                    'E00E864A-17C5-4A4B-9C06-F5B95A8D5BD8',
+                    'D29B2B05-8046-44BA-8758-1E26182FCF32',
                 ],
             },
             log: (result) =>
@@ -954,10 +954,10 @@ const MenuContainer = () => {
                         } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
             params: {
                 addOwnerRoles: [
-                    '8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2',
-                    '4ba39ca4-527c-499a-b93d-d9b492c50246',
-                    'e00e864a-17c5-4a4b-9c06-f5b95a8d5bd8',
-                    'd29b2b05-8046-44ba-8758-1e26182fcf32',
+                    '8AC3FC64-6ECA-42EA-9E69-59F4C7B60EB2',
+                    '4BA39CA4-527C-499A-B93D-D9B492C50246',
+                    'E00E864A-17C5-4A4B-9C06-F5B95A8D5BD8',
+                    'D29B2B05-8046-44BA-8758-1E26182FCF32',
                 ],
             },
             log: (result) =>
