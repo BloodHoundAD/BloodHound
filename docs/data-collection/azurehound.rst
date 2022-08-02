@@ -1,87 +1,118 @@
 AzureHound
 ==========
 
-AzureHound uses the "Az" Azure PowerShell module and "Azure AD" PowerShell
-module for gathering data within Azure and Azure AD. 
+AzureHound is a Go binary that collects data from AzureAD and AzureRM via the MS Graph
+and Azure REST APIs. It does not use any external dependencies and will run on any
+operating system.
 
-If the modules are not installed, you can use the the following commands to installed them. 
-The modules require PowerShell version 5.1 and greater. To check your PowerShell version,
-use "$PSVersionTable.PSVersion". 
+Building AzureHound From Source
+-------------------------------
 
-:: 
+You can build AzureHound from source by cloning this repository:
 
-    Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
-    Install-Module -Name AzureAD -Scope CurrentUser -Repository PSGallery -Force
-
-You then need to import the modules
+Then, cd into the directory you just cloned and type:
 
 ::
 
-    Import-Module Az
-    Import-Module Azuread
+    go build .
+    
+This will build AzureHound and you will have a new binary called azurehound
+in this directory.
 
-It’s also recommended to first set your TLS
-version to 1.2 with this command to prevent any issues while installing these
-modules:
+Collecting Data with AzureHound
+-------------------------------
 
-::
+AzureHound supports several authentication flows for collecting information from Azure.
+You can supply a username/password combo, a JWT, a refresh token, a service principal
+secret, or service principal certificate. You can combine these various authentication
+methods with several collection scoping options.
 
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
-Once the Az module is installed, you can import AzureHound by using the command:
-
-::
-
-    Import-Module C:\path\to\AzureHound.ps1
-
-Next, you must login to Azure PowerShell using the command:
+For example, to authenticate with a username/password and list all groups in a tenant:
 
 ::
 
-    Connect-AzAccount
+    ./azurehound -u "MattNelson@contoso.onmicrosoft.com" -p "MyVeryStrongPassword" list groups --tenant "contoso.onmicrosoft.com"
+    
+AzureHound will authenticate as that user and print all groups in the "Contoso" tenant.
 
-This will bring up an interactive page to login into Azure. Once successfully logged
-into Azure, it will print your active subscription, account name, and Tenant ID.
-
-You must also do the same for connecting to Azure AD:
-
-::
-
-    Connect-AzureAD
-
-It is also possible to steal the access tokens from a compromised machine if that
-machine has been used to login to Azure PowerShell before. Copy the existing files:
+Or, you may want to supply a JWT and collect all users from the tenant instead. You do not
+need to supply a username or password when supplying a JWT:
 
 ::
 
-    C:\users\[Username]\.azure\AzureRmContextSettings.json
-    C:\users\[Username]\.azure\TokenCache.dat
-
-And place them in your own .azure folder. Re-launch PowerShell and the token will
-now be used. 
-
-For stealing AzureAD tokens, the tokens are cached in one of the module’s DLL files
-and requires the PowerShell process context in order to access the tokens. They can be
-stolen using the command:
+    ./azurehound -j "ey..." list users --tenant "contoso.onmicrosoft.com"
+    
+When collecting data for import into BloodHound, you must use the -o switch to instruct
+AzureHound to output to a file. For example, to list all available data in both AzureAD
+and AzureRM, you can do this:
 
 ::
 
-    $token = [Microsoft.Open.Azure.AD.CommonLibrary.AzureSession]::AccessTokens['AccessToken']
-    $token.AccessToken
+    ./azurehound -u "MattNelson@contoso.onmicrosoft.com" -p "MyVeryStrongPassword" list groups --tenant "contoso.onmicrosoft.com" -o output.json
 
-You can then decode this JWT token to gather the UserPrincipalName and TenantID by
-copy and pasting it into the JWT decoder.
+Dealing with Multi-Factor Auth and Conditional Access Policies
+--------------------------------------------------------------
 
-To use AzureHound, you can invoke it using the command "Invoke-AzureHound"
+If a user has MFA or CAP restrictions applied to them, you will not be able to authenticate
+with just a username and password with AzureHound. In this situation, you can acquire a
+refresh token for the user and supply the refresh token to AzureHound.
 
-By default, AzureHound will output the results to a file called "[timestamp]-azurecollection.zip"
-in the directory that AzureHound is run from. This can be changed using the "-OutputDirectory"
-switch, e.g. "Invoke-AzureHound -OutputDirectory "C:\temp\results""
+The most straight-forward way to accomplish this is to use the device code flow. In this
+example I will show you how to perform this flow using PowerShell, but this example can
+be very easiliy ported to any language, as we are simply making calls to Azure APIs.
 
-AzureHound supports a few switches, as shown below:
+Open a PowerShell window on any system and paste the following:
 
 ::
 
-    -Install | Installs the PowerShell modules
-    -TenantId xxxx-xxxx-xxxx-xxxx | Gather using a specific tenant Id instead of using the current one
-    -OutputDirectory "C:\path\to\destination\folder" | Outputs the results to a custom directory
+    $body = @{
+        "client_id" =     "1950a258-227b-4e31-a9cf-717495945fc2"
+        "resource" =      "https://graph.microsoft.com"  
+    }
+    $UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+    $Headers=@{}
+    $Headers["User-Agent"] = $UserAgent
+    $authResponse = Invoke-RestMethod `
+        -UseBasicParsing `
+        -Method Post `
+        -Uri "https://login.microsoftonline.com/common/oauth2/devicecode?api-version=1.0" `
+        -Headers $Headers `
+        -Body $body
+    $authResponse
+
+The output will contain a user_code and device_code. Now, open a browser where your AzureAD
+user either already logged on or can log on to Azure. In this browser, navigate to 
+https://microsoft.com/devicelogin
+
+Enter the code you generated from the above PowerShell script. Follow the steps in the browser
+to authenticate as the AzureAD user and approve the device code flow request. When done,
+the browser page should display a message similar to "You have signed in to the Microsoft Azure
+PowerShell application on your device. You may now close this window."
+
+Now go back to your original PowerShell window and paste this:
+
+::
+
+    $body=@{
+        "client_id" =  "1950a258-227b-4e31-a9cf-717495945fc2" 
+        "grant_type" = "urn:ietf:params:oauth:grant-type:device_code"
+        "code" =       $authResponse.device_code
+    }
+    $Tokens = Invoke-RestMethod `
+        -UseBasicParsing `
+        -Method Post `
+        -Uri "https://login.microsoftonline.com/Common/oauth2/token?api-version=1.0" `
+        -Headers $Headers `
+        -Body $body
+    $Tokens
+    
+The output will include several tokens including a refresh_token. It will start with
+characters similar to "0.ARwA6Wg...". Now you are ready to run AzureHound! Take the refresh
+token and supply it to AzureHound using the -r switch:
+
+::
+
+    ./azurehound-cli -r "0.ARwA6Wg..." list --tenant "contoso.onmicrosoft.com" -o output.json
+
+This will attempt to list all possible data from that particular tenant, but you can ALSO
+use that same refresh token to target any other tenant your user has access to!
