@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
 import { findGraphPath, generateUniqueId, setSchema } from 'utils';
-import { writeFile, readFile } from 'fs';
+import { readFile, writeFile } from 'fs';
 import { fork } from 'child_process';
-
-let child;
 import { join } from 'path';
 import { remote } from 'electron';
-const { dialog } = remote;
 import { v4 as uuidv4 } from 'uuid';
-let Observer = require('fontfaceobserver');
 import { withAlert } from 'react-alert';
 import NodeTooltip from './Tooltips/NodeTooltip';
 import StageTooltip from './Tooltips/StageTooltip';
 import EdgeTooltip from './Tooltips/EdgeTooltip';
 import ConfirmDrawModal from './Modals/ConfirmDrawModal';
 import { escapeRegExp } from '../js/utils';
+
+let child;
+const { dialog } = remote;
+let Observer = require('fontfaceobserver');
 
 class GraphContainer extends Component {
     constructor(props) {

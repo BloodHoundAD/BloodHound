@@ -21,5 +21,15 @@
         "react"
     ],
     "rules": {
+    },
+    "globals": {
+        "emitter": "writable",
+        "appStore": "writable",
+        "closeTooltip": "readonly",
+        "$": "readonly",
+        "sigma": "readonly",
+        "driver": "readonly",
+        "conf": "readonly",
+        "jQuery": "readonly"
     }
 }
