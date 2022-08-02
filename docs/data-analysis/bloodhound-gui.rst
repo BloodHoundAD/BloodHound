@@ -111,14 +111,21 @@ any particular attack primitive:
    :width: 900px
    :alt: Right click edge and get help
    
-Finally, there are two keyboard shortcuts when the graph rendering area has
+Finally, there are four keyboard shortcuts when the graph rendering area has
 focus:
 
-* **CTRL**: Pressing CTRL will cycle through the three different node label
+* **CTRL**: Pressing `CTRL` will cycle through the three different node label
   display settings - default, always show, always hide.
-* **Spacebar**: Pressing spacebar will bring up the spotlight window, which
+* **Spacebar**: Pressing `spacebar` will bring up the spotlight window, which
   lists all nodes that are currently drawn. Click an item in the list and the
   GUI will zoom into and briefly highlight that node.
+* **Backspace**: Pressing `backspace` will go back to the previous graph result
+  rendering. This is the same functionality as clicking the `Back` button in 
+  the search bar.
+* **S**: Pressing the letter `s` will toggle the expansion or collapse of 
+  the information panel below the search bar. This is the same functionality
+  as clicking the `More Info` button in the search bar.  
+  
 
 Search Bar
 ----------
@@ -142,12 +149,32 @@ groups with the word "Admin" in them with this search:
   
 You can prepend your search with the following node types:
 
+Active Directory
+++++++++++++++++
+
 * Group
 * Domain
 * Computer
 * User
 * OU
 * GPO
+* Container
+
+Azure
+++++++
+
+* AZApp
+* AZRole
+* AZDevice
+* AZGroup
+* AZKeyVault
+* AZManagementGroup
+* AZResourceGroup
+* AZServicePrincipal
+* AZSubscription
+* AZTenant
+* AZUser
+* AZVM
 
 Pathfinding
 -----------
@@ -206,7 +233,7 @@ going down:
 * **Refresh**: Re-run the last query and display the results
 * **Export Graph**: Export the currently rendered graph in JSON format
 * **Import Graph**: Select a JSON formatted graph for the GUI to render
-* **Upload Data**: Select your SharpHound data to upload to neo4j
+* **Upload Data**: Select your SharpHound or AzureHound data to upload to neo4j
 * **Change Layout Type**: Switch between hierarchial or force directed layout
 * **Settings**: Configure node and edge display settings, as well as query debug mode,
   low detail mode, and dark mode here.
