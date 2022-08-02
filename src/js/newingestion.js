@@ -1921,11 +1921,16 @@ export function convertAzureUser(data, ingestionData) {
         );
     }
 
-    insertNewAzureRel(
-        ingestionData,
-        fProps(AzureLabels.Tenant, AzureLabels.User, AzureLabels.Contains),
-        { source: data.tenantId.toUpperCase(), target: data.id.toUpperCase() }
-    );
+    if (!data.userPrincipalName.toUpperCase().includes('#EXT#')) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(AzureLabels.Tenant, AzureLabels.User, AzureLabels.Contains),
+            {
+                source: data.tenantId.toUpperCase(),
+                target: data.id.toUpperCase(),
+            }
+        );
+    }
 }
 
 /**
