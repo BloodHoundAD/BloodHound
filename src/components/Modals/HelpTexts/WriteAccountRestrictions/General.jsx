@@ -5,11 +5,13 @@ const General = (sourceName, sourceType, targetName) => {
     return (
         <>
             <p>
-                {groupSpecialFormat(sourceType, sourceName)} can modify the
-                msds-AllowedToActOnBehalfOfOtherIdentity attribute on the
-                computer {targetName} through writing to the
-                UserAccountRestrictions property set (see Dirkjan's blog post in
-                references for more info)
+                {groupSpecialFormat(sourceType, sourceName)} has write rights on 
+                all properties in the User Account Restrictions property set.
+                Having write access to this property set translates to the ability
+                to modify several attributes on computer {targetName}, among which 
+                the msDS-AllowedToActOnBehalfOfOtherIdentity attribute is the most 
+                interesting. The other attributes in this set are listed in 
+                Dirk-jan's blog on this topic (see references).
             </p>
 
             <p>
