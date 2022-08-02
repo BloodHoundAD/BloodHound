@@ -1022,11 +1022,11 @@ References
 
 * https://github.com/GhostPack/Rubeus#s4u
 * https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/
-* http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/
+* https://blog.harmj0y.net/activedirectory/s4u2pwnage/
 * https://twitter.com/gentilkiwi/status/806643377278173185
 * https://www.coresecurity.com/blog/kerberos-delegation-spns-and-more
-* http://www.harmj0y.net/blog/redteaming/from-kekeo-to-rubeus/
-* http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+* https://blog.harmj0y.net/redteaming/from-kekeo-to-rubeus/
+* https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 
 |
 
@@ -1061,7 +1061,7 @@ References
 ----------
 
 * https://adsecurity.org/?p=1729
-* http://www.harmj0y.net/blog/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/
+* https://blog.harmj0y.net/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/
 
 |
 
@@ -1097,7 +1097,7 @@ References
 ----------
 
 * https://adsecurity.org/?p=1729
-* http://www.harmj0y.net/blog/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/
+* https://blog.harmj0y.net/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/
 
 |
 
@@ -1312,12 +1312,12 @@ References
 * https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1
 * https://www.youtube.com/watch?v=z8thoG7gPd0
 * https://adsecurity.org/?p=1729
-* http://www.harmj0y.net/blog/activedirectory/targeted-kerberoasting/
+* https://blog.harmj0y.net/activedirectory/targeted-kerberoasting/
 * https://posts.specterops.io/a-red-teamers-guide-to-gpos-and-ous-f0d03976a31e
 * https://eladshamir.com/2019/01/28/Wagging-the-Dog.html
 * https://github.com/GhostPack/Rubeus#s4u
 * https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff
-* http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+* https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 * https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1
 * https://github.com/Kevin-Robertson/Powermad#new-machineaccount
 
@@ -1426,7 +1426,7 @@ References
 * https://eladshamir.com/2019/01/28/Wagging-the-Dog.html
 * https://github.com/GhostPack/Rubeus#s4u
 * https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff
-* http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+* https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 * https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1
 * https://github.com/Kevin-Robertson/Powermad#new-machineaccount
 * https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectorysecurityinheritance?view=netframework-4.8
@@ -1596,7 +1596,7 @@ modified, but this configuration is very rare.
 References
 ----------
 
-https://www.harmj0y.net/blog/redteaming/kerberoasting-revisited/
+https://www.harmj0y.net/redteaming/kerberoasting-revisited/
 
 |
 
@@ -2005,7 +2005,7 @@ References
 * https://eladshamir.com/2019/01/28/Wagging-the-Dog.html
 * https://github.com/GhostPack/Rubeus#s4u
 * https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff
-* http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+* https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 * https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1
 * https://github.com/Kevin-Robertson/Powermad#new-machineaccount
 
@@ -2047,7 +2047,7 @@ References
 * https://eladshamir.com/2019/01/28/Wagging-the-Dog.html
 * https://github.com/GhostPack/Rubeus#s4u
 * https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff
-* http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+* https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 * https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1
 * https://github.com/Kevin-Robertson/Powermad#new-machineaccount
 
@@ -2067,12 +2067,12 @@ Abuse Info
 
 This edge will come in handy when analzying how to jump a forest trust to get enterprise
 admin access from domain admin access within a forest. For more information about that
-attack, see http://www.harmj0y.net/blog/redteaming/the-trustpocalypse/
+attack, see https://blog.harmj0y.net/redteaming/the-trustpocalypse/
 
 References
 ----------
 
-http://www.harmj0y.net/blog/redteaming/the-trustpocalypse/
+https://blog.harmj0y.net/redteaming/the-trustpocalypse/
 
 |
 

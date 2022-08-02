@@ -3,12 +3,12 @@ import React from 'react';
 const References = () => {
     return (
         <>
-            <a href='http://www.harmj0y.net/blog/redteaming/the-trustpocalypse/'>
-                http://www.harmj0y.net/blog/redteaming/the-trustpocalypse/
+            <a href='https://blog.harmj0y.net/redteaming/the-trustpocalypse/'>
+                https://blog.harmj0y.net/redteaming/the-trustpocalypse/
             </a>
             <br />
-            <a href='http://www.harmj0y.net/blog/redteaming/a-guide-to-attacking-domain-trusts/'>
-                http://www.harmj0y.net/blog/redteaming/a-guide-to-attacking-domain-trusts/
+            <a href='https://blog.harmj0y.net/redteaming/a-guide-to-attacking-domain-trusts/'>
+                https://blog.harmj0y.net/redteaming/a-guide-to-attacking-domain-trusts/
             </a>
             <br />
             <a href='https://adsecurity.org/?p=1772'>

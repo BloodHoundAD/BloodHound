@@ -11,8 +11,8 @@ const References = () => {
                 https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/
             </a>
             <br />
-            <a href='http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/'>
-                http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/
+            <a href='https://blog.harmj0y.net/activedirectory/s4u2pwnage/'>
+                https://blog.harmj0y.net/activedirectory/s4u2pwnage/
             </a>
             <br />
             <a href='https://twitter.com/gentilkiwi/status/806643377278173185'>
@@ -23,12 +23,12 @@ const References = () => {
                 https://www.coresecurity.com/blog/kerberos-delegation-spns-and-more
             </a>
             <br />
-            <a href='http://www.harmj0y.net/blog/redteaming/from-kekeo-to-rubeus/'>
-                http://www.harmj0y.net/blog/redteaming/from-kekeo-to-rubeus/
+            <a href='https://blog.harmj0y.net/redteaming/from-kekeo-to-rubeus/'>
+                https://blog.harmj0y.net/redteaming/from-kekeo-to-rubeus/
             </a>
             <br />
-            <a href='http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/'>
-                http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+            <a href='https://blog.harmj0y.net/redteaming/another-word-on-delegation/'>
+                https://blog.harmj0y.net/redteaming/another-word-on-delegation/
             </a>
         </>
     );

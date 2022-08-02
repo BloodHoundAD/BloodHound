@@ -15,8 +15,8 @@ const References = () => {
                 https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff
             </a>
             <br />
-            <a href='http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/'>
-                http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+            <a href='https://blog.harmj0y.net/redteaming/another-word-on-delegation/'>
+                https://blog.harmj0y.net/redteaming/another-word-on-delegation/
             </a>
             <br />
             <a href='https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1'>

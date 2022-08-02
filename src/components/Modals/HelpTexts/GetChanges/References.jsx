@@ -7,8 +7,8 @@ const References = () => {
                 https://adsecurity.org/?p=1729
             </a>
             <br />
-            <a href='http://www.harmj0y.net/blog/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/'>
-                http://www.harmj0y.net/blog/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/
+            <a href='https://blog.harmj0y.net/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/'>
+                https://blog.harmj0y.net/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/
             </a>
         </>
     );
