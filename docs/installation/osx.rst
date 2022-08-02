@@ -40,7 +40,7 @@ Alternative: Build the BloodHound GUI
 
 ::
 
-   $ npm install -g electron-packager
+   $ npm install --location=global electron-packager
 
 3. Clone the BloodHound GitHub repo:
 
