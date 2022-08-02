@@ -39,7 +39,7 @@ Finally, administrators can often disable host-based security controls that
 would otherwise prevent the aforementioned techniques.
 
 Abuse Info
-----------
+------------
 
 There are several ways to pivot to a Windows system. If using Cobalt
 Strike's beacon, check the help info for the commands "psexec", "psexec_psh",
@@ -149,7 +149,7 @@ has. If a group has rights to another principal, users/computers in the group,
 as well as other groups inside the group inherit those permissions.
 
 Abuse Info
-----------
+------------
 
 No abuse is necessary. This edge simply indicates that a principal belongs to a
 security group.
@@ -192,7 +192,7 @@ This video explains exactly how BloodHound's session data collection method work
     </div>
 
 Abuse Info
-----------
+------------
 
 When a user has a session on the computer, you may be able to obtain credentials for
 the user via credential dumping or token impersonation. You must be able to move
@@ -272,7 +272,7 @@ To see an example of this edge being abused, see this clip from Derbycon 2017:
     </div>
 
 Abuse Info
-----------
+------------
 
 There are at least two ways to execute this attack. The first and most obvious is by
 using the built-in net.exe binary in Windows (e.g.: net user dfm.a Password123! /domain).
@@ -366,7 +366,7 @@ See this clip for an example of this edge being abused:
     </div>
 
 Abuse Info
-----------
+------------
 
 There are at least two ways to execute this attack. The first and most obvious is by using
 the built-in net.exe binary in Windows (e.g.: net group "Domain Admins" dfm.a /add
@@ -451,7 +451,7 @@ See this clip for an example of this edge being abused:
     </div>
 
 Abuse Info
-----------
+------------
 
 There are at least two ways to execute this attack. The first and most obvious is by using
 the built-in net.exe binary in Windows (e.g.: net group "Domain Admins" dfm.a /add
@@ -527,7 +527,7 @@ privileges on the system.
 .. note:: This edge does not guarantee privileged execution.
 
 Abuse Info
----------
+-------------
 
 Abuse of this privilege will depend heavily on the type of access you have. 
             
@@ -616,7 +616,7 @@ on the system.
 .. note:: This edge does not guarantee privileged execution.
 
 Abuse Info
----------
+-------------
 
 Abuse of this privilege will require you to have interactive access with a system on the network.
     
@@ -689,7 +689,7 @@ This can allow code execution under certain conditions by instantiating a COM ob
 machine and invoking its methods.
 
 Abuse Info
----------
+-----------
 
 The PowerShell script Invoke-DCOM implements lateral movement using a variety of different COM
 objects (ProgIds: MMC20.Application, ShellWindows, ShellBrowserWindow, ShellBrowserWindow, and
@@ -791,7 +791,7 @@ This clip demonstrates how to abuse this edge:
     </div>
 
 Abuse Info
----------
+-----------
 
 Scott Sutherland from NetSPI has authored PowerUpSQL, a PowerShell Toolkit for Attacking SQL
 Server. Major contributors include Antti Rantasaari, Eric Gruber, and Thomas Elling. Before
@@ -993,7 +993,7 @@ is "HTTP/host.domain.com", tickets can be modified for LDAP/HOST/etc. service na
 in complete server compromise, regardless of the specific service listed.
 
 Abuse Info
----------
+-----------
 
 Abusing this privilege can utilize Benjamin Delpy’s Kekeo project, proxying in traffic generated
 from the Impacket library, or using the Rubeus project's s4u abuse.
@@ -1030,16 +1030,17 @@ References
 
 |
 
-----
+-----------
 
 |
+
 DCSync
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 This edge represents the combination of GetChanges and GetChangesAll. The combination of both these privileges grants a principal the ability to perform the DCSync attack.
 
 Abuse Info
----------
+-----------
 
 With both GetChanges and GetChangesAll privileges in BloodHound, you may perform a dcsync attack to
 get the password hash of an arbitrary principal using mimikatz:
@@ -1075,7 +1076,7 @@ GetChanges/GetChangesAll
 The combination of both these privileges grants a principal the ability to perform the DCSync attack.
 
 Abuse Info
----------
+-----------
 
 With both GetChanges and GetChangesAll privileges in BloodHound, you may perform a dcsync attack to
 get the password hash of an arbitrary principal using mimikatz:
@@ -1101,7 +1102,7 @@ References
 
 |
 
-----
+---------
 
 |
 
@@ -1112,7 +1113,7 @@ This is also known as full control. This privilege allows the trustee to manipul
 however they wish.
 
 Abuse Info
----------
+-----------
 
 **With GenericAll Over a Group:**
 
@@ -1334,7 +1335,7 @@ With write access to the target object's DACL, you can grant yourself any privil
 on the object.
 
 Abuse Info
----------
+-----------
 
 With the ability to modify the DACL on the target object, you can grant yourself almost any
 privilege against the object you wish.
@@ -1443,7 +1444,7 @@ Generic Write access grants you the ability to write to any non-protected attrib
 object, including "members" for a group, and "serviceprincipalnames" for a user
 
 Abuse Info
----------
+-----------
 
 **Users**
 
@@ -1492,7 +1493,7 @@ This clip shows an example of abusing this edge:
     </div>
 
 Abuse Info
----------
+-----------
 
 To change the ownership of the object, you may use the Set-DomainObjectOwner function in
 PowerView.
@@ -1552,7 +1553,7 @@ Writing to this property gives you the opportunity to perform a targeted kerbero
 attack against that user.
 
 Abuse Info
-----------
+------------
 
 A targeted kerberoast attack can be performed using PowerView’s Set-DomainObject along with
 Get-DomainSPNTicket. 
@@ -1619,7 +1620,7 @@ This clip shows an example of abusing object ownership:
     </div>
 
 Abuse Info
-----------
+------------
 
 With ownership of the object, you may modify the DACL of the object however you wish.
 For more information about that, see the WriteDacl edge section.
@@ -1656,7 +1657,7 @@ Writing to this property allows an attacker to create "Shadow Credentials" on th
 object and authenticate as the principal using kerberos PKINIT.
 
 Abuse Info
-----------
+------------
 
 To abuse this privilege, use Whisker:
     
@@ -1692,7 +1693,7 @@ ReadLAPSPassword
 This privilege allows you to read the LAPS password from a computer
 
 Abuse Info
----------
+-----------
 You may need to authenticate to the Domain Controller as the user with full control over the target
 user if you are not running a process as that user. To do this in conjunction with Get-DomainObject,
 first create a PSCredential object (these examples comes from the PowerView help documentation):
@@ -1740,7 +1741,7 @@ then run local services as the GMSA. An attacker with control of an authorized p
 privilege to impersonate the GMSA.`;
 
 Abuse Info
----------
+-----------
 There are several ways to abuse the ability to read the GMSA password.
 The most straight forward abuse is possible when the GMSA is currently logged on to a computer, which is the intended behavior for a GMSA.
 
@@ -1801,7 +1802,7 @@ GPOs linked to a container apply to all objects that are contained by the contai
 ACEs set on a parent OU may inherit down to child objects.
 
 Abuse Info
----------
+-----------
 
 With control of an OU, you may add a new ACE on the OU that will inherit down to the objects under that
 OU. Below are two options depending on how targeted you choose to be in this step:
@@ -1885,7 +1886,7 @@ Extended rights are special rights granted on objects which allow reading of pri
 attributes, as well as performing special actions.
 
 Abuse Info
----------
+-----------
 
 **Users**
 
@@ -1925,7 +1926,7 @@ GPLink
 A linked GPO applies its settings to objects in the linked container.
 
 Abuse Info
----------
+-----------
 
 This edge helps you understand which object a GPO applies to, and so the actual abuse
 is actually being performed against the GPO this edge originates from. For more info
@@ -1972,7 +1973,7 @@ This clip demonstrates how to abuse this edge:
     </div>
 
 Abuse Info
----------
+-----------
 
 Abusing this primitive is currently only possible through the Rubeus project.
             
@@ -2032,7 +2033,7 @@ This clip demonstrates how to abuse this edge:
     </div>
 
 Abuse Info
----------
+-----------
 
 See the AllowedToAct edge section for abuse info
 
@@ -2063,7 +2064,7 @@ TrustedBy
 This edge is used to keep track of domain trusts, and maps to the direction of access.
 
 Abuse Info
----------
+-----------
 
 This edge will come in handy when analzying how to jump a forest trust to get enterprise
 admin access from domain admin access within a forest. For more information about that
@@ -2088,7 +2089,7 @@ synchronization, the value of confidential and RODC filtered attributes, such as
 LAPS' *ms-Mcs-AdmPwd*.
 
 Abuse Info
-----------
+------------
 
 To abuse these privileges, use DirSync:
     
@@ -2122,7 +2123,7 @@ AZAddMembers
 The ability to add other principals to an Azure security group
 
 Abuse Info
-----------
+------------
 
 Via the Azure portal:
 1. Find the group in your tenant (Azure Active Directory -> Groups -> Find Group in list)
@@ -2158,7 +2159,7 @@ AZAppAdmin
 Principals with the Application Admin role can control tenant-resident apps.
 
 Abuse Info
-----------
+------------
 
 Create a new credential for the app, then authenticate to the tenant as the
 app’s service principal, then abuse whatever privilege it is that the service
@@ -2186,7 +2187,7 @@ AZCloudAppAdmin
 Principals with the Cloud App Admin role can control tenant-resident apps.
 
 Abuse Info
-----------
+------------
 
 Create a new credential for the app, then authenticate to the tenant as the
 app’s service principal, then abuse whatever privilege it is that the service
@@ -2227,7 +2228,7 @@ The contributor role grants almost all abusable privileges in all circumstances,
 with some exceptions. Those exceptions are not collected by AzureHound.
 
 Abuse Info
-----------
+------------
 
 This depends on what the target object is:
 * **Key Vault:** You can read secrets and alter access policies (grant yourself
@@ -2265,7 +2266,7 @@ AZGetCertificates
 The ability to read certificates from key vaults.
 
 Abuse Info
-----------
+------------
 
 Use PowerShell or PowerZure to fetch the certificate from the key vault.
     
@@ -2296,7 +2297,7 @@ AZGetKeys
 The ability to read keys from key vaults.
 
 Abuse Info
-----------
+------------
 
 Use PowerShell or PowerZure to fetch the certificate from the key vault.
     
@@ -2327,7 +2328,7 @@ AZGetSecrets
 The ability to read secrets from key vaults.
 
 Abuse Info
-----------
+------------
 
 Use PowerShell or PowerZure to fetch the certificate from the key vault.
     
@@ -2361,7 +2362,7 @@ Admins can do almost anything against almost every object type in the tenant,
 this is the highest privilege role in Azure.
 
 Abuse Info
-----------
+------------
 
 As a Global Admin, you can change passwords, run commands on VMs, read key vault
 secrets, activate roles for other users, etc.
@@ -2396,7 +2397,7 @@ The Privileged Role Admin role can grant any other admin role to another princip
 at the tenant level.
 
 Abuse Info
-----------
+------------
 
 Activate the Global Admin role for yourself or for another user using PowerZure or
 PowerShell.
@@ -2424,7 +2425,7 @@ AZResetPassword
 The ability to change another user’s password without knowing their current password.
 
 Abuse Info
-----------
+------------
 
 Find the user in the Azure portal, then click "Reset Password", or use PowerZure’s
 Set-AzureUserPassword cmdlet. If password write-back is enabled, this password will
@@ -2452,7 +2453,7 @@ AZRunsAs
 The Azure App runs as the Service Principal when it needs to authenticate to the tenant.
 
 Abuse Info
-----------
+------------
 
 This edge should be taken into consideration when abusing control of an app. Apps authenticate
 with service principals to the tenant, so if you have control of an app, what you are abusing
@@ -2471,7 +2472,7 @@ AZUserAccessAdministrator
 The User Access Admin role can edit roles against many other objects.
 
 Abuse Info
-----------
+------------
 This role can be used to grant yourself or another principal any privilege
 you want against Automation Accounts, VMs, Key Vaults, and Resource Groups.
 Use the Azure portal to add a new, abusable role assignment against the target
