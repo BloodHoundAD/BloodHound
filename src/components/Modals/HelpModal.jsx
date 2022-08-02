@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import BaseModal from './BaseModal';
 import GenericAll from './HelpTexts/GenericAll/GenericAll';
-import {Button, Modal} from 'react-bootstrap';
-import {encode} from 'he';
+import { Button, Modal } from 'react-bootstrap';
+import { encode } from 'he';
 import MemberOf from './HelpTexts/MemberOf/MemberOf';
 import AllExtendedRights from './HelpTexts/AllExtendedRights/AllExtendedRights';
 import AdminTo from './HelpTexts/AdminTo/AdminTo';
@@ -53,11 +53,12 @@ import AZRunsAs from './HelpTexts/AZRunsAs/AZRunsAs';
 import AZVMAdminLogin from './HelpTexts/AZVMAdminLogin/AZVMAdminLogin';
 import AZVMContributor from './HelpTexts/AZVMContributor/AZVMContributor';
 import Default from './HelpTexts/Default/Default';
-import WriteSPN from "./HelpTexts/WriteSPN/WriteSPN";
-import AddSelf from "./HelpTexts/AddSelf/AddSelf";
-import AddKeyCredentialLink from "./HelpTexts/AddKeyCredentialLink/AddKeyCredentialLink";
-import DCSync from "./HelpTexts/DCSync/DCSync";
-import SyncLAPSPassword from "./HelpTexts/SyncLAPSPassword/SyncLAPSPassword";
+import WriteSPN from './HelpTexts/WriteSPN/WriteSPN';
+import AddSelf from './HelpTexts/AddSelf/AddSelf';
+import AddKeyCredentialLink from './HelpTexts/AddKeyCredentialLink/AddKeyCredentialLink';
+import DCSync from './HelpTexts/DCSync/DCSync';
+import SyncLAPSPassword from './HelpTexts/SyncLAPSPassword/SyncLAPSPassword';
+import WriteAccountRestrictions from './HelpTexts/WriteAccountRestrictions/WriteAccountRestrictions';
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -86,10 +87,10 @@ const HelpModal = () => {
         setTargetName(encode(target.label));
         setTargetType(encode(target.type));
         settargetId(encode(target.objectid));
-        if (!typeof(target.haslaps) === 'boolean') {
-            setHaslaps(false)
-        }else{
-            setHaslaps(target.haslaps)
+        if (!typeof target.haslaps === 'boolean') {
+            setHaslaps(false);
+        } else {
+            setHaslaps(target.haslaps);
         }
         setEdge(edge.etype);
         setOpen(true);
@@ -150,7 +151,8 @@ const HelpModal = () => {
         AddSelf: AddSelf,
         AddKeyCredentialLink: AddKeyCredentialLink,
         DCSync: DCSync,
-        SyncLAPSPassword: SyncLAPSPassword
+        SyncLAPSPassword: SyncLAPSPassword,
+        WriteAccountRestrictions: WriteAccountRestrictions,
     };
 
     const Component = edge in components ? components[edge] : Default;

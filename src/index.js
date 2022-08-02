@@ -305,7 +305,7 @@ global.appStore = {
             ReadGMSAPassword: 'line',
             HasSIDHistory: 'line',
             CanPSRemote: 'line',
-            SyncLAPSPassword: 'line'
+            SyncLAPSPassword: 'line',
         },
     },
     highResStyle: {

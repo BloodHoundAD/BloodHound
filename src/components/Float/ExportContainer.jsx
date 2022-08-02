@@ -1,10 +1,10 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PoseContainer from '../PoseContainer';
 import styles from './ExportContainer.module.css';
-import {Button, Panel, Table} from 'react-bootstrap';
-import {AppContext} from '../../AppContext';
+import { Button, Panel, Table } from 'react-bootstrap';
+import { AppContext } from '../../AppContext';
 import clsx from 'clsx';
-import {useDragControls} from 'framer-motion';
+import { useDragControls } from 'framer-motion';
 
 const ExportContainer = () => {
     const [jsonActive, setJsonActive] = useState(true);

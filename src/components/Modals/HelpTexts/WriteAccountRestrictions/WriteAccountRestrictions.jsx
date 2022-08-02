@@ -6,7 +6,7 @@ import Abuse from './Abuse';
 import Opsec from './Opsec';
 import References from './References';
 
-const AddAllowedToAct = ({
+const WriteAccountRestrictions = ({
     sourceName,
     sourceType,
     targetName,
@@ -34,10 +34,10 @@ const AddAllowedToAct = ({
     );
 };
 
-AddAllowedToAct.propTypes = {
+WriteAccountRestrictions.propTypes = {
     sourceName: PropTypes.string,
     sourceType: PropTypes.string,
     targetName: PropTypes.string,
     targetType: PropTypes.string,
 };
-export default AddAllowedToAct;
+export default WriteAccountRestrictions;
