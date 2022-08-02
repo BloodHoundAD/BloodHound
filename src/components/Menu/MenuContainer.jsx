@@ -499,15 +499,16 @@ const MenuContainer = () => {
                     }
 
                     let syncsLapsPrincipals = getChangesPrincipals.filter(
-                        (principal) => getChangesFilteredSetPrincipals.includes(principal)
-                    )
+                        (principal) =>
+                            getChangesFilteredSetPrincipals.includes(principal)
+                    );
 
-                    if (syncsLapsPrincipals.length > 0 ){
+                    if (syncsLapsPrincipals.length > 0) {
                         console.log(
                             'Found SyncLAPSPassword principals: ' +
-                            dcSyncPrincipals.join(', ') +
-                            ' in domain ' +
-                            domainId
+                                dcSyncPrincipals.join(', ') +
+                                ' in domain ' +
+                                domainId
                         );
                         await session.run(
                             `UNWIND $syncers AS sync MATCH (n:Base {objectid: sync}) MATCH (n:Computer {domainsid: $domainid, haslaps:true}) 
@@ -560,6 +561,34 @@ const MenuContainer = () => {
             description: 'Mark all tenants as High Value',
             type: 'query',
             statement: 'MATCH (n:AZTenant) SET n.highvalue=TRUE',
+            params: null,
+        },
+        {
+            step: 'setGlobalAdminHighValue',
+            description: 'Mark all global admins as High Value',
+            type: 'query',
+            statement: `MATCH (n:AZRole {templateid:"62e90394-69f5-4237-9190-012177145e10"})
+                OPTIONAL MATCH (g:AZGroup)-[:AZHasRole]->(n)
+                OPTIONAL MATCH (i)-[:AZMemberOf]->(g) WHERE n:AZUser OR n:AZServicePrincipal OR n:AZDevice
+                OPTIONAL MATCH (p)-[:AZHasRole]->(n) WHERE n:AZUser OR n:AZServicePrincipal OR n:AZDevice
+                CALL {
+                    WITH g,i,p
+                    SET g.highvalue=true, i.highvalue=true, p.highvalue=true
+                } IN TRANSACTIONS OF 500 ROWS`,
+            params: null,
+        },
+        {
+            step: 'setPrivRoleAdminHighValue',
+            description: 'Mark all privileged role admins as High Value',
+            type: 'query',
+            statement: `MATCH (n:AZRole {templateid:"e8611ab8-c189-46e8-94e1-60213ab1f814"})
+                OPTIONAL MATCH (g:AZGroup)-[:AZHasRole]->(n)
+                OPTIONAL MATCH (i)-[:AZMemberOf]->(g) WHERE n:AZUser OR n:AZServicePrincipal OR n:AZDevice
+                OPTIONAL MATCH (p)-[:AZHasRole]->(n) WHERE n:AZUser OR n:AZServicePrincipal OR n:AZDevice
+                CALL {
+                    WITH g,i,p
+                    SET g.highvalue=true, i.highvalue=true, p.highvalue=true
+                } IN TRANSACTIONS OF 500 ROWS`,
             params: null,
         },
         {
