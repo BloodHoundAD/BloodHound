@@ -419,8 +419,10 @@ const MenuContainer = () => {
 
                     setNeedsPostProcess(false);
                     setPostProcessRunning(true);
+                    console.time('PostProcess');
                     await postProcessAD().catch(console.error);
                     await postProcessAzure().catch(console.error);
+                    console.timeEnd('PostProcess');
                     console.log('Post-processing complete');
                     setPostProcessRunning(false);
                 }
