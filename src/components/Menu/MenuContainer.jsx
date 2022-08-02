@@ -859,7 +859,7 @@ const MenuContainer = () => {
             statement: `MATCH (azt:AZTenant)
                         MATCH (azt)-[:AZContains]->(InTuneAdmin)-[:AZHasRole]->(azr:AZRole {templateid:'3A2C62DB-5318-420D-8D74-23AFFEE5D9D5'})
                         MATCH (azt)-[:AZContains]->(azd:AZDevice)
-                        WHERE toUpper(azd.operatingsystem) CONTAINS "WINDOWS" AND azd.mdmAppId IN ['54B943F8-D761-4F8D-951E-9CEA1846DB5A','0000000A-0000-0000-C000-000000000000']
+                        WHERE toUpper(azd.operatingsystem) CONTAINS "WINDOWS" AND azd.mdmappid IN ['54B943F8-D761-4F8D-951E-9CEA1846DB5A','0000000A-0000-0000-C000-000000000000']
                         CALL {
                             WITH InTuneAdmin, azd
                             MERGE (InTuneAdmin)-[:AZExecuteCommand]->(azd)

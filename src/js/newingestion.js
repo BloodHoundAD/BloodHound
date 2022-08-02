@@ -1140,8 +1140,8 @@ export function convertAzureDevice(data, ingestionData) {
                 operatingsystemversion: data.operatingSystemVersion,
                 trusttype: data.trustType,
                 name: `${data.displayName}@${data.tenantName}`.toUpperCase(),
-                tenantid: data.tenantId,
-                mdmAppId: data.mdmAppId,
+                tenantid: data.tenantId.tpUpperCase(),
+                mdmappid: data.mdmAppId.toUpperCase(),
             },
         },
         false

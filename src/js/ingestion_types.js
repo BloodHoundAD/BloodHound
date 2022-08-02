@@ -199,6 +199,7 @@
  * @property {string} tenantId
  * @property {string} tenantName
  * @property {string} id
+ * @property {string} mdmAppId
  */
 
 /**
