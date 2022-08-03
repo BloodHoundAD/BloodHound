@@ -54,9 +54,9 @@ their authentication use-cases:
 Authenticating with Username and Password
 -----------------------------------------
 
-* **-u** or **--username** - The user principal name of the AzureAD user you wish to authenticate
+* ``-u`` or ``--username`` - The user principal name of the AzureAD user you wish to authenticate
   as. UPN format is "username@domain.com"
-* **-p** or **--password** - The clear-text password of the AzureAD user.
+* ``-p`` or ``--password`` - The clear-text password of the AzureAD user.
 
 Example:
 
@@ -70,9 +70,9 @@ interactively prompt you for the password.
 Authenticating with Service Principal Secret
 --------------------------------------------
 
-* **-a** or **--app** - The Application Id that the Azure app registration
+* ``-a`` or ``--app`` - The Application Id that the Azure app registration
   portal assigned when the app was registered.
-* **-s** or **--secret** - The Application Secret that was generated for the
+* ``-s`` or ``--secret`` - The Application Secret that was generated for the
   app in the app registration portal.
   
 Example:
@@ -84,7 +84,7 @@ Example:
 Authenticating with a JWT
 -------------------------
 
-* **-j** or **--jwt** - An MS Graph or AzureRM scoped JWT. These JWTs last a maximum
+* ``-j`` or ``--jwt`` - An MS Graph or AzureRM scoped JWT. These JWTs last a maximum
   of 90 minutes, so you may need to get a new JWT to enumerate data with AzureHound later.
   
 Example:
@@ -96,7 +96,7 @@ Example:
 Authenticating with a Refresh Token
 -----------------------------------
 
-* **-r** or **--refresh-token** - A refresh token. AzureHound will automatically
+* ``-r`` or ``--refresh-token`` - A refresh token. AzureHound will automatically
   exchange this for an appropriately scoped JWT when accessing the MS Graph
   and AzureRM APIs.
   
@@ -109,11 +109,11 @@ Example:
 Additional Scoping and Output Flags
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* **-t** or **--tenant** - The directory tenant that you want to request permission from. This can be in GUID or friendly name format.
-* **-b** - Filter by one or more subscription ID. AzureHound will automatically dedupe this list for you.
-* **-m** - Filter by one or more management group ID. AzureHound will automatically dedupe all descendent management groups and subscriptions for you.
+* ``-t`` or ``--tenant`` - The directory tenant that you want to request permission from. This can be in GUID or friendly name format.
+* ``-b`` - Filter by one or more subscription ID. AzureHound will automatically dedupe this list for you.
+* ``-m`` - Filter by one or more management group ID. AzureHound will automatically dedupe all descendent management groups and subscriptions for you.
 
-* **-o** or **--output** - Instructs AzureHound to write its output to a specified file name.
-* **--log-file** - Output logs to this file
+* ``-o`` or ``--output`` - Instructs AzureHound to write its output to a specified file name.
+* ``--log-file`` - Output logs to this file
 
-* **-v** or **--verbosity** - AzureHound verbosity level (defaults to 0) [Min: -1, Max: 2]
+* ``-v`` or ``--verbosity`` - AzureHound verbosity level (defaults to 0) [Min: -1, Max: 2]
