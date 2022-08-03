@@ -112,7 +112,7 @@ token and supply it to AzureHound using the -r switch:
 
 ::
 
-    ./azurehound-cli -r "0.ARwA6Wg..." list --tenant "contoso.onmicrosoft.com" -o output.json
+    ./azurehound -r "0.ARwA6Wg..." list --tenant "contoso.onmicrosoft.com" -o output.json
 
 This will attempt to list all possible data from that particular tenant, but you can ALSO
 use that same refresh token to target any other tenant your user has access to!
