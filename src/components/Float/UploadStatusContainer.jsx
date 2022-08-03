@@ -7,8 +7,18 @@ import { AppContext } from '../../AppContext';
 import { Button, Grid, Row, Col } from 'react-bootstrap';
 import FileUploadDisplay from './FileUploadDisplay';
 import { AnimatePresence, useDragControls } from 'framer-motion';
+import PostProcessDisplay from './PostProcessDisplay';
 
-const UploadStatusContainer = ({ files, clearFinished, open, close }) => {
+const UploadStatusContainer = ({
+    files,
+    clearFinished,
+    open,
+    close,
+    postProcessStep,
+    postProcessVisible,
+    adPostProcessCount,
+    azPostProcessCount,
+}) => {
     const dragControl = useDragControls();
 
     let context = useContext(AppContext);
@@ -53,6 +63,12 @@ const UploadStatusContainer = ({ files, clearFinished, open, close }) => {
                                 />
                             );
                         })}
+                        <PostProcessDisplay
+                            step={postProcessStep}
+                            visible={postProcessVisible}
+                            adPostProcessCount={adPostProcessCount}
+                            azPostProcessCount={azPostProcessCount}
+                        />
                     </div>
                 </AnimatePresence>
                 <div className={styles.footer}>

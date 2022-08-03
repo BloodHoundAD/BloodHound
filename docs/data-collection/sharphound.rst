@@ -78,7 +78,7 @@ SharpHound's Session Loop collection method makes this very easy:
 
 ::
 
-   C:\> SharpHound.exe --CollectionMethod Session --Loop
+   C:\> SharpHound.exe --CollectionMethods Session --Loop
 
 This will run SharpHound's session collection method for 2 hours, generating
 a zip file after each loop ends. When done, collect all the zip files and
@@ -91,7 +91,7 @@ to perform looped session collection for 3 hours, 9 minutes and 41 seconds:
 
 ::
 
-   C:\> SharpHound.exe --CollectionMethod Session --Loop --Loopduration 03:09:41
+   C:\> SharpHound.exe --CollectionMethods Session --Loop --Loopduration 03:09:41
 
 Running SharpHound from a Non Domain-Joined System
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

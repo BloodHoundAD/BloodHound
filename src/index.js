@@ -1,21 +1,21 @@
-import "core-js/stable";
-import "regenerator-runtime/runtime"; // generators
+import 'core-js/stable';
+import 'regenerator-runtime/runtime'; // generators
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import AppContainer from './AppContainer';
 import Login from './components/Float/Login';
-import {positions, Provider as AlertProvider, transitions} from 'react-alert';
+import { positions, Provider as AlertProvider, transitions } from 'react-alert';
 import AlertTemplate from 'react-alert-template-basic';
 
-import {remote, shell} from 'electron';
-import {join} from 'path';
-import {existsSync, mkdirSync, writeFileSync} from 'fs';
+import { remote, shell } from 'electron';
+import { join } from 'path';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
 
 import ConfigStore from 'electron-store';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import {EventEmitter2 as e} from 'eventemitter2';
+import { EventEmitter2 as e } from 'eventemitter2';
 
 const { app } = remote;
 
@@ -160,6 +160,12 @@ global.appStore = {
                 scale: 1.25,
                 color: '#34D2EB',
             },
+            AZRole: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf2d2',
+                scale: 1.25,
+                color: '#ED8537',
+            },
             AZGroup: {
                 font: "'Font Awesome 5 Free'",
                 content: '\uF0C0',
@@ -183,6 +189,12 @@ global.appStore = {
                 content: '\uf1b2',
                 scale: 1.25,
                 color: '#FFE066',
+            },
+            AZManagementGroup: {
+                font: "'Font Awesome 5 Free'",
+                content: '\uf1b2',
+                scale: 1.25,
+                color: '#BD93D8',
             },
             AZVM: {
                 font: "'Font Awesome 5 Free'",
@@ -235,7 +247,7 @@ global.appStore = {
             TrustedBy: 'curvedArrow',
             DCSync: 'tapered',
             Contains: 'tapered',
-            GpLink: 'tapered',
+            GPLink: 'tapered',
             Owns: 'tapered',
             CanRDP: 'tapered',
             ExecuteDCOM: 'tapered',
@@ -251,7 +263,8 @@ global.appStore = {
             CanPSRemote: 'tapered',
             AddSelf: 'tapered',
             WriteSPN: 'tapered',
-            AddKeyCredentialLink: 'tapered'
+            AddKeyCredentialLink: 'tapered',
+            SyncLAPSPassword: 'tapered',
         },
     },
     lowResPalette: {
@@ -278,7 +291,7 @@ global.appStore = {
             TrustedBy: 'curvedArrow',
             DCSync: 'line',
             Contains: 'line',
-            GpLink: 'line',
+            GPLink: 'line',
             Owns: 'line',
             CanRDP: 'line',
             ExecuteDCOM: 'line',
@@ -292,6 +305,7 @@ global.appStore = {
             ReadGMSAPassword: 'line',
             HasSIDHistory: 'line',
             CanPSRemote: 'line',
+            SyncLAPSPassword: 'line',
         },
     },
     highResStyle: {
@@ -382,13 +396,14 @@ if (typeof conf.get('edgeincluded') === 'undefined') {
         AllowedToDelegate: true,
         ReadLAPSPassword: true,
         Contains: true,
-        GpLink: true,
+        GPLink: true,
         AddAllowedToAct: true,
         AllowedToAct: true,
         SQLAdmin: true,
         ReadGMSAPassword: true,
         HasSIDHistory: true,
         CanPSRemote: true,
+        SyncLAPSPassword: true,
     });
 }
 
@@ -399,7 +414,7 @@ const alertOptions = {
     transitions: transitions.FADE,
     containerStyle: {
         zIndex: 100,
-        width: '25%',
+        width: '100%',
     },
 };
 

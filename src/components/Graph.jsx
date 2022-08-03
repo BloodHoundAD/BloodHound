@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
 import { findGraphPath, generateUniqueId, setSchema } from 'utils';
-import { writeFile, readFile } from 'fs';
+import { readFile, writeFile } from 'fs';
 import { fork } from 'child_process';
-
-let child;
 import { join } from 'path';
 import { remote } from 'electron';
-const { dialog } = remote;
-import { v4 as uuidv4 } from 'uuid'
-let Observer = require('fontfaceobserver');
+import { v4 as uuidv4 } from 'uuid';
 import { withAlert } from 'react-alert';
 import NodeTooltip from './Tooltips/NodeTooltip';
 import StageTooltip from './Tooltips/StageTooltip';
 import EdgeTooltip from './Tooltips/EdgeTooltip';
 import ConfirmDrawModal from './Modals/ConfirmDrawModal';
 import { escapeRegExp } from '../js/utils';
+
+let child;
+const { dialog } = remote;
+let Observer = require('fontfaceobserver');
 
 class GraphContainer extends Component {
     constructor(props) {
@@ -811,19 +811,19 @@ class GraphContainer extends Component {
                                                     'end' in value &&
                                                     !edges.id
                                                 ) {
-                                                    edges[
-                                                        id
-                                                    ] = this.createEdgeFromRow(
-                                                        value
-                                                    );
+                                                    edges[id] =
+                                                        this.createEdgeFromRow(
+                                                            value
+                                                        );
                                                 } else if (
                                                     !nodes.id &&
                                                     !('end' in value)
                                                 ) {
-                                                    let node = this.createNodeFromRow(
-                                                        value,
-                                                        params
-                                                    );
+                                                    let node =
+                                                        this.createNodeFromRow(
+                                                            value,
+                                                            params
+                                                        );
                                                     if (node !== null) {
                                                         nodes[id] = node;
                                                     }
@@ -837,9 +837,8 @@ class GraphContainer extends Component {
                                         Object.hasOwnProperty(field, 'end') &&
                                         !edges.id
                                     ) {
-                                        edges[id] = this.createEdgeFromRow(
-                                            field
-                                        );
+                                        edges[id] =
+                                            this.createEdgeFromRow(field);
                                     } else if (
                                         !nodes.id &&
                                         !Object.hasOwnProperty(field, 'end')
@@ -866,7 +865,7 @@ class GraphContainer extends Component {
                 }, 1500);
             },
             onCompleted: function () {
-                const graph = {nodes: [], edges: []};
+                const graph = { nodes: [], edges: [] };
                 $.each(nodes, function (node) {
                     graph.nodes.push(nodes[node]);
                 });
@@ -920,13 +919,13 @@ class GraphContainer extends Component {
         return edge;
     }
 
-    selectLabel(properties){
-        if (properties.hasOwnProperty("name")){
-            return properties["name"];
-        }else if (properties.hasOwnProperty("azname")){
-            return properties["azname"];
-        }else{
-            return properties["objectid"]
+    selectLabel(properties) {
+        if (properties.hasOwnProperty('name')) {
+            return properties['name'];
+        } else if (properties.hasOwnProperty('azname')) {
+            return properties['azname'];
+        } else {
+            return properties['objectid'];
         }
     }
 
@@ -935,9 +934,9 @@ class GraphContainer extends Component {
             return null;
         }
         let id = data.identity;
-        let fType = data.labels.filter((w) => w !== 'Base');
+        let fType = data.labels.filter((w) => w !== 'Base' && w !== 'AZBase');
         let type = fType.length > 0 ? fType[0] : 'Base';
-        let label = this.selectLabel(data.properties)
+        let label = this.selectLabel(data.properties);
 
         let node = {
             id: id,
@@ -1242,14 +1241,7 @@ class GraphContainer extends Component {
             options
         ) {
             const _this = this;
-            let i,
-                l,
-                a,
-                b,
-                c,
-                d,
-                scale,
-                margin;
+            let i, l, a, b, c, d, scale, margin;
             const n = this.graph.nodes(),
                 e = this.graph.edges(),
                 settings = this.settings.embedObjects(options || {}),
@@ -1525,30 +1517,34 @@ class GraphContainer extends Component {
                 let mode = appStore.performance.nodeLabels;
                 let sigmaInstance = this.state.sigmaInstance;
 
-                if (
-                    document.activeElement === document.body &&
-                    this.state.ctrlDown &&
-                    !this.state.otherDown
-                ) {
-                    mode = mode + 1;
-                    if (mode > 2) {
-                        mode = 0;
-                    }
-                    appStore.performance.nodeLabels = mode;
-                    conf.set('performance', appStore.performance);
+                if (document.activeElement === document.body) {
+                    if (this.state.ctrlDown && !this.state.otherDown) {
+                        mode = mode + 1;
+                        if (mode > 2) {
+                            mode = 0;
+                        }
+                        appStore.performance.nodeLabels = mode;
+                        conf.set('performance', appStore.performance);
 
-                    if (mode === 2) {
-                        sigmaInstance.settings('labelThreshold', 500);
-                        this.props.alert.info('Hiding Node Labels');
-                    } else if (mode === 0) {
-                        sigmaInstance.settings('labelThreshold', 15);
-                        this.props.alert.info('Default Node Label Threshold');
-                    } else {
-                        sigmaInstance.settings('labelThreshold', 1);
-                        this.props.alert.info('Always Showing Node Labels');
-                    }
+                        if (mode === 2) {
+                            sigmaInstance.settings('labelThreshold', 500);
+                            this.props.alert.info('Hiding Node Labels');
+                        } else if (mode === 0) {
+                            sigmaInstance.settings('labelThreshold', 15);
+                            this.props.alert.info(
+                                'Default Node Label Threshold'
+                            );
+                        } else {
+                            sigmaInstance.settings('labelThreshold', 1);
+                            this.props.alert.info('Always Showing Node Labels');
+                        }
 
-                    sigmaInstance.refresh({ skipIndexation: true });
+                        sigmaInstance.refresh({ skipIndexation: true });
+                    } else if (e.key === 'Backspace') {
+                        emitter.emit('graphBack');
+                    } else if (e.key === 's') {
+                        jQuery('#tabcontainer').slideToggle('fast');
+                    }
                 }
 
                 this.setState({

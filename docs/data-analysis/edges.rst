@@ -39,7 +39,7 @@ Finally, administrators can often disable host-based security controls that
 would otherwise prevent the aforementioned techniques.
 
 Abuse Info
-----------
+------------
 
 There are several ways to pivot to a Windows system. If using Cobalt
 Strike's beacon, check the help info for the commands "psexec", "psexec_psh",
@@ -149,7 +149,7 @@ has. If a group has rights to another principal, users/computers in the group,
 as well as other groups inside the group inherit those permissions.
 
 Abuse Info
-----------
+------------
 
 No abuse is necessary. This edge simply indicates that a principal belongs to a
 security group.
@@ -192,7 +192,7 @@ This video explains exactly how BloodHound's session data collection method work
     </div>
 
 Abuse Info
-----------
+------------
 
 When a user has a session on the computer, you may be able to obtain credentials for
 the user via credential dumping or token impersonation. You must be able to move
@@ -272,7 +272,7 @@ To see an example of this edge being abused, see this clip from Derbycon 2017:
     </div>
 
 Abuse Info
-----------
+------------
 
 There are at least two ways to execute this attack. The first and most obvious is by
 using the built-in net.exe binary in Windows (e.g.: net user dfm.a Password123! /domain).
@@ -366,7 +366,7 @@ See this clip for an example of this edge being abused:
     </div>
 
 Abuse Info
-----------
+------------
 
 There are at least two ways to execute this attack. The first and most obvious is by using
 the built-in net.exe binary in Windows (e.g.: net group "Domain Admins" dfm.a /add
@@ -451,7 +451,7 @@ See this clip for an example of this edge being abused:
     </div>
 
 Abuse Info
-----------
+------------
 
 There are at least two ways to execute this attack. The first and most obvious is by using
 the built-in net.exe binary in Windows (e.g.: net group "Domain Admins" dfm.a /add
@@ -527,7 +527,7 @@ privileges on the system.
 .. note:: This edge does not guarantee privileged execution.
 
 Abuse Info
----------
+-------------
 
 Abuse of this privilege will depend heavily on the type of access you have. 
             
@@ -616,7 +616,7 @@ on the system.
 .. note:: This edge does not guarantee privileged execution.
 
 Abuse Info
----------
+-------------
 
 Abuse of this privilege will require you to have interactive access with a system on the network.
     
@@ -689,7 +689,7 @@ This can allow code execution under certain conditions by instantiating a COM ob
 machine and invoking its methods.
 
 Abuse Info
----------
+-----------
 
 The PowerShell script Invoke-DCOM implements lateral movement using a variety of different COM
 objects (ProgIds: MMC20.Application, ShellWindows, ShellBrowserWindow, ShellBrowserWindow, and
@@ -701,7 +701,7 @@ PowerShell code.  If specifying a COM object by its CLSID:
 :: 
 
   $ComputerName = <target computer name>              # Remote computer
-  $clsid = “{fbae34e8-bf95-4da8-bf98-6c6e580aa348}”   # GUID of the COM object
+  $clsid = "{fbae34e8-bf95-4da8-bf98-6c6e580aa348}"   # GUID of the COM object
   $Type = [Type]::GetTypeFromCLSID($clsid, $ComputerName)
   $ComObject = [Activator]::CreateInstance($Type)
 
@@ -710,7 +710,7 @@ If specifying a COM object by its ProgID:
 ::
 
   $ComputerName = <target computer name>              # Remote computer
-  $ProgId = “<NAME>”                                  # GUID of the COM object
+  $ProgId = "<NAME>"                                  # GUID of the COM object
   $Type = [Type]::GetTypeFromProgID($ProgId, $ComputerName)
   $ComObject = [Activator]::CreateInstance($Type)
 
@@ -727,9 +727,9 @@ etc.) will be generated when using DCOM.
 Processes may be spawned as the user authenticating to the remote system, as a user already
 logged into the system, or may take advantage of an already spawned process.  
 
-Many DCOM servers spawn under the process “svchost.exe -k DcomLaunch” and typically have a
-command line containing the string “ -Embedding” or are executing inside of the DLL hosting
-process “DllHost.exe /Processid:{<AppId>}“ (where AppId is the AppId the COM object is
+Many DCOM servers spawn under the process "svchost.exe -k DcomLaunch" and typically have a
+command line containing the string " -Embedding" or are executing inside of the DLL hosting
+process "DllHost.exe /Processid:{<AppId>}" (where AppId is the AppId the COM object is
 registered to use).  Certain COM services are implemented as service executables; consequently,
 service-related event logs may be generated.
 
@@ -791,7 +791,7 @@ This clip demonstrates how to abuse this edge:
     </div>
 
 Abuse Info
----------
+-----------
 
 Scott Sutherland from NetSPI has authored PowerUpSQL, a PowerShell Toolkit for Attacking SQL
 Server. Major contributors include Antti Rantasaari, Eric Gruber, and Thomas Elling. Before
@@ -810,7 +810,7 @@ Search columns and data for keywords:
 
 ::
 
-  Get-SQLColumnSampleDataThreaded –Verbose -Instance sqlserver\instance –Threads 10 –Keyword “card, password” –SampleSize 2 –ValidateCC -NoDefaults | ft -AutoSize
+  Get-SQLColumnSampleDataThreaded –Verbose -Instance sqlserver\instance –Threads 10 –Keyword "card, password" –SampleSize 2 –ValidateCC -NoDefaults | ft -AutoSize
 
 **Executing Commands**
 
@@ -989,11 +989,11 @@ revoked.
 An issue exists in the constrained delegation where the service name (sname) of the resulting
 ticket is not a part of the protected ticket information, meaning that an attacker can modify
 the target service name to any service of their choice. For example, if msds-AllowedToDelegateTo
-is “HTTP/host.domain.com”, tickets can be modified for LDAP/HOST/etc. service names, resulting
+is "HTTP/host.domain.com", tickets can be modified for LDAP/HOST/etc. service names, resulting
 in complete server compromise, regardless of the specific service listed.
 
 Abuse Info
----------
+-----------
 
 Abusing this privilege can utilize Benjamin Delpy’s Kekeo project, proxying in traffic generated
 from the Impacket library, or using the Rubeus project's s4u abuse.
@@ -1022,11 +1022,47 @@ References
 
 * https://github.com/GhostPack/Rubeus#s4u
 * https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/
-* http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/
+* https://blog.harmj0y.net/activedirectory/s4u2pwnage/
 * https://twitter.com/gentilkiwi/status/806643377278173185
 * https://www.coresecurity.com/blog/kerberos-delegation-spns-and-more
-* http://www.harmj0y.net/blog/redteaming/from-kekeo-to-rubeus/
-* http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+* https://blog.harmj0y.net/redteaming/from-kekeo-to-rubeus/
+* https://blog.harmj0y.net/redteaming/another-word-on-delegation/
+
+|
+
+-----------
+
+|
+
+DCSync
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+This edge represents the combination of GetChanges and GetChangesAll. The combination of both these privileges grants a principal the ability to perform the DCSync attack.
+
+Abuse Info
+-----------
+
+With both GetChanges and GetChangesAll privileges in BloodHound, you may perform a dcsync attack to
+get the password hash of an arbitrary principal using mimikatz:
+
+::
+
+  lsadump::dcsync /domain:testlab.local /user:Administrator
+
+You can also perform the more complicated ExtraSids attack to hop domain trusts. For information on
+this see the blog post by harmj0y in the references tab.
+
+Opsec Considerations
+--------------------
+
+For detailed information on detection of DCSync as well as opsec considerations, see the ADSecurity
+post in the references section below.
+
+References
+----------
+
+* https://adsecurity.org/?p=1729
+* https://blog.harmj0y.net/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/
 
 |
 
@@ -1040,7 +1076,7 @@ GetChanges/GetChangesAll
 The combination of both these privileges grants a principal the ability to perform the DCSync attack.
 
 Abuse Info
----------
+-----------
 
 With both GetChanges and GetChangesAll privileges in BloodHound, you may perform a dcsync attack to
 get the password hash of an arbitrary principal using mimikatz:
@@ -1062,11 +1098,11 @@ References
 ----------
 
 * https://adsecurity.org/?p=1729
-* http://www.harmj0y.net/blog/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/
+* https://blog.harmj0y.net/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/
 
 |
 
-----
+---------
 
 |
 
@@ -1077,7 +1113,7 @@ This is also known as full control. This privilege allows the trustee to manipul
 however they wish.
 
 Abuse Info
----------
+-----------
 
 **With GenericAll Over a Group:**
 
@@ -1277,12 +1313,12 @@ References
 * https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1
 * https://www.youtube.com/watch?v=z8thoG7gPd0
 * https://adsecurity.org/?p=1729
-* http://www.harmj0y.net/blog/activedirectory/targeted-kerberoasting/
+* https://blog.harmj0y.net/activedirectory/targeted-kerberoasting/
 * https://posts.specterops.io/a-red-teamers-guide-to-gpos-and-ous-f0d03976a31e
 * https://eladshamir.com/2019/01/28/Wagging-the-Dog.html
 * https://github.com/GhostPack/Rubeus#s4u
 * https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff
-* http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+* https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 * https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1
 * https://github.com/Kevin-Robertson/Powermad#new-machineaccount
 
@@ -1299,7 +1335,7 @@ With write access to the target object's DACL, you can grant yourself any privil
 on the object.
 
 Abuse Info
----------
+-----------
 
 With the ability to modify the DACL on the target object, you can grant yourself almost any
 privilege against the object you wish.
@@ -1391,7 +1427,7 @@ References
 * https://eladshamir.com/2019/01/28/Wagging-the-Dog.html
 * https://github.com/GhostPack/Rubeus#s4u
 * https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff
-* http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+* https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 * https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1
 * https://github.com/Kevin-Robertson/Powermad#new-machineaccount
 * https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectorysecurityinheritance?view=netframework-4.8
@@ -1408,7 +1444,7 @@ Generic Write access grants you the ability to write to any non-protected attrib
 object, including "members" for a group, and "serviceprincipalnames" for a user
 
 Abuse Info
----------
+-----------
 
 **Users**
 
@@ -1457,7 +1493,7 @@ This clip shows an example of abusing this edge:
     </div>
 
 Abuse Info
----------
+-----------
 
 To change the ownership of the object, you may use the Set-DomainObjectOwner function in
 PowerView.
@@ -1517,7 +1553,7 @@ Writing to this property gives you the opportunity to perform a targeted kerbero
 attack against that user.
 
 Abuse Info
-----------
+------------
 
 A targeted kerberoast attack can be performed using PowerView’s Set-DomainObject along with
 Get-DomainSPNTicket. 
@@ -1561,7 +1597,7 @@ modified, but this configuration is very rare.
 References
 ----------
 
-https://www.harmj0y.net/blog/redteaming/kerberoasting-revisited/
+https://www.harmj0y.net/redteaming/kerberoasting-revisited/
 
 |
 
@@ -1584,7 +1620,7 @@ This clip shows an example of abusing object ownership:
     </div>
 
 Abuse Info
-----------
+------------
 
 With ownership of the object, you may modify the DACL of the object however you wish.
 For more information about that, see the WriteDacl edge section.
@@ -1621,7 +1657,7 @@ Writing to this property allows an attacker to create "Shadow Credentials" on th
 object and authenticate as the principal using kerberos PKINIT.
 
 Abuse Info
-----------
+------------
 
 To abuse this privilege, use Whisker:
     
@@ -1651,6 +1687,114 @@ https://posts.specterops.io/shadow-credentials-abusing-key-trust-account-mapping
 
 |
 
+ReadLAPSPassword
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+This privilege allows you to read the LAPS password from a computer
+
+Abuse Info
+-----------
+You may need to authenticate to the Domain Controller as the user with full control over the target
+user if you are not running a process as that user. To do this in conjunction with Get-DomainObject,
+first create a PSCredential object (these examples comes from the PowerView help documentation):
+
+::
+
+  $SecPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
+  $Cred = New-Object System.Management.Automation.PSCredential('TESTLAB\\dfm.a', $SecPassword)
+
+Then, use Get-DomainObject, optionally specifying $Cred if you are not already running a process as
+the user with full control over the target user.
+
+::
+
+  Get-DomainObject -Credential $Cred -Identity windows10 -Properties "ms-mcs-AdmPwd",name
+
+
+Opsec Considerations
+--------------------
+
+Reading properties from LDAP is extremely low risk, and can only be found using monitoring of LDAP queries.
+
+References
+----------
+
+* https://www.specterops.io/assets/resources/an_ace_up_the_sleeve.pdf
+* https://adsecurity.org/?p=3164
+
+|
+
+----
+
+|
+
+ReadGMSAPassword
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+This privilege allows you to read the password for a Group Managed Service Account (GMSA).
+Group Managed Service Accounts are a special type of Active Directory object, where the password
+for that object is mananaged by and automatically changed by Domain Controllers on a set interval
+(check the MSDS-ManagedPasswordInterval attribute).
+
+The intended use of a GMSA is to allow certain computer accounts to retrieve the password for the GMSA,
+then run local services as the GMSA. An attacker with control of an authorized principal may abuse that
+privilege to impersonate the GMSA.`;
+
+Abuse Info
+-----------
+There are several ways to abuse the ability to read the GMSA password.
+The most straight forward abuse is possible when the GMSA is currently logged on to a computer, which is the intended behavior for a GMSA.
+
+If the GMSA is logged on to the computer account which is granted the ability to retrieve the GMSA's password,
+simply steal the token from the process running as the GMSA, or inject into that process.
+
+If the GMSA is not logged onto the computer, you may create a scheduled task or service set to run as the GMSA.
+The computer account will start the sheduled task or service as the GMSA, and then you may abuse the GMSA
+logon in the same fashion you would a standard user running processes on the machine (see the "HasSession" help modal for more details).
+Finally, it is possible to remotely retrieve the password for the GMSA and convert that password to its equivalent NT hash,
+then perform overpass-the-hash to retrieve a Kerberos ticket for the GMSA:
+
+1. Build GMSAPasswordReader.exe from its source: https://github.com/rvazarkar/GMSAPasswordReader
+
+2. Drop GMSAPasswordReader.exe to disk. If using Cobalt Strike, load and run this binary using execute-assembly
+
+3. Use GMSAPasswordReader.exe to retrieve the NT hash for the GMSA. You may have more than one NT hash come back, one for the
+"old" password and one for the "current" password. It is possible that either value is valid:
+
+::
+
+  gmsapasswordreader.exe --accountname gmsa-jkohler
+
+At this point you are ready to use the NT hash the same way you would with a regular user account.
+You can perform pass-the-hash, overpass-the-hash, or any other technique that takes an NT hash as an input.
+
+
+Opsec Considerations
+--------------------
+
+When abusing a GMSA that is already logged onto a system, you will have the same opsec considerations as when
+abusing a standard user logon. For more information about that, see the "HasSession" modal's opsec considerations tab.
+
+When retrieving the GMSA password from Active Directory, you may generate a 4662 event on the Domain Controller;
+however, that event will likely perfectly resemble a legitimate event if you request the password from the same
+context as a computer account that is already authorized to read the GMSA password.
+
+References
+----------
+
+* https://www.dsinternals.com/en/retrieving-cleartext-gmsa-passwords-from-active-directory/
+* https://www.powershellgallery.com/packages/DSInternals/
+* https://github.com/markgamache/gMSA/tree/master/PSgMSAPwd
+* https://adsecurity.org/?p=36
+* https://adsecurity.org/?p=2535
+* https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4662
+
+|
+
+----
+
+|
+
 Contains
 ^^^^^^^^
 
@@ -1658,7 +1802,7 @@ GPOs linked to a container apply to all objects that are contained by the contai
 ACEs set on a parent OU may inherit down to child objects.
 
 Abuse Info
----------
+-----------
 
 With control of an OU, you may add a new ACE on the OU that will inherit down to the objects under that
 OU. Below are two options depending on how targeted you choose to be in this step:
@@ -1742,7 +1886,7 @@ Extended rights are special rights granted on objects which allow reading of pri
 attributes, as well as performing special actions.
 
 Abuse Info
----------
+-----------
 
 **Users**
 
@@ -1776,13 +1920,13 @@ https://www.youtube.com/watch?v=z8thoG7gPd0
 
 |
 
-GpLink
+GPLink
 ^^^^^^
 
 A linked GPO applies its settings to objects in the linked container.
 
 Abuse Info
----------
+-----------
 
 This edge helps you understand which object a GPO applies to, and so the actual abuse
 is actually being performed against the GPO this edge originates from. For more info
@@ -1829,7 +1973,7 @@ This clip demonstrates how to abuse this edge:
     </div>
 
 Abuse Info
----------
+-----------
 
 Abusing this primitive is currently only possible through the Rubeus project.
             
@@ -1862,7 +2006,7 @@ References
 * https://eladshamir.com/2019/01/28/Wagging-the-Dog.html
 * https://github.com/GhostPack/Rubeus#s4u
 * https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff
-* http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+* https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 * https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1
 * https://github.com/Kevin-Robertson/Powermad#new-machineaccount
 
@@ -1889,7 +2033,7 @@ This clip demonstrates how to abuse this edge:
     </div>
 
 Abuse Info
----------
+-----------
 
 See the AllowedToAct edge section for abuse info
 
@@ -1904,7 +2048,7 @@ References
 * https://eladshamir.com/2019/01/28/Wagging-the-Dog.html
 * https://github.com/GhostPack/Rubeus#s4u
 * https://gist.github.com/HarmJ0y/224dbfef83febdaf885a8451e40d52ff
-* http://www.harmj0y.net/blog/redteaming/another-word-on-delegation/
+* https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 * https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1
 * https://github.com/Kevin-Robertson/Powermad#new-machineaccount
 
@@ -1920,16 +2064,52 @@ TrustedBy
 This edge is used to keep track of domain trusts, and maps to the direction of access.
 
 Abuse Info
----------
+-----------
 
 This edge will come in handy when analzying how to jump a forest trust to get enterprise
 admin access from domain admin access within a forest. For more information about that
-attack, see http://www.harmj0y.net/blog/redteaming/the-trustpocalypse/
+attack, see https://blog.harmj0y.net/redteaming/the-trustpocalypse/
 
 References
 ----------
 
-http://www.harmj0y.net/blog/redteaming/the-trustpocalypse/
+https://blog.harmj0y.net/redteaming/the-trustpocalypse/
+
+|
+
+----
+
+|
+
+SyncLAPSPassword
+^^^^^^^^^^^^^^^^^^^^
+
+A principal with this signifies the capability of retrieving, through a directory 
+synchronization, the value of confidential and RODC filtered attributes, such as 
+LAPS' *ms-Mcs-AdmPwd*.
+
+Abuse Info
+------------
+
+To abuse these privileges, use DirSync:
+    
+::
+
+    Sync-LAPS -LDAPFilter '(samaccountname=TargetComputer$)'
+    
+For other optional parameters, view the DirSync documentation.
+
+Opsec Considerations
+--------------------
+
+Executing the attack will generate a 4662 (An operation was performed on an object) 
+event at the domain controller if an appropriate SACL is in place on the target object.
+
+References
+----------
+
+* https://github.com/simondotsh/DirSync
+* https://simondotsh.com/infosec/2022/07/11/dirsync.html
 
 |
 
@@ -1943,15 +2123,15 @@ AZAddMembers
 The ability to add other principals to an Azure security group
 
 Abuse Info
-----------
+------------
 
 Via the Azure portal:
 1. Find the group in your tenant (Azure Active Directory -> Groups -> Find Group in list)
 2. Click the group from the list
-3. In the left pane, click “Members”
-4. At the top, click “Add members”
-5. Find the principals you want to add to the group and click them, then click “select” at the bottom
-6. You should see a message in the top right saying “Member successfully added”
+3. In the left pane, click "Members"
+4. At the top, click "Add members"
+5. Find the principals you want to add to the group and click them, then click "select" at the bottom
+6. You should see a message in the top right saying "Member successfully added"
     
 Via PowerZure: Add-AzureADGroup -User [UPN] -Group [Group name]
 
@@ -1979,7 +2159,7 @@ AZAppAdmin
 Principals with the Application Admin role can control tenant-resident apps.
 
 Abuse Info
-----------
+------------
 
 Create a new credential for the app, then authenticate to the tenant as the
 app’s service principal, then abuse whatever privilege it is that the service
@@ -2007,7 +2187,7 @@ AZCloudAppAdmin
 Principals with the Cloud App Admin role can control tenant-resident apps.
 
 Abuse Info
-----------
+------------
 
 Create a new credential for the app, then authenticate to the tenant as the
 app’s service principal, then abuse whatever privilege it is that the service
@@ -2033,7 +2213,7 @@ AZContains
 ^^^^^^^^^^
 
 This indicates that the parent object contains the child object, such as a resource
-group containing a virtual machine, or a tenant “containing” a subscription.
+group containing a virtual machine, or a tenant "containing" a subscription.
 
 |
 
@@ -2048,7 +2228,7 @@ The contributor role grants almost all abusable privileges in all circumstances,
 with some exceptions. Those exceptions are not collected by AzureHound.
 
 Abuse Info
-----------
+------------
 
 This depends on what the target object is:
 * **Key Vault:** You can read secrets and alter access policies (grant yourself
@@ -2086,7 +2266,7 @@ AZGetCertificates
 The ability to read certificates from key vaults.
 
 Abuse Info
-----------
+------------
 
 Use PowerShell or PowerZure to fetch the certificate from the key vault.
     
@@ -2117,7 +2297,7 @@ AZGetKeys
 The ability to read keys from key vaults.
 
 Abuse Info
-----------
+------------
 
 Use PowerShell or PowerZure to fetch the certificate from the key vault.
     
@@ -2148,7 +2328,7 @@ AZGetSecrets
 The ability to read secrets from key vaults.
 
 Abuse Info
-----------
+------------
 
 Use PowerShell or PowerZure to fetch the certificate from the key vault.
     
@@ -2182,7 +2362,7 @@ Admins can do almost anything against almost every object type in the tenant,
 this is the highest privilege role in Azure.
 
 Abuse Info
-----------
+------------
 
 As a Global Admin, you can change passwords, run commands on VMs, read key vault
 secrets, activate roles for other users, etc.
@@ -2217,7 +2397,7 @@ The Privileged Role Admin role can grant any other admin role to another princip
 at the tenant level.
 
 Abuse Info
-----------
+------------
 
 Activate the Global Admin role for yourself or for another user using PowerZure or
 PowerShell.
@@ -2245,9 +2425,9 @@ AZResetPassword
 The ability to change another user’s password without knowing their current password.
 
 Abuse Info
-----------
+------------
 
-Find the user in the Azure portal, then click “Reset Password”, or use PowerZure’s
+Find the user in the Azure portal, then click "Reset Password", or use PowerZure’s
 Set-AzureUserPassword cmdlet. If password write-back is enabled, this password will
 also be set for a synced on-prem user.
 
@@ -2273,7 +2453,7 @@ AZRunsAs
 The Azure App runs as the Service Principal when it needs to authenticate to the tenant.
 
 Abuse Info
-----------
+------------
 
 This edge should be taken into consideration when abusing control of an app. Apps authenticate
 with service principals to the tenant, so if you have control of an app, what you are abusing
@@ -2292,7 +2472,7 @@ AZUserAccessAdministrator
 The User Access Admin role can edit roles against many other objects.
 
 Abuse Info
-----------
+------------
 This role can be used to grant yourself or another principal any privilege
 you want against Automation Accounts, VMs, Key Vaults, and Resource Groups.
 Use the Azure portal to add a new, abusable role assignment against the target

@@ -20,11 +20,11 @@ https://blog.cptjesus.com/posts/bloodhound15
 https://blog.cptjesus.com/posts/bloodhound20
 https://blog.cptjesus.com/posts/bloodhound21
 
-http://www.harmj0y.net/blog/redteaming/a-guide-to-attacking-domain-trusts/
-http://www.harmj0y.net/blog/activedirectory/a-case-study-in-wagging-the-dog-computer-takeover/
-http://www.harmj0y.net/blog/redteaming/kerberoasting-revisited/
-http://www.harmj0y.net/blog/redteaming/from-kekeo-to-rubeus/
-http://www.harmj0y.net/blog/activedirectory/the-most-dangerous-user-right-you-probably-have-never-heard-of/
+https://blog.harmj0y.net/redteaming/a-guide-to-attacking-domain-trusts/
+https://blog.harmj0y.net/activedirectory/a-case-study-in-wagging-the-dog-computer-takeover/
+https://blog.harmj0y.net/redteaming/kerberoasting-revisited/
+https://blog.harmj0y.net/redteaming/from-kekeo-to-rubeus/
+https://blog.harmj0y.net/activedirectory/the-most-dangerous-user-right-you-probably-have-never-heard-of/
 
 Presentations from the Authors
 ------------------------------

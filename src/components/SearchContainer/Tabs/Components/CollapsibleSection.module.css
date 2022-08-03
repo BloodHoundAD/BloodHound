@@ -17,3 +17,39 @@
     padding-left: 0;
     padding-right: 15px;
 }
+
+.itemlist {
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 5px 10px;
+}
+
+.itemlist :global table {
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.itemlist :global table > thead {
+    text-align: left;
+    position: -webkit-sticky;
+    position: sticky;
+}
+
+.itemlist :global table > tbody > tr {
+    font-family: Helvetica, serif;
+    font-size: 12px;
+    border-style: none;
+}
+
+.dark > .dl > h5 {
+    color: white !important;
+}
+
+.light > .dl > h5 {
+    color: black;
+}
+
+.dark td {
+    color: white !important;
+    opacity: 1;
+}

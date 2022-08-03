@@ -3,6 +3,7 @@ import {Button} from 'react-bootstrap';
 import clsx from 'clsx';
 import {motion} from 'framer-motion';
 import neo4j from 'neo4j-driver';
+import semver from 'semver'
 
 const Login = () => {
     const [url, setUrl] = useState('bolt://localhost:7687');
@@ -84,14 +85,14 @@ const Login = () => {
     useEffect(() => {
         if (pwfReady && iconReady && buttonReady) {
             if (password !== '') {
-                checkDatabaseCreds();
+                checkDatabaseCreds().catch(console.error);
             } else {
                 checkDatabaseExists();
             }
         }
     }, [pwfReady, iconReady, buttonReady]);
 
-    const checkDatabaseCreds = () => {
+    const checkDatabaseCreds = async () => {
         if (loginRunning) {
             return;
         }
@@ -102,121 +103,139 @@ const Login = () => {
         let driver = neo4j.driver(url, neo4j.auth.basic(user, password));
         let session = driver.session();
 
-        let pwf = jQuery(passwordRef.current);
+        let pwf = $(passwordRef.current);
         pwf.tooltip('hide');
 
-        let btn = jQuery(buttonRef.current);
-
         let tempUrl = url.replace('bolt://', 'http://').replace('7687', '7474');
-
-        session
-            .run('MATCH (n) RETURN n LIMIT 1')
-            .then((_) => {
+        let versionRecord;
+        try{
+            versionRecord = await session.run('CALL dbms.components() YIELD versions RETURN versions[0] AS version')
+        }catch (error) {
+            console.log(error);
+            if (error.message.includes('authentication failure')) {
+                setLoginEnabled(true);
                 setLoginRunning(false);
-                setLoginSuccess(true);
 
-                const dbInfo = {
-                    url: url,
-                    user: user,
-                    password: password,
-                };
+                pwf.attr(
+                    'data-original-title',
+                    'Invalid username or password'
+                )
+                    .tooltip('fixTitle')
+                    .tooltip('show');
+            } else if (error.message.includes('too many times in a row')) {
+                setLoginRunning(false);
 
-                if (save) {
-                    conf.set('databaseInfo', dbInfo);
-                }
-
-                appStore.databaseInfo = dbInfo;
-
-                pwf.tooltip('hide');
-                icon.tooltip('hide');
-
-                session.close();
-                driver.close();
-
-                global.driver = neo4j.driver(
-                    url,
-                    neo4j.auth.basic(user, password),
-                    {
-                        disableLosslessIntegers: true,
-                        connectionTimeout: 120000,
-                    }
-                );
-
-                session = global.driver.session();
-                session
-                    .run(
-                        'CALL dbms.components() YIELD versions RETURN versions[0] AS version'
-                    )
-                    .then((result) => {
-                        let record = result.records[0];
-                        global.neoVersion = record.get('version');
-                        session.close();
-                    });
+                pwf.attr(
+                    'data-original-title',
+                    'Too many wrong authentication attempts. Please wait'
+                )
+                    .tooltip('fixTitle')
+                    .tooltip('show');
 
                 setTimeout(() => {
-                    setVisible(false);
-                    setTimeout(() => {
-                        renderEmit.emit('login');
-                    }, 400);
-                }, 1500);
-            })
-            .catch((error) => {
-                console.log(error);
-                if (error.message.includes('authentication failure')) {
                     setLoginEnabled(true);
-                    setLoginRunning(false);
-
-                    pwf.attr(
-                        'data-original-title',
-                        'Invalid username or password'
+                    pwf.tooltip('hide');
+                }, 5000);
+            } else if (
+                error.message.includes('WebSocket connection failure')
+            ) {
+                icon.toggle('true');
+                icon.removeClass();
+                icon.addClass(
+                    'fa fa-times-circle red-icon-color form-control-feedback'
+                );
+                icon.attr('data-original-title', 'No database found')
+                    .tooltip('fixTitle')
+                    .tooltip('show');
+                setLoginEnabled(false);
+                setLoginRunning(false);
+            } else if (
+                error.message.includes(
+                    'The credentials you provided were valid'
+                )
+            ) {
+                pwf.attr(
+                    'data-original-title',
+                    'Credentials need to be changed from the neo4j browser first. Go to {} and change them.'.format(
+                        tempUrl
                     )
-                        .tooltip('fixTitle')
-                        .tooltip('show');
-                } else if (error.message.includes('too many times in a row')) {
-                    setLoginRunning(false);
+                )
+                    .tooltip('fixTitle')
+                    .tooltip('show');
 
-                    pwf.attr(
-                        'data-original-title',
-                        'Too many wrong authentication attempts. Please wait'
-                    )
-                        .tooltip('fixTitle')
-                        .tooltip('show');
+                setLoginEnabled(true);
+                setLoginRunning(false);
+            }
 
-                    setTimeout(() => {
-                        setLoginEnabled(true);
-                        pwf.tooltip('hide');
-                    }, 5000);
-                } else if (
-                    error.message.includes('WebSocket connection failure')
-                ) {
-                    icon.toggle('true');
-                    icon.removeClass();
-                    icon.addClass(
-                        'fa fa-times-circle red-icon-color form-control-feedback'
-                    );
-                    icon.attr('data-original-title', 'No database found')
-                        .tooltip('fixTitle')
-                        .tooltip('show');
-                    setLoginEnabled(false);
-                    setLoginRunning(false);
-                } else if (
-                    error.message.includes(
-                        'The credentials you provided were valid'
-                    )
-                ) {
-                    pwf.attr(
-                        'data-original-title',
-                        'Credentials need to be changed from the neo4j browser first. Go to {} and change them.'.format(
-                            tempUrl
-                        )
-                    )
-                        .tooltip('fixTitle')
-                        .tooltip('show');
+            return
+        }
 
-                    setLoginEnabled(true);
-                    setLoginRunning(false);
-                }
-            });
+        let version = versionRecord.records[0].get('version')
+        if (!semver.gte(version, '4.4.0')){
+            setLoginEnabled(false);
+            setLoginRunning(false);
+
+            icon.toggle('true');
+            icon.removeClass();
+            icon.addClass(
+                'fa fa-times-circle red-icon-color form-control-feedback'
+            );
+            icon.attr('data-original-title', 'Neo4j Version is too low. Upgrade to >= 4.4.0')
+                .tooltip('fixTitle')
+                .tooltip('show');
+
+            return
+        }
+
+        setLoginRunning(false)
+        setLoginSuccess(true)
+
+        let dbInfo = {
+            url: url,
+            user: user,
+            password: password
+        }
+
+        if (save) {
+            conf.set('databaseInfo', dbInfo)
+        }
+
+        appStore.databaseInfo = dbInfo
+
+        pwf.tooltip('hide');
+        icon.tooltip('hide');
+
+        await session.close()
+        await driver.close()
+
+        global.driver = neo4j.driver(
+            url,
+            neo4j.auth.basic(user, password), {
+                disableLosslessIntegers: true,
+                connectionTimeout: 120000,
+            }
+        )
+
+        session = global.driver.session()
+
+        //Migrate GpLink to GPLink
+        try{
+            await session.run(`MATCH (n:GPO)-[r:GpLink]->(m) 
+            CALL {
+                WITH n, r, m
+                CREATE (n)-[:GPLink {isacl: false, enforced:r.enforced}]->(m)
+                DELETE r
+            } IN TRANSACTIONS OF 500 ROWS`)
+        }catch (e) {
+            console.error(e)
+        }
+
+        setTimeout(() => {
+            setVisible(false)
+            setTimeout(() => {
+                renderEmit.emit('login')
+            }, 400)
+        }, 1500)
     };
 
     const checkDatabaseExists = () => {

@@ -1,6 +1,6 @@
-import React, {useContext} from 'react';
-import {motion} from 'framer-motion';
-import {AppContext} from '../../../AppContext';
+import React, { useContext } from 'react';
+import { motion } from 'framer-motion';
+import { AppContext } from '../../../AppContext';
 import styles from './EdgeFilter.module.css';
 import EdgeFilterCheck from './EdgeFilterCheck';
 import clsx from 'clsx';
@@ -58,7 +58,10 @@ const EdgeFilter = ({ open }) => {
                             'ReadGMSAPassword',
                             'AddKeyCredentialLink',
                             'WriteSPN',
-                            'AddSelf'
+                            'AddSelf',
+                            'AddAllowedToAct',
+                            'DCSync',
+                            'SyncLAPSPassword'
                         ]}
                         sectionName='ACL'
                     />
@@ -75,13 +78,16 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterCheck name='AddKeyCredentialLink' />
                     <EdgeFilterCheck name='WriteSPN' />
                     <EdgeFilterCheck name='AddSelf' />
+                    <EdgeFilterCheck name='AddAllowedToAct' />
+                    <EdgeFilterCheck name='DCSync' />
+                    <EdgeFilterCheck name='SyncLAPSPassword' />
                     <EdgeFilterSection
                         title='Containers'
                         sectionName='container'
-                        edges={['Contains', 'GpLink']}
+                        edges={['Contains', 'GPLink']}
                     />
                     <EdgeFilterCheck name='Contains' />
-                    <EdgeFilterCheck name='GpLink' />
+                    <EdgeFilterCheck name='GPLink' />
                     <EdgeFilterSection
                         title='Special'
                         sectionName='special'
@@ -90,7 +96,6 @@ const EdgeFilter = ({ open }) => {
                             'CanPSRemote',
                             'ExecuteDCOM',
                             'AllowedToDelegate',
-                            'AddAllowedToAct',
                             'AllowedToAct',
                             'SQLAdmin',
                             'HasSIDHistory',
@@ -100,7 +105,6 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterCheck name='CanPSRemote' />
                     <EdgeFilterCheck name='ExecuteDCOM' />
                     <EdgeFilterCheck name='AllowedToDelegate' />
-                    <EdgeFilterCheck name='AddAllowedToAct' />
                     <EdgeFilterCheck name='AllowedToAct' />
                     <EdgeFilterCheck name='SQLAdmin' />
                     <EdgeFilterCheck name='HasSIDHistory' />
@@ -109,38 +113,66 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterSection
                         title='Azure Edges'
                         edges={[
-                            'AZAddMembers',
+                            'AZAvereContributor',
                             'AZContains',
                             'AZContributor',
                             'AZGetCertificates',
                             'AZGetKeys',
                             'AZGetSecrets',
+                            'AZHasRole',
+                            'AZMemberOf',
+                            'AZOwner',
+                            'AZRunsAs',
+                            'AZVMContributor',
+                            'AZVMAdminLogin',
+                            'AZAddMembers',
+                            'AZAddSecret',
+                            'AZExecuteCommand',
                             'AZGlobalAdmin',
-                            'AZOwns',
+                            'AZPrivilegedAuthAdmin',
+                            'AZGrant',
+                            'AZGrantSelf',
                             'AZPrivilegedRoleAdmin',
                             'AZResetPassword',
                             'AZUserAccessAdministrator',
-                            'AZAppAdmin',
+                            'AZOwns',
+                            'AZScopedTo',
                             'AZCloudAppAdmin',
-                            'AZRunsAs',
+                            'AZAppAdmin',
+                            'AZAddOwner',
+                            'AZManagedIdentity',
                             'AZKeyVaultContributor',
                         ]}
                         sectionName='azure'
                     />
-                    <EdgeFilterCheck name='AZAddMembers' />
+                    <EdgeFilterCheck name='AZAvereContributor' />
                     <EdgeFilterCheck name='AZContains' />
                     <EdgeFilterCheck name='AZContributor' />
                     <EdgeFilterCheck name='AZGetCertificates' />
                     <EdgeFilterCheck name='AZGetKeys' />
                     <EdgeFilterCheck name='AZGetSecrets' />
+                    <EdgeFilterCheck name='AZHasRole' />
+                    <EdgeFilterCheck name='AZMemberOf' />
+                    <EdgeFilterCheck name='AZOwner' />
+                    <EdgeFilterCheck name='AZRunsAs' />
+                    <EdgeFilterCheck name='AZVMContributor' />
+                    <EdgeFilterCheck name='AZVMAdminLogin' />
+                    <EdgeFilterCheck name='AZAddMembers' />
+                    <EdgeFilterCheck name='AZAddSecret' />
+                    <EdgeFilterCheck name='AZExecuteCommand' />
                     <EdgeFilterCheck name='AZGlobalAdmin' />
-                    <EdgeFilterCheck name='AZOwns' />
+                    <EdgeFilterCheck name='AZPrivilegedAuthAdmin' />
+                    <EdgeFilterCheck name='AZGrant' />
+                    <EdgeFilterCheck name='AZGrantSelf' />
                     <EdgeFilterCheck name='AZPrivilegedRoleAdmin' />
                     <EdgeFilterCheck name='AZResetPassword' />
                     <EdgeFilterCheck name='AZUserAccessAdministrator' />
-                    <EdgeFilterCheck name='AZAppAdmin' />
+                    <EdgeFilterCheck name='AZOwns' />
+                    <EdgeFilterCheck name='AZScopedTo' />
                     <EdgeFilterCheck name='AZCloudAppAdmin' />
-                    <EdgeFilterCheck name='AZRunsAs' />
+                    <EdgeFilterCheck name='AZAppAdmin' />
+                    <EdgeFilterCheck name='AZAddOwner' />
+                    <EdgeFilterCheck name='AZManagedIdentity' />
                     <EdgeFilterCheck name='AZKeyVaultContributor' />
                 </div>
             </div>

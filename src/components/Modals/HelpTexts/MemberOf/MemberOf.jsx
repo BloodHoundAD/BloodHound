@@ -9,23 +9,22 @@ import References from './References';
 const MemberOf = ({ sourceName, sourceType, targetName, targetType }) => {
     return (
         <Tabs defaultActiveKey={1} id='tab-style' bsStyle='pills' justified>
-            <Tab
-                eventKey={1}
-                title='GENERAL'
-                dangerouslySetInnerHTML={General(
-                    sourceName,
-                    sourceType,
-                    targetName,
-                    targetType
-                )}
-            />
-            <Tab eventKey={2} title='ABUSE' dangerouslySetInnerHTML={Abuse()} />
-            <Tab eventKey={3} title='OPSEC' dangerouslySetInnerHTML={Opsec()} />
-            <Tab
-                eventKey={4}
-                title='REFERENCES'
-                dangerouslySetInnerHTML={References()}
-            />
+            <Tab eventKey={1} title='GENERAL'>
+                <General
+                    sourceName={sourceName}
+                    sourceType={sourceType}
+                    targetName={targetName}
+                />
+            </Tab>
+            <Tab eventKey={2} title='ABUSE'>
+                <Abuse />
+            </Tab>
+            <Tab eventKey={3} title='OPSEC'>
+                <Opsec />
+            </Tab>
+            <Tab eventKey={4} title='REFERENCES'>
+                <References />
+            </Tab>
         </Tabs>
     );
 };

@@ -76,7 +76,7 @@ const AddEdgeModal = () => {
         for (let record of result.records) {
             let node = record.get(0)
             let properties = node.properties;
-            let fType = node.labels.filter((w) => w !== 'Base');
+            let fType = node.labels.filter((w) => w !== 'Base' && w !== 'AZBase');
             properties.type = fType.length > 0 ? fType[0] : 'Base';
             data.push(properties);
         }
@@ -149,7 +149,8 @@ const AddEdgeModal = () => {
             edgeValue === 'ReadLAPSPassword' ||
             edgeValue === 'WriteSPN' ||
             edgeValue === 'AddKeyCredentialLink' ||
-            edgeValue === 'AddSelf'
+            edgeValue === 'AddSelf' ||
+            edgeValue === 'SyncLAPSPassword'
         ) {
             edgepart = `[r:${edgeValue} {isacl: true}]`;
         } else if (edgeValue === 'SQLAdmin') {
@@ -289,7 +290,7 @@ const AddEdgeModal = () => {
                                 ReadLAPSPassword
                             </option>
                             <option value='Contains'>Contains</option>
-                            <option value='GpLink'>GpLink</option>
+                            <option value='GPLink'>GPLink</option>
                             <option value='CanRDP'>CanRDP</option>
                             <option value='CanPSRemote'>CanPSRemote</option>
                             <option value='ExecuteDCOM'>ExecuteDCOM</option>
@@ -311,6 +312,7 @@ const AddEdgeModal = () => {
                             </option>
                             <option value='SQLAdmin'>SQLAdmin</option>
                             <option value='HasSIDHistory'>HasSIDHistory</option>
+                            <option value='SyncLAPSPassword'>SyncLAPSPassword</option>
                         </FormControl>
                         {errors.edgeErrors.length > 0 && (
                             <span className={styles.error}>

@@ -1,0 +1,29 @@
+
+.nodeEditRow *[contenteditable='true'] {
+    background-color: white;
+    border: 1px solid lightgray;
+    color:black
+}
+
+.nodeEditRow > td {
+    padding: 5px !important;
+}
+
+.nodeEditString {
+    resize: none;
+    max-width: 400px;
+}
+
+.nodeEditNumber {
+    resize: none;
+}
+
+.nodeEditArray {
+    resize: none;
+    max-height: 200px;
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    overflow-y: scroll;
+    white-space: pre-line;
+}

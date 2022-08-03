@@ -150,18 +150,23 @@ const NodeEditor = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {Object.keys(properties).map(function (key) {
-                                    let val = properties[key];
-                                    return (
-                                        <NodeEditorRow
-                                            key={key}
-                                            attributeName={key}
-                                            val={val}
-                                            deleteHandler={deleteAttribute}
-                                            updateHandler={updateAttribute}
-                                        />
-                                    );
-                                })}
+                                {Object.keys(properties)
+                                    .map(function (key) {
+                                        if (key === 'lastseen') {
+                                            return null;
+                                        }
+                                        let val = properties[key];
+                                        return (
+                                            <NodeEditorRow
+                                                key={key}
+                                                attributeName={key}
+                                                val={val}
+                                                deleteHandler={deleteAttribute}
+                                                updateHandler={updateAttribute}
+                                            />
+                                        );
+                                    })
+                                    .filter((x) => x !== null)}
                             </tbody>
                         </Table>
                     </div>

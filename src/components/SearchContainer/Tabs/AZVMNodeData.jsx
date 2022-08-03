@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 import NodeCypherLinkComplex from './Components/NodeCypherLinkComplex';
@@ -7,9 +7,9 @@ import NodeCypherNoNumberLink from './Components/NodeCypherNoNumberLink';
 import MappedNodeProps from './Components/MappedNodeProps';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import NodePlayCypherLink from './Components/NodePlayCypherLink';
-import {Table} from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
-import {AppContext} from '../../../AppContext';
+import { AppContext } from '../../../AppContext';
 
 const AZVMNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -76,6 +76,13 @@ const AZVMNodeData = () => {
                                     property='See VM within Tenant'
                                     query='MATCH p = (d:AZTenant)-[r:AZContains*1..]->(u:AZVM {objectid: $objectid}) RETURN p'
                                 />
+                                <NodeCypherLink
+                                    baseQuery={
+                                        'MATCH p=(:AZVM {objectid:$objectid})-[:AZManagedIdentity]->(n)'
+                                    }
+                                    property={'Managed Identities'}
+                                    target={objectid}
+                                />
                             </tbody>
                         </Table>
                     </div>
@@ -99,7 +106,7 @@ const AZVMNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header={'Local Admins'}>
+                <CollapsibleSection header={'LOCAL ADMINS'}>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
@@ -116,7 +123,7 @@ const AZVMNodeData = () => {
                                     property='Unrolled Admins'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n)-[r:MemberOf|AdminTo*1..]->(m:AZVM {objectid: $objectid}) WHERE NOT n:Group'
+                                        'MATCH p=(n)-[r:MemberOf|AdminTo*1..]->(m:AZVM {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -147,7 +154,7 @@ const AZVMNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header={'Inbound Execution Privileges'}>
+                <CollapsibleSection header={'INBOUND EXECUTION PRIVILEGES'}>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
@@ -165,7 +172,7 @@ const AZVMNodeData = () => {
                                     property='Group Delegated Execution Rights'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n)-[r1:MemberOf*1..]->(g)-[r:AZAvereContributor|AZVMContributor|AZContributor]->(m:AZVM {objectid: $objectid})'
+                                        'MATCH p=(n)-[r1:AZMemberOf]->(g)-[r:AZAvereContributor|AZVMContributor|AZContributor]->(m:AZVM {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -177,7 +184,7 @@ const AZVMNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header={'Inbound Object Control'}>
+                <CollapsibleSection header={'INBOUND OBJECT CONTROL'}>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
@@ -186,7 +193,7 @@ const AZVMNodeData = () => {
                                     property='Explicit Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n)-[r:AZAvereContributor|AZVMContributor|AZContributor]->(c:AZVM {objectid:$objectid})'
+                                        'MATCH p=(n)-[r:AZAvereContributor|AZVMContributor|AZContributor|AZUserAccessAdministrator|AZOwns]->(c:AZVM {objectid:$objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -195,7 +202,7 @@ const AZVMNodeData = () => {
                                     property='Unrolled Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n)-[r:MemberOf*1..]->(g)-[r1:AZAvereContributor|AZVMContributor|AZContributor|AZUserAccessAdministrator|AZOwns]->(c:AZVM {objectid:$objectid})'
+                                        'MATCH p=(n)-[r:AZMemberOf]->(g)-[r1:AZAvereContributor|AZVMContributor|AZContributor|AZUserAccessAdministrator|AZOwns]->(c:AZVM {objectid:$objectid})'
                                     }
                                     end={label}
                                     distinct

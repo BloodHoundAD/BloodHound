@@ -18,11 +18,11 @@
 # -- Project information -----------------------------------------------------
 
 project = 'BloodHound'
-copyright = '2020, Andy Robbins, Rohan Vazarkar, Will Schroeder'
-author = 'Andy Robbins, Rohan Vazarkar, Will Schroeder'
+copyright = '2016-2022, Andy Robbins, Rohan Vazarkar, Will Schroeder'
+author = 'The BloodHound Enterprise Team'
 
 # The full version, including alpha/beta/rc tags
-release = '3.0.3'
+release = '4.2.0'
 
 
 # -- General configuration ---------------------------------------------------

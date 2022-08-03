@@ -1,5 +1,5 @@
 const electron = require('electron');
-var platform = require('os').platform();
+const platform = require('os').platform();
 // Module to control application life.
 const app = electron.app;
 const Menu = electron.Menu;
@@ -20,7 +20,7 @@ function createWindow() {
             icon: __dirname + '/src/img/icon.png',
             webPreferences: {
                 nodeIntegration: true,
-                enableRemoteModule: true
+                enableRemoteModule: true,
             },
         });
     } else if (platform === 'linux') {
@@ -30,7 +30,7 @@ function createWindow() {
             icon: __dirname + '/src/img/icon.png',
             webPreferences: {
                 nodeIntegration: true,
-                enableRemoteModule: true
+                enableRemoteModule: true,
             },
         });
     } else {
@@ -40,7 +40,7 @@ function createWindow() {
             icon: __dirname + '/src/img/icon.ico',
             webPreferences: {
                 nodeIntegration: true,
-                enableRemoteModule: true
+                enableRemoteModule: true,
             },
         });
     }
@@ -58,7 +58,7 @@ function createWindow() {
         mainWindow = null;
     });
 
-    var template = [
+    const template = [
         {
             label: 'Application',
             submenu: [

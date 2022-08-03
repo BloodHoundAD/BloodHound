@@ -17,6 +17,8 @@ const labels = [
     'AZTenant',
     'AZUser',
     'AZVM',
+    'AZRole',
+    'AZManagementGroup'
 ];
 
 export function generateUniqueId(sigmaInstance, isNode) {
@@ -124,37 +126,44 @@ async function deleteSessions() {
 
 export async function clearDatabase() {
     emitter.emit('openClearingModal');
-    await deleteEdges();
+    await deleteDb();
 }
 
-async function deleteEdges() {
-    let session = driver.session();
-    let results = await session.run('MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)')
-    emitter.emit('refreshDBData')
-    let count = results.records[0].get(0)
-    await session.close()
-
-    if (count === 0){
-        await deleteNodes()
-    }else{
-        await deleteEdges()
-    }
-
+async function deleteDb() {
+    let session = driver.session()
+    let results = await session.run('MATCH (n) CALL { WITH n DETACH DELETE n} IN TRANSACTIONS OF 500 ROWS')
+    console.log(results.summary.counters)
+    await dropConstraints()
 }
-
-async function deleteNodes() {
-    let session = driver.session();
-    let results = await session.run('MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)')
-    emitter.emit('refreshDBData')
-    let count = results.records[0].get(0)
-    await session.close()
-
-    if (count === 0){
-        await dropConstraints()
-    }else{
-        await deleteNodes()
-    }
-}
+//
+// async function deleteEdges() {
+//     let session = driver.session();
+//     let results = await session.run('MATCH ()-[r]-() WITH r LIMIT 100000 DELETE r RETURN count(r)')
+//     emitter.emit('refreshDBData')
+//     let count = results.records[0].get(0)
+//     await session.close()
+//
+//     if (count === 0){
+//         await deleteNodes()
+//     }else{
+//         await deleteEdges()
+//     }
+//
+// }
+//
+// async function deleteNodes() {
+//     let session = driver.session();
+//     let results = await session.run('MATCH (n) WITH n LIMIT 100000 DELETE n RETURN count(n)')
+//     emitter.emit('refreshDBData')
+//     let count = results.records[0].get(0)
+//     await session.close()
+//
+//     if (count === 0){
+//         await dropConstraints()
+//     }else{
+//         await deleteNodes()
+//     }
+// }
 
 async function dropConstraints() {
     let session = driver.session();
@@ -163,12 +172,7 @@ async function dropConstraints() {
 
     for (let record of result.records){
         let constraint = record.get(0)
-        let query;
-        if (neoVersion.startsWith('3.')){
-            query = 'DROP ' + constraint
-        }else{
-            query = 'DROP CONSTRAINT ' + constraint
-        }
+        let query = 'DROP CONSTRAINT ' + constraint;
 
         constraints.push(query)
     }
@@ -190,12 +194,7 @@ async function dropIndexes() {
 
     for (let record of result.records){
         let constraint = record.get(0)
-        let query;
-        if (neoVersion.startsWith('3.')){
-            query = 'DROP ' + constraint
-        }else{
-            query = 'DROP INDEX ' + constraint
-        }
+        let query = 'DROP INDEX ' + constraint;
 
         indexes.push(query)
     }
@@ -212,8 +211,8 @@ async function dropIndexes() {
 
 export async function setSchema() {
     const luceneIndexProvider = "lucene+native-3.0"
-    let labels = ["User", "Group", "Computer", "GPO", "OU", "Domain", "Container", "Base", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM"]
-    let azLabels = ["AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM"]
+    let labels = ["User", "Group", "Computer", "GPO", "OU", "Domain", "Container", "Base", "AZBase", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM"]
+    let azLabels = ["AZBase", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM"]
     let schema = {}
     for (let label of labels){
         schema[label] = {

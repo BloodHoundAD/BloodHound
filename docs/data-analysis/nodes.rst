@@ -251,7 +251,7 @@ Local Admin Rights
 * **Derivative Local Admin Rights**: This query does not run by default because
   it’s a very expensive query for neo4j to run. If you press the play button here,
   neo4j will run the query and return the number of computers this group has
-  “derivative” local admin rights on. For more info about this concept, see
+  "derivative" local admin rights on. For more info about this concept, see
   http://www.sixdub.net/?p=591
 
 Execution Privileges
@@ -328,7 +328,7 @@ Node Properties
   style of kerberos delegation. For information about the abuse related to this
   configuration, see https://blog.harmj0y.net/redteaming/another-word-on-delegation/
 * **Compromised**: Whether the computer is marked as Owned. You can mark any computer in
-  the BloodHound GUI as Owned by right-clicking it and clicking “Mark Computer as Owned”.
+  the BloodHound GUI as Owned by right-clicking it and clicking "Mark Computer as Owned".
 * **LAPS Enabled**: Whether LAPS is running on the computer. This is determined by
   checking whether the associated MS LAPS properties are populated on the computer
   object
@@ -399,7 +399,7 @@ Local Admin Rights
   deep those group nestings may go
 * **Derivative Local Admin Rights**: This query does not run by default because it’s a very
   expensive query for neo4j to run. If you press the play button here, neo4j will run the
-  query and return the number of computers this computer has “derivative” local admin rights
+  query and return the number of computers this computer has "derivative" local admin rights
   on. For more info about this concept, see http://www.sixdub.net/?p=591
 
 Outbound Execution Privileges
@@ -611,21 +611,21 @@ Descendant Objects
   this OU belongs to
 
 AZTenant
-^^^^^^^
+^^^^^^^^^
 At the top of the node info tab you will see the following info:
 
 * **TENANT NAME**: The name of the tenant in Azure.
 
 Node Properties
---------------
+----------------
 * **Object ID**: The tenant ID for the tenant.
 
 Extra Properties
---------------
+----------------
 * **Object ID**: The tenant ID for the tenant.
 
 Descendant Objects
---------------
+------------------
 * **Subscriptions**: The subscriptions that fall under the tenant
 * **Total VM Objects**: The virtual machine resources in Azure resources
 * **Total Resource Group Objects**: The resource groups contained within the subscriptions under the tenant
@@ -720,7 +720,7 @@ Node Properties
 * **Object ID**: The group’s objectID in AzureAD
 
 Extra Properties
----------------
+-----------------
 
 * **Object ID**: The group’s objectID in AzureAD
 
@@ -734,7 +734,7 @@ Group Members
 * **On-Prem Members**: The number of users that contain an on-premise SID that are members of the group.
 
 Group Membership
-----------------
+-------------------
 
 * **First Degree Group Membership**: The number of groups this group has been
   added to
@@ -742,7 +742,7 @@ Group Membership
   nested group memberships
 
 Outbound Object Control
------------------------
+--------------------------
 
 * **First Degree Object Control**: In AzureAD, the number of objects where this group has direct control of. 
 * **Group Delegated Object Control**: The number of objects where this
@@ -751,7 +751,7 @@ Outbound Object Control
 * **Transitive Object Control**: The number of objects this group can gain control through an object-control abuse attack path.
 
 Inbound Object Control
-----------------------
+-------------------------
 
 * **Explicit Object Controllers**: In AzureAD, the number of principals that have direct control of this group. 
 * **Unrolled Object Controllers**: The *actual* number of principals that have
@@ -778,30 +778,30 @@ At the top of the node info tab you will see the following info:
 * **See Subscription Under Tenant**: See where the subscription lives relative to the tenant it trusts.
 
 Node Properties
----------------
+------------------
 
 * **Object ID**: The Azure objectid for the resource group.
 
 Descendent Objects
-----------------
+-------------------
 
 * **Total VM Objects**: The VMs in Azure that belong to the subscription
 * **Total Resource Group Objects**: The resource groups that belong to the subscription
 * **Total Key Vault Objects**: The Key vaults in Azure that belong to the subscription
 
 AZResourceGroup
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 At the top of the node info tab you will see the following info:
 
 * **RESOURCEGROUPNAME**: The full name of the resource group.
 
 Node Properties
----------------
+----------------
 
 * **Object ID**: The Azure objectid for the resource group.
 
 Descendent Objects
-----------------
+-------------------
 
 * **Descendent VMs**: The VMs in Azure that belong to the resource group
 * **Descendent KeyVaults**: The Key vaults in Azure that belong to the resource group
@@ -813,7 +813,7 @@ Inbound Object Control
 * **Transitive Object Controllers**: The number of objects in AzureAD that can achieve control of this object through object-control attack paths.
 
 AZVM
-^^^^
+^^^^^
 
 At the top of the node info tab you will see the following info:
 
@@ -824,23 +824,23 @@ Overview
 * **See VM within Tenant**: Unrolls the VM membership within Azure, displaying the VM’s resource group & subscription.
 
 Node Properties
----------------
+------------------
 
 * **Object ID**: The Azure objectid for the VM.
 
 Extra Properties
-----------------
+-------------------
 
 * **Object ID**: The Azure objectid for the computer.
 
 Inbound Execution Privileges
-----------------------------
+-------------------------------
 
 * **First Degree Execution Rights**: Principals that have the ability to execute commands or directly log onto the machine.
 * **Group Delegated Execution Rights**: Groups that have the ability to execute commands or directly log onto the machine.
 
 Inbound Object Control
-----------------------
+-------------------------
 
 * **Explicit Object Controllers**: The number of principals that are in a role that has the ability to manage or execute code on the machine.
 * **Unrolled Object Controllers**: The actual number of principals that have control of this
@@ -849,7 +849,7 @@ Inbound Object Control
 * **Transitive Object Controllers**: The number of objects in AzureAD that can achieve control of this object through object-control attack paths.
 
 AZDevice
-^^^^^^^
+^^^^^^^^^
 
 At the top of the node info tab you will see the following info:
 
@@ -867,7 +867,7 @@ Inbound Execution Privileges
 * **InTune Admins**: Principals that have the ability to setup InTune scripts to run on the machine.
 
 AZServicePrincipal
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 
 At the top of the node info tab you will see the following info:
 

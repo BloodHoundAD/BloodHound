@@ -1,9 +1,25 @@
+import React from 'react';
+
 const References = () => {
-    let text = `<a href="https://blog.netspi.com/maintaining-azure-persistence-via-automation-accounts/ ">https://blog.netspi.com/maintaining-azure-persistence-via-automation-accounts/ </a>
-    <a href="https://blog.netspi.com/azure-automation-accounts-key-stores/">https://blog.netspi.com/azure-automation-accounts-key-stores/</a> 
-    <a href="https://blog.netspi.com/get-azurepasswords/">https://blog.netspi.com/get-azurepasswords/</a> 
-    <a href="https://blog.netspi.com/attacking-azure-cloud-shell/">https://blog.netspi.com/attacking-azure-cloud-shell/</a> `;
-    return { __html: text };
+    return (
+        <>
+            <a href='https://blog.netspi.com/maintaining-azure-persistence-via-automation-accounts/ '>
+                https://blog.netspi.com/maintaining-azure-persistence-via-automation-accounts/{' '}
+            </a>
+            <br />
+            <a href='https://blog.netspi.com/azure-automation-accounts-key-stores/'>
+                https://blog.netspi.com/azure-automation-accounts-key-stores/
+            </a>
+            <br />
+            <a href='https://blog.netspi.com/get-azurepasswords/'>
+                https://blog.netspi.com/get-azurepasswords/
+            </a>
+            <br />
+            <a href='https://blog.netspi.com/attacking-azure-cloud-shell/'>
+                https://blog.netspi.com/attacking-azure-cloud-shell/
+            </a>
+        </>
+    );
 };
 
 export default References;

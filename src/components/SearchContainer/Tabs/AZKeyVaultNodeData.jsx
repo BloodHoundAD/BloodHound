@@ -1,12 +1,12 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import CollapsibleSection from './Components/CollapsibleSection';
 import NodeCypherLink from './Components/NodeCypherLink';
 import MappedNodeProps from './Components/MappedNodeProps';
 import NodePlayCypherLink from './Components/NodePlayCypherLink';
-import {Table} from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
-import {AppContext} from '../../../AppContext';
+import { AppContext } from '../../../AppContext';
 
 const AZKeyVaultNodeData = () => {
     const [visible, setVisible] = useState(false);
@@ -51,6 +51,8 @@ const AZKeyVaultNodeData = () => {
 
     const displayMap = {
         objectid: 'Object ID',
+        enablerbacauthorization: 'Enable RBAC Authorization',
+        tenantid: 'Tenant ID',
     };
 
     return objectid === null ? (
@@ -73,7 +75,7 @@ const AZKeyVaultNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header='Vault Readers'>
+                <CollapsibleSection header='VAULT READERS'>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
@@ -82,7 +84,7 @@ const AZKeyVaultNodeData = () => {
                                     property='Key Readers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:AZGetKeys|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
+                                        'MATCH p = (n)-[r:AZGetKeys|AZMemberOf*1..2]->(g:AZKeyVault {objectid: $objectid})'
                                     }
                                     end={label}
                                 />
@@ -90,7 +92,7 @@ const AZKeyVaultNodeData = () => {
                                     property='Certificate Readers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:AZGetCertificates|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
+                                        'MATCH p = (n)-[r:AZGetCertificates|AZMemberOf*1..2]->(g:AZKeyVault {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -99,7 +101,7 @@ const AZKeyVaultNodeData = () => {
                                     property='Secret Readers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:AZGetSecrets|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
+                                        'MATCH p = (n)-[r:AZGetSecrets|AZMemberOf*1..2]->(g:AZKeyVault {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -108,7 +110,7 @@ const AZKeyVaultNodeData = () => {
                                     property='All Readers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:AZGetKeys|AZGetCertificates|AZGetSecrets|MemberOf*1..]->(g:AZKeyVault {objectid: $objectid})'
+                                        'MATCH p = (n)-[r:AZGetKeys|AZGetCertificates|AZGetSecrets|AZMemberOf*1..2]->(g:AZKeyVault {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -120,7 +122,7 @@ const AZKeyVaultNodeData = () => {
 
                 <hr></hr>
 
-                <CollapsibleSection header='Inbound Object Control'>
+                <CollapsibleSection header='INBOUND OBJECT CONTROL'>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
@@ -138,7 +140,7 @@ const AZKeyVaultNodeData = () => {
                                     property='Unrolled Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:MemberOf*1..]->(g1:Group)-[r1:AZOwns|AZUserAccessAdministrator|AZContributor]->(g2:AZKeyVault {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                        'MATCH p = (n)-[r:AZMemberOf]->(g1)-[r1:AZOwns|AZUserAccessAdministrator|AZContributor]->(g2:AZKeyVault {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
                                     }
                                     end={label}
                                     distinct

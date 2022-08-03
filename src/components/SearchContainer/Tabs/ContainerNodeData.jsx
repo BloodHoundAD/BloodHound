@@ -1,5 +1,5 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {AppContext} from '../../../AppContext';
+import React, { useContext, useEffect, useState } from 'react';
+import { AppContext } from '../../../AppContext';
 import CollapsibleSection from './Components/CollapsibleSection';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import MappedNodeProps from './Components/MappedNodeProps';
@@ -7,7 +7,7 @@ import NodeCypherLink from './Components/NodeCypherLink';
 import NodeCypherNoNumberLink from './Components/NodeCypherNoNumberLink';
 import styles from './NodeData.module.css';
 import clsx from 'clsx';
-import {Table} from "react-bootstrap";
+import { Table } from 'react-bootstrap';
 
 const ContainerNodeData = ({}) => {
     const [visible, setVisible] = useState(false);
@@ -32,9 +32,12 @@ const ContainerNodeData = ({}) => {
             setDomain(domain);
             let session = driver.session();
             session
-                .run(`MATCH (n:Container {objectid: $objectid}) RETURN n AS node`, {
-                    objectid: id,
-                })
+                .run(
+                    `MATCH (n:Container {objectid: $objectid}) RETURN n AS node`,
+                    {
+                        objectid: id,
+                    }
+                )
                 .then((r) => {
                     let props = r.records[0].get('node').properties;
                     setNodeProps(props);
@@ -52,7 +55,9 @@ const ContainerNodeData = ({}) => {
         description: 'Description',
     };
 
-    return objectid == null ? (<div></div>) : (
+    return objectid == null ? (
+        <div></div>
+    ) : (
         <div
             className={clsx(
                 !visible && 'displaynone',
@@ -67,11 +72,11 @@ const ContainerNodeData = ({}) => {
                         <Table>
                             <thead></thead>
                             <tbody className='searchable'>
-                            <NodeCypherNoNumberLink
-                                query='MATCH p = ()-[r:Contains*1..]->(:Container {objectid: $objectid}) RETURN p'
-                                target={objectid}
-                                property='See Container Within Domain Tree'
-                            />
+                                <NodeCypherNoNumberLink
+                                    query='MATCH p = ()-[r:Contains*1..]->(:Container {objectid: $objectid}) RETURN p'
+                                    target={objectid}
+                                    property='See Container Within Domain Tree'
+                                />
                             </tbody>
                         </Table>
                     </div>
@@ -100,20 +105,20 @@ const ContainerNodeData = ({}) => {
                         <Table>
                             <thead></thead>
                             <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='GPOs Directly Affecting This Container'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p=(n:GPO)-[r:GpLink]->(o:Container {objectid: $objectid})'
-                                }
-                            />
-                            <NodeCypherLink
-                                property='GPOs Affecting This Container'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p=(n:GPO)-[r:GpLink|Contains*1..]->(o:Container {objectid: $objectid})'
-                                }
-                            />
+                                <NodeCypherLink
+                                    property='GPOs Directly Affecting This Container'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(n:GPO)-[r:GPLink]->(o:Container {objectid: $objectid})'
+                                    }
+                                />
+                                <NodeCypherLink
+                                    property='GPOs Affecting This Container'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(n:GPO)-[r:GPLink|Contains*1..]->(o:Container {objectid: $objectid})'
+                                    }
+                                />
                             </tbody>
                         </Table>
                     </div>
@@ -126,45 +131,45 @@ const ContainerNodeData = ({}) => {
                         <Table>
                             <thead></thead>
                             <tbody className='searchable'>
-                            <NodeCypherLink
-                                property='Total User Objects'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p=(o:Container {objectid: $objectid})-[r:Contains*1..]->(n:User)'
-                                }
-                                distinct
-                            />
-                            <NodeCypherLink
-                                property='Total Group Objects'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p=(o:Container {objectid: $objectid})-[r:Contains*1..]->(n:Group)'
-                                }
-                                distinct
-                            />
-                            <NodeCypherLink
-                                property='Total Computer Objects'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH p=(o:Container {objectid: $objectid})-[r:Contains*1..]->(n:Computer)'
-                                }
-                                distinct
-                            />
-                            <NodeCypherLink
-                                property='Sibling Objects within Container'
-                                target={objectid}
-                                baseQuery={
-                                    'MATCH (o1)-[r1:Contains]->(o2:Container {objectid: $objectid}) WITH o1 MATCH p=(d)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)'
-                                }
-                                distinct
-                            />
+                                <NodeCypherLink
+                                    property='Total User Objects'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:Container {objectid: $objectid})-[r:Contains*1..]->(n:User)'
+                                    }
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Total Group Objects'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:Container {objectid: $objectid})-[r:Contains*1..]->(n:Group)'
+                                    }
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Total Computer Objects'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(o:Container {objectid: $objectid})-[r:Contains*1..]->(n:Computer)'
+                                    }
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Sibling Objects within Container'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH (o1)-[r1:Contains]->(o2:Container {objectid: $objectid}) WITH o1 MATCH p=(d)-[r2:Contains*1..]->(o1)-[r3:Contains]->(n)'
+                                    }
+                                    distinct
+                                />
                             </tbody>
                         </Table>
                     </div>
                 </CollapsibleSection>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default ContainerNodeData;

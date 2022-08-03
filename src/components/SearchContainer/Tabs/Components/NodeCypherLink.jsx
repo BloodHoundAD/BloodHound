@@ -57,7 +57,6 @@ const NodeCypherLink = ({
 
     return (
         <tr
-            style={{ cursor: 'pointer' }}
             onClick={() => {
                 emitter.emit(
                     'query',
@@ -69,7 +68,7 @@ const NodeCypherLink = ({
             }}
         >
             <td align='left'>{property}</td>
-            <td align='right'>{value}</td>
+            <td style={{cursor: "pointer"}} align='right'>{value}</td>
         </tr>
     );
 };

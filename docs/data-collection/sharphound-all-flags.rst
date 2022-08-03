@@ -87,7 +87,7 @@ touch systems that are the most likely to have user session data:
 
 ::
 
-   C:\> SharpHound.exe --CollectionMethod Session --Stealth
+   C:\> SharpHound.exe --CollectionMethods Session --Stealth
 
 ComputerFile
 ------------
@@ -225,7 +225,7 @@ attempt to collect local group memberships across all systems in a loop:
 
 ::
 
-   C:\> SharpHound.exe --CollectionMethod LocalGroup --Loop
+   C:\> SharpHound.exe --CollectionMethods LocalGroup --Loop
 
 LoopDuration
 ------------
@@ -236,7 +236,7 @@ you like using the HH:MM:SS format. For example, to loop session collection for
 
 ::
 
-   C:\> SharpHound.exe --CollectionMethod Session --Loop --LoopDuration 12:30:12
+   C:\> SharpHound.exe --CollectionMethods Session --Loop --LoopDuration 12:30:12
 
 LoopInterval
 ------------
@@ -247,7 +247,7 @@ minute interval between loops:
 
 ::
 
-   C:\> SharpHound.exe --CollectionMethod Session --Loop --Loopduration 12:30:12 --LoopInterval 00:15:00
+   C:\> SharpHound.exe --CollectionMethods Session --Loop --Loopduration 12:30:12 --LoopInterval 00:15:00
 
 Connection Options
 ^^^^^^^^^^^^^^^^^^

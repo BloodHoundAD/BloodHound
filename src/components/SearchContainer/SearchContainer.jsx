@@ -82,13 +82,15 @@ const SearchContainer = () => {
         session.run(statement, { name: term }).then((result) => {
             let data = [];
             for (let record of result.records) {
-                let node = record.get(0)
+                let node = record.get(0);
                 let properties = node.properties;
-                let labels = node.labels
-                if (labels.length === 1){
+                let labels = node.labels;
+                if (labels.length === 1) {
                     properties.type = labels[0];
-                }else{
-                    properties.type = labels.filter(x => {return x !== "Base"})[0]
+                } else {
+                    properties.type = labels.filter((x) => {
+                        return x !== 'Base' && x !== 'AZBase';
+                    })[0];
                 }
 
                 data.push(properties);
