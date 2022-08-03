@@ -508,12 +508,12 @@ const MenuContainer = () => {
                     if (syncsLapsPrincipals.length > 0) {
                         console.log(
                             'Found SyncLAPSPassword principals: ' +
-                                dcSyncPrincipals.join(', ') +
+                                syncsLapsPrincipals.join(', ') +
                                 ' in domain ' +
                                 domainId
                         );
                         await session.run(
-                            `UNWIND $syncers AS sync MATCH (n:Base {objectid: sync}) MATCH (n:Computer {domainsid: $domainid, haslaps:true}) 
+                            `UNWIND $syncers AS sync MATCH (n:Base {objectid: sync}) MATCH (m:Computer {domainsid: $domainid, haslaps:true}) 
                                 CALL {
                                     WITH n, m
                                     MERGE (n)-[:SyncLAPSPassword {isacl: true, isinherited: false}]->(m)
