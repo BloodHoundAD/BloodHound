@@ -57,4 +57,4 @@ Build BloodHound with `npm run build:linux`:
 
 ::
 
-   $ npm run build:macos
+   $ npm run build
