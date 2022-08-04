@@ -1141,7 +1141,7 @@ export function convertAzureDevice(data, ingestionData) {
                 trusttype: data.trustType,
                 name: `${data.displayName}@${data.tenantName}`.toUpperCase(),
                 tenantid: data.tenantId.toUpperCase(),
-                mdmappid: data.mdmAppId.toUpperCase(),
+                mdmappid: data.mdmAppId?.toUpperCase() ?? '',
             },
         },
         false
