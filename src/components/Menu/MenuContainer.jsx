@@ -879,7 +879,8 @@ const MenuContainer = () => {
             statement: `MATCH (n)-[:AZHasRole]->(m)
                         WHERE m.templateid IN $addGroupMembersRoles
                         MATCH (at:AZTenant)-[:AZContains]->(n)
-                        MATCH (at)-[:AZContains]->(azg:AZGroup {isassignabletorole: false})
+                        MATCH (at)-[:AZContains]->(azg:AZGroup)
+                        WHERE NOT EXISTS(azg.isassignabletorole)
                         CALL {
                             WITH n, azg
                             MERGE (n)-[:AZAddMembers]->(azg)
