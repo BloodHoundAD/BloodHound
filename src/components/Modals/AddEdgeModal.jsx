@@ -1,13 +1,19 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {Button, ControlLabel, FormControl, FormGroup, Modal,} from 'react-bootstrap';
-import {AsyncTypeahead, Menu, MenuItem} from 'react-bootstrap-typeahead';
+import React, { useContext, useEffect, useState } from 'react';
+import {
+    Button,
+    ControlLabel,
+    FormControl,
+    FormGroup,
+    Modal,
+} from 'react-bootstrap';
+import { AsyncTypeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 import styles from './AddEdgeModal.module.css';
 import SearchRow from '../SearchContainer/SearchRow';
-import {buildSearchQuery} from 'utils';
+import { buildSearchQuery } from 'utils';
 import BaseModal from './BaseModal';
-import {motion} from 'framer-motion';
+import { motion } from 'framer-motion';
 import clsx from 'clsx';
-import {AppContext} from '../../AppContext';
+import { AppContext } from '../../AppContext';
 
 const AddEdgeModal = () => {
     const [open, setOpen] = useState(false);
@@ -74,9 +80,11 @@ const AddEdgeModal = () => {
 
         let data = [];
         for (let record of result.records) {
-            let node = record.get(0)
+            let node = record.get(0);
             let properties = node.properties;
-            let fType = node.labels.filter((w) => w !== 'Base' && w !== 'AZBase');
+            let fType = node.labels.filter(
+                (w) => w !== 'Base' && w !== 'AZBase'
+            );
             properties.type = fType.length > 0 ? fType[0] : 'Base';
             data.push(properties);
         }
@@ -304,15 +312,16 @@ const AddEdgeModal = () => {
                             <option value='AddKeyCredentialLink'>
                                 AddKeyCredentialLink
                             </option>
-                            <option value='WriteSPN'>
-                                WriteSPN
-                            </option>
-                            <option value='AddSelf'>
-                                AddSelf
-                            </option>
+                            <option value='WriteSPN'>WriteSPN</option>
+                            <option value='AddSelf'>AddSelf</option>
                             <option value='SQLAdmin'>SQLAdmin</option>
                             <option value='HasSIDHistory'>HasSIDHistory</option>
-                            <option value='SyncLAPSPassword'>SyncLAPSPassword</option>
+                            <option value='SyncLAPSPassword'>
+                                SyncLAPSPassword
+                            </option>
+                            <option value='WriteAccountRestrictions'>
+                                WriteAccountRestrictions
+                            </option>
                         </FormControl>
                         {errors.edgeErrors.length > 0 && (
                             <span className={styles.error}>

@@ -1,17 +1,18 @@
 import React from 'react';
 import { groupSpecialFormat } from '../Formatter';
 
-const General = (sourceName, sourceType, targetName) => {
+const General = ({ sourceName, sourceType, targetName }) => {
     return (
         <>
             <p>
-                {groupSpecialFormat(sourceType, sourceName)} has write rights on 
+                {groupSpecialFormat(sourceType, sourceName)} has write rights on
                 all properties in the User Account Restrictions property set.
-                Having write access to this property set translates to the ability
-                to modify several attributes on computer {targetName}, among which 
-                the msDS-AllowedToActOnBehalfOfOtherIdentity attribute is the most 
-                interesting. The other attributes in this set are listed in 
-                Dirk-jan's blog on this topic (see references).
+                Having write access to this property set translates to the
+                ability to modify several attributes on computer {targetName},
+                among which the msDS-AllowedToActOnBehalfOfOtherIdentity
+                attribute is the most interesting. The other attributes in this
+                set are listed in Dirk-jan's blog on this topic (see
+                references).
             </p>
 
             <p>
