@@ -399,6 +399,7 @@ if (typeof conf.get('edgeincluded') === 'undefined') {
         GPLink: true,
         AddAllowedToAct: true,
         AllowedToAct: true,
+        WriteAccountRestrictions: true,
         SQLAdmin: true,
         ReadGMSAPassword: true,
         HasSIDHistory: true,
