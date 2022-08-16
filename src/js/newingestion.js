@@ -1079,7 +1079,7 @@ export function convertAzureApp(data, ingestionData) {
                 description: data.description,
                 displayname: data.displayName,
                 whencreated: data.createdDateTime,
-                appid: data.appId,
+                appid: data.appId.toUpperCase(),
                 publisherdomain: data.publisherDomain,
                 signinaudience: data.signInAudience,
                 name: `${data.displayName}@${data.publisherDomain}`.toUpperCase(),
@@ -1727,7 +1727,7 @@ export function convertAzureServicePrincipal(data, ingestionData) {
         ingestionData,
         AzureLabels.App,
         {
-            objectid: data.appId,
+            objectid: data.appId.toUpperCase(),
             map: {
                 displayname: data.appDisplayName,
                 tenantid: data.tenantId,
