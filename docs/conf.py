@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'BloodHound'
-copyright = '2016-2022, Andy Robbins, Rohan Vazarkar, Will Schroeder'
+copyright = '2016-2022, Specter Ops Inc.'
 author = 'The BloodHound Enterprise Team'
 
 # The full version, including alpha/beta/rc tags
