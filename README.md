@@ -1,5 +1,7 @@
 [![Build](https://github.com/BloodHoundAD/BloodHound/actions/workflows/build.yml/badge.svg)](https://github.com/BloodHoundAD/BloodHound/actions/workflows/build.yml)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/BloodHoundAD/BloodHound)](https://github.com/BloodHoundAD/BloodHound/releases/latest)
+![GitHub all releases](https://img.shields.io/github/downloads/BloodHoundAD/BloodHound/total)
+
 
 # Getting Started with BloodHound
 
