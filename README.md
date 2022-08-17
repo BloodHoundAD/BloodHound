@@ -34,7 +34,7 @@ You can create your own example Active Directory environment using [BadBlood](ht
 
 BloodHound uses graph theory to reveal hidden relationships and
 attack paths in an Active Directory environment.
-Copyright (C) 2016-2019 Andrew Robbins, Rohan Vazarkar, Will Schroeder
+Copyright (C) 2016-2022 Specter Ops Inc.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
