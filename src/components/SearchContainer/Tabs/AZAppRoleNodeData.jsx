@@ -3,10 +3,13 @@ import { AppContext } from '../../../AppContext';
 import clsx from 'clsx';
 import styles from './NodeData.module.css';
 import NodeCypherLink from './Components/NodeCypherLink';
+import CollapsibleSection from './Components/CollapsibleSection';
 import MappedNodeProps from './Components/MappedNodeProps';
 import ExtraNodeProps from './Components/ExtraNodeProps';
 import { withAlert } from 'react-alert';
+import { Table } from 'react-bootstrap';
 import CollapsibleSectionTable from './Components/CollapsibleSectionNew';
+import NodeDisplayLink from './Components/NodeDisplayLink';
 
 const AZAppRoleNodeData = ({}) => {
     const [visible, setVisible] = useState(false);
@@ -14,6 +17,7 @@ const AZAppRoleNodeData = ({}) => {
     const [label, setLabel] = useState(null);
     const [domain, setDomain] = useState(null);
     const [nodeProps, setNodeProps] = useState({});
+    const [servicePrincipal, setServicePrincipal] = useState(null);
 
     const context = useContext(AppContext);
 
@@ -32,7 +36,7 @@ const AZAppRoleNodeData = ({}) => {
             let loadData = async () => {
                 let session = driver.session();
                 let results = await session.run(
-                    `MATCH (n:AZAppRole {objectid: $objectid}) RETURN n AS node`,
+                    `MATCH (n:AZAppRole {objectid: $objectid}) OPTIONAL MATCH (m:AZServicePrincipal)-[:AZExposeAppRole]->(n) RETURN n AS node, m AS serviceprincipal`,
                     {
                         objectid: id,
                     }
@@ -41,6 +45,10 @@ const AZAppRoleNodeData = ({}) => {
                 let props = results.records[0].get('node').properties;
                 setNodeProps(props);
                 setLabel(props.name || props.azname || objectid);
+                let sp = results.records[0].get('serviceprincipal');
+                if (sp !== null) {
+                    setServicePrincipal(sp.properties.objectid);
+                }
             };
 
             loadData();
@@ -73,6 +81,26 @@ const AZAppRoleNodeData = ({}) => {
         >
             <div className={clsx(styles.dl)}>
                 <h5>{label || objectid}</h5>
+
+                <CollapsibleSection header='OVERVIEW'>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeDisplayLink
+                                    graphQuery={
+                                        'MATCH p=(:AZServicePrincipal)-[:AZExposeAppRole]->(:AZAppRole {objectid: $objectid}) RETURN p'
+                                    }
+                                    queryProps={{ objectid: objectid }}
+                                    title={'Service Principal'}
+                                    value={servicePrincipal}
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
+                </CollapsibleSection>
+
+                <hr></hr>
 
                 <MappedNodeProps
                     displayMap={displayMap}

@@ -65,6 +65,7 @@ export const AzureLabels = {
     HasRole: 'AZHasRole',
     AppRole: 'AZAppRole',
     HasAppRole: 'AZHasAppRole',
+    ExposeAppRole: 'AZExposeAppRole',
     AppAdmin: 'AZAppAdmin',
     CloudAppAdmin: 'AZCloudAppAdmin',
     RunsAs: 'AZRunsAs',
@@ -1776,7 +1777,22 @@ export function convertAzureServicePrincipal(data, ingestionData) {
                 },
                 false
             );
+            
+
+            insertNewAzureRel(
+                ingestionData,
+                fProps(
+                    AzureLabels.ServicePrincipal,
+                    AzureLabels.AppRole,
+                    AzureLabels.ExposeAppRole
+                ), {
+                    source: data.id.toUpperCase(),
+                    target: `${appRole.id}@${data.tenantId}`.toUpperCase()
+                }
+            );
+
         }
+        
     
     }
 

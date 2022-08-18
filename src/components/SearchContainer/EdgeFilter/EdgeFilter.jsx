@@ -123,6 +123,7 @@ const EdgeFilter = ({ open }) => {
                             'AZGetSecrets',
                             'AZHasRole',
                             'AZHasAppRole',
+                            'AZExposeAppRole',
                             'AZMemberOf',
                             'AZOwner',
                             'AZRunsAs',
@@ -156,6 +157,7 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterCheck name='AZGetSecrets' />
                     <EdgeFilterCheck name='AZHasRole' />
                     <EdgeFilterCheck name='AZHasAppRole' />
+                    <EdgeFilterCheck name='AZExposeAppRole' />
                     <EdgeFilterCheck name='AZMemberOf' />
                     <EdgeFilterCheck name='AZOwner' />
                     <EdgeFilterCheck name='AZRunsAs' />
