@@ -976,6 +976,20 @@ const MenuContainer = () => {
                     result.summary.counters.updates().relationshipsCreated
                 } AZAddOwner Edges`,
         },
+        {
+            step: 'setAppRoleAssignmentReadWriteAllHighValue',
+            description: 'Mark application role AppRoleAssignment.ReadWrite.All as High Value',
+            type: 'query',
+            statement: 'MATCH (n:AZAppRole {value:"AppRoleAssignment.ReadWrite.All"}) SET n.highvalue=TRUE',
+            params: null,
+        },
+        {
+            step: 'setRoleManagementReadWriteDirectoryAllHighValue',
+            description: 'Mark application role RoleManagement.ReadWrite.Directory as High Value',
+            type: 'query',
+            statement: 'MATCH (n:AZAppRole {value:"RoleManagement.ReadWrite.Directory"}) SET n.highvalue=TRUE',
+            params: null,
+        },
     ];
 
     const executePostProcessSteps = async (steps, session) => {
