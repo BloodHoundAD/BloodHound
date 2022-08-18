@@ -176,6 +176,11 @@ const DatabaseDataDisplay = () => {
                             label={'AZRole'}
                         />
                         <DatabaseDataLabel
+                            query={'MATCH (n:AZAppRole) RETURN count(n) AS count'}
+                            index={index}
+                            label={'AZAppRole'}
+                        />
+                        <DatabaseDataLabel
                             query={
                                 'MATCH (n:AZServicePrincipal) RETURN count(n) AS count'
                             }

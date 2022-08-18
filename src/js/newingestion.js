@@ -63,6 +63,7 @@ export const AzureLabels = {
     Subscription: 'AZSubscription',
     Role: 'AZRole',
     HasRole: 'AZHasRole',
+    AppRole: 'AZAppRole',
     AppAdmin: 'AZAppAdmin',
     CloudAppAdmin: 'AZCloudAppAdmin',
     RunsAs: 'AZRunsAs',
@@ -1735,6 +1736,29 @@ export function convertAzureServicePrincipal(data, ingestionData) {
         },
         false
     );
+
+    if (typeof data.appRoles !== 'undefined'){
+        for (let appRole of data.appRoles) {
+            insertNewAzureNodeProp(
+                ingestionData,
+                AzureLabels.AppRole, {
+                    objectid: appRole.id.toUpperCase(),
+                    map: {
+                        description: appRole.description,
+                        displayname: appRole.displayName,
+                        enabled: appRole.isEnabled,
+                        name: `${appRole.value}@${data.tenantName}`.toUpperCase(),
+                        tenantid: data.tenantId.toUpperCase(),
+                        allowedMemberTypes: appRole.allowedMemberTypes,
+                        origin: appRole.origin,
+                        value: appRole.value
+                    },
+                },
+                false
+            );
+        }
+    
+    }
 
     insertNewAzureRel(
         ingestionData,

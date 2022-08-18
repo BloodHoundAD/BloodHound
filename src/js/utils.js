@@ -18,6 +18,7 @@ const labels = [
     'AZUser',
     'AZVM',
     'AZRole',
+    'AZAppRole',
     'AZManagementGroup'
 ];
 
