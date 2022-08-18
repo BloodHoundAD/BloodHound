@@ -51,14 +51,15 @@ const AZAppRoleNodeData = ({}) => {
     };
 
     const displayMap = {
-        objectid: 'Role ID',
+        objectid: 'Object ID',
         displayname: 'Display Name',
         enabled: 'Enabled',
         description: 'Description',
         value: 'Value',
         tenantid: 'Tenant ID',
         allowedMemberTypes: 'Allowed member types',
-        origin: "Origin"
+        origin: "Origin",
+        id: "Id"
     };
 
     return objectid === null ? (
@@ -88,24 +89,17 @@ const AZAppRoleNodeData = ({}) => {
                 />
 
                 <hr></hr>
-{/* TODO
+
                 <CollapsibleSectionTable header={'ASSIGNMENTS'}>
                     <NodeCypherLink
                         baseQuery={
-                            'MATCH p=(n)-[:AZHasRole|AZMemberOf*1..2]->(:AZAppRole {objectid:$objectid})'
+                            'MATCH p=(n)-[:AZHasAppRole]->(:AZAppRole {objectid:$objectid})'
                         }
                         property={'Active Assignments'}
                         target={objectid}
                     />
-                    <NodeCypherLink
-                        baseQuery={
-                            'MATCH p=(n)-[:AZCanGrant|AZGrantSelf|AZMemberOf*1..2]->(:AZAppRole {objectid:$objectid})'
-                        }
-                        property={'PIM Assignments'}
-                        target={objectid}
-                    />
                 </CollapsibleSectionTable>
-*/}
+
             </div>
         </div>
     );

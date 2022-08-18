@@ -64,6 +64,7 @@ export const AzureLabels = {
     Role: 'AZRole',
     HasRole: 'AZHasRole',
     AppRole: 'AZAppRole',
+    HasAppRole: 'AZHasAppRole',
     AppAdmin: 'AZAppAdmin',
     CloudAppAdmin: 'AZCloudAppAdmin',
     RunsAs: 'AZRunsAs',
@@ -104,6 +105,7 @@ const AzurehoundKindLabels = {
     KindAZResourceGroupUserAccessAdmin: 'AZResourceGroupUserAccessAdmin',
     KindAZRole: 'AZRole',
     KindAZRoleAssignment: 'AZRoleAssignment',
+    KindAZAppRoleAssignment: 'AZAppRoleAssignment',
     KindAZServicePrincipal: 'AZServicePrincipal',
     KindAZServicePrincipalOwner: 'AZServicePrincipalOwner',
     KindAZSubscription: 'AZSubscription',
@@ -1017,6 +1019,9 @@ export function convertAzureData(chunk) {
             case AzurehoundKindLabels.KindAZRoleAssignment:
                 convertAzureRoleAssignment(item.data, data);
                 break;
+            case AzurehoundKindLabels.KindAZAppRoleAssignment:
+                convertAzureAppRoleAssignment(item.data, data);
+                break;
             case AzurehoundKindLabels.KindAZServicePrincipal:
                 convertAzureServicePrincipal(item.data, data);
                 break;
@@ -1700,6 +1705,21 @@ export function convertAzureRoleAssignment(data, ingestionData) {
 
 /**
  *
+ * @param {AzureAppRoleAssignment} data
+ * @param ingestionData
+ */
+export function convertAzureAppRoleAssignment(data, ingestionData) {
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Base, AzureLabels.AppRole, AzureLabels.HasAppRole), {
+            source: data.principalId.toUpperCase(),
+            target: `${data.appRoleId}@${data.tenantId}`.toUpperCase(),
+        }
+    );
+}
+
+/**
+ *
  * @param {AzureServicePrincipal} data
  * @param ingestionData
  */
@@ -1742,7 +1762,7 @@ export function convertAzureServicePrincipal(data, ingestionData) {
             insertNewAzureNodeProp(
                 ingestionData,
                 AzureLabels.AppRole, {
-                    objectid: appRole.id.toUpperCase(),
+                    objectid: `${appRole.id}@${data.tenantId}`.toUpperCase(),
                     map: {
                         description: appRole.description,
                         displayname: appRole.displayName,

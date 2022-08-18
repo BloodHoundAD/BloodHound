@@ -40,6 +40,7 @@ import AZGetSecrets from './HelpTexts/AZGetSecrets/AZGetSecrets';
 import AZGrant from './HelpTexts/AZGrant/AZGrant';
 import AZGrantSelf from './HelpTexts/AZGrantSelf/AZGrantSelf';
 import AZHasRole from './HelpTexts/AZHasRole/AZHasRole';
+import AZHasAppRole from './HelpTexts/AZHasAppRole/AZHasAppRole';
 import AZMemberOf from './HelpTexts/AZMemberOf/AZMemberOf';
 import AZOwner from './HelpTexts/AZOwner/AZOwner';
 import AZOwns from './HelpTexts/AZOwns/AZOwns';
@@ -135,6 +136,7 @@ const HelpModal = () => {
         AZGrant: AZGrant,
         AZGrantSelf: AZGrantSelf,
         AZHasRole: AZHasRole,
+        AZHasAppRole: AZHasAppRole,
         AZMemberOf: AZMemberOf,
         AZOwner: AZOwner,
         AZOwns: AZOwns,

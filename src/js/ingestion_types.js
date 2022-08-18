@@ -446,6 +446,21 @@
  * @property {Array.<AzureUnifiedRoleAssignment>} roleAssignments
  */
 
+
+/**
+ * @typedef {Object} AzureAppRoleAssignment
+* @property {string} appRoleId
+* @property {string} createdDateTime
+* @property {string} id
+* @property {string} principalDisplayName
+* @property {string} principalId
+* @property {string} principalType
+* @property {string} resourceDisplayName
+* @property {string} tenantId
+* @property {string} resourceId
+*/
+
+
 /**
  * @typedef {Object} AzureServicePrincipal
  * @property {boolean} accountEnabled
