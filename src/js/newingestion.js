@@ -79,7 +79,10 @@ export const AzureLabels = {
     PrivilegedRoleAdmin: 'AZPrivilegedRoleAdmin',
     PrivilegedAuthAdmin: 'AZPrivilegedAuthAdmin',
     StorageAccount: 'AZStorageAccount',
-    StorageAccountDataReader: 'AZSADataReader', 
+    StorageContainer: 'AZStorageContainer',
+    StorageAccountDataReader: 'AZSADataReader',
+    StorageAccountKeyOperator: 'AZSAKeyOperator'
+
 };
 
 const AzurehoundKindLabels = {
@@ -121,7 +124,10 @@ const AzurehoundKindLabels = {
     KindAZStorageAccount : "AZStorageAccount",
 	KindAZSAContributor : "AZSAContributor",
 	KindAZSAOwner  : "AZSAOwner",
-	KindAZSADataReader  : "AZSADataReader"
+	KindAZSADataReader  : "AZSADataReader",
+    KindAZSAKeyOperator      : "AZSAKeyOperator",
+	KindAZStorageContainer   : "AZStorageContainer"
+
 };
 
 const DirectoryObjectEntityTypes = {
@@ -1072,6 +1078,12 @@ export function convertAzureData(chunk) {
                 break;
             case AzurehoundKindLabels.KindAZSADataReader:
                 convertAzureStorageAccountDataReaders(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZSAKeyOperator:
+                convertAzureStorageAccountKeyOperators(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZStorageContainer:
+                convertAzureStorageContainer(item.data, data);
                 break;
             default:
                 console.error(`invalid azure type detected: ${item.kind}`);
@@ -2160,6 +2172,8 @@ export function convertAzureVirtualMachineUserAccessAdmins(
                 name: data.name.toUpperCase(),
                 kind: data.kind.toUpperCase(),
                 tenantid: data.tenantId.toUpperCase(),
+                privateEndpointConnections: data.properties.privateEndpointConnections,
+                allowedSharedKeyAccess: data.properties.allowSharedKeyAccess
             },
         },
         false
@@ -2193,12 +2207,12 @@ export function convertAzureVirtualMachineUserAccessAdmins(
             ingestionData,
             fProps(
                 AzureLabels.Base,
-                AzureLabels.StorageAccount,
+                AzureLabels.Base,
                 AzureLabels.Contributor
             ),
             {
                 source: contributor.contributor.properties.principalId.toUpperCase(),
-                target: data.storageAccountId.toUpperCase(),
+                target: contributor.contributor.properties.scope.toUpperCase(),
             }
         );
     }
@@ -2216,12 +2230,12 @@ export function convertAzureStorageAccountOwners(data, ingestionData) {
             ingestionData,
             fProps(
                 AzureLabels.Base,
-                AzureLabels.StorageAccount,
+                AzureLabels.Base,
                 AzureLabels.Owns
             ),
             {
                 source: owner.owner.properties.principalId.toUpperCase(),
-                target: data.storageAccountId.toUpperCase(),
+                target: owner.owner.properties.scope.toUpperCase(),
             }
         );
     }
@@ -2239,15 +2253,88 @@ export function convertAzureStorageAccountOwners(data, ingestionData) {
             ingestionData,
             fProps(
                 AzureLabels.Base,
-                AzureLabels.StorageAccount,
+                AzureLabels.Base,
                 AzureLabels.StorageAccountDataReader
             ),
             {
                 source: datareader.dataReader.properties.principalId.toUpperCase(),
+                target: datareader.dataReader.properties.scope.toUpperCase(),
+            }
+        );
+    }
+}
+
+/**
+ *
+ * @param {AzureStorageAccountKeyOperators} data
+ * @param ingestionData
+ */
+export function convertAzureStorageAccountKeyOperators(data, ingestionData){
+    if (data.keyOperators === null) return;
+    for (let keyOperator of data.keyOperators) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.StorageAccount,
+                AzureLabels.StorageAccountKeyOperator
+            ),
+            {
+                source: keyOperator.keyOperator.properties.principalId.toUpperCase(),
                 target: data.storageAccountId.toUpperCase(),
             }
         );
     }
+}
+
+/**
+ *
+ * @param {AzureStorageContainer} data
+ * @param ingestionData
+ */
+export function convertAzureStorageContainer(
+    data,
+    ingestionData
+) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.StorageContainer,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+                publicAccess: data.properties.publicAccess.toUpperCase(),
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.StorageContainer,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.StorageAccount,
+            AzureLabels.StorageContainer,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.storageAccountId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
 }
 
 /**
