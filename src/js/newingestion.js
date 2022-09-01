@@ -78,6 +78,8 @@ export const AzureLabels = {
     GlobalAdmin: 'AZGlobalAdmin',
     PrivilegedRoleAdmin: 'AZPrivilegedRoleAdmin',
     PrivilegedAuthAdmin: 'AZPrivilegedAuthAdmin',
+    StorageAccount: 'AZStorageAccount',
+    StorageAccountDataReader: 'AZSADataReader', 
 };
 
 const AzurehoundKindLabels = {
@@ -116,6 +118,10 @@ const AzurehoundKindLabels = {
     KindAZVMContributor: 'AZVMContributor',
     KindAZVMOwner: 'AZVMOwner',
     KindAZVMUserAccessAdmin: 'AZVMUserAccessAdmin',
+    KindAZStorageAccount : "AZStorageAccount",
+	KindAZSAContributor : "AZSAContributor",
+	KindAZSAOwner  : "AZSAOwner",
+	KindAZSADataReader  : "AZSADataReader"
 };
 
 const DirectoryObjectEntityTypes = {
@@ -1054,6 +1060,18 @@ export function convertAzureData(chunk) {
                 break;
             case AzurehoundKindLabels.KindAZVMUserAccessAdmin:
                 convertAzureVirtualMachineUserAccessAdmins(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZStorageAccount:
+                convertAzureStorageAccount(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZSAContributor:
+                convertAzureStorageAccountContributors(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZSAOwner:
+                convertAzureStorageAccountOwners(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZSADataReader:
+                convertAzureStorageAccountDataReaders(item.data, data);
                 break;
             default:
                 console.error(`invalid azure type detected: ${item.kind}`);
@@ -2119,6 +2137,114 @@ export function convertAzureVirtualMachineUserAccessAdmins(
             {
                 source: admin.userAccessAdmin.properties.principalId.toUpperCase(),
                 target: data.virtualMachineId.toUpperCase(),
+            }
+        );
+    }
+}
+
+/**
+ *
+ * @param {AzureStorageAccount} data
+ * @param ingestionData
+ */
+ export function convertAzureStorageAccount(
+    data,
+    ingestionData
+) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.StorageAccount,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                kind: data.kind.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.StorageAccount,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+}
+
+
+
+/**
+ *
+ * @param {AzureStorageAccountContributors} data
+ * @param ingestionData
+ */
+ export function convertAzureStorageAccountContributors(data, ingestionData) {
+    if (data.contributors === null) return;
+    for (let contributor of data.contributors) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.StorageAccount,
+                AzureLabels.Contributor
+            ),
+            {
+                source: contributor.contributor.properties.principalId.toUpperCase(),
+                target: data.storageAccountId.toUpperCase(),
+            }
+        );
+    }
+}
+
+/**
+ *
+ * @param {AzureStorageAccountOwners} data
+ * @param ingestionData
+ */
+export function convertAzureStorageAccountOwners(data, ingestionData) {
+    if (data.owners === null) return;
+    for (let owner of data.owners) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.StorageAccount,
+                AzureLabels.Owns
+            ),
+            {
+                source: owner.owner.properties.principalId.toUpperCase(),
+                target: data.storageAccountId.toUpperCase(),
+            }
+        );
+    }
+}
+
+/**
+ *
+ * @param {AzureStorageAccountDataReaders} data
+ * @param ingestionData
+ */
+ export function convertAzureStorageAccountDataReaders(data, ingestionData) {
+    if (data.dataReaders === null) return;
+    for (let datareader of data.dataReaders) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.StorageAccount,
+                AzureLabels.StorageAccountDataReader
+            ),
+            {
+                source: datareader.dataReader.properties.principalId.toUpperCase(),
+                target: data.storageAccountId.toUpperCase(),
             }
         );
     }
