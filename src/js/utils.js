@@ -213,8 +213,8 @@ async function dropIndexes() {
 
 export async function setSchema() {
     const luceneIndexProvider = "lucene+native-3.0"
-    let labels = ["User", "Group", "Computer", "GPO", "OU", "Domain", "Container", "Base", "AZBase", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM", "AZStorageAccount", "AZStorageContainer", "AZAutomationAccount"]
-    let azLabels = ["AZBase", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM", "AZStorageAccount", "AZStorageContainer", "AZAutomationAccount"]
+    let labels = ["User", "Group", "Computer", "GPO", "OU", "Domain", "Container", "Base", "AZBase", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM", "AZStorageAccount", "AZStorageContainer", "AZAutomationAccount", "AZLogicApp"]
+    let azLabels = ["AZBase", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM", "AZStorageAccount", "AZStorageContainer", "AZAutomationAccount", "AZLogicApp"]
     let schema = {}
     for (let label of labels){
         schema[label] = {
