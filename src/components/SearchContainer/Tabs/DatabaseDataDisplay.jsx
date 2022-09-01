@@ -206,6 +206,26 @@ const DatabaseDataDisplay = () => {
                             index={index}
                             label={'AZVM'}
                         />
+                        <DatabaseDataLabel
+                            query={'MATCH (n:AZStorageAccount) RETURN count(n) AS count'}
+                            index={index}
+                            label={'AZStorageAccount'}
+                        />
+                        <DatabaseDataLabel
+                            query={'MATCH (n:AZAutomationAccount) RETURN count(n) AS count'}
+                            index={index}
+                            label={'AZAutomationAccount'}
+                        />
+                        <DatabaseDataLabel
+                            query={'MATCH (n:AZLogicApp) RETURN count(n) AS count'}
+                            index={index}
+                            label={'AZLogicApp(Workflow)'}
+                        />
+                        <DatabaseDataLabel
+                            query={'MATCH (n:AZFunctionApp) RETURN count(n) AS count'}
+                            index={index}
+                            label={'AZFunctionApp'}
+                        />
                     </tbody>
                 </Table>
             </CollapsibleSection>
