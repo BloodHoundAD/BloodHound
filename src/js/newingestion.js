@@ -127,13 +127,16 @@ const AzurehoundKindLabels = {
 	KindAZSAOwner  : "AZSAOwner",
 	KindAZSADataReader  : "AZSADataReader",
     KindAZSAKeyOperator      : "AZSAKeyOperator",
+    KindAZSAUserAccessAdmin: "AZSAUserAccessAdmin",
 	KindAZStorageContainer   : "AZStorageContainer",
     KindAZAutomationAccount : 'AZAutomationAccount',
     KindAZAAOwner: 'AZAutomationAccountOwner',
     KindAZAAContributor: 'AZAutomationAccountContributor',
+    KindAZAAUserAccessAdmin: 'AZAutomationAccountUserAccessAdmin',
     KindAZLogicApp: 'AZWorkflow',
     KindAZLogicAppOwner: 'AZWorkflowOwner',
     KindAZLogicAppContributor: 'AZWorkflowContributor',
+    KindAZLogicAppUserAccessAdmin: 'AZWorkflowUserAccessAdmin'
 
 };
 
@@ -1089,6 +1092,9 @@ export function convertAzureData(chunk) {
             case AzurehoundKindLabels.KindAZSAKeyOperator:
                 convertAzureStorageAccountKeyOperators(item.data, data);
                 break;
+            case AzurehoundKindLabels.KindAZSAUserAccessAdmin:
+                convertAzureStorageAccountUserAccessAdmin(item.data, data);
+                break;
             case AzurehoundKindLabels.KindAZStorageContainer:
                 convertAzureStorageContainer(item.data, data);
                 break;
@@ -1101,14 +1107,20 @@ export function convertAzureData(chunk) {
             case AzurehoundKindLabels.KindAZAAContributor:
                 convertAzureAutomationAccountContributor(item.data,data);
                 break;
+            case AzurehoundKindLabels.KindAZAAUserAccessAdmin:
+                convertAzureAutomationAccountUserAccessAdmin(item.data, data);
+                break;
             case AzurehoundKindLabels.KindAZLogicApp:
                 convertAzureLogicApp(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZLogicAppOwner:
                 convertAzureLogicAppOwner(item.data, data);
                 break;
-            case AzurehoundKindLabels.KindAZLogi:
+            case AzurehoundKindLabels.KindAZLogicAppContributor:
                 convertAzureLogicAppContributor(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZLogicAppUserAccessAdmin:
+                convertAzureLogicAppUserAccessAdmin(item.data, data);
                 break;
             default:
                 console.error(`invalid azure type detected: ${item.kind}`);
@@ -2206,6 +2218,15 @@ export function convertAzureVirtualMachineUserAccessAdmins(
 
     insertNewAzureRel(
         ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.StorageAccount, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
         fProps(
             AzureLabels.ResourceGroup,
             AzureLabels.StorageAccount,
@@ -2306,7 +2327,30 @@ export function convertAzureStorageAccountKeyOperators(data, ingestionData){
             ),
             {
                 source: keyOperator.keyOperator.properties.principalId.toUpperCase(),
-                target: data.storageAccountId.toUpperCase(),
+                target: keyOperator.keyOperator.properties.scope.toUpperCase(),
+            }
+        );
+    }
+}
+
+/**
+ *
+ * @param {AzureStorageAccountUserAccessAdmins} data
+ * @param ingestionData
+ */
+export function convertAzureStorageAccountUserAccessAdmin(data, ingestionData){
+    if (data.userAccessAdmins === null) return;
+    for (let userAccessAdmin of data.userAccessAdmins) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.StorageAccount,
+                AzureLabels.UserAccessAdministrator
+            ),
+            {
+                source: userAccessAdmin.userAccessAdmin.properties.principalId.toUpperCase(),
+                target: userAccessAdmin.userAccessAdmin.properties.scope.toUpperCase(),
             }
         );
     }
@@ -2333,6 +2377,15 @@ export function convertAzureStorageContainer(
             },
         },
         false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.StorageContainer, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
     );
 
     insertNewAzureRel(
@@ -2382,6 +2435,15 @@ export function convertAzureStorageContainer(
             },
         },
         false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.AutomationAccount, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
     );
 
     insertNewAzureRel(
@@ -2446,7 +2508,7 @@ export function convertAzureAutomationAccountOwner(data, ingestionData) {
             ingestionData,
             fProps(
                 AzureLabels.Base,
-                AzureLabels.Base,
+                AzureLabels.AutomationAccount,
                 AzureLabels.Owns
             ),
             {
@@ -2469,12 +2531,35 @@ export function convertAzureAutomationAccountOwner(data, ingestionData) {
             ingestionData,
             fProps(
                 AzureLabels.Base,
-                AzureLabels.Base,
+                AzureLabels.AutomationAccount,
                 AzureLabels.Contributor
             ),
             {
                 source: contributor.contributor.properties.principalId.toUpperCase(),
                 target: contributor.contributor.properties.scope.toUpperCase(),
+            }
+        );
+    }
+}
+
+/**
+ *
+ * @param {AzureAutomationAccountUserAccessAdmin} data
+ * @param ingestionData
+ */
+ export function convertAzureAutomationAccountUserAccessAdmin(data, ingestionData) {
+    if (data.userAccessAdmins === null) return;
+    for (let userAccessAdmin of data.userAccessAdmins) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.AutomationAccount,
+                AzureLabels.UserAccessAdministrator
+            ),
+            {
+                source: userAccessAdmin.userAccessAdmin.properties.principalId.toUpperCase(),
+                target: userAccessAdmin.userAccessAdmin.properties.scope.toUpperCase(),
             }
         );
     }
@@ -2497,6 +2582,15 @@ export function convertAzureAutomationAccountOwner(data, ingestionData) {
             },
         },
         false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.LogicApp, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
     );
 
     insertNewAzureRel(
@@ -2561,7 +2655,7 @@ export function convertAzureLogicAppOwner(data, ingestionData) {
             ingestionData,
             fProps(
                 AzureLabels.Base,
-                AzureLabels.Base,
+                AzureLabels.LogicApp,
                 AzureLabels.Owns
             ),
             {
@@ -2584,12 +2678,35 @@ export function convertAzureLogicAppOwner(data, ingestionData) {
             ingestionData,
             fProps(
                 AzureLabels.Base,
-                AzureLabels.Base,
+                AzureLabels.LogicApp,
                 AzureLabels.Contributor
             ),
             {
                 source: contributor.contributor.properties.principalId.toUpperCase(),
                 target: contributor.contributor.properties.scope.toUpperCase(),
+            }
+        );
+    }
+}
+
+/**
+ *
+ * @param {AzureLogicAppUserAccessAdmins} data
+ * @param ingestionData
+ */
+ export function convertAzureLogicAppUserAccessAdmin(data, ingestionData) {
+    if (data.userAccessAdmins === null) return;
+    for (let userAccessAdmin of data.userAccessAdmins) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.LogicApp,
+                AzureLabels.UserAccessAdministrator
+            ),
+            {
+                source: userAccessAdmin.userAccessAdmin.properties.principalId.toUpperCase(),
+                target: userAccessAdmin.userAccessAdmin.properties.scope.toUpperCase(),
             }
         );
     }
