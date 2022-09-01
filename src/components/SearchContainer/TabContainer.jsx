@@ -27,6 +27,9 @@ import BaseNodeData from "./Tabs/BaseNodeData";
 import ContainerNodeData from "./Tabs/ContainerNodeData";
 import AZManagementGroupNodeData from "./Tabs/AZManagementGroupNodeData";
 import AZRoleNodeData from "./Tabs/AZRoleNodeData";
+import AZStorageAccountNodeData from './Tabs/AZStorageAccountNodeData';
+import AZStorageContainerNodeData from './Tabs/AZStorageContainerNodeData';
+import AZLogicAppNodeData from './Tabs/AZLogicAppNodeData';
 
 class TabContainer extends Component {
 
@@ -50,6 +53,9 @@ class TabContainer extends Component {
             azSubscriptionVisible: false,
             azTenantVisible: false,
             azVMVisible: false,
+            azStorageAccountVisible: false,
+            azStorageContainerVisible: false,
+            azLogicAppVisible: false,
             azServicePrincipalVisible: false,
             azAppVisible: false,
             azManagementGroupVisible: false,
@@ -109,6 +115,12 @@ class TabContainer extends Component {
             this._azManagementGroupNodeClicked()
         } else if (type === 'AZRole') {
             this._azRoleNodeClicked()
+        } else if (type === 'AZStorageAccount') {
+            this._azStorageAccountNodeClicked();
+        } else if (type === 'AZStorageContainer'){
+            this._azStorageContainerNodeClicked();
+        } else if (type === 'AZLogicApp'){
+            this._azLogicAppNodeClicked();
         }
     }
 
@@ -278,6 +290,30 @@ class TabContainer extends Component {
         });
     }
 
+    _azStorageAccountNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azStorageAccountVisble: true,
+            selected: 2
+        });
+    }
+
+    _azStorageContainerNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azStorageContainerVisble: true,
+            selected: 2
+        });
+    }
+
+    _azLogicAppNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azLogicAppVisible: true,
+            selected: 2
+        });
+    }
+
     _azServicePrincipalNodeClicked() {
         this.clearVisible()
         this.setState({
@@ -330,6 +366,9 @@ class TabContainer extends Component {
                                 !this.state.azSubscriptionVisible &&
                                 !this.state.azTenantVisible &&
                                 !this.state.azVMVisible &&
+                                !this.state.azStorageAccountVisble &&
+                                !this.state.azStorageContainerVisible &&
+                                !this.state.azLogicAppVisible &&
                                 !this.state.azServicePrincipalVisible &&
                                 !this.state.azAppVisible &&
                                 !this.state.baseVisible &&
@@ -365,6 +404,9 @@ class TabContainer extends Component {
                             visible={this.state.azTenantVisible}
                         />
                         <AZVMNodeData visible={this.state.azVMVisible} />
+                        <AZStorageAccountNodeData visible={this.state.azStorageAccountVisble} />
+                        <AZStorageContainerNodeData visible={this.state.azStorageContainerVisible} />
+                        <AZLogicAppNodeData visible={this.state.azLogicAppVisible} />
                         <AZServicePrincipalNodeData
                             visible={this.state.azServicePrincipalVisible}
                         />
