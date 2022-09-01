@@ -21,6 +21,9 @@ const labels = [
     'AZManagementGroup',
     'AZStorageAccount',
     'AZStorageContainer',
+    'AZAutomationAccount',
+    'AZLogicApp',
+    'AZFunctionApp',
 ];
 
 export function generateUniqueId(sigmaInstance, isNode) {
@@ -213,8 +216,8 @@ async function dropIndexes() {
 
 export async function setSchema() {
     const luceneIndexProvider = "lucene+native-3.0"
-    let labels = ["User", "Group", "Computer", "GPO", "OU", "Domain", "Container", "Base", "AZBase", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM", "AZStorageAccount", "AZStorageContainer", "AZAutomationAccount", "AZLogicApp"]
-    let azLabels = ["AZBase", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM", "AZStorageAccount", "AZStorageContainer", "AZAutomationAccount", "AZLogicApp"]
+    let labels = ["User", "Group", "Computer", "GPO", "OU", "Domain", "Container", "Base", "AZBase", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM", "AZStorageAccount", "AZStorageContainer", "AZAutomationAccount", "AZLogicApp", "AZFunctionApp"]
+    let azLabels = ["AZBase", "AZApp", "AZDevice", "AZGroup", "AZKeyVault", "AZResourceGroup", "AZServicePrincipal", "AZTenant", "AZUser", "AZVM", "AZStorageAccount", "AZStorageContainer", "AZAutomationAccount", "AZLogicApp", "AZFunctionApp"]
     let schema = {}
     for (let label of labels){
         schema[label] = {

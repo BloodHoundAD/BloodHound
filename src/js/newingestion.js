@@ -83,7 +83,8 @@ export const AzureLabels = {
     StorageAccountDataReader: 'AZSADataReader',
     StorageAccountKeyOperator: 'AZSAKeyOperator',
     AutomationAccount: 'AZAutomationAccount',
-    LogicApp: 'AZLogicApp'
+    LogicApp: 'AZLogicApp',
+    FunctionApp: 'AZFunctionApp'
 };
 
 const AzurehoundKindLabels = {
@@ -136,7 +137,11 @@ const AzurehoundKindLabels = {
     KindAZLogicApp: 'AZWorkflow',
     KindAZLogicAppOwner: 'AZWorkflowOwner',
     KindAZLogicAppContributor: 'AZWorkflowContributor',
-    KindAZLogicAppUserAccessAdmin: 'AZWorkflowUserAccessAdmin'
+    KindAZLogicAppUserAccessAdmin: 'AZWorkflowUserAccessAdmin',
+    KindAZFunctionApp: 'AZFunctionApp',
+    KindAZFunctionAppOwner: 'AZFunctionAppOwner',
+    KindAZFunctionAppContributor: 'AZFunctionAppContributor',
+    KindAZFunctionAppUserAccessAdmin: 'AZFunctionAppUserAccessAdmin',
 
 };
 
@@ -1093,7 +1098,7 @@ export function convertAzureData(chunk) {
                 convertAzureStorageAccountKeyOperators(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZSAUserAccessAdmin:
-                convertAzureStorageAccountUserAccessAdmin(item.data, data);
+                convertAzureStorageAccountUserAccessAdmins(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZStorageContainer:
                 convertAzureStorageContainer(item.data, data);
@@ -1102,25 +1107,37 @@ export function convertAzureData(chunk) {
                 convertAzureAutomationAccount(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZAAOwner:
-                convertAzureAutomationAccountOwner(item.data, data);
+                convertAzureAutomationAccountOwners(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZAAContributor:
-                convertAzureAutomationAccountContributor(item.data,data);
+                convertAzureAutomationAccountContributors(item.data,data);
                 break;
             case AzurehoundKindLabels.KindAZAAUserAccessAdmin:
-                convertAzureAutomationAccountUserAccessAdmin(item.data, data);
+                convertAzureAutomationAccountUserAccessAdmins(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZLogicApp:
                 convertAzureLogicApp(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZLogicAppOwner:
-                convertAzureLogicAppOwner(item.data, data);
+                convertAzureLogicAppOwners(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZLogicAppContributor:
-                convertAzureLogicAppContributor(item.data, data);
+                convertAzureLogicAppContributors(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZLogicAppUserAccessAdmin:
-                convertAzureLogicAppUserAccessAdmin(item.data, data);
+                convertAzureLogicAppUserAccessAdmins(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZFunctionApp:
+                convertAzureFunctionApp(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZFunctionAppOwner:
+                convertAzureFunctionAppOwners(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZFunctionAppContributor:
+                convertAzureFunctionAppContributors(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZFunctionAppUserAccessAdmin:
+                convertAzureFunctionAppUserAccessAdmins(item.data, data);
                 break;
             default:
                 console.error(`invalid azure type detected: ${item.kind}`);
@@ -2239,8 +2256,6 @@ export function convertAzureVirtualMachineUserAccessAdmins(
     );
 }
 
-
-
 /**
  *
  * @param {AzureStorageAccountContributors} data
@@ -2338,7 +2353,7 @@ export function convertAzureStorageAccountKeyOperators(data, ingestionData){
  * @param {AzureStorageAccountUserAccessAdmins} data
  * @param ingestionData
  */
-export function convertAzureStorageAccountUserAccessAdmin(data, ingestionData){
+export function convertAzureStorageAccountUserAccessAdmins(data, ingestionData){
     if (data.userAccessAdmins === null) return;
     for (let userAccessAdmin of data.userAccessAdmins) {
         insertNewAzureRel(
@@ -2494,14 +2509,13 @@ export function convertAzureStorageContainer(
         }
     }
 }
-
-           
+         
 /**
  *
  * @param {AzureAutomationAccountOwners} data
  * @param ingestionData
  */
-export function convertAzureAutomationAccountOwner(data, ingestionData) {
+export function convertAzureAutomationAccountOwners(data, ingestionData) {
     if (data.owners === null) return;
     for (let owner of data.owners) {
         insertNewAzureRel(
@@ -2524,7 +2538,7 @@ export function convertAzureAutomationAccountOwner(data, ingestionData) {
  * @param {AzureAutomationAccountContributors} data
  * @param ingestionData
  */
- export function convertAzureAutomationAccountContributor(data, ingestionData) {
+ export function convertAzureAutomationAccountContributors(data, ingestionData) {
     if (data.contributors === null) return;
     for (let contributor of data.contributors) {
         insertNewAzureRel(
@@ -2547,7 +2561,7 @@ export function convertAzureAutomationAccountOwner(data, ingestionData) {
  * @param {AzureAutomationAccountUserAccessAdmin} data
  * @param ingestionData
  */
- export function convertAzureAutomationAccountUserAccessAdmin(data, ingestionData) {
+ export function convertAzureAutomationAccountUserAccessAdmins(data, ingestionData) {
     if (data.userAccessAdmins === null) return;
     for (let userAccessAdmin of data.userAccessAdmins) {
         insertNewAzureRel(
@@ -2648,7 +2662,7 @@ export function convertAzureAutomationAccountOwner(data, ingestionData) {
  * @param {AzureLogicAppOwners} data
  * @param ingestionData
  */
-export function convertAzureLogicAppOwner(data, ingestionData) {
+export function convertAzureLogicAppOwners(data, ingestionData) {
     if (data.owners === null) return;
     for (let owner of data.owners) {
         insertNewAzureRel(
@@ -2671,7 +2685,7 @@ export function convertAzureLogicAppOwner(data, ingestionData) {
  * @param {AzureLogicAppContributors} data
  * @param ingestionData
  */
- export function convertAzureLogicAppContributor(data, ingestionData) {
+ export function convertAzureLogicAppContributors(data, ingestionData) {
     if (data.contributors === null) return;
     for (let contributor of data.contributors) {
         insertNewAzureRel(
@@ -2694,7 +2708,7 @@ export function convertAzureLogicAppOwner(data, ingestionData) {
  * @param {AzureLogicAppUserAccessAdmins} data
  * @param ingestionData
  */
- export function convertAzureLogicAppUserAccessAdmin(data, ingestionData) {
+ export function convertAzureLogicAppUserAccessAdmins(data, ingestionData) {
     if (data.userAccessAdmins === null) return;
     for (let userAccessAdmin of data.userAccessAdmins) {
         insertNewAzureRel(
@@ -2711,6 +2725,153 @@ export function convertAzureLogicAppOwner(data, ingestionData) {
         );
     }
 }
+
+/**
+ *
+ * @param {AzureFunctionApp} data
+ * @param ingestionData
+ */
+export function convertAzureFunctionApp(data, ingestionData) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.FunctionApp,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase()
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.FunctionApp, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.FunctionApp,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    if (data.identity.principalId) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.FunctionApp,
+                AzureLabels.ServicePrincipal,
+                AzureLabels.ManagedIdentity
+            ),
+            {
+                source: data.id.toUpperCase(),
+                target: data.identity.principalId.toUpperCase(),
+            }
+        );
+    }
+
+    if (data.identity.userAssignedIdentities) {
+        for (let key in data.identity.userAssignedIdentities) {
+            let user = data.identity.userAssignedIdentities[key];
+            if (user.clientId !== '') {
+                insertNewAzureRel(
+                    ingestionData,
+                    fProps(
+                        AzureLabels.FunctionApp,
+                        AzureLabels.ServicePrincipal,
+                        AzureLabels.ManagedIdentity
+                    ),
+                    {
+                        source: data.id.toUpperCase(),
+                        target: user.principalId.toUpperCase(),
+                    }
+                );
+            }
+        }
+    }
+}
+
+/**
+ *
+ * @param {AzureFunctionAppOwners} data
+ * @param ingestionData
+ */
+ export function convertAzureFunctionAppOwners(data, ingestionData) {
+    if (data.owners === null) return;
+    for (let owner of data.owners) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.FunctionApp,
+                AzureLabels.Owns
+            ),
+            {
+                source: owner.owner.properties.principalId.toUpperCase(),
+                target: owner.owner.properties.scope.toUpperCase(),
+            }
+        );
+    }
+}
+                
+/**
+ *
+ * @param {AzureFunctionAppContributors} data
+ * @param ingestionData
+ */
+ export function convertAzureFunctionAppContributors(data, ingestionData) {
+    if (data.contributors === null) return;
+    for (let contributor of data.contributors) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.FunctionApp,
+                AzureLabels.Contributor
+            ),
+            {
+                source: contributor.contributor.properties.principalId.toUpperCase(),
+                target: contributor.contributor.properties.scope.toUpperCase(),
+            }
+        );
+    }
+}
+
+/**
+ *
+ * @param {AzureFunctionAppUserAccessAdmins} data
+ * @param ingestionData
+ */
+ export function convertAzureFunctionAppUserAccessAdmins(data, ingestionData) {
+    if (data.userAccessAdmins === null) return;
+    for (let userAccessAdmin of data.userAccessAdmins) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.FunctionApp,
+                AzureLabels.UserAccessAdministrator
+            ),
+            {
+                source: userAccessAdmin.userAccessAdmin.properties.principalId.toUpperCase(),
+                target: userAccessAdmin.userAccessAdmin.properties.scope.toUpperCase(),
+            }
+        );
+    }
+}
+
 
 
 /**
