@@ -571,8 +571,8 @@ const MenuContainer = () => {
             type: 'query',
             statement: `MATCH (n:AZRole {templateid:"62E90394-69F5-4237-9190-012177145E10"})
                 OPTIONAL MATCH (g:AZGroup)-[:AZHasRole]->(n)
-                OPTIONAL MATCH (i)-[:AZMemberOf]->(g) WHERE n:AZUser OR n:AZServicePrincipal OR n:AZDevice
-                OPTIONAL MATCH (p)-[:AZHasRole]->(n) WHERE n:AZUser OR n:AZServicePrincipal OR n:AZDevice
+                OPTIONAL MATCH (i)-[:AZMemberOf]->(g) WHERE i:AZUser OR i:AZServicePrincipal OR i:AZDevice
+                OPTIONAL MATCH (p)-[:AZHasRole]->(n) WHERE p:AZUser OR p:AZServicePrincipal OR p:AZDevice
                 CALL {
                     WITH g,i,p
                     SET g.highvalue=true, i.highvalue=true, p.highvalue=true
