@@ -880,7 +880,8 @@ const MenuContainer = () => {
                         WHERE m.templateid IN $addGroupMembersRoles
                         MATCH (at:AZTenant)-[:AZContains]->(n)
                         MATCH (at)-[:AZContains]->(azg:AZGroup)
-                        WHERE NOT EXISTS(azg.isassignabletorole)
+                        WHERE azg.isassignabletorole IS null
+		        OR azg.isassignabletorole = false
                         CALL {
                             WITH n, azg
                             MERGE (n)-[:AZAddMembers]->(azg)
