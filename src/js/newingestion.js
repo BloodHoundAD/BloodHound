@@ -1388,15 +1388,17 @@ export function convertAzureKeyVaultContributors(data, ingestionData) {
  */
 export function convertAzureKeyVaultOwners(data, ingestionData) {
     if (data.owners === null) return;
-    for (let owner of data.owners) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(AzureLabels.Base, AzureLabels.KeyVault, AzureLabels.Owns),
-            {
-                source: owner.owner.properties.principalId.toUpperCase(),
-                target: data.keyVaultId.toUpperCase(),
-            }
-        );
+    for (let entry of data.owners) {
+        if (data.keyVaultId === entry.owner.properties.scope) {
+            insertNewAzureRel(
+                ingestionData,
+                fProps(AzureLabels.Base, AzureLabels.KeyVault, AzureLabels.Owns),
+                {
+                    source: entry.owner.properties.principalId.toUpperCase(),
+                    target: data.keyVaultId.toUpperCase(),
+                }
+            );
+        }
     }
 }
 
@@ -1407,19 +1409,21 @@ export function convertAzureKeyVaultOwners(data, ingestionData) {
  */
 export function convertAzureKeyVaultUserAccessAdmins(data, ingestionData) {
     if (data.userAccessAdmins === null) return;
-    for (let userAccessAdmin of data.userAccessAdmins) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(
-                AzureLabels.Base,
-                AzureLabels.KeyVault,
-                AzureLabels.UserAccessAdministrator
-            ),
-            {
-                source: userAccessAdmin.userAccessAdmin.properties.principalId.toUpperCase(),
-                target: data.keyVaultId.toUpperCase(),
-            }
-        );
+    for (let entry of data.userAccessAdmins) {
+        if (data.keyVaultId === entry.userAccessAdmin.properties.scope) {
+            insertNewAzureRel(
+                ingestionData,
+                fProps(
+                    AzureLabels.Base,
+                    AzureLabels.KeyVault,
+                    AzureLabels.UserAccessAdministrator
+                ),
+                {
+                    source: entry.userAccessAdmin.properties.principalId.toUpperCase(),
+                    target: data.keyVaultId.toUpperCase(),
+                }
+            );
+        }
     }
 }
 
@@ -1450,19 +1454,21 @@ export function convertAzureManagementGroupDescendant(data, ingestionData) {
  */
 export function convertAzureManagementGroupOwners(data, ingestionData) {
     if (data.owners === null) return;
-    for (let owner of data.owners) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(
-                AzureLabels.Base,
-                AzureLabels.ManagementGroup,
-                AzureLabels.Owns
-            ),
-            {
-                source: owner.owner.properties.principalId.toUpperCase(),
-                target: data.managementGroupId.toUpperCase(),
-            }
-        );
+    for (let entry of data.owners) {
+        if (data.managementGroupId === entry.owner.properties.scope) {
+            insertNewAzureRel(
+                ingestionData,
+                fProps(
+                    AzureLabels.Base,
+                    AzureLabels.ManagementGroup,
+                    AzureLabels.Owns
+                ),
+                {
+                    source: entry.owner.properties.principalId.toUpperCase(),
+                    target: data.managementGroupId.toUpperCase(),
+                }
+            );
+        }
     }
 }
 
@@ -1476,19 +1482,21 @@ export function convertAzureManagementGroupUserAccessAdmins(
     ingestionData
 ) {
     if (data.userAccessAdmins === null) return;
-    for (let userAccessAdmin of data.userAccessAdmins) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(
-                AzureLabels.Base,
-                AzureLabels.ManagementGroup,
-                AzureLabels.UserAccessAdministrator
-            ),
-            {
-                source: userAccessAdmin.userAccessAdmin.properties.principalId.toUpperCase(),
-                target: data.managementGroupId.toUpperCase(),
-            }
-        );
+    for (let entry of data.userAccessAdmins) {
+        if (data.managementGroupId === entry.userAccessAdmin.properties.scope) {
+            insertNewAzureRel(
+                ingestionData,
+                fProps(
+                    AzureLabels.Base,
+                    AzureLabels.ManagementGroup,
+                    AzureLabels.UserAccessAdministrator
+                ),
+                {
+                    source: entry.userAccessAdmin.properties.principalId.toUpperCase(),
+                    target: data.managementGroupId.toUpperCase(),
+                }
+            );
+        }
     }
 }
 
@@ -1567,19 +1575,21 @@ export function convertAzureResourceGroup(data, ingestionData) {
  */
 export function convertAzureResourceGroupOwners(data, ingestionData) {
     if (data.owners === null) return;
-    for (let owner of data.owners) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(
-                AzureLabels.Base,
-                AzureLabels.ResourceGroup,
-                AzureLabels.Owns
-            ),
-            {
-                source: owner.owner.properties.principalId.toUpperCase(),
-                target: data.resourceGroupId.toUpperCase(),
-            }
-        );
+    for (let entry of data.owners) {
+        if (data.resourceGroupId === entry.owner.properties.scope) {
+            insertNewAzureRel(
+                ingestionData,
+                fProps(
+                    AzureLabels.Base,
+                    AzureLabels.ResourceGroup,
+                    AzureLabels.Owns
+                ),
+                {
+                    source: entry.owner.properties.principalId.toUpperCase(),
+                    target: data.resourceGroupId.toUpperCase(),
+                }
+            );
+        }
     }
 }
 
@@ -1590,19 +1600,21 @@ export function convertAzureResourceGroupOwners(data, ingestionData) {
  */
 export function convertAzureResourceGroupUserAccessAdmins(data, ingestionData) {
     if (data.userAccessAdmins === null) return;
-    for (let userAccessAdmin of data.userAccessAdmins) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(
-                AzureLabels.Base,
-                AzureLabels.ResourceGroup,
-                AzureLabels.UserAccessAdministrator
-            ),
-            {
-                source: userAccessAdmin.userAccessAdmin.properties.principalId.toUpperCase(),
-                target: data.resourceGroupId.toUpperCase(),
-            }
-        );
+    for (let entry of data.userAccessAdmins) {
+        if (data.resourceGroupId === entry.userAccessAdmin.properties.scope) {
+            insertNewAzureRel(
+                ingestionData,
+                fProps(
+                    AzureLabels.Base,
+                    AzureLabels.ResourceGroup,
+                    AzureLabels.UserAccessAdministrator
+                ),
+                {
+                    source: entry.userAccessAdmin.properties.principalId.toUpperCase(),
+                    target: data.resourceGroupId.toUpperCase(),
+                }
+            );
+        }
     }
 }
 
@@ -1648,12 +1660,7 @@ export function convertAzureRole(data, ingestionData) {
 export function convertAzureRoleAssignment(data, ingestionData) {
     if (data.roleAssignments === null) return;
     for (let roleAssignment of data.roleAssignments) {
-        if (
-            roleAssignment.roleDefinitionId ===
-                AzureApplicationAdministratorRoleId ||
-            roleAssignment.roleDefinitionId ===
-                AzureCloudApplicationAdministratorRoleId
-        ) {
+        if (canAddSecret(roleAssignment.roleDefinitionId)) {
             if (roleAssignment.directoryScopeId === '/') {
                 insertNewAzureRel(
                     ingestionData,
@@ -1670,7 +1677,7 @@ export function convertAzureRoleAssignment(data, ingestionData) {
             } else {
                 let relType =
                     roleAssignment.roleDefinitionId ===
-                    AzureApplicationAdministratorRoleId
+                        AzureApplicationAdministratorRoleId
                         ? AzureLabels.AppAdmin
                         : AzureLabels.CloudAppAdmin;
                 insertNewAzureRel(
@@ -1695,6 +1702,14 @@ export function convertAzureRoleAssignment(data, ingestionData) {
             );
         }
     }
+}
+
+/*
+ *
+ * @param {string} roleDefinitionId
+*/
+export function canAddSecret(roleDefinitionId) {
+    return [AzureApplicationAdministratorRoleId, AzureCloudApplicationAdministratorRoleId].indexOf(roleDefinitionId) != -1;
 }
 
 /**
@@ -1819,19 +1834,21 @@ export function convertAzureSubscription(data, ingestionData) {
  */
 export function convertAzureSubscriptionOwners(data, ingestionData) {
     if (data.owners === null) return;
-    for (let owner of data.owners) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(
-                AzureLabels.Base,
-                AzureLabels.Subscription,
-                AzureLabels.Owns
-            ),
-            {
-                source: owner.owner.properties.principalId.toUpperCase(),
-                target: data.subscriptionId.toUpperCase(),
-            }
-        );
+    for (let entry of data.owners) {
+        if (data.subscriptionId === entry.owner.properties.scope) {
+            insertNewAzureRel(
+                ingestionData,
+                fProps(
+                    AzureLabels.Base,
+                    AzureLabels.Subscription,
+                    AzureLabels.Owns
+                ),
+                {
+                    source: entry.owner.properties.principalId.toUpperCase(),
+                    target: data.subscriptionId.toUpperCase(),
+                }
+            );
+        }
     }
 }
 
@@ -1842,19 +1859,21 @@ export function convertAzureSubscriptionOwners(data, ingestionData) {
  */
 export function convertAzureSubscriptionUserAccessAdmins(data, ingestionData) {
     if (data.userAccessAdmins === null) return;
-    for (let userAccessAdmin of data.userAccessAdmins) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(
-                AzureLabels.Base,
-                AzureLabels.Subscription,
-                AzureLabels.UserAccessAdministrator
-            ),
-            {
-                source: userAccessAdmin.userAccessAdmin.properties.principalId.toUpperCase(),
-                target: data.subscriptionId.toUpperCase(),
-            }
-        );
+    for (let entry of data.userAccessAdmins) {
+        if (data.subscriptionId === entry.userAccessAdmin.properties.scope) {
+            insertNewAzureRel(
+                ingestionData,
+                fProps(
+                    AzureLabels.Base,
+                    AzureLabels.Subscription,
+                    AzureLabels.UserAccessAdministrator
+                ),
+                {
+                    source: entry.userAccessAdmin.properties.principalId.toUpperCase(),
+                    target: data.subscriptionId.toUpperCase(),
+                }
+            );
+        }
     }
 }
 
@@ -2082,19 +2101,21 @@ export function convertAzureVirtualMachineContributors(data, ingestionData) {
  */
 export function convertAzureVirtualMachineOwners(data, ingestionData) {
     if (data.owners === null) return;
-    for (let owner of data.owners) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(
-                AzureLabels.Base,
-                AzureLabels.VirtualMachine,
-                AzureLabels.Owns
-            ),
-            {
-                source: owner.owner.properties.principalId.toUpperCase(),
-                target: data.virtualMachineId.toUpperCase(),
-            }
-        );
+    for (let entry of data.owners) {
+        if (data.virtualMachineId === entry.owner.properties.scope) {
+            insertNewAzureRel(
+                ingestionData,
+                fProps(
+                    AzureLabels.Base,
+                    AzureLabels.VirtualMachine,
+                    AzureLabels.Owns
+                ),
+                {
+                    source: entry.owner.properties.principalId.toUpperCase(),
+                    target: data.virtualMachineId.toUpperCase(),
+                }
+            );
+        }
     }
 }
 
@@ -2108,19 +2129,21 @@ export function convertAzureVirtualMachineUserAccessAdmins(
     ingestionData
 ) {
     if (data.userAccessAdmins === null) return;
-    for (let admin of data.userAccessAdmins) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(
-                AzureLabels.Base,
-                AzureLabels.VirtualMachine,
-                AzureLabels.UserAccessAdministrator
-            ),
-            {
-                source: admin.userAccessAdmin.properties.principalId.toUpperCase(),
-                target: data.virtualMachineId.toUpperCase(),
-            }
-        );
+    for (let entry of data.userAccessAdmins) {
+        if (data.virtualMachineId === entry.userAccessAdmin.properties.scope) {
+            insertNewAzureRel(
+                ingestionData,
+                fProps(
+                    AzureLabels.Base,
+                    AzureLabels.VirtualMachine,
+                    AzureLabels.UserAccessAdministrator
+                ),
+                {
+                    source: entry.userAccessAdmin.properties.principalId.toUpperCase(),
+                    target: data.virtualMachineId.toUpperCase(),
+                }
+            );
+        }
     }
 }
 
