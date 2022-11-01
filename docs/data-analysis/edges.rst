@@ -2058,6 +2058,46 @@ References
 
 |
 
+WriteAccountRestrictions
+^^^^^^^
+
+This edge indicates the principal has the ability to write to modify several properties on the target principal, most notably the msDS-AllowedToActOnBehalfOfOtherIdentity attribute. The ability to modify the msDS-AllowedToActOnBehalfOfOtherIdentity property allows an attacker to abuse resource-based constrained delegation to compromise the remote computer system. This property is a binary DACL that controls what security principals can pretend to be any domain user to the particular computer object.
+
+This clip demonstrates how to abuse this edge:
+
+.. raw:: html
+
+    <div style="text-align: center; margin-bottom: 2em;">
+    <iframe width="100%" height="350" src="https://www.youtube.com/embed/fqYoOoghqdE?t=1814?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+
+
+
+Abuse Info
+------------
+
+See the AllowedToAct edge section for abuse info
+
+
+Opsec Considerations
+--------------------
+
+See the AllowedToAct edge section for opsec considerations
+
+
+References
+----------
+
+* https://attack.mitre.org/techniques/T1098/
+* https://dirkjanm.io/abusing-forgotten-permissions-on-precreated-computer-objects-in-active-directory/
+* https://docs.microsoft.com/en-us/windows/win32/adschema/r-user-account-restrictions
+
+|
+
+----
+
+|
+
 TrustedBy
 ^^^^^^^^^
 
