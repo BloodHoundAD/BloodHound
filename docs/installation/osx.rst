@@ -4,6 +4,10 @@ macOS
 Install neo4j
 ^^^^^^^^^^^^^
 
+.. Warning::
+
+  Neo4j 5 suffers from severe performance regression issues. Until further notice, please use Neo4j 4.4.13
+
 1. Download the macOS version of neo4j Community Edition Server from https://neo4j.com/download-center/#community. **Do not install from brew.**
 
 2. Unzip the neo4j folder.
