@@ -22,6 +22,10 @@ install process
 Install neo4j
 ^^^^^^^^^^^^^
 
+.. Warning::
+
+  Neo4j 5 suffers from severe performance regression issues. Until further notice, please use Neo4j 4.4.13
+
 1. Add the neo4j repo to your apt sources:
 
 ::
