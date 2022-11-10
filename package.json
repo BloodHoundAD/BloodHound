@@ -64,7 +64,7 @@
         "core-js": "^3.23.5",
         "cross-env": "^7.0.3",
         "css-loader": "^3.6.0",
-        "electron": "^11.5.0",
+        "electron": "^18.3.7",
         "electron-packager": "^15.4.0",
         "eslint": "^8.20.0",
         "eslint-config-prettier": "^8.5.0",
