@@ -31,7 +31,7 @@ Install neo4j
 ::
 
   wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo apt-key add -
-  echo 'deb https://debian.neo4j.com stable latest' > /etc/apt/sources.list.d/neo4j.list
+  echo 'deb https://debian.neo4j.com stable 4.0' > /etc/apt/sources.list.d/neo4j.list
   sudo apt-get update
 
 2. Install apt-transport-https with apt
@@ -44,7 +44,7 @@ Install neo4j
 
 ::
 
-  sudo apt-get install neo4j
+  sudo apt-get install neo4j=1:4.4.12
 
 3. Stop neo4j
 
