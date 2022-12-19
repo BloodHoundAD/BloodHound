@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Abuse = ({ sourceName, sourceType, targetName, targetType, haslaps }) => {
+const WindowsAbuse = ({ sourceName, sourceType, targetName, targetType, haslaps }) => {
     switch (targetType) {
         case 'User':
             return (
@@ -122,7 +122,7 @@ const Abuse = ({ sourceName, sourceType, targetName, targetType, haslaps }) => {
     }
 };
 
-Abuse.propTypes = {
+WindowsAbuse.propTypes = {
     sourceName: PropTypes.string,
     sourceType: PropTypes.string,
     targetName: PropTypes.string,
@@ -130,4 +130,4 @@ Abuse.propTypes = {
     haslaps: PropTypes.bool
 }
 
-export default Abuse;
+export default WindowsAbuse;
