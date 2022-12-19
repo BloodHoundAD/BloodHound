@@ -26,6 +26,14 @@ const References = () => {
             <a href='https://github.com/Kevin-Robertson/Powermad#new-machineaccount'>
                 https://github.com/Kevin-Robertson/Powermad#new-machineaccount
             </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/kerberos/delegations/rbcd'>
+                https://www.thehacker.recipes/ad/movement/kerberos/delegations/rbcd
+            </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/domain-settings/machineaccountquota'>
+                https://www.thehacker.recipes/ad/movement/domain-settings/machineaccountquota
+            </a>
         </>
     );
 };
