@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Abuse = ({ sourceName, sourceType }) => {
+const WindowsAbuse = ({ sourceName, sourceType }) => {
     return (
         <>
             <p>
@@ -40,9 +40,9 @@ const Abuse = ({ sourceName, sourceType }) => {
     );
 };
 
-Abuse.propTypes = {
+WindowsAbuse.propTypes = {
     sourceName: PropTypes.string,
     sourceType: PropTypes.string,
 };
 
-export default Abuse;
+export default WindowsAbuse;
