@@ -26,6 +26,10 @@ const References = () => {
             <a href='https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4662'>
                 https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4662
             </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/dacl/readgmsapassword'>
+                https://www.thehacker.recipes/ad/movement/dacl/readgmsapassword
+            </a>
         </>
     );
 };
