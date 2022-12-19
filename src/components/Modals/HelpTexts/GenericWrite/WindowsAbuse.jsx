@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Abuse = ({ sourceName, sourceType, targetType }) => {
+const WindowsAbuse = ({ sourceName, sourceType, targetType }) => {
     switch (targetType) {
         case 'Group':
             return (
@@ -213,10 +213,10 @@ const Abuse = ({ sourceName, sourceType, targetType }) => {
     }
 };
 
-Abuse.propTypes = {
+WindowsAbuse.propTypes = {
     sourceName: PropTypes.string,
     sourceType: PropTypes.string,
     targetType: PropTypes.string,
 };
 
-export default Abuse;
+export default WindowsAbuse;
