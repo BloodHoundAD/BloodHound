@@ -80,6 +80,8 @@ const LinuxAbuse = ({ sourceName, sourceType, targetName, targetType, haslaps })
         case 'Domain':
             return (
                 <>
+                    <h4> DCSync </h4>
+
                     <p>
                         The AllExtendedRights privilege grants {sourceName} both the
                         DS-Replication-Get-Changes and
@@ -99,6 +101,8 @@ const LinuxAbuse = ({ sourceName, sourceType, targetName, targetType, haslaps })
                                 }
                             </code>
                     </pre>
+
+                    <h4> Retrieve LAPS Passwords </h4>
 
                     <p>
                         The AllExtendedRights privilege also grants {sourceName} enough{' '}
