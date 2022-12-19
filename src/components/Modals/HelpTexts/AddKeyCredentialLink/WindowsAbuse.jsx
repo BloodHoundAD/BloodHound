@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Abuse = ({ sourceName, sourceType }) => {
+const WindowsAbuse = ({ sourceName, sourceType }) => {
     return (
         <>
             <p>To abuse this privilege, use Whisker. </p>
@@ -18,15 +18,15 @@ const Abuse = ({ sourceName, sourceType }) => {
             </pre>
 
             <p>
-                For other optional parameters, view the Whisper documentation.
+                For other optional parameters, view the Whisker documentation.
             </p>
         </>
     );
 };
 
-Abuse.propTypes = {
+WindowsAbuse.propTypes = {
     sourceName: PropTypes.string,
     sourceType: PropTypes.string,
 };
 
-export default Abuse;
+export default WindowsAbuse;
