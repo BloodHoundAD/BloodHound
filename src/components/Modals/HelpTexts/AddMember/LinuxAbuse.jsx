@@ -18,10 +18,8 @@ const LinuxAbuse = ({ sourceName, sourceType }) => {
             </pre>
 
             <p>
-                Pass-the-hash can also be done here with
-                <a href='https://github.com/byt3bl33d3r/pth-toolkit'>
-                    pth-toolkit's net tool
-                </a>. If the LM hash is not known it must be replace with <code>ffffffffffffffffffffffffffffffff</code>.
+                Pass-the-hash can also be done here with <a href='https://github.com/byt3bl33d3r/pth-toolkit'>pth-toolkit's net tool</a>.
+                If the LM hash is not known it must be replace with <code>ffffffffffffffffffffffffffffffff</code>.
             </p>
 
             <pre>
