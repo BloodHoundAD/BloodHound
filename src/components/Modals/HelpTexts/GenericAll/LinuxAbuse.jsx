@@ -386,50 +386,6 @@ const LinuxAbuse = ({
                     </p>
                 </>
             );
-        case 'OU':
-            return (
-                <>
-                    <h4>Control of the Organization Unit</h4>
-
-                    <p>
-                        With full control of the OU, you may add a new ACE on
-                        the OU that will inherit down to the objects under that
-                        OU. Below are two options depending on how targeted you
-                        choose to be in this step:
-                    </p>
-
-                    <h4>Generic Descendent Object Takeover</h4>
-                    <p>
-                        The simplest and most straight forward way to abuse
-                        control of the OU is to apply a GenericAll ACE on the OU
-                        that will inherit down to all object types. This
-                        can be done using Impacket's dacledit (cf. "grant rights"
-                        reference for the link).
-                    </p>
-
-                    <pre>
-                        <code>
-                            {
-                                "dacledit.py -action 'write' -rights 'FullControl' -inheritance -principal 'JKHOLER' -target-dn 'OUDistinguishedName' 'domain'/'user':'password'"
-                            }
-                        </code>
-                    </pre>
-
-                    <p>
-                        Now, the "JKOHLER" user will have full control of all
-                        descendent objects of each type.
-                    </p>
-
-                    <h4>Targeted Descendent Object Takeoever</h4>
-
-                    <p>
-                        If you want to be more targeted with your approach, it
-                        is possible to specify precisely what right you want to
-                        apply to precisely which kinds of descendent objects.
-                        Refer to the Windows Abuse info for this.
-                    </p>
-                </>
-            );
         case 'Container':
             return (
                 <>
