@@ -9,11 +9,11 @@ const LinuxAbuse = () => {
             </p>
 
             <pre>
-                    <code>
-                        {
-                            "secretsdump 'testlab.local'/'Administrator':'Password'@'DOMAINCONTROLLER'"
-                        }
-                    </code>
+                <code>
+                    {
+                        "secretsdump 'testlab.local'/'Administrator':'Password'@'DOMAINCONTROLLER'"
+                    }
+                </code>
             </pre>
 
             <p>
