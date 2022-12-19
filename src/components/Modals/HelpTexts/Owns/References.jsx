@@ -38,6 +38,14 @@ const References = () => {
             <a href='https://github.com/Kevin-Robertson/Powermad#new-machineaccount'>
                 https://github.com/Kevin-Robertson/Powermad#new-machineaccount
             </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/dacl/addmember'>
+                https://www.thehacker.recipes/ad/movement/dacl/addmember
+            </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/dacl/grant-rights'>
+                https://www.thehacker.recipes/ad/movement/dacl/grant-rights
+            </a>
         </>
     );
 };
