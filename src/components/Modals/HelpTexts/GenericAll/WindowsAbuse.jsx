@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Abuse = ({
+const WindowsAbuse = ({
     sourceName,
     sourceType,
     targetName,
@@ -592,7 +592,7 @@ const Abuse = ({
     return <></>;
 };
 
-Abuse.propTypes = {
+WindowsAbuse.propTypes = {
     sourceName: PropTypes.string,
     sourceType: PropTypes.string,
     targetName: PropTypes.string,
@@ -600,4 +600,4 @@ Abuse.propTypes = {
     targetId: PropTypes.string,
     haslaps: PropTypes.bool,
 };
-export default Abuse;
+export default WindowsAbuse;
