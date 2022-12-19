@@ -30,6 +30,9 @@ const References = () => {
             <a href='https://blog.harmj0y.net/redteaming/another-word-on-delegation/'>
                 https://blog.harmj0y.net/redteaming/another-word-on-delegation/
             </a>
+            <a href='https://www.thehacker.recipes/ad/movement/kerberos/delegations/constrained'>
+                https://www.thehacker.recipes/ad/movement/kerberos/delegations/constrained
+            </a>
         </>
     );
 };
