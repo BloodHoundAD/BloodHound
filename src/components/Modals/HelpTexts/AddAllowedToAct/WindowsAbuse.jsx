@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Abuse = () => {
+const WindowsAbuse = () => {
     return (
         <>
             Abusing this primitive is currently only possible through the Rubeus
@@ -62,4 +62,4 @@ const Abuse = () => {
     );
 };
 
-export default Abuse;
+export default WindowsAbuse;
