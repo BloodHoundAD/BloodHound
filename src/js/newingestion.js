@@ -34,6 +34,7 @@ export const ADLabels = {
     Contains: 'Contains',
     GPLink: 'GPLink',
     TrustedBy: 'TrustedBy',
+    DumpSMSAPassword: 'DumpSMSAPassword',
 };
 
 const AzureApplicationAdministratorRoleId =
@@ -190,6 +191,7 @@ export function buildComputerJsonNew(chunk) {
         let privSessions = computer.PrivilegedSessions.Results;
         let regSessions = computer.RegistrySessions.Results;
         let aces = computer.Aces;
+        let smsa = computer.SMSA;
 
         queries.properties.props.push({
             objectid: identifier,
@@ -236,6 +238,19 @@ export function buildComputerJsonNew(chunk) {
             });
             insertNew(queries, format, props);
         }
+
+        format = [
+            ADLabels.Computer,
+            ADLabels.User,
+            ADLabels.DumpSMSAPassword,
+            NON_ACL_PROPS,
+        ];
+
+        props = smsa.map((principal) => {
+            return { source: identifier, target: principal };
+        });
+
+        insertNew(queries, format, props);
 
         format = [
             ADLabels.Computer,

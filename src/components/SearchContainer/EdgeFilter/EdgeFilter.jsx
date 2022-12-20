@@ -101,6 +101,7 @@ const EdgeFilter = ({ open }) => {
                             'AllowedToAct',
                             'SQLAdmin',
                             'HasSIDHistory',
+                            'DumpSMSAPassword',
                         ]}
                     />
                     <EdgeFilterCheck name='CanRDP' />
@@ -110,6 +111,7 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterCheck name='AllowedToAct' />
                     <EdgeFilterCheck name='SQLAdmin' />
                     <EdgeFilterCheck name='HasSIDHistory' />
+                    <EdgeFilterCheck name='DumpSMSAPassword' />
                 </div>
                 <div>
                     <EdgeFilterSection

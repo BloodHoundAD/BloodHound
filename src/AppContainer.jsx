@@ -79,7 +79,8 @@ const fullEdgeList = [
     'AddSelf',
     'WriteSPN',
     'AddKeyCredentialLink',
-    'SyncLAPSPassword'
+    'SyncLAPSPassword',
+    'DumpSMSAPassword'
 ];
 
 export default class AppContainer extends Component {
