@@ -27,6 +27,8 @@ import BaseNodeData from "./Tabs/BaseNodeData";
 import ContainerNodeData from "./Tabs/ContainerNodeData";
 import AZManagementGroupNodeData from "./Tabs/AZManagementGroupNodeData";
 import AZRoleNodeData from "./Tabs/AZRoleNodeData";
+import AZStorageAccountNodeData from './Tabs/AZStorageAccountNodeData';
+import AZStorageContainerNodeData from './Tabs/AZStorageContainerNodeData';
 
 class TabContainer extends Component {
 
@@ -51,6 +53,8 @@ class TabContainer extends Component {
             azTenantVisible: false,
             azVMVisible: false,
             azServicePrincipalVisible: false,
+            azStorageAccountVisible: false,
+            azStorageContainerVisible: false,
             azAppVisible: false,
             azManagementGroupVisible: false,
             azRoleVisible: false,
@@ -109,7 +113,12 @@ class TabContainer extends Component {
             this._azManagementGroupNodeClicked()
         } else if (type === 'AZRole') {
             this._azRoleNodeClicked()
+        } else if (type === 'AZStorageAccount') {
+            this._azStorageAccountNodeClicked();
+        } else if (type === 'AZStorageContainer') {
+            this._azStorageContainerNodeClicked();
         }
+
     }
 
     componentDidMount() {
@@ -286,6 +295,22 @@ class TabContainer extends Component {
         });
     }
 
+    _azStorageAccountNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azStorageAccountVisible: true,
+            selected: 2
+        });
+    }
+
+    _azStorageContainerNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azStorageContainerVisible: true,
+            selected: 2
+        });
+    }
+
     _azAppNodeClicked() {
         this.clearVisible()
         this.setState({
@@ -331,6 +356,8 @@ class TabContainer extends Component {
                                 !this.state.azTenantVisible &&
                                 !this.state.azVMVisible &&
                                 !this.state.azServicePrincipalVisible &&
+                                !this.state.azStorageAccountVisble &&
+                                !this.state.azStorageContainerVisble &&
                                 !this.state.azAppVisible &&
                                 !this.state.baseVisible &&
                                 !this.state.azManagementGroupVisible &&
@@ -368,6 +395,8 @@ class TabContainer extends Component {
                         <AZServicePrincipalNodeData
                             visible={this.state.azServicePrincipalVisible}
                         />
+                        <AZStorageAccountNodeData visible={this.state.azStorageAccountVisble} />
+                        <AZStorageContainerNodeData visible={this.state.azStorageContainerVisible} />
                         <AZAppNodeData visible={this.state.azAppVisible} />
                         <AZManagementGroupNodeData visible={this.state.azManagementGroupVisible} />
                         <AZRoleNodeData visible={this.state.azRoleVisible} />

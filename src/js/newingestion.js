@@ -78,6 +78,11 @@ export const AzureLabels = {
     GlobalAdmin: 'AZGlobalAdmin',
     PrivilegedRoleAdmin: 'AZPrivilegedRoleAdmin',
     PrivilegedAuthAdmin: 'AZPrivilegedAuthAdmin',
+    StorageAccount: 'AZStorageAccount',
+    StorageContainer: 'AZStorageContainer',
+    AutomationAccount: 'AZAutomationAccount',
+    LogicApp: 'AZLogicApp',
+    WebApp: 'AZWebApp',  // Function App
 };
 
 const AzurehoundKindLabels = {
@@ -116,7 +121,36 @@ const AzurehoundKindLabels = {
     KindAZVMContributor: 'AZVMContributor',
     KindAZVMOwner: 'AZVMOwner',
     KindAZVMUserAccessAdmin: 'AZVMUserAccessAdmin',
+    KindAZStorageAccount : "AZStorageAccount",
+	KindAZStorageContainer   : "AZStorageContainer",
+    KindAZStorageAccountRoleAssignment : "AZStorageAccountRoleAssignment",
 };
+
+export const AzureRoleDefinitions = {
+    "b24988ac-6180-42a0-ab88-20f7382dd24c" : "Contributor",
+    "acdd72a7-3385-48ef-bd42-f606fba81ae7" : "Reader",
+    "8e3af657-a8ff-443c-a75c-2fe8c4bcb635" : "Owner",
+    "c12c1c16-33a1-487b-954d-41c89c60f349" : "ReaderAndDataAccess",
+    "8a0f0c08-91a1-4084-bc3d-661d67233fed" : "StorageQueueDataMessageProcessor",
+    "b7e6dc6d-f1e8-4753-8033-0f276bb0955b" : "StorageBlobDataOwner",
+    "18d7d88d-d35e-4fb5-a5c3-7773c20a72d9" : "UserAccessAdministrator",
+    "e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1" : "StorageAccountBackupContributor",
+    "17d1049b-9a84-46fb-8f53-869881c3d3ab" : "StorageAccountContributor",
+    "81a9662b-bebf-436f-a333-f67b29880f12" : "StorageAccountKeyOperator",
+    "ba92f5b4-2d11-453d-a403-e96b0029c9fe" : "StorageBlobDataContributor",
+	"b7e6dc6d-f1e8-4753-8033-0f276bb0955b" : "StorageBlobDataOwner",
+	"2a2b9908-6ea1-4ae2-8e65-a410df84e7d1" : "StorageBlobDataReader",
+	"db58b8e5-c6ad-4a2a-8342-4190687cbf4a" : "StorageBlobDelegator",
+    "0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb" : "StorageFileDataSMBShareContributor",
+	"a7264617-510b-434b-a828-9731dc254ea7" : "StorageFileDataSMBShareElevatedContributor",
+	"aba4ae5f-2193-4029-9191-0cb91df5e314" : "StorageFileDataSMBShareReader",
+    "974c5e8b-45b9-4653-ba55-5f855dd0fb88" : "StorageQueueDataContributor",
+    "8a0f0c08-91a1-4084-bc3d-661d67233fed" : "StorageQueueDataMessageProcessor",
+    "c6a89b2d-59bc-44d0-9896-0f6e12d7b80a" : "StorageQueueDataMessageSender",
+    "19e7f393-937e-4f77-808e-94535e297925" : "StorageQueueDataReader",
+	"0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3" : "StorageTableDataContributor",
+    "76199698-9eea-4c19-bc75-cec21354c6b6" : "StorageTableDataReader",    
+}
 
 const DirectoryObjectEntityTypes = {
     User: '#microsoft.graph.user',
@@ -1054,6 +1088,15 @@ export function convertAzureData(chunk) {
                 break;
             case AzurehoundKindLabels.KindAZVMUserAccessAdmin:
                 convertAzureVirtualMachineUserAccessAdmins(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZStorageAccount:
+                convertAzureStorageAccount(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZStorageContainer:
+                convertAzureStorageContainer(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZStorageAccountRoleAssignment:
+                convertAzureStorageAccountRoleAssignments(item.data, data);
                 break;
             default:
                 console.error(`invalid azure type detected: ${item.kind}`);
@@ -2144,6 +2187,141 @@ export function convertAzureVirtualMachineUserAccessAdmins(
                 }
             );
         }
+    }
+}
+
+/**
+ *
+ * @param {AzureStorageAccount} data
+ * @param ingestionData
+ */
+export function convertAzureStorageAccount(data, ingestionData) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.StorageAccount,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                kind: data.kind.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+                privateEndpointConnections: data.properties.privateEndpointConnections,
+                allowedSharedKeyAccess: data.properties.allowSharedKeyAccess,
+                blobPrimaryEndpoint: data.properties.primaryEndpoints.blob,
+                dfsPrimaryEndpoint: data.properties.primaryEndpoints.dfs,
+                filePrimaryEndpoint: data.properties.primaryEndpoints.file,
+                queuePrimaryEndpoint: data.properties.primaryEndpoints.queue,
+                tablePrimaryEndpoint: data.properties.primaryEndpoints.table,
+                webPrimaryEndpoint: data.properties.primaryEndpoints.web
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.StorageAccount, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.StorageAccount,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+}
+
+/** *
+ * @param {AzureStorageContainer} data
+ * @param ingestionData
+ */
+export function convertAzureStorageContainer(
+    data,
+    ingestionData
+) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.StorageContainer,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+                publicAccess: data.properties.publicAccess.toUpperCase(),
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.StorageContainer, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.StorageContainer,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.StorageAccount,
+            AzureLabels.StorageContainer,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.storageAccountId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+}
+
+/**
+ *
+ * @param {AzureStorageAccountRoleAssignments} data
+ * @param ingestionData
+ */
+export function convertAzureStorageAccountRoleAssignments(
+    data,
+    ingestionData
+) {
+    if (data.assignees === null) return;
+    for (let assignee of data.assignees) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.Base,
+                AzureRoleDefinitions[assignee.roleDefinitionId]
+            ),
+            {
+                source: assignee.assignee.properties.principalId.toUpperCase(),
+                target:assignee.assignee.properties.scope.toUpperCase(),
+            }
+        );    
     }
 }
 
