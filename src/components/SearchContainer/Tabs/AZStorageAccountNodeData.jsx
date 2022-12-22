@@ -172,6 +172,16 @@ const AZStorageAccountNodeData = () => {
                                 />
                                 <NodeCypherLinkComplex
                                     countQuery={
+                                        'MATCH p = (d)-[r:UserAccessAdministrator*1..]->(u:AZStorageAccount {objectid: $objectid}) RETURN COUNT(p)'
+                                    }
+                                    graphQuery={
+                                        'MATCH p = (d)-[r:UserAccessAdministrator*1..]->(u:AZStorageAccount {objectid: $objectid}) RETURN p'
+                                    }
+                                    property={'User Access Administrators'}
+                                    target={objectid}
+                                />
+                                <NodeCypherLinkComplex
+                                    countQuery={
                                         'MATCH p = (d)-[r]->(u:AZStorageAccount {objectid: $objectid}) RETURN COUNT(p)'
                                     }
                                     graphQuery={

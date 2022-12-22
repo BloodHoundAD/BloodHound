@@ -29,6 +29,7 @@ import AZManagementGroupNodeData from "./Tabs/AZManagementGroupNodeData";
 import AZRoleNodeData from "./Tabs/AZRoleNodeData";
 import AZStorageAccountNodeData from './Tabs/AZStorageAccountNodeData';
 import AZStorageContainerNodeData from './Tabs/AZStorageContainerNodeData';
+import AZAutomationAccountNodeData from './Tabs/AZAutomationAccountNodeData';
 
 class TabContainer extends Component {
 
@@ -55,6 +56,7 @@ class TabContainer extends Component {
             azServicePrincipalVisible: false,
             azStorageAccountVisible: false,
             azStorageContainerVisible: false,
+            azAutomationAccountVisible: false,
             azAppVisible: false,
             azManagementGroupVisible: false,
             azRoleVisible: false,
@@ -117,6 +119,8 @@ class TabContainer extends Component {
             this._azStorageAccountNodeClicked();
         } else if (type === 'AZStorageContainer') {
             this._azStorageContainerNodeClicked();
+        } else if (type === 'AZAutomationAccount') {
+            this._azAutomationAccountNodeClicked();
         }
 
     }
@@ -311,6 +315,14 @@ class TabContainer extends Component {
         });
     }
 
+    _azAutomationAccountNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azAutomationAccountVisible: true,
+            selected: 2
+        });
+    }
+
     _azAppNodeClicked() {
         this.clearVisible()
         this.setState({
@@ -358,6 +370,7 @@ class TabContainer extends Component {
                                 !this.state.azServicePrincipalVisible &&
                                 !this.state.azStorageAccountVisble &&
                                 !this.state.azStorageContainerVisble &&
+                                !this.state.azAutomationAccountVisible &&
                                 !this.state.azAppVisible &&
                                 !this.state.baseVisible &&
                                 !this.state.azManagementGroupVisible &&
@@ -397,6 +410,7 @@ class TabContainer extends Component {
                         />
                         <AZStorageAccountNodeData visible={this.state.azStorageAccountVisble} />
                         <AZStorageContainerNodeData visible={this.state.azStorageContainerVisible} />
+                        <AZAutomationAccountNodeData visible={this.state.azAutomationAccountVisible} />
                         <AZAppNodeData visible={this.state.azAppVisible} />
                         <AZManagementGroupNodeData visible={this.state.azManagementGroupVisible} />
                         <AZRoleNodeData visible={this.state.azRoleVisible} />

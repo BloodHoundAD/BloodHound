@@ -124,6 +124,9 @@ const AzurehoundKindLabels = {
     KindAZStorageAccount : "AZStorageAccount",
 	KindAZStorageContainer   : "AZStorageContainer",
     KindAZStorageAccountRoleAssignment : "AZStorageAccountRoleAssignment",
+    KindAZAutomationAccount : "AZAutomationAccount",
+    KindAZAutomationAccountRoleAssignment: "AZAutomationAccountRoleAssignment",
+                
 };
 
 export const AzureRoleDefinitions = {
@@ -150,6 +153,10 @@ export const AzureRoleDefinitions = {
     "19e7f393-937e-4f77-808e-94535e297925" : "StorageQueueDataReader",
 	"0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3" : "StorageTableDataContributor",
     "76199698-9eea-4c19-bc75-cec21354c6b6" : "StorageTableDataReader",    
+	"f353d9bd-d4a6-484e-a77a-8050b599b867" : "AutomationContributor",
+	"4fe576fe-1146-4730-92eb-48519fa6bf9f" : "AutomationJobOperator",
+	"d3881f73-407a-4167-8283-e981cbba0404" : "AutomationOperator",
+	"5fb5aef8-1081-4b8e-bb16-9d5d0385bab5" : "AutomationRunbookOperator",
 }
 
 const DirectoryObjectEntityTypes = {
@@ -1098,6 +1105,13 @@ export function convertAzureData(chunk) {
             case AzurehoundKindLabels.KindAZStorageAccountRoleAssignment:
                 convertAzureStorageAccountRoleAssignments(item.data, data);
                 break;
+            case AzurehoundKindLabels.KindAZAutomationAccount:
+                convertAzureAutomationAccount(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZAutomationAccountRoleAssignment:
+                convertAzureAutomationAccountRoleAssignments(item.data, data);
+                break;
+
             default:
                 console.error(`invalid azure type detected: ${item.kind}`);
                 break;
@@ -2305,6 +2319,110 @@ export function convertAzureStorageContainer(
  * @param ingestionData
  */
 export function convertAzureStorageAccountRoleAssignments(
+    data,
+    ingestionData
+) {
+    if (data.assignees === null) return;
+    for (let assignee of data.assignees) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.Base,
+                AzureRoleDefinitions[assignee.roleDefinitionId]
+            ),
+            {
+                source: assignee.assignee.properties.principalId.toUpperCase(),
+                target:assignee.assignee.properties.scope.toUpperCase(),
+            }
+        );    
+    }
+}
+
+/**
+ *
+ * @param {AzureAutomationAccount} data
+ * @param ingestionData
+ */
+export function convertAzureAutomationAccount(data, ingestionData) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.AutomationAccount,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+                publicNetworkAccess:  data.properties.publicNetworkAccess,
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.AutomationAccount, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.AutomationAccount,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    if (data.identity.principalId) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.AutomationAccount,
+                AzureLabels.ServicePrincipal,
+                AzureLabels.ManagedIdentity
+            ),
+            {
+                source: data.id.toUpperCase(),
+                target: data.identity.principalId.toUpperCase(),
+            }
+        );
+    }
+
+    if (data.identity.userAssignedIdentities) {
+        for (let key in data.identity.userAssignedIdentities) {
+            let user = data.identity.userAssignedIdentities[key];
+            if (user.clientId !== '') {
+                insertNewAzureRel(
+                    ingestionData,
+                    fProps(
+                        AzureLabels.AutomationAccount,
+                        AzureLabels.ServicePrincipal,
+                        AzureLabels.ManagedIdentity
+                    ),
+                    {
+                        source: data.id.toUpperCase(),
+                        target: user.principalId.toUpperCase(),
+                    }
+                );
+            }
+        }
+    }
+}
+
+/**
+ *
+ * @param {AzureAutomationAccountRoleAssignments} data
+ * @param ingestionData
+ */
+export function convertAzureAutomationAccountRoleAssignments(
     data,
     ingestionData
 ) {

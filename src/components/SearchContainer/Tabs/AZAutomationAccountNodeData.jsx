@@ -11,7 +11,7 @@ import { Table } from 'react-bootstrap';
 import styles from './NodeData.module.css';
 import { AppContext } from '../../../AppContext';
 
-const AZStorageContainerNodeData = () => {
+const AZAutomationAccountNodeData = () => {
     const [visible, setVisible] = useState(false);
     const [objectid, setObjectid] = useState(null);
     const [label, setLabel] = useState(null);
@@ -28,13 +28,13 @@ const AZStorageContainerNodeData = () => {
     }, []);
 
     const nodeClickEvent = (type, id, blocksinheritance, domain) => {
-        if (type === 'AZStorageContainer') {
+        if (type === 'AZAutomationAccount') {
             setVisible(true);
             setObjectid(id);
             setDomain(domain);
             let session = driver.session();
             session
-                .run(`MATCH (n:AZStorageContainer {objectid: $objectid}) RETURN n AS node`, {
+                .run(`MATCH (n:AZAutomationAccount {objectid: $objectid}) RETURN n AS node`, {
                     objectid: id,
                 })
                 .then((r) => {
@@ -72,18 +72,25 @@ const AZStorageContainerNodeData = () => {
                             <tbody className='searchable'>
                                 <NodeCypherNoNumberLink
                                     target={objectid}
-                                    property='See Storage Container within Tenant'
-                                    query='MATCH p = (d:AZTenant)-[r:AZContains*1..]->(u:AZStorageContainer {objectid: $objectid}) RETURN p'
+                                    property='See Automation Account within Tenant'
+                                    query='MATCH p = (d:AZTenant)-[r:AZContains*1..]->(u:AZAutomationAccount {objectid: $objectid}) RETURN p'
                                 />
                                 <NodeCypherNoNumberLink
                                     target={objectid}
-                                    property='Resource group / Storage Account'
-                                    query='MATCH p = (d:AZResourceGroup)-[r:AZContains*1..]->(u:AZStorageContainer {objectid: $objectid}) RETURN p'
+                                    property='See Automation Account within Resource group'
+                                    query='MATCH p = (d:AZResourceGroup)-[r:AZContains*1..]->(u:AZAutomationAccount {objectid: $objectid}) RETURN p'
                                 />
-                                <NodeCypherNoNumberLink
+                                <NodeCypherLinkComplex
+                                    countQuery={
+                                        'MATCH p=(:AZAutomationAccount {objectid:$objectid})-[:AZManagedIdentity]->(n) RETURN COUNT(p)'
+                                    }
+                                    graphQuery={
+                                        'MATCH p=(:AZAutomationAccount {objectid:$objectid})-[:AZManagedIdentity]->(n) RETURN p'
+                                    }
+                                    start={label}
+                                    property={'Managed Identities'}
                                     target={objectid}
-                                    property='Storage Account'
-                                    query='MATCH p = (d:AZStorageAccount)-[r:AZContains*1..]->(u:AZStorageContainer {objectid: $objectid}) RETURN p'
+                                    distinct
                                 />
                             </tbody>
                         </Table>
@@ -115,50 +122,40 @@ const AZStorageContainerNodeData = () => {
                             <tbody className='searchable'>
                                 <NodeCypherLinkComplex
                                     countQuery={
-                                        'MATCH p = (d)-[r:Owner*1..]->(u:AZStorageContainer {objectid: $objectid}) RETURN COUNT(p)'
+                                        'MATCH p = (d)-[r:Owner*1..]->(u:AZAutomationAccount {objectid: $objectid}) RETURN COUNT(p)'
                                     }
                                     graphQuery={
-                                        'MATCH p = (d)-[r:Owner*1..]->(u:AZStorageContainer {objectid: $objectid}) RETURN p'
+                                        'MATCH p = (d)-[r:Owner*1..]->(u:AZAutomationAccount {objectid: $objectid}) RETURN p'
                                     }
-                                    property={'Storage Container Owners'}
+                                    property={'Automation Account Owners'}
                                     target={objectid}
                                 />
                                 <NodeCypherLinkComplex
                                     countQuery={
-                                        'MATCH p = (d)-[r:Contributor*1..]->(u:AZStorageContainer {objectid: $objectid}) RETURN COUNT(p)'
+                                        'MATCH p = (d)-[r:Contributor*1..]->(u:AZAutomationAccount {objectid: $objectid}) RETURN COUNT(p)'
                                     }
                                     graphQuery={
-                                        'MATCH p = (d)-[r:Contributor*1..]->(u:AZStorageContainer {objectid: $objectid}) RETURN p'
+                                        'MATCH p = (d)-[r:Contributor*1..]->(u:AZAutomationAccount {objectid: $objectid}) RETURN p'
                                     }
-                                    property={'Storage Container Contributors'}
+                                    property={'Automation Account Contributors'}
                                     target={objectid}
                                 />
                                 <NodeCypherLinkComplex
                                     countQuery={
-                                        'MATCH p = (d)-[r:ReaderAndDataAccess*1..]->(u:AZStorageContainer {objectid: $objectid}) RETURN COUNT(p)'
+                                        'MATCH p = (d)-[r:UserAccessAdministrator*1..]->(u:AZAutomationAccount {objectid: $objectid}) RETURN COUNT(p)'
                                     }
                                     graphQuery={
-                                        'MATCH p = (d)-[r:ReaderAndDataAccess*1..]->(u:AZStorageContainer {objectid: $objectid}) RETURN p'
-                                    }
-                                    property={'Storage Container Data Readers'}
-                                    target={objectid}
-                                />
-                                <NodeCypherLinkComplex
-                                    countQuery={
-                                        'MATCH p = (d)-[r:UserAccessAdministrator*1..]->(u:AZStorageContainer {objectid: $objectid}) RETURN COUNT(p)'
-                                    }
-                                    graphQuery={
-                                        'MATCH p = (d)-[r:UserAccessAdministrator*1..]->(u:AZStorageContainer {objectid: $objectid}) RETURN p'
+                                        'MATCH p = (d)-[r:UserAccessAdministrator*1..]->(u:AZAutomationAccount {objectid: $objectid}) RETURN p'
                                     }
                                     property={'User Access Administrators'}
                                     target={objectid}
                                 />
                                 <NodeCypherLinkComplex
                                     countQuery={
-                                        'MATCH p = (d)-[r]->(u:AZStorageContainer {objectid: $objectid}) RETURN COUNT(p)'
+                                        'MATCH p = (d)-[r]->(u:AZAutomationAccount {objectid: $objectid}) RETURN COUNT(p)'
                                     }
                                     graphQuery={
-                                        'MATCH p = (d)-[r]->(u:AZStorageContainer {objectid: $objectid}) RETURN p'
+                                        'MATCH p = (d)-[r]->(u:AZAutomationAccount {objectid: $objectid}) RETURN p'
                                     }
                                     property={'All Relations'}
                                     target={objectid}
@@ -173,5 +170,5 @@ const AZStorageContainerNodeData = () => {
     );
 };
 
-AZStorageContainerNodeData.propTypes = {};
-export default AZStorageContainerNodeData;
+AZAutomationAccountNodeData.propTypes = {};
+export default AZAutomationAccountNodeData;
