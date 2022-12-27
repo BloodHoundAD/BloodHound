@@ -216,6 +216,11 @@ const DatabaseDataDisplay = () => {
                             index={index}
                             label={'AZAutomationAccount'}
                         />
+                        <DatabaseDataLabel
+                            query={'MATCH (n:AZLogicApp) RETURN count(n) AS count'}
+                            index={index}
+                            label={'AZLogicApp'}
+                        />
                     </tbody>
                 </Table>
             </CollapsibleSection>
