@@ -128,6 +128,8 @@ const AzurehoundKindLabels = {
     KindAZAutomationAccountRoleAssignment: "AZAutomationAccountRoleAssignment",
     KindAZLogicApp : "AZWorkflow",
     KindAZLogicAppRoleAssignment : "AZWorkflowRoleAssignment",
+    KindAZWebApp : "AZWebApp",
+    KindAZWebAppRoleAssignment : "AZWebAppRoleAssignment",
                 
 };
 
@@ -161,7 +163,8 @@ export const AzureRoleDefinitions = {
 	"5fb5aef8-1081-4b8e-bb16-9d5d0385bab5" : "AutomationRunbookOperator",
     "87a39d53-fc1b-424a-814c-f7e04687dc9e" : "LogicAppContributor",
 	"515c2055-d9d4-4321-b1b9-bd0c9a0f79fe" : "LogicAppOperator",
-    
+    "de139f84-1756-47ae-9be6-808fbbe84772" : "WebsiteContributor",
+
 }
 
 const DirectoryObjectEntityTypes = {
@@ -1120,6 +1123,12 @@ export function convertAzureData(chunk) {
                 convertAzureLogicApp(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZLogicAppRoleAssignment:
+                convertAzureRoleAssignments(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZWebApp:
+                convertAzureWebApp(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZWebAppRoleAssignment:
                 convertAzureRoleAssignments(item.data, data);
                 break;
 
@@ -2510,6 +2519,89 @@ export function convertAzureLogicApp(data, ingestionData) {
     }
 }
 
+/**
+ *
+ * @param {AzureWebApp} data
+ * @param ingestionData
+ */
+export function convertAzureWebApp(data, ingestionData) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.WebApp,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                kind: data.kind.toUpperCase(),
+                location: data.location.toUpperCase(),
+                enabled: data.properties.enabled,
+                enabledHostnames: data.properties.enabledHostnames,
+                hostnames: data.properties.hostnames,
+                httpsOnly: data.properties.httpsOnly,
+                type: data.type.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.WebApp, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.WebApp,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    if (data.identity.principalId) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.WebApp,
+                AzureLabels.ServicePrincipal,
+                AzureLabels.ManagedIdentity
+            ),
+            {
+                source: data.id.toUpperCase(),
+                target: data.identity.principalId.toUpperCase(),
+            }
+        );
+    }
+
+    if (data.identity.userAssignedIdentities) {
+        for (let key in data.identity.userAssignedIdentities) {
+            let user = data.identity.userAssignedIdentities[key];
+            if (user.clientId !== '') {
+                insertNewAzureRel(
+                    ingestionData,
+                    fProps(
+                        AzureLabels.WebApp,
+                        AzureLabels.ServicePrincipal,
+                        AzureLabels.ManagedIdentity
+                    ),
+                    {
+                        source: data.id.toUpperCase(),
+                        target: user.principalId.toUpperCase(),
+                    }
+                );
+            }
+        }
+    }
+}
 
 
 /**

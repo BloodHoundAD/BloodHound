@@ -31,6 +31,7 @@ import AZStorageAccountNodeData from './Tabs/AZStorageAccountNodeData';
 import AZStorageContainerNodeData from './Tabs/AZStorageContainerNodeData';
 import AZAutomationAccountNodeData from './Tabs/AZAutomationAccountNodeData';
 import AZLogicAppNodeData from './Tabs/AZLogicAppNodeData';
+import AZWebAppNodeData from './Tabs/AZWebAppNodeData';
 
 class TabContainer extends Component {
 
@@ -59,6 +60,7 @@ class TabContainer extends Component {
             azStorageContainerVisible: false,
             azAutomationAccountVisible: false,
             azLogicAppVisible: false,
+            azWebAppVisible: false,
             azAppVisible: false,
             azManagementGroupVisible: false,
             azRoleVisible: false,
@@ -125,6 +127,8 @@ class TabContainer extends Component {
             this._azAutomationAccountNodeClicked();
         } else if (type === 'AZLogicApp') {
             this._azLogicAppNodeClicked();
+        } else if (type === 'AZWebApp') {
+            this._azWebAppNodeClicked();
         }
 
     }
@@ -335,6 +339,14 @@ class TabContainer extends Component {
         });
     }
 
+    _azWebAppNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azWebAppVisible: true,
+            selected: 2
+        });
+    }
+
     _azAppNodeClicked() {
         this.clearVisible()
         this.setState({
@@ -384,6 +396,7 @@ class TabContainer extends Component {
                                 !this.state.azStorageContainerVisble &&
                                 !this.state.azAutomationAccountVisible &&
                                 !this.state.azLogicAppVisible &&
+                                !this.state.azWebAppVisible &&
                                 !this.state.azAppVisible &&
                                 !this.state.baseVisible &&
                                 !this.state.azManagementGroupVisible &&
@@ -425,6 +438,7 @@ class TabContainer extends Component {
                         <AZStorageContainerNodeData visible={this.state.azStorageContainerVisible} />
                         <AZAutomationAccountNodeData visible={this.state.azAutomationAccountVisible} />
                         <AZLogicAppNodeData visible={this.state.azLogicAppVisible} />
+                        <AZWebAppNodeData visible={this.state.azWebAppVisible} />
                         <AZAppNodeData visible={this.state.azAppVisible} />
                         <AZManagementGroupNodeData visible={this.state.azManagementGroupVisible} />
                         <AZRoleNodeData visible={this.state.azRoleVisible} />
