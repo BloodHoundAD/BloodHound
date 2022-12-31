@@ -18,7 +18,7 @@ const Abuse = ({ sourceName, sourceType }) => {
             </pre>
 
             <p>
-                For other optional parameters, view the Whisper documentation.
+                For other optional parameters, view the Whisker documentation.
             </p>
         </>
     );
