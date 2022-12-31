@@ -1665,7 +1665,7 @@ To abuse this privilege, use Whisker:
 
     Whisker.exe add /target:<TargetPrincipal>
     
-For other optional parameters, view the Whisper documentation.
+For other optional parameters, view the Whisker documentation.
 
 Opsec Considerations
 --------------------
