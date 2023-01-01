@@ -670,7 +670,6 @@ const MenuContainer = () => {
                 pwResetRoles: [
                     'C4E39BD9-1100-46D3-8C65-FB160DA0071F',
                     '62E90394-69F5-4237-9190-012177145E10',
-                    '729827E3-9C14-49F7-BB1B-9608F156BBB8',
                     '966707D0-3269-4727-9BE2-8C3A10F19B9D',
                     '7BE44C8A-ADAF-4E2A-84D6-AB2649E08A13',
                     'FE930BE7-5E62-47DB-91AF-98C3A49A38B1',
@@ -746,12 +745,11 @@ const MenuContainer = () => {
         Helpdesk Admin template id: 729827e3-9c14-49f7-bb1b-9608f156bbb8`,
             type: 'query',
             statement:
-                `MATCH (at:AZTenant)-[:AZContains]->(HelpdeskAdmin)-[:AZHasRole]->(HelpdeskAdminRole:AZRole {templateid:"729827E3-9C14-49F7-BB1B-9608F156BBB8"})
-                MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
-                WHERE NOT ar.templateid IN $HelpdeskAdminTargetRoles
-                WITH COLLECT(NonTargets) AS NonTargets,at,HelpdeskAdmin
-                MATCH (at)-[:AZContains]->(HelpdeskAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
-                WHERE NOT HelpdeskAdminTargets IN NonTargets AND arTargets.templateid IN $HelpdeskAdminTargetRoles
+                `MATCH (NonTargetsRoles:AZUser)-[:AZHasRole]->(ar:AZRole) WHERE NOT ar.templateid IN $HelpdeskAdminTargetRoles
+                MATCH (NonTargetsGroups:AZUser)-[:AZMemberOf|AZOwns]->(:AZGroup {isassignabletorole: true})
+                MATCH (at:AZTenant)-[:AZContains]->(HelpdeskAdmin)-[:AZHasRole]->(:AZRole {templateid:"729827E3-9C14-49F7-BB1B-9608F156BBB8"})
+                WITH COLLECT(NonTargetsRoles) + COLLECT(NonTargetsGroups) AS NonTargets, at, HelpdeskAdmin
+                MATCH (at)-[:AZContains]->(HelpdeskAdminTargets:AZUser) WHERE NOT HelpdeskAdminTargets IN NonTargets
                 CALL {
                     WITH HelpdeskAdmin, HelpdeskAdminTargets
                     MERGE (HelpdeskAdmin)-[:AZResetPassword]->(HelpdeskAdminTargets)
