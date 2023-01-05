@@ -668,7 +668,6 @@ const MenuContainer = () => {
                         } IN TRANSACTIONS OF {} ROWS`.format(batchSize),
             params: {
                 pwResetRoles: [
-                    'C4E39BD9-1100-46D3-8C65-FB160DA0071F',
                     '62E90394-69F5-4237-9190-012177145E10',
                     '966707D0-3269-4727-9BE2-8C3A10F19B9D',
                     '7BE44C8A-ADAF-4E2A-84D6-AB2649E08A13',
@@ -712,12 +711,11 @@ const MenuContainer = () => {
         Authentication admin template id: c4e39bd9-1100-46d3-8c65-fb160da0071f`,
             type: 'query',
             statement:
-                `MATCH (at:AZTenant)-[:AZContains]->(AuthAdmin)-[:AZHasRole]->(AuthAdminRole:AZRole {templateid:"C4E39BD9-1100-46D3-8C65-FB160DA0071F"})
-                MATCH (NonTargets:AZUser)-[:AZHasRole]->(ar:AZRole)
-                WHERE NOT ar.templateid IN $AuthAdminTargetRoles
-                WITH COLLECT(NonTargets) AS NonTargets,at,AuthAdmin
-                MATCH (at)-[:AZContains]->(AuthAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
-                WHERE NOT AuthAdminTargets IN NonTargets AND arTargets.templateid IN $AuthAdminTargetRoles
+                `MATCH (NonTargetsRoles:AZUser)-[:AZHasRole]->(ar:AZRole) WHERE NOT ar.templateid IN $AuthAdminTargetRoles
+                MATCH (NonTargetsGroups:AZUser)-[:AZMemberOf|AZOwns]->(:AZGroup {isassignabletorole: true})
+                MATCH (at:AZTenant)-[:AZContains]->(AuthAdmin)-[:AZHasRole]->(AuthAdminRole:AZRole {templateid:"C4E39BD9-1100-46D3-8C65-FB160DA0071F"})
+                WITH COLLECT(NonTargetsRoles) + COLLECT(NonTargetsGroups) AS NonTargets, at, AuthAdmin
+                MATCH (at)-[:AZContains]->(AuthAdminTargets:AZUser) WHERE NOT AuthAdminTargets IN NonTargets
                 CALL {
                     WITH AuthAdmin, AuthAdminTargets
                     MERGE (AuthAdmin)-[:AZResetPassword]->(AuthAdminTargets)
