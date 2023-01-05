@@ -711,7 +711,7 @@ const MenuContainer = () => {
             statement:
                 `MATCH (NonTargetsRoles:AZUser)-[:AZHasRole]->(ar:AZRole) WHERE NOT ar.templateid IN $AuthAdminTargetRoles
                 MATCH (NonTargetsGroups:AZUser)-[:AZMemberOf|AZOwns]->(:AZGroup {isassignabletorole: true})
-                MATCH (at:AZTenant)-[:AZContains]->(AuthAdmin)-[:AZHasRole]->(AuthAdminRole:AZRole {templateid:"C4E39BD9-1100-46D3-8C65-FB160DA0071F"})
+                MATCH (at:AZTenant)-[:AZContains]->(AuthAdmin)-[:AZHasRole]->(:AZRole {templateid:"C4E39BD9-1100-46D3-8C65-FB160DA0071F"})
                 WITH COLLECT(NonTargetsRoles) + COLLECT(NonTargetsGroups) AS NonTargets, at, AuthAdmin
                 MATCH (at)-[:AZContains]->(AuthAdminTargets:AZUser) WHERE NOT AuthAdminTargets IN NonTargets
                 CALL {
@@ -774,7 +774,7 @@ const MenuContainer = () => {
             statement:
                 `MATCH (NonTargetsRoles:AZUser)-[:AZHasRole]->(ar:AZRole) WHERE NOT ar.templateid IN $PasswordAdminTargetRoles
                 MATCH (NonTargetsGroups:AZUser)-[:AZMemberOf|AZOwns]->(:AZGroup {isassignabletorole: true})
-                MATCH (at:AZTenant)-[:AZContains]->(PasswordAdmin)-[:AZHasRole]->(PasswordAdminRole:AZRole {templateid:"966707D0-3269-4727-9BE2-8C3A10F19B9D"})
+                MATCH (at:AZTenant)-[:AZContains]->(PasswordAdmin)-[:AZHasRole]->(:AZRole {templateid:"966707D0-3269-4727-9BE2-8C3A10F19B9D"})
                 WITH COLLECT(NonTargetsRoles) + COLLECT(NonTargetsGroups) AS NonTargets, at, PasswordAdmin
                 MATCH (at)-[:AZContains]->(PasswordAdminTargets:AZUser) WHERE NOT PasswordAdminTargets IN NonTargets
                 CALL {
