@@ -662,6 +662,7 @@ const MenuContainer = () => {
                         WITH at,n
                         MATCH (at)-[:AZContains]->(u:AZUser)
                         WHERE NOT (u)-[:AZHasRole]->()
+                        AND NOT (u)-[:AZMemberOf|AZOwns]->(:AZGroup {isassignabletorole: true})
                         CALL {
                             WITH n, u
                             MERGE (n)-[:AZResetPassword]->(u)
@@ -719,6 +720,7 @@ const MenuContainer = () => {
                 WITH COLLECT(NonTargets) AS NonTargets,at,AuthAdmin
                 MATCH (at)-[:AZContains]->(AuthAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
                 WHERE NOT AuthAdminTargets IN NonTargets AND arTargets.templateid IN $AuthAdminTargetRoles
+                AND NOT (AuthAdminTargets)-[:AZMemberOf|AZOwns]->(:AZGroup {isassignabletorole: true})
                 CALL {
                     WITH AuthAdmin, AuthAdminTargets
                     MERGE (AuthAdmin)-[:AZResetPassword]->(AuthAdminTargets)
@@ -752,6 +754,7 @@ const MenuContainer = () => {
                 WITH COLLECT(NonTargets) AS NonTargets,at,HelpdeskAdmin
                 MATCH (at)-[:AZContains]->(HelpdeskAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
                 WHERE NOT HelpdeskAdminTargets IN NonTargets AND arTargets.templateid IN $HelpdeskAdminTargetRoles
+                AND NOT (HelpdeskAdminTargets)-[:AZMemberOf|AZOwns]->(:AZGroup {isassignabletorole: true})
                 CALL {
                     WITH HelpdeskAdmin, HelpdeskAdminTargets
                     MERGE (HelpdeskAdmin)-[:AZResetPassword]->(HelpdeskAdminTargets)
@@ -784,6 +787,7 @@ const MenuContainer = () => {
                 WITH COLLECT(NonTargets) AS NonTargets,at,PasswordAdmin
                 MATCH (at)-[:AZContains]->(PasswordAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
                 WHERE NOT PasswordAdminTargets IN NonTargets AND arTargets.templateid IN $PasswordAdminTargetRoles
+                AND NOT (PasswordAdminTargets)-[:AZMemberOf|AZOwns]->(:AZGroup {isassignabletorole: true})
                 CALL {
                     WITH PasswordAdmin, PasswordAdminTargets
                     MERGE (PasswordAdmin)-[:AZResetPassword]->(PasswordAdminTargets)
@@ -813,6 +817,7 @@ const MenuContainer = () => {
                 WITH COLLECT(NonTargets) AS NonTargets,at,UserAccountAdmin
                 MATCH (at)-[:AZContains]->(UserAccountAdminTargets:AZUser)-[:AZHasRole]->(arTargets)
                 WHERE NOT UserAccountAdminTargets IN NonTargets AND arTargets.templateid IN $UserAccountAdminTargetRoles
+                AND NOT (UserAccountAdminTargets)-[:AZMemberOf|AZOwns]->(:AZGroup {isassignabletorole: true})
                 CALL {
                     WITH UserAccountAdmin, UserAccountAdminTargets
                     MERGE (UserAccountAdmin)-[:AZResetPassword]->(UserAccountAdminTargets)
