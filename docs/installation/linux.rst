@@ -96,7 +96,7 @@ Download the BloodHound GUI
 
 ::
 
-  ./BloodHound.bin --no-sandbox
+  ./BloodHound --no-sandbox
 
 3. Authenticate with the credentials you set up for neo4j
 
