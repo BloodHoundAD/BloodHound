@@ -57,14 +57,14 @@ const LinuxAbuse = ({ sourceName, sourceType, targetName, targetType, haslaps })
                         </p>
 
                         <p>
-                            <a href='https://github.com/n00py/LAPSDumper'>LAPSDumper</a> can be used
+                            <a href='https://github.com/p0dalirius/pyLAPS'>pyLAPS</a> can be used
                              to retrieve LAPS passwords:
                         </p>
 
                         <pre>
                             <code>
                                 {
-                                    'laps.py --action get -d "DOMAIN" -u "ControlledUser" -p "ItsPassword"'
+                                    'pyLAPS.py --action get -d "DOMAIN" -u "ControlledUser" -p "ItsPassword"'
                                 }
                             </code>
                         </pre>
@@ -110,14 +110,14 @@ const LinuxAbuse = ({ sourceName, sourceType, targetName, targetType, haslaps })
                     </p>
 
                     <p>
-                        <a href="https://github.com/n00py/LAPSDumper">LAPSDumper</a> can be used
+                        <a href="https://github.com/p0dalirius/pyLAPS">pyLAPS</a> can be used
                          for that purpose:
                     </p>
 
                     <pre>
                         <code>
                             {
-                                'laps.py --action get -d "DOMAIN" -u "ControlledUser" -p "ItsPassword"'
+                                'pyLAPS.py --action get -d "DOMAIN" -u "ControlledUser" -p "ItsPassword"'
                             }
                         </code>
                     </pre>
