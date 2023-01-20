@@ -11,7 +11,7 @@ const LinuxAbuse = () => {
             <pre>
                 <code>
                     {
-                        "secretsdump 'testlab.local'/'Administrator':'Password'@'DOMAINCONTROLLER'"
+                        "secretsdump.py 'testlab.local'/'Administrator':'Password'@'DOMAINCONTROLLER'"
                     }
                 </code>
             </pre>
