@@ -4,16 +4,6 @@ import PropTypes from 'prop-types';
 const LinuxAbuse = ({ sourceName }) => {
     return (
         <>
-            First, if an attacker does not control an account with an
-            SPN set, a new attacker-controlled computer account can be
-            added with Impacket's addcomputer.py example script:
-            <pre>
-                <code>
-                    {
-                        "addcomputer.py -method LDAPS -computer-name 'ATTACKERSYSTEM$' -computer-pass 'Summer2018!' -dc-host $DomainController -domain-netbios $DOMAIN 'domain/user:password'"
-                    }
-                </code>
-            </pre>
             We can then get a service ticket for the service name (sname) we
             want to "pretend" to be "admin" for. Impacket's getST.py example script
             can be used for that purpose.
