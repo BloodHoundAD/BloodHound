@@ -16,9 +16,9 @@ by providing a scope option after the "list" command:
 
 These are the most common options you'll likely use:
 
-* **az-ad** Collect all information available at the AzureAD tenant level. In most
+* **az-ad** Collects all information available at the AzureAD tenant level. In most
   tenants, all users have the ability to read all this information by default.
-* **az-rm** Collect all information available at the AzureRM subscription level. Users
+* **az-rm** Collects all information available at the AzureRM subscription level. Users
   do not by default have read access to any of this information.
 
 You can also scope collection to particular object types:
@@ -27,12 +27,12 @@ You can also scope collection to particular object types:
 * **devices** Collects AzureAD devices regardless of join type.
 * **groups** Collects AzureAD security-enabled groups, both role eligible and non role eligible.
 * **key-vaults** Collects AzureRM key vaults.
-* **management-groups** Collets AzureRM management group objects
+* **management-groups** Collects AzureRM management group objects
 * **resource-groups** Collects AzureRM resource group objects
 * **roles** Collects AzureAD admin role objects
 * **service-principals** Collects AzureAD service principals
-* **subscriptions** Collets AzureRM subscriptions
-* **tenants** Collets AzureAD tenant objects
+* **subscriptions** Collects AzureRM subscriptions
+* **tenants** Collects AzureAD tenant objects
 * **users** Collects AzureAD users, including any guest users in the target tenant.
 * **virtual-machines** Collects AzureRM virtual machines
 
