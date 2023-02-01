@@ -28,7 +28,7 @@ Install neo4j
 
 ::
 
-   C:\> neo4j.bat install-service
+   C:\> neo4j.bat windows-service install
 
 .. note:: At this point you may see an error about Java not being found, or the wrong
    version of Java running. Ensure your JAVA_HOME environment variable is set to the
