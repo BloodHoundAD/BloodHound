@@ -227,7 +227,10 @@
  * @property {string} tenantId
  * @property {string} id
  * @property {string} tenantName
+ * @property {String} azureGroupTypes
+ * @property {String} azureMembershipRule
  */
+
 
 /**
  * @typedef {Object} AzureGroupMember

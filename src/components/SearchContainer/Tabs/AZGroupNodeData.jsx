@@ -57,6 +57,8 @@ const AZGroupNodeData = () => {
         displayname: 'Display Name',
         whencreated: 'Creation Time',
         securityenabled: 'Security Enabled',
+        groupTypes: 'Group Types',
+        membershipRule: 'Membership Rule',
     };
 
     return objectid === null ? (
