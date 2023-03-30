@@ -191,7 +191,7 @@ export function buildComputerJsonNew(chunk) {
         let privSessions = computer.PrivilegedSessions.Results;
         let regSessions = computer.RegistrySessions.Results;
         let aces = computer.Aces;
-        let smsa = computer.SMSA;
+        let dumpSMSAPassword = computer.DumpSMSAPassword;
 
         queries.properties.props.push({
             objectid: identifier,
@@ -246,8 +246,8 @@ export function buildComputerJsonNew(chunk) {
             NON_ACL_PROPS,
         ];
 
-        props = smsa.map((principal) => {
-            return { source: identifier, target: principal };
+        props = dumpSMSAPassword.map((principal) => {
+            return { source: identifier, target: principal.ObjectIdentifier };
         });
 
         insertNew(queries, format, props);
