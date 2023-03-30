@@ -246,6 +246,9 @@ export function buildComputerJsonNew(chunk) {
             NON_ACL_PROPS,
         ];
 
+        if (dumpSMSAPassword === undefined)
+            dumpSMSAPassword = [];
+
         props = dumpSMSAPassword.map((principal) => {
             return { source: identifier, target: principal.ObjectIdentifier };
         });
