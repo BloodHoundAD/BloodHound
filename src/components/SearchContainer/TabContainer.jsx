@@ -10,6 +10,13 @@ import GpoNodeData from './Tabs/GPONodeData';
 import OuNodeData from './Tabs/OUNodeData';
 import AZGroupNodeData from './Tabs/AZGroupNodeData';
 import AZUserNodeData from './Tabs/AZUserNodeData';
+import AZContainerRegistryNodeData from './Tabs/AZContainerRegistryNodeData';
+import AZAutomationAccountNodeData from './Tabs/AZAutomationAccountNodeData';
+import AZLogicAppNodeData from './Tabs/AZLogicAppNodeData';
+import AZFunctionAppNodeData from './Tabs/AZFunctionAppNodeData';
+import AZWebAppNodeData from './Tabs/AZWebAppNodeData';
+import AZManagedClusterNodeData from './Tabs/AZManagedClusterNodeData';
+import AZVMScaleSetNodeData from './Tabs/AZVMScaleSetNodeData';
 import AZKeyVaultNodeData from './Tabs/AZKeyVaultNodeData';
 import AZResourceGroupNodeData from './Tabs/AZResourceGroupNodeData';
 import AZDeviceNodeData from './Tabs/AZDeviceNodeData';
@@ -44,6 +51,12 @@ class TabContainer extends Component {
             containerVisible: false,
             azGroupVisible: false,
             azUserVisible: false,
+            azContainerRegistryVisible: false,
+            azLogicAppVisible: false,
+            azFunctionAppVisible: false,
+            azWebAppVisible: false,
+            azManagedClusterVisible: false,
+            azVMScaleSetVisible: false,
             azKeyVaultVisible: false,
             azResourceGroupVisible: false,
             azDeviceVisible: false,
@@ -85,6 +98,20 @@ class TabContainer extends Component {
             this._azGroupNodeClicked();
         } else if (type === 'AZUser') {
             this._azUserNodeClicked();
+        } else if (type === 'AZContainerRegistry') {
+            this._azContainerRegistryNodeClicked();
+        } else if (type === 'AZAutomationAccount') {
+            this._azAutomationAccountNodeClicked();
+        } else if (type === 'AZLogicApp') {
+            this._azLogicAppNodeClicked();
+        } else if (type === 'AZFunctionApp') {
+            this._azFunctionAppNodeClicked();
+        } else if (type === 'AZWebApp') {
+            this._azWebAppNodeClicked();
+        } else if (type === 'AZManagedCluster') {
+            this._azManagedClusterNodeClicked();
+        } else if (type === 'AZVMScaleSet') {
+            this._azVMScaleSetNodeClicked();
         } else if (type === 'AZKeyVault') {
             this._azKeyVaultNodeClicked();
         } else if (type === 'AZResourceGroup') {
@@ -214,6 +241,62 @@ class TabContainer extends Component {
         });
     }
 
+    _azContainerRegistryNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azContainerRegistryVisible: true,
+            selected: 2
+        })
+    }
+
+    _azAutomationAccountNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azAutomationAccountVisible: true,
+            selected: 2
+        })
+    }
+
+    _azLogicAppNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azLogicAppVisible: true,
+            selected: 2
+        })
+    }
+
+    _azFunctionAppNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azFunctionAppVisible: true,
+            selected: 2
+        })
+    }
+
+    _azWebAppNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azWebAppVisible: true,
+            selected: 2
+        })
+    }
+
+    _azManagedClusterNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azManagedClusterVisible: true,
+            selected: 2
+        })
+    }
+
+    _azVMScaleSetNodeClicked() {
+        this.clearVisible()
+        this.setState({
+            azVMScaleSetVisible: true,
+            selected: 2
+        })
+    }
+
     _azKeyVaultNodeClicked() {
         this.clearVisible()
         this.setState({
@@ -324,6 +407,13 @@ class TabContainer extends Component {
                                 !this.state.ouVisible &&
                                 !this.state.azGroupVisible &&
                                 !this.state.azUserVisible &&
+                                !this.state.azContainerRegistryVisible &&
+                                !this.state.azAutomationAccountVisible &&
+                                !this.state.azLogicAppVisible &&
+                                !this.state.azFunctionAppVisible &&
+                                !this.state.azWebAppVisible &&
+                                !this.state.azManagedClusterVisible &&
+                                !this.state.azVMScaleSetVisible &&
                                 !this.state.azKeyVaultVisible &&
                                 !this.state.azResourceGroupVisible &&
                                 !this.state.azDeviceVisible &&
@@ -349,6 +439,13 @@ class TabContainer extends Component {
                         <ContainerNodeData visible={this.state.containerVisible} />
                         <AZGroupNodeData visible={this.state.azGroupVisible} />
                         <AZUserNodeData visible={this.state.azUserVisible} />
+                        <AZContainerRegistryNodeData visible={this.state.azContainerRegistryVisible} />
+                        <AZAutomationAccountNodeData visible={this.state.azAutomationAccountVisible} />
+                        <AZLogicAppNodeData visible={this.state.azLogicAppVisible} />
+                        <AZFunctionAppNodeData visible={this.state.azFunctionAppVisible} />
+                        <AZWebAppNodeData visible={this.state.azWebAppVisible} />
+                        <AZManagedClusterNodeData visible={this.state.azManagedClusterVisible} />
+                        <AZVMScaleSetNodeData visible={this.state.azVMScaleSetVisible} />
                         <AZKeyVaultNodeData
                             visible={this.state.azKeyVaultVisible}
                         />
