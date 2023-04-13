@@ -164,6 +164,14 @@ const AZTenantNodeData = () => {
                                     }
                                     distinct
                                 />
+                                <NodeCypherLink
+                                    property='MS Graph Admins'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(n)-[r:AZMGGrantAppRoles]->(o:AZTenant {objectid: $objectid})'
+                                    }
+                                    distinct
+                                />
                                 <NodePlayCypherLink
                                     property='Transitive Object Controllers'
                                     target={objectid}

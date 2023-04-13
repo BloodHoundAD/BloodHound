@@ -70,6 +70,27 @@ const SearchRow = ({ item, search }) => {
         case 'AZDevice':
             icon.className = 'fa fa-desktop';
             break;
+        case 'AZContainerRegistry':
+            icon.className = 'fa fa-box-open';
+            break;
+        case 'AZAutomationAccount':
+            icon.className = 'fa fa-cogs';
+            break;
+        case 'AZLogicApp':
+            icon.className = 'fa fa-sitemap';
+            break;
+        case 'AZFunctionApp':
+            icon.className = 'fa fa-bolt-lightning';
+            break;
+        case 'AZWebApp':
+            icon.className = 'fa fa-object-group';
+            break;
+        case 'AZManagedCluster':
+            icon.className = 'fa fa-cubes';
+            break;
+        case 'AZVMScaleSet':
+            icon.className = 'fa fa-server';
+            break;
         case 'AZKeyVault':
             icon.className = 'fa fa-lock';
             break;

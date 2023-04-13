@@ -148,6 +148,27 @@ const AZServicePrincipalNodeData = () => {
 
                 <hr></hr>
 
+                <CollapsibleSection header='MS GRAPH PRIVILEGES'>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherLink
+                                    property='MS Graph App Role Assignments'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(m:AZServicePrincipal {objectid: $objectid})-[r:AZMGAppRoleAssignment_ReadWrite_All|AZMGApplication_ReadWrite_All|AZMGDirectory_ReadWrite_All|AZMGGroupMember_ReadWrite_All|AZMGGroup_ReadWrite_All|AZMGRoleManagement_ReadWrite_Directory|AZMGServicePrincipalEndpoint_ReadWrite_All]->(n:AZServicePrincipal)'
+                                    }
+                                    start={label}
+                                    distinct
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
+                </CollapsibleSection>
+
+                <hr></hr>
+
                 <CollapsibleSection header='OUTBOUND OBJECT CONTROL'>
                     <div className={styles.itemlist}>
                         <Table>
@@ -157,7 +178,7 @@ const AZServicePrincipalNodeData = () => {
                                     property='First Degree Object Control'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (g:AZServicePrincipal {objectid: $objectid})-[r:AZPrivilegedAuthAdmin|AZPrivilegedRoleAdmin|AZGlobalAdmin|AZGetCertificates|AZGetKeys|AZGetSecrets|AZVMAdminLogin|AZContributor|AZAvereContributor|AZUserAccessAdministrator|AZOwns|AZAddMembers|AZResetPassword|AZAppAdmin|AZCloudAppAdmin|AZVMContributor|AZAddSecret]->(n)'
+                                        'MATCH p = (g:AZServicePrincipal {objectid: $objectid})-[r:AZAddMembers|AZAddOwner|AZAddSecret|AZAppAdmin|AZAvereContributor|AZCloudAppAdmin|AZContributor|AZExecuteCommand|AZGetCertificates|AZGetKeys|AZGetSecrets|AZGlobalAdmin|AZMGAddMember|AZMGAddOwner|AZMGAddSecret|AZMGGrantAppRoles|AZMGGrantRole|AZOwns|AZPrivilegedRoleAdmin|AZResetPassword|AZUserAccessAdministrator|AZVMAdminLogin|AZVMContributor]->(n)'
                                     }
                                     start={label}
                                     distinct
@@ -166,7 +187,7 @@ const AZServicePrincipalNodeData = () => {
                                     property='Group Delegated Object Control'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (g1:AZServicePrincipal {objectid: $objectid})-[r1:AZMemberOf*1..]->(g2)-[r2:AZPrivilegedAuthAdmin|AZPrivilegedRoleAdmin|AZGlobalAdmin|AZGetCertificates|AZGetKeys|AZGetSecrets|AZVMAdminLogin|AZContributor|AZAvereContributor|AZUserAccessAdministrator|AZOwns|AZAddMembers|AZResetPassword|AZAppAdmin|AZCloudAppAdmin|AZVMContributor|AZAddSecret]->(n)'
+                                        'MATCH p = (g1:AZServicePrincipal {objectid: $objectid})-[r1:AZMemberOf*1..]->(g2)-[r2:AZAddMembers|AZAddOwner|AZAddSecret|AZAppAdmin|AZAvereContributor|AZCloudAppAdmin|AZContributor|AZExecuteCommand|AZGetCertificates|AZGetKeys|AZGetSecrets|AZGlobalAdmin|AZMGAddMember|AZMGAddOwner|AZMGAddSecret|AZMGGrantAppRoles|AZMGGrantRole|AZOwns|AZPrivilegedRoleAdmin|AZResetPassword|AZUserAccessAdministrator|AZVMAdminLogin|AZVMContributor]->(n)'
                                     }
                                     start={label}
                                     distinct
@@ -196,7 +217,7 @@ const AZServicePrincipalNodeData = () => {
                                     property='Explicit Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:AZOwns|AZAppAdmin|AZCloudAppAdmin]->(g:AZServicePrincipal {objectid: $objectid})'
+                                        'MATCH p = (n)-[r:AZAddOwner|AZAddSecret|AZAppAdmin|AZCloudAppAdmin|AZMGAddOwner|AZMGAddSecret|AZOwns]->(g:AZServicePrincipal {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -205,7 +226,7 @@ const AZServicePrincipalNodeData = () => {
                                     property='Unrolled Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns|AZAppAdmin|AZCloudAppAdmin]->(g2:AZServicePrincipal {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                        'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZAddOwner|AZAddSecret|AZAppAdmin|AZCloudAppAdmin|AZMGAddOwner|AZMGAddSecret|AZOwns]->(g2:AZServicePrincipal {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
                                     }
                                     end={label}
                                     distinct
