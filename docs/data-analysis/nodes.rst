@@ -822,6 +822,8 @@ At the top of the node info tab you will see the following info:
 Overview
 ------------
 * **See VM within Tenant**: Unrolls the VM membership within Azure, displaying the VM’s resource group & subscription.
+* **Managed Identities**: Shows the assigned managed identity service principals for the VM.
+
 
 Node Properties
 ------------------
@@ -898,3 +900,329 @@ Inbound Object Control
   control of this object through Azure group delegation.
 * **Transitive Object Controllers**: The number of objects in AD that can achieve
   control of this object through object-control attack paths
+
+AZAutomationAccount
+^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **NAME**: The full name of the asset
+
+Overview
+------------
+* **See asset within Tenant**: Unrolls the asset's membership within Azure, displaying the asset’s resource group & subscription.
+* **Managed Identities**: Shows the assigned managed identity service principals for the asset.
+
+
+Node Properties
+------------------
+
+* **Object ID**: The Azure objectid for the asset.
+
+Extra Properties
+-------------------
+
+* **tenantid**: The Azure tenant ID for the asset.
+
+
+Inbound Object Control
+-------------------------
+
+* **Explicit Object Controllers**: The number of principals that are in a role that has the ability to control this asset.
+* **Unrolled Object Controllers**: The actual number of principals that have control of this
+  asset through security group delegation. This number can sometimes be wildly higher than
+  the previous number.
+* **Transitive Object Controllers**: The number of assets in Azure that can achieve control of this object through control attack paths.
+
+AZContainerRegistry
+^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **NAME**: The full name of the asset
+
+Overview
+------------
+* **See asset within Tenant**: Unrolls the asset's membership within Azure, displaying the asset’s resource group & subscription.
+* **Managed Identities**: Shows the assigned managed identity service principals for the asset.
+
+
+Node Properties
+------------------
+
+* **Object ID**: The Azure objectid for the asset.
+
+Extra Properties
+-------------------
+
+* **tenantid**: The Azure tenant ID for the asset.
+
+
+Inbound Object Control
+-------------------------
+
+* **Explicit Object Controllers**: The number of principals that are in a role that has the ability to control this asset.
+* **Unrolled Object Controllers**: The actual number of principals that have control of this
+  asset through security group delegation. This number can sometimes be wildly higher than
+  the previous number.
+* **Transitive Object Controllers**: The number of assets in Azure that can achieve control of this object through control attack paths.
+
+AZFunctionApp
+^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **NAME**: The full name of the asset
+
+Overview
+------------
+* **See asset within Tenant**: Unrolls the asset's membership within Azure, displaying the asset’s resource group & subscription.
+* **Managed Identities**: Shows the assigned managed identity service principals for the asset.
+
+
+Node Properties
+------------------
+
+* **Object ID**: The Azure objectid for the asset.
+
+Extra Properties
+-------------------
+
+* **tenantid**: The Azure tenant ID for the asset.
+
+
+Inbound Object Control
+-------------------------
+
+* **Explicit Object Controllers**: The number of principals that are in a role that has the ability to control this asset.
+* **Unrolled Object Controllers**: The actual number of principals that have control of this
+  asset through security group delegation. This number can sometimes be wildly higher than
+  the previous number.
+* **Transitive Object Controllers**: The number of assets in Azure that can achieve control of this object through control attack paths.
+
+AZLogicApp
+^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **NAME**: The full name of the asset
+
+Overview
+------------
+* **See asset within Tenant**: Unrolls the asset's membership within Azure, displaying the asset’s resource group & subscription.
+* **Managed Identities**: Shows the assigned managed identity service principals for the asset.
+
+
+Node Properties
+------------------
+
+* **Object ID**: The Azure objectid for the asset.
+
+Extra Properties
+-------------------
+
+* **tenantid**: The Azure tenant ID for the asset.
+
+
+Inbound Object Control
+-------------------------
+
+* **Explicit Object Controllers**: The number of principals that are in a role that has the ability to control this asset.
+* **Unrolled Object Controllers**: The actual number of principals that have control of this
+  asset through security group delegation. This number can sometimes be wildly higher than
+  the previous number.
+* **Transitive Object Controllers**: The number of assets in Azure that can achieve control of this object through control attack paths.
+
+AZManagedCluster
+^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **NAME**: The full name of the asset
+
+Overview
+------------
+* **See asset within Tenant**: Unrolls the asset's membership within Azure, displaying the asset’s resource group & subscription.
+* **Managed Identities**: Shows the assigned managed identity service principals for the asset.
+
+
+Node Properties
+------------------
+
+* **Object ID**: The Azure objectid for the asset.
+
+Extra Properties
+-------------------
+
+* **tenantid**: The Azure tenant ID for the asset.
+
+
+Inbound Object Control
+-------------------------
+
+* **Explicit Object Controllers**: The number of principals that are in a role that has the ability to control this asset.
+* **Unrolled Object Controllers**: The actual number of principals that have control of this
+  asset through security group delegation. This number can sometimes be wildly higher than
+  the previous number.
+* **Transitive Object Controllers**: The number of assets in Azure that can achieve control of this object through control attack paths.
+
+AZVMScaleSet
+^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **NAME**: The full name of the asset
+
+Overview
+------------
+* **See asset within Tenant**: Unrolls the asset's membership within Azure, displaying the asset’s resource group & subscription.
+* **Managed Identities**: Shows the assigned managed identity service principals for the asset.
+
+
+Node Properties
+------------------
+
+* **Object ID**: The Azure objectid for the asset.
+
+Extra Properties
+-------------------
+
+* **tenantid**: The Azure tenant ID for the asset.
+
+
+Inbound Object Control
+-------------------------
+
+* **Explicit Object Controllers**: The number of principals that are in a role that has the ability to control this asset.
+* **Unrolled Object Controllers**: The actual number of principals that have control of this
+  asset through security group delegation. This number can sometimes be wildly higher than
+  the previous number.
+* **Transitive Object Controllers**: The number of assets in Azure that can achieve control of this object through control attack paths.
+
+AzWebApp
+^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **NAME**: The full name of the asset
+
+Overview
+------------
+* **See asset within Tenant**: Unrolls the asset's membership within Azure, displaying the asset’s resource group & subscription.
+* **Managed Identities**: Shows the assigned managed identity service principals for the asset.
+
+
+Node Properties
+------------------
+
+* **Object ID**: The Azure objectid for the asset.
+
+Extra Properties
+-------------------
+
+* **tenantid**: The Azure tenant ID for the asset.
+
+
+Inbound Object Control
+-------------------------
+
+* **Explicit Object Controllers**: The number of principals that are in a role that has the ability to control this asset.
+* **Unrolled Object Controllers**: The actual number of principals that have control of this
+  asset through security group delegation. This number can sometimes be wildly higher than
+  the previous number.
+* **Transitive Object Controllers**: The number of assets in Azure that can achieve control of this object through control attack paths.
+
+AzManagementGroup
+^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **NAME**: The full name of the asset
+
+Overview
+------------
+* **Reachable High Value Targets**: The count of how many high value
+  targets this asset has an attack path to. Click this number to see the shortest attack paths from this asset
+  to those high value targets.
+
+Node Properties
+------------------
+
+* **Object ID**: The Azure objectid for the asset.
+* **Tenant ID**: The Azure tenant ID for the asset.
+
+Extra Properties
+----------------
+
+No extra properties.
+
+Descendent Objects
+-------------------
+
+The number of assets under this asset categorized in Azure asset types.
+
+Inbound Object Control
+-------------------------
+
+* **Explicit Object Controllers**: The number of principals that are in a role that has the ability to control this asset.
+* **Unrolled Object Controllers**: The actual number of principals that have control of this
+  asset through security group delegation. This number can sometimes be wildly higher than
+  the previous number.
+* **Transitive Object Controllers**: The number of assets in Azure that can achieve control of this object through control attack paths.
+
+AzRole
+^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **NAME**: The full name of the role
+
+Node Properties
+------------------
+
+* **Object ID**: The Azure objectid for the role.
+* **Display Name**: The display name of the role.
+* **Enabled**: Whether the role is enabled or disabled.
+* **Description**: Description of the role.
+* **Template ID**: Template ID of the role.
+* **Tenant ID**: The Azure tenant ID for the role.
+
+Extra Properties
+----------------
+
+* **isbuiltin**: Whether the role is an Azure built-in role or custom.
+
+
+Assignments
+-------------------
+
+* **Active Assignments**: The assets with this role actively assigned.
+* **PIM Assignments**: The assets with this PIM assigned.
+
+AZKeyVault
+^^^^^
+
+At the top of the node info tab you will see the following info:
+
+* **NAME**: The full name of the asset
+
+Node Properties
+------------------
+
+* **Object ID**: The Azure objectid for the asset.
+* **Enable RBAC Authorization**: Whether the Key Vault has RBAC authorization enabled or not.
+* **Tenant ID**: The Azure tenant ID for the asset.
+
+Vault Readers
+-------------------
+
+The number of assets that can read keys, certificates, and secrets in the Key Vault.
+
+Inbound Object Control
+-------------------------
+
+* **Explicit Object Controllers**: The number of principals that are in a role that has the ability to control this asset.
+* **Unrolled Object Controllers**: The actual number of principals that have control of this
+  asset through security group delegation. This number can sometimes be wildly higher than
+  the previous number.
+* **Transitive Object Controllers**: The number of assets in Azure that can achieve control of this object through control attack paths.
