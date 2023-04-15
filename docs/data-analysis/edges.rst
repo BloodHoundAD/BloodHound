@@ -257,6 +257,52 @@ References
 
 |
 
+HasSIDHistory
+^^^^^^^
+
+The given source principal has, in its SIDHistory
+attribute, the SID for the target principal.
+
+When a kerberos ticket is created for source principal, it will
+include the SID for the target principal, and therefore grant
+the source principal the same privileges and permissions as
+the target principal.
+
+
+Abuse Info
+------------
+
+No special actions are needed to abuse this, as the kerberos
+tickets created will have all SIDs in the object's SID history
+attribute added to them; however, if traversing a domain trust
+boundary, ensure that SID filtering is not enforced, as SID
+filtering will ignore any SIDs in the SID history portion of a
+kerberos ticket.
+
+By default, SID filtering is not enabled for all domain trust
+types.
+
+Opsec Considerations
+--------------------
+
+No opsec considerations apply to this edge.
+
+References
+----------
+
+* https://blog.harmj0y.net/redteaming/the-trustpocalypse/
+* https://blog.harmj0y.net/redteaming/a-guide-to-attacking-domain-trusts/
+* https://adsecurity.org/?p=1772
+* https://adsecurity.org/?tag=sidhistory
+* https://attack.mitre.org/techniques/T1178/
+* https://dirkjanm.io/active-directory-forest-trusts-part-one-how-does-sid-filtering-work/
+
+|
+
+----
+
+|
+
 ForceChangePassword
 ^^^^^^^^^^^^^^^^^^^
 
