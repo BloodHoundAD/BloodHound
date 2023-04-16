@@ -904,6 +904,13 @@ Inbound Object Control
 AZAutomationAccount
 ^^^^^
 
+Automation Accounts are one of several services falling under the umbrella of “Azure Automation”. Azure admins can use Automation Accounts to automate a variety of business operations, such as creating and configuring Virtual Machines in Azure.
+
+Automation Accounts offer different process automation services, but at the core of all those services are what are called Runbooks.
+
+Read more about how attackers abuse Automation Accounts in this blog post: https://medium.com/p/82667d17187a 
+
+
 At the top of the node info tab you will see the following info:
 
 * **NAME**: The full name of the asset
@@ -936,6 +943,11 @@ Inbound Object Control
 
 AZContainerRegistry
 ^^^^^
+
+Azure Container Registry (ACR) is Microsoft’s implementation of the Open Container Initiative’s (OCI) Distribution Spec, which itself is based on the original Docker Registry protocol. In plain English: ACR stores and manages container images for you. ACR serves those images, making them available to run locally, on some remote system, or as an Azure Container Instance. You can think of ACR as being somewhat analogous to your very own Docker Registry.
+
+Read more about how attackers abuse Container Registries in this blog post: https://medium.com/p/1f407bfaa465 
+
 
 At the top of the node info tab you will see the following info:
 
@@ -970,6 +982,11 @@ Inbound Object Control
 AZFunctionApp
 ^^^^^
 
+Functions are one of several services falling under the umbrella of “Azure Automation”. Azure admins can create functions using a variety of language (C#, Java, PowerShell, etc.), then run those functions on-demand in Azure. Functions are hosted and grouped together in Azure using Function Apps.
+
+Read more about how attackers abuse Function Apps in this blog post: https://medium.com/p/300065251cbe 
+
+
 At the top of the node info tab you will see the following info:
 
 * **NAME**: The full name of the asset
@@ -1002,6 +1019,11 @@ Inbound Object Control
 
 AZLogicApp
 ^^^^^
+
+Logic Apps are another Azure service falling under the general umbrella of “Azure Automation”. Admins can use Logic Apps to construct what are called “workflows”. Workflows are comprised of triggers and actions that occur as a result of those triggers.
+
+Read more about how attackers abuse Logic Apps in this blog post: https://medium.com/p/52b29354fc54 
+
 
 At the top of the node info tab you will see the following info:
 
@@ -1036,6 +1058,11 @@ Inbound Object Control
 AZManagedCluster
 ^^^^^
 
+Azure Kubernetes Service Managed Clusters provide Azure admins an easy way to create and maintain Kubernetes clusters.
+
+Read about how attackers abuse AKS Managed Clusters in this blog post: https://www.netspi.com/blog/technical/cloud-penetration-testing/extract-credentials-from-azure-kubernetes-service/ 
+
+
 At the top of the node info tab you will see the following info:
 
 * **NAME**: The full name of the asset
@@ -1069,6 +1096,11 @@ Inbound Object Control
 AZVMScaleSet
 ^^^^^
 
+Azure Virtual Machine Scale Sets are used by AKS Managed Clusters to spin up and spin down compute nodes. They can also by used by admins to spin up and manage virtual machines outside of the AKS use-case.
+
+Read about how attackers abuse Virtual Machine Scale Sets in this blog post: https://www.netspi.com/blog/technical/cloud-penetration-testing/extract-credentials-from-azure-kubernetes-service/ 
+
+
 At the top of the node info tab you will see the following info:
 
 * **NAME**: The full name of the asset
@@ -1101,6 +1133,11 @@ Inbound Object Control
 
 AzWebApp
 ^^^^^
+
+Azure App Service is a Platform-as-a-Service product that promises to improve web application deployment, hosting, availability, and security. Web Apps hosted by Azure App Service are organized into Azure App Service Plans, which are Virtual Machines that the Web Apps in that plan all run on.
+
+Read more about how attackers abuse Web Apps in this blog post: https://medium.com/p/c3adefccff95 
+
 
 At the top of the node info tab you will see the following info:
 
