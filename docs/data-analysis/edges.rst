@@ -2245,10 +2245,10 @@ all App Registrations and Service Principals within the same tenant
 when an Azure principal has one of the following Azure Active
 Directory roles:
 
-    * Hybrid Identity Administrator
-    * Partner Tier1 Support
-    * Partner Tier2 Support
-    * Directory Synchronization Accounts
+* Hybrid Identity Administrator
+* Partner Tier1 Support
+* Partner Tier2 Support
+* Directory Synchronization Accounts
 
 You will not see these privileges when auditing permissions against 
 any of the mentioned objects when you use Microsoft tooling, including 
@@ -2357,8 +2357,7 @@ by supplying a refresh token:
 
 ::
 
-	$MGToken = Get-GraphTokenWithRefreshToken -RefreshToken
-    	"0.ARwA6WgJJ9X2qk..." -TenantID "contoso.onmicrosoft.com"
+	$MGToken = Get-GraphTokenWithRefreshToken -RefreshToken "0.ARwA6WgJJ9X2qk..." -TenantID "contoso.onmicrosoft.com"
 
 Then use BARK's New-AppRegSecret to add a new secret to the
 target application:
@@ -2616,9 +2615,9 @@ commands on the VM
 
 Via PowerZure:
 
-	* `Invoke-AzureRunCommand <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#invoke-azureruncommand>`_
-	* `Invoke-AzureRunMSBuild <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#invoke-azurerunmsbuild>`_
-	* `Invoke-AzureRunProgram <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#invoke-azurerunprogram>`_
+* `Invoke-AzureRunCommand <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#invoke-azureruncommand>`_
+* `Invoke-AzureRunMSBuild <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#invoke-azurerunmsbuild>`_
+* `Invoke-AzureRunProgram <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#invoke-azurerunprogram>`_
 
 
 Opsec Considerations
@@ -2820,6 +2819,7 @@ Abuse Info
 Use PowerShell or PowerZure to fetch the certificate from the key vault.
     
 Via PowerZure:
+
 * Get-AzureKeyVaultContent
 * Export-AzureKeyVaultcontent
 
@@ -2851,6 +2851,7 @@ Abuse Info
 Use PowerShell or PowerZure to fetch the certificate from the key vault.
     
 Via PowerZure:
+
 * Get-AzureKeyVaultContent
 * Export-AzureKeyVaultcontent
 
@@ -2882,6 +2883,7 @@ Abuse Info
 Use PowerShell or PowerZure to fetch the certificate from the key vault.
     
 Via PowerZure:
+
 * Get-AzureKeyVaultContent
 * Export-AzureKeyVaultcontent
 
@@ -2986,8 +2988,8 @@ You can read secrets and alter access policies (grant yourself access to read se
 
 Via PowerZure:
 
-	* `Get-AzureKeyVaultContent <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#get-azurekeyvaultcontent>`_
-	* `Export-AzureKeyVaultContent <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#export-azurekeyvaultcontent>`_
+* `Get-AzureKeyVaultContent <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#get-azurekeyvaultcontent>`_
+* `Export-AzureKeyVaultContent <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#export-azurekeyvaultcontent>`_
 
 
 Opsec Considerations
@@ -3084,16 +3086,16 @@ This edge is created during post-processing. It is created against
 non role assignable Azure AD security groups when a Service
 Principal has one of the following MS Graph app role assignments:
 
-    * Directory.ReadWrite.All
-    * Group.ReadWrite.All
-    * GroupMember.ReadWrite.All
+* Directory.ReadWrite.All
+* Group.ReadWrite.All
+* GroupMember.ReadWrite.All
 
 
 It is created against all Azure AD security groups, including those 
 that are role assignable, when a Service Principal has the following 
 MS Graph app role:
 
-    * RoleManagement.ReadWrite.Directory
+* RoleManagement.ReadWrite.Directory
 
 
 You will not see this privilege when using just the Azure portal 
@@ -3165,28 +3167,28 @@ This edge is created during post-processing. It is created against
 all App Registrations and Service Principals within the same tenant 
 when a Service Principal has the following MS Graph app role:
 
-    * Application.ReadWrite.All
+* Application.ReadWrite.All
 
 
 It is also created against all Azure Service Principals when a 
 Service Principal has the following MS Graph app role:
 
-    * ServicePrincipalEndpoint.ReadWrite.All
+* ServicePrincipalEndpoint.ReadWrite.All
 
 
 It is also created against all Azure security groups that are not 
 role eligible when a Service Principal has one of the following MS 
 Graph app roles:
 
-    * Directory.ReadWrite.All
-    * Group.ReadWrite.All
+* Directory.ReadWrite.All
+* Group.ReadWrite.All
 
 
 Finally, it is created against all Azure security groups and all 
 Azure App Registrations when a Service Principal has the following 
 MS Graph app role:
 
-    * RoleManagement.ReadWrite.Directory
+* RoleManagement.ReadWrite.Directory
 
 
 You will not see these privileges when auditing permissions against 
@@ -3274,8 +3276,8 @@ This edge is created during post-processing. It is created against
 all Azure App Registrations and Service Principals when a Service 
 Principal has one of the following MS Graph app roles:
 
-    * Application.ReadWrite.All
-    * RoleManagement.ReadWrite.Directory
+* Application.ReadWrite.All
+* RoleManagement.ReadWrite.Directory
 
 
 You will not see this privilege when using just the Azure portal 
@@ -3473,8 +3475,8 @@ This edge is created during post-processing. It is created against
 AzureAD tenant objects when a Service Principal has one of the following 
 MS Graph app role assignments:
 
-    * AppRoleAssignment.ReadWrite.All
-    * RoleManagement.ReadWrite.Directory
+* AppRoleAssignment.ReadWrite.All
+* RoleManagement.ReadWrite.Directory
 
 
 Abuse Info
@@ -3584,7 +3586,7 @@ This edge is created during post-processing. It is created against
 all AzureAD admin roles when a Service Principal has the following 
 MS Graph app role assignment:
 
-    * RoleManagement.ReadWrite.Directory
+* RoleManagement.ReadWrite.Directory
 
 This privilege allows the Service Principal to promote itself or 
 any other principal to any AzureAD admin role, including Global 
@@ -4002,9 +4004,9 @@ commands on the VM
 
 Via PowerZure:
 
-	* `Invoke-AzureRunCommand <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#invoke-azureruncommand>`_
-	* `Invoke-AzureRunMSBuild <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#invoke-azurerunmsbuild>`_
-	* `Invoke-AzureRunProgram <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#invoke-azurerunprogram>`_
+* `Invoke-AzureRunCommand <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#invoke-azureruncommand>`_
+* `Invoke-AzureRunMSBuild <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#invoke-azurerunmsbuild>`_
+* `Invoke-AzureRunProgram <https://powerzure.readthedocs.io/en/latest/Functions/operational.html#invoke-azurerunprogram>`_
 
 
 Opsec Considerations
