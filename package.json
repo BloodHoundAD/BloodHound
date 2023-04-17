@@ -65,7 +65,7 @@
         "cross-env": "^7.0.3",
         "css-loader": "^3.6.0",
         "electron": "^11.5.0",
-        "electron-packager": "^15.5.2",
+        "electron-packager": "15.4.0",
         "eslint": "^8.20.0",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-react": "^7.30.1",
