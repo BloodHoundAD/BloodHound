@@ -447,6 +447,16 @@ if (typeof conf.get('edgeincluded') === 'undefined') {
         HasSIDHistory: true,
         CanPSRemote: true,
         SyncLAPSPassword: true,
+        AZMGGrantRole: true,
+        AZMGAddSecret: true,
+        AZMGAddOwner: true,
+        AZMGAddMember: true,
+        AZMGGrantAppRoles: true,
+        AZNodeResourceGroup: true,
+        AZWebsiteContributor: true,
+        AZLogicAppContributo: true,
+        AZAutomationContributor: true,
+        AZAKSContributor: true,
     });
 }
 

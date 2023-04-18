@@ -144,6 +144,11 @@ const EdgeFilter = ({ open }) => {
                             'AZAddOwner',
                             'AZManagedIdentity',
                             'AZKeyVaultContributor',
+                            'AZNodeResourceGroup',
+                            'AZWebsiteContributor',
+                            'AZLogicAppContributor',
+                            'AZAutomationContributor',
+                            'AZAKSContributor',
                         ]}
                         sectionName='azure'
                     />
@@ -176,6 +181,29 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterCheck name='AZAddOwner' />
                     <EdgeFilterCheck name='AZManagedIdentity' />
                     <EdgeFilterCheck name='AZKeyVaultContributor' />
+                    <EdgeFilterCheck name='AZNodeResourceGroup' />
+                    <EdgeFilterCheck name='AZWebsiteContributor' />
+                    <EdgeFilterCheck name='AZLogicAppContributor' />
+                    <EdgeFilterCheck name='AZAutomationContributor' />
+                    <EdgeFilterCheck name='AZAKSContributor' />
+                </div>
+                <div>
+                    <EdgeFilterSection
+                        title='MS Graph App Roles'
+                        edges={[
+                            'AZMGAddSecret',
+                            'AZMGAddOwner',
+                            'AZMGAddMember',
+                            'AZMGGrantAppRoles',
+                            'AZMGGrantRole',
+                        ]}
+                        sectionName='msgraphapproles'
+                    />
+                    <EdgeFilterCheck name='AZMGAddSecret' />
+                    <EdgeFilterCheck name='AZMGAddOwner' />
+                    <EdgeFilterCheck name='AZMGAddMember' />
+                    <EdgeFilterCheck name='AZMGGrantAppRoles' />
+                    <EdgeFilterCheck name='AZMGGrantRole' />
                 </div>
             </div>
         </motion.div>
