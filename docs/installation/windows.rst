@@ -14,7 +14,7 @@ Install neo4j
 
 .. Warning::
 
-  Neo4j 5 suffers from severe performance regression issues. Until further notice, please use Neo4j 4.4.13
+  Neo4j 5 suffers from severe performance regression issues. Until further notice, please use Neo4j 4.4.19 (https://neo4j.com/release-notes/database/neo4j-4-4-19/).
 
 1. Download the neo4j Community Server Edition zip from https://neo4j.com/download-center/#community
 
