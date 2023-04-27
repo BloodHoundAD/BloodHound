@@ -554,7 +554,7 @@ const LinuxAbuse = ({
                         scheduled task. Then wait at least 2 hours for the group
                         policy client to pick up and execute the new evil
                         policy. See the references tab for a more detailed write
-                        up on this abuse`;
+                        up on this abuse.
                     </p>
 
                     <p>

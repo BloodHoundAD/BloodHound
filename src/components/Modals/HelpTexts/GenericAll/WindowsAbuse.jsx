@@ -480,10 +480,10 @@ const WindowsAbuse = ({
                         you wish to push an evil policy down to, then use the
                         gpedit GUI to modify the GPO, using an evil policy that
                         allows item-level targeting, such as a new immediate
-                        scheduled task. Then wait at least 2 hours for the group
+                        scheduled task. Then wait for the group
                         policy client to pick up and execute the new evil
                         policy. See the references tab for a more detailed write
-                        up on this abuse`;
+                        up on this abuse.
                     </p>
                 </>
             );
