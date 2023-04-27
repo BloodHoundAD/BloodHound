@@ -132,8 +132,8 @@
  * @property {string} TargetDomainName
  * @property {boolean} IsTransitive
  * @property {boolean} SidFilteringEnabled
- * @property {string} TrustDirection
- * @property {string} TrustType
+ * @property {number} TrustDirection
+ * @property {number} TrustType
  */
 
 /**
