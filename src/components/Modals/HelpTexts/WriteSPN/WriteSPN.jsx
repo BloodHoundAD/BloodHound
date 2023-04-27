@@ -19,10 +19,16 @@ const WriteSPN = ({ sourceName, sourceType, targetName, targetType }) => {
                 />
             </Tab>
             <Tab eventKey={2} title='Windows Abuse'>
-                <Windows AbusesourceName={sourceName} sourceType={sourceType} />
+                <WindowsAbuse
+                    sourceName={sourceName}
+                    sourceType={sourceType}
+                />
             </Tab>
             <Tab eventKey={3} title='Linux Abuse'>
-                <Linux AbusesourceName={sourceName} sourceType={sourceType} />
+                <LinuxAbuse
+                    sourceName={sourceName}
+                    sourceType={sourceType}
+                />
             </Tab>
             <Tab eventKey={4} title='Opsec'>
                 <Opsec />
