@@ -9,7 +9,7 @@ Download the pre-compiled SharpHound binary and PS1 version at
 https://github.com/BloodHoundAD/BloodHound/tree/master/Collectors
 
 You can view the source code for SharpHound and build it from source
-by visiting the SharpHound repo at https://github.com/BloodHoundAD/SharpHound3
+by visiting the SharpHound repo at https://github.com/BloodHoundAD/SharpHound
 
 Basic Usage
 ^^^^^^^^^^^
