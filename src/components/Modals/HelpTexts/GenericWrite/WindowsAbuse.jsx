@@ -127,6 +127,34 @@ const WindowsAbuse = ({ sourceName, sourceType, targetType }) => {
                     </pre>
                 </>
             );
+        case 'GPO':
+            return (
+                <>
+                    <p>
+                        With GenericWrite on a GPO, you may make modifications
+                        to that GPO which will then apply to the users and
+                        computers affected by the GPO. Select the target object
+                        you wish to push an evil policy down to, then use the
+                        gpedit GUI to modify the GPO, using an evil policy that
+                        allows item-level targeting, such as a new immediate
+                        scheduled task. Then wait for the group
+                        policy client to pick up and execute the new evil
+                        policy. See the references tab for a more detailed write
+                        up on this abuse.
+                    </p>
+                    <p>
+                        This edge can be a false positive in rare scenarios. If you have 
+                        GenericWrite on the GPO with 'This object only' (no inheritance) 
+                        and no other permissions in the ACL, it is not possible to add or 
+                        modify settings of the GPO. The GPO's settings are stored in 
+                        SYSVOL under a folder for the given GPO. Therefore, you need write 
+                        access to child objects of this folder or create child objects 
+                        permission. The security descriptor of the GPO is reflected on 
+                        the folder, meaning permissions to write child items on the GPO
+                        are required.
+                    </p>
+                </>
+            );
         case 'Computer':
             return (
                 <>
