@@ -14,6 +14,14 @@ const References = () => {
             <a href='https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4728'>
                 https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4728
             </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/dacl/addmember'>
+                https://www.thehacker.recipes/ad/movement/dacl/addmember
+            </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/dacl#bloodhound-edges'>
+                https://www.thehacker.recipes/ad/movement/dacl#bloodhound-edges
+            </a>
         </>
     );
 };

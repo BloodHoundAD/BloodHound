@@ -1,10 +1,11 @@
 import React from 'react';
 
-const Abuse = () => {
+const WindowsAbuse = () => {
     return (
         <>
             <p>
-                You may perform a dcsync attack to get the password hash of an
+                With both GetChanges and GetChangesAll privileges in BloodHound,
+                you may perform a dcsync attack to get the password hash of an
                 arbitrary principal using mimikatz:
             </p>
             <pre>
@@ -23,4 +24,4 @@ const Abuse = () => {
     );
 };
 
-export default Abuse;
+export default WindowsAbuse;

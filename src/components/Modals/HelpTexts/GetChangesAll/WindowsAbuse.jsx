@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Abuse = () => {
+const WindowsAbuse = () => {
     return (
         <>
             <p>
@@ -24,4 +24,4 @@ const Abuse = () => {
     );
 };
 
-export default Abuse;
+export default WindowsAbuse;
