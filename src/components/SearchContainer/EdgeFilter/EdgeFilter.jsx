@@ -131,8 +131,6 @@ const EdgeFilter = ({ open }) => {
                             'AZExecuteCommand',
                             'AZGlobalAdmin',
                             'AZPrivilegedAuthAdmin',
-                            'AZGrant',
-                            'AZGrantSelf',
                             'AZPrivilegedRoleAdmin',
                             'AZResetPassword',
                             'AZUserAccessAdministrator',
@@ -167,8 +165,6 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterCheck name='AZExecuteCommand' />
                     <EdgeFilterCheck name='AZGlobalAdmin' />
                     <EdgeFilterCheck name='AZPrivilegedAuthAdmin' />
-                    <EdgeFilterCheck name='AZGrant' />
-                    <EdgeFilterCheck name='AZGrantSelf' />
                     <EdgeFilterCheck name='AZPrivilegedRoleAdmin' />
                     <EdgeFilterCheck name='AZResetPassword' />
                     <EdgeFilterCheck name='AZUserAccessAdministrator' />
