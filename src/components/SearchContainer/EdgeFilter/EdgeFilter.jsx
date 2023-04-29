@@ -135,7 +135,6 @@ const EdgeFilter = ({ open }) => {
                             'AZResetPassword',
                             'AZUserAccessAdministrator',
                             'AZOwns',
-                            'AZScopedTo',
                             'AZCloudAppAdmin',
                             'AZAppAdmin',
                             'AZAddOwner',
@@ -169,7 +168,6 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterCheck name='AZResetPassword' />
                     <EdgeFilterCheck name='AZUserAccessAdministrator' />
                     <EdgeFilterCheck name='AZOwns' />
-                    <EdgeFilterCheck name='AZScopedTo' />
                     <EdgeFilterCheck name='AZCloudAppAdmin' />
                     <EdgeFilterCheck name='AZAppAdmin' />
                     <EdgeFilterCheck name='AZAddOwner' />
