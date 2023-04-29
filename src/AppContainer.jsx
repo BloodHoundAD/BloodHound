@@ -51,7 +51,6 @@ const fullEdgeList = [
     'AZGrantSelf',
     'AZHasRole',
     'AZMemberOf',
-    'AZOwner',
     'AZOwns',
     'AZPrivilegedRoleAdmin',
     'AZResetPassword',

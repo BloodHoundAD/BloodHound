@@ -41,7 +41,6 @@ import AZGrant from './HelpTexts/AZGrant/AZGrant';
 import AZGrantSelf from './HelpTexts/AZGrantSelf/AZGrantSelf';
 import AZHasRole from './HelpTexts/AZHasRole/AZHasRole';
 import AZMemberOf from './HelpTexts/AZMemberOf/AZMemberOf';
-import AZOwner from './HelpTexts/AZOwner/AZOwner';
 import AZOwns from './HelpTexts/AZOwns/AZOwns';
 import AZPrivilegedRoleAdmin from './HelpTexts/AZPrivilegedRoleAdmin/AZPrivilegedRoleAdmin';
 import AZResetPassword from './HelpTexts/AZResetPassword/AZResetPassword';
@@ -155,7 +154,6 @@ const HelpModal = () => {
         AZGrantSelf: AZGrantSelf,
         AZHasRole: AZHasRole,
         AZMemberOf: AZMemberOf,
-        AZOwner: AZOwner,
         AZOwns: AZOwns,
         AZPrivilegedRoleAdmin: AZPrivilegedRoleAdmin,
         AZResetPassword: AZResetPassword,
