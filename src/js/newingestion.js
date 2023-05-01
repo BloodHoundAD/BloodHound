@@ -1404,6 +1404,8 @@ export function convertAzureGroup(data, ingestionData) {
                 securityidentifier: data.securityIdentifier,
                 name: `${data.displayName}@${data.tenantName}`.toUpperCase(),
                 tenantid: data.tenantId.toUpperCase(),
+                groupTypes: data.groupTypes,
+                membershipRule: data.membershipRule,
             },
         },
         false
