@@ -18,11 +18,11 @@
 # -- Project information -----------------------------------------------------
 
 project = 'BloodHound'
-copyright = '2016-2022, Specter Ops Inc.'
+copyright = '2016-2023, Specter Ops Inc.'
 author = 'The BloodHound Enterprise Team'
 
 # The full version, including alpha/beta/rc tags
-release = '4.2.0'
+release = '4.3.1'
 
 
 # -- General configuration ---------------------------------------------------
