@@ -41,6 +41,7 @@ import AZHasRole from './HelpTexts/AZHasRole/AZHasRole';
 import AZManagedIdentity from './HelpTexts/AZManagedIdentity/AZManagedIdentity';
 import AZMemberOf from './HelpTexts/AZMemberOf/AZMemberOf';
 import AZOwns from './HelpTexts/AZOwns/AZOwns';
+import AZPrivilegedAuthAdmin from './HelpTexts/AZPrivilegedAuthAdmin/AZPrivilegedAuthAdmin';
 import AZPrivilegedRoleAdmin from './HelpTexts/AZPrivilegedRoleAdmin/AZPrivilegedRoleAdmin';
 import AZResetPassword from './HelpTexts/AZResetPassword/AZResetPassword';
 import AZUserAccessAdministrator from './HelpTexts/AZUserAccessAdministrator/AZUserAccessAdministrator';
@@ -153,6 +154,7 @@ const HelpModal = () => {
         AZManagedIdentity: AZManagedIdentity,
         AZMemberOf: AZMemberOf,
         AZOwns: AZOwns,
+        AZPrivilegedAuthAdmin: AZPrivilegedAuthAdmin,
         AZPrivilegedRoleAdmin: AZPrivilegedRoleAdmin,
         AZResetPassword: AZResetPassword,
         AZUserAccessAdministrator: AZUserAccessAdministrator,

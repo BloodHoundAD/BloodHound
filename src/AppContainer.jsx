@@ -51,6 +51,7 @@ const fullEdgeList = [
     'AZManagedIdentity',
     'AZMemberOf',
     'AZOwns',
+    'AZPrivilegedAuthAdmin',
     'AZPrivilegedRoleAdmin',
     'AZResetPassword',
     'AZUserAccessAdministrator',

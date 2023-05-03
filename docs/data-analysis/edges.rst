@@ -3912,6 +3912,36 @@ References
 
 |
 
+AZPrivilegedAuthAdmin
+^^^^^^^^^^^^^
+
+This edge indicates the principal has the Privileged Authentication Administrator 
+role active against the target tenant. Principals with this role can update
+sensitive properties for all users. Privileged Authentication Administrator can 
+set or reset any authentication method (including passwords) for any user,
+including Global Administrators.
+
+Abuse Info
+------------
+
+See the abuse info under AZAddSecret or AZResetPassword.
+
+Opsec Considerations
+--------------------
+
+See the opsec consideration under AZAddSecret or AZResetPassword.
+
+References
+----------
+
+* https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference#privileged-authentication-administrator
+
+|
+
+----
+
+|
+
 AZPrivilegedRoleAdmin
 ^^^^^^^^^^^^^^^^^^^^^
 
