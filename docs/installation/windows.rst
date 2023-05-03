@@ -3,7 +3,12 @@ Windows
 
 Walkthrough Video
 ^^^^^^^^^^^^^^^^^
-https://youtu.be/PgjtvxA-MMk  
+
+.. raw:: html
+
+    <div style="text-align: center; margin-bottom: 2em;">
+    <iframe width="100%" height="350" src="https://www.youtube.com/embed/PgjtvxA-MMk" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
 
 
 Install Java
