@@ -1,22 +1,46 @@
 Windows
 =======
 
+Walkthrough Video
+^^^^^^^^^^^^^^^^^
+https://youtu.be/PgjtvxA-MMk  
+
+
 Install Java
 ^^^^^^^^^^^^
 
-1. Download the Windows installer for Oracle JDK 11 from https://www.oracle.com/java/technologies/javase-jdk11-downloads.html
+1. Download the Windows installer for Oracle JDK 11 from https://www.oracle.com/java/technologies/javase-jdk11-downloads.html (needs an Oracle account).  
 
-2. Use the installer to install Oracle JDK. The default options work fine.
+   Alternatively download and install the Microsoft build of OpenJDK 11 without any registration or login: https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-11
 
+2. Use the according installer to setup JDK. The default options work fine. You want to make sure though that the `JAVA_HOME` System variable is set correctly.
+   In the Microsoft setup this is an option during installation:
+
+   .. image:: /images/java_home_variable.png  
+      :align: center
+      :width: 900px
+      :alt: JAVA_HOME variable
+
+   .. note:: You want to make sure that the System variable `JAVA_HOME` is set correctly, pointing to you OpenJDK 11 by running the following command:
+   
+   ::
+
+      rundll32.exe sysdm.cpl,EditEnvironmentVariables
+
+
+   .. image:: /images/java_home_check.png  
+      :align: center
+      :width: 900px
+      :alt: JAVA_HOME variable
 
 Install neo4j
 ^^^^^^^^^^^^^
 
 .. Warning::
 
-  Neo4j 5 suffers from severe performance regression issues. Until further notice, please use Neo4j 4.4.19 (https://neo4j.com/release-notes/database/neo4j-4-4-19/).
+  Neo4j 5 suffers from severe performance regression issues. Until further notice, please use the latest Neo4j 4.4.x version
 
-1. Download the neo4j Community Server Edition zip from https://neo4j.com/download-center/#community
+1. Download the latest neo4j 4.x Community Server Edition zip from https://neo4j.com/download-center/#community
 
 2. Unzip the neo4j zip file.
 
@@ -31,8 +55,28 @@ Install neo4j
    C:\> neo4j.bat install-service
 
 .. note:: At this point you may see an error about Java not being found, or the wrong
-   version of Java running. Ensure your JAVA_HOME environment variable is set to the
-   JDK folder (example: C:\\Program Files\\Java\\jdk-11.0.6
+   version of Java running. Make sure you followed the JAVA installation steps correctly.  
+
+.. note:: You might run into an error `Couldn't find prunsrv file for interacting with the windows service subsystem ...`. This happens if the System variables 
+   `NEO4J_CONF` and `NEO4J_HOME` are not set (correctly). Both need to point to the root of the neo4j folder.
+
+.. image:: /images/neo4j_error_1.png 
+   :align: center
+   :width: 900px
+   :alt: JAVA_HOME variable
+
+.. note:: You might run into an error `Could not find or load main class org.neo4j.server.startup.Neo4jCommand`. This happens if the System variables 
+   `NEO4J_CONF` and `NEO4J_HOME` are not set (correctly). Both need to point to the root of the neo4j folder.
+
+.. image:: /images/neo4j_error_2.png 
+   :align: center
+   :width: 900px
+   :alt: JAVA_HOME variable
+
+.. image:: /images/neo4j_paths.png  
+      :align: center
+      :width: 900px
+      :alt: neo4j variables
 
 6. neo4j is now installed as a Windows service. Run this command:
 
@@ -44,7 +88,7 @@ You should see the message, "The neo4j Graph Database - neo4j service was starte
 
 7. Open a web browser and navigate to http://localhost:7474/. You should see the neo4j web console.
 
-8. Authenticate to neo4j in the web console with username neo4j, password neo4j. You'll
+8. Authenticate to neo4j in the web console with username `neo4j`, password `neo4j`. You'll
    be prompted to change this password.
 
 Download the BloodHound GUI
