@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Tabs, Tab } from 'react-bootstrap';
 import General from './General';
-import Abuse from './Abuse';
+import WindowsAbuse from './WindowsAbuse';
+import LinuxAbuse from './LinuxAbuse';
 import Opsec from './Opsec';
 import References from './References';
 
@@ -17,8 +18,8 @@ const Owns = ({ sourceName, sourceType, targetName, targetType, targetId }) => {
                     targetType={targetType}
                 />
             </Tab>
-            <Tab eventKey={2} title='Abuse Info'>
-                <Abuse
+            <Tab eventKey={2} title='Windows Abuse'>
+                <WindowsAbuse
                     sourceName={sourceName}
                     sourceType={sourceType}
                     targetName={targetName}
@@ -26,10 +27,19 @@ const Owns = ({ sourceName, sourceType, targetName, targetType, targetId }) => {
                     targetId={targetId}
                 />
             </Tab>
-            <Tab eventKey={3} title='Opsec Considerations'>
+            <Tab eventKey={3} title='Linux Abuse'>
+                <LinuxAbuse
+                    sourceName={sourceName}
+                    sourceType={sourceType}
+                    targetName={targetName}
+                    targetType={targetType}
+                    targetId={targetId}
+                />
+            </Tab>
+            <Tab eventKey={4} title='Opsec'>
                 <Opsec />
             </Tab>
-            <Tab eventKey={4} title='References'>
+            <Tab eventKey={5} title='Refs'>
                 <References />
             </Tab>
         </Tabs>

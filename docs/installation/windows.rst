@@ -123,8 +123,8 @@ Alternative: Build the BloodHound GUI
 
    C:\> npm install
 
-5. Build BloodHound with `npm run build:windows`
+5. Build BloodHound with `npm run build:win32`
 
 ::
 
-   C:\> npm run build:windows
+   C:\> npm run build:win32

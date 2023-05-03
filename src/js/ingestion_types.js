@@ -132,8 +132,8 @@
  * @property {string} TargetDomainName
  * @property {boolean} IsTransitive
  * @property {boolean} SidFilteringEnabled
- * @property {string} TrustDirection
- * @property {string} TrustType
+ * @property {number} TrustDirection
+ * @property {number} TrustType
  */
 
 /**
@@ -227,7 +227,10 @@
  * @property {string} tenantId
  * @property {string} id
  * @property {string} tenantName
+ * @property {String} azureGroupTypes
+ * @property {String} azureMembershipRule
  */
+
 
 /**
  * @typedef {Object} AzureGroupMember

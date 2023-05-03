@@ -1234,7 +1234,6 @@ Assignments
 -------------------
 
 * **Active Assignments**: The assets with this role actively assigned.
-* **PIM Assignments**: The assets with this PIM assigned.
 
 AZKeyVault
 ^^^^^

@@ -12,7 +12,10 @@ const Abuse = () => {
                 Invoke-SMBExec. With Metasploit, consider the modules
                 "exploit/windows/smb/psexec",
                 "exploit/windows/winrm/winrm_script_exec", and
-                "exploit/windows/local/ps_wmi_exec". Additionally, there are
+                "exploit/windows/local/ps_wmi_exec".
+                With Impacket, consider the example scripts
+                psexec/wmiexec/smbexec/atexec/dcomexec. There are other alternatives
+                like evil-winrm and crackmapexec. Additionally, there are
                 several manual methods for remotely executing code on the
                 machine, including via RDP, with the service control binary and
                 interaction with the remote machine's service control manager,
