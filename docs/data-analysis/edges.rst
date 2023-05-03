@@ -3071,6 +3071,58 @@ References
 
 |
 
+AZManagedIdentity
+^^^^^^^^
+
+Azure resources like Virtual Machines, Logic Apps, and Automation Accounts
+can be assigned to either System- or User-Assigned Managed Identities.
+This assignment allows the Azure resource to authenticate to Azure services
+as the Managed Identity without needing to know the credential for that 
+Managed Identity. Managed Identities, whether System- or User-Assigned, are
+AzureAD Service Principals.
+
+Abuse Info
+------------
+
+You can modify the Azure RM resource to execute actions against Azure with the 
+privileges of the Managed Identity Service Principal.
+
+It is also possible to extract a JSON Web Token (JWT) for the Service Principal, 
+then use that JWT to authenticate as the Service Principal outside the scope of
+the Azure RM resource. Here is how you extract the JWT using PowerShell:
+
+::
+
+
+  $tokenAuthURI = $env:MSI_ENDPOINT + "?resource=https://graph.microsoft.com/&api-version=2017-09-01"
+  $tokenResponse = Invoke-RestMethod -Method Get -Headers @{"Secret"="$env:MSI_SECRET"} -Uri $tokenAuthURI
+  $tokenResponse.access_token
+
+
+We can then use this JWT to authenticate as the Service Principal to the Microsoft 
+Graph APIs using BARK for example.
+
+
+Opsec Considerations
+--------------------
+
+This will depend on which particular abuse you perform, but in general Azure will create a log event for each abuse.
+
+References
+----------
+
+* https://attack.mitre.org/techniques/T1078/
+* https://posts.specterops.io/managed-identity-attack-paths-part-1-automation-accounts-82667d17187a
+* https://m365internals.com/2021/11/30/lateral-movement-with-managed-identities-of-azure-virtual-machines
+* https://github.com/BloodHoundAD/BARK
+
+|
+
+----
+
+|
+
+
 AZMemberOf
 ^^^^^^^
 

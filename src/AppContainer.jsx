@@ -48,6 +48,7 @@ const fullEdgeList = [
     'AZGetSecrets',
     'AZGlobalAdmin',
     'AZHasRole',
+    'AZManagedIdentity',
     'AZMemberOf',
     'AZOwns',
     'AZPrivilegedRoleAdmin',

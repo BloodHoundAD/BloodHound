@@ -38,6 +38,7 @@ import AZGetCertificates from './HelpTexts/AZGetCertificates/AZGetCertificates';
 import AZGetKeys from './HelpTexts/AZGetKeys/AZGetKeys';
 import AZGetSecrets from './HelpTexts/AZGetSecrets/AZGetSecrets';
 import AZHasRole from './HelpTexts/AZHasRole/AZHasRole';
+import AZManagedIdentity from './HelpTexts/AZManagedIdentity/AZManagedIdentity';
 import AZMemberOf from './HelpTexts/AZMemberOf/AZMemberOf';
 import AZOwns from './HelpTexts/AZOwns/AZOwns';
 import AZPrivilegedRoleAdmin from './HelpTexts/AZPrivilegedRoleAdmin/AZPrivilegedRoleAdmin';
@@ -149,6 +150,7 @@ const HelpModal = () => {
         AZGetKeys: AZGetKeys,
         AZGetSecrets: AZGetSecrets,
         AZHasRole: AZHasRole,
+        AZManagedIdentity: AZManagedIdentity,
         AZMemberOf: AZMemberOf,
         AZOwns: AZOwns,
         AZPrivilegedRoleAdmin: AZPrivilegedRoleAdmin,
