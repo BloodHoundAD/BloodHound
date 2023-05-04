@@ -2997,7 +2997,7 @@ References
 
 |
 
-AZKeyVaultKVContributor
+AZKeyVaultContributor
 ^^^^^^^
 
 The Key Vault Contributor role grants full control of the 
