@@ -38,6 +38,7 @@ const fullEdgeList = [
     'SQLAdmin',
     'HasSIDHistory',
     'AZAddMembers',
+    'AZAddOwner',
     'AZAddSecret',
     'AZAvereContributor',
     'AZContains',
@@ -60,6 +61,8 @@ const fullEdgeList = [
     'AZRunsAs',
     'AZKeyVaultContributor',
     'AZVMAdminLogin',
+    'AZVMContributor',
+    'AZLogicAppContributor',
     'Contains',
     'GPLink',
     'AllExtendedRights',
@@ -78,6 +81,7 @@ const fullEdgeList = [
     'AddSelf',
     'WriteSPN',
     'AddKeyCredentialLink',
+    'DCSync',
     'SyncLAPSPassword'
 ];
 
