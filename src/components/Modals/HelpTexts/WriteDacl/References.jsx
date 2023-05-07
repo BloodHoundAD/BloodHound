@@ -42,6 +42,42 @@ const References = () => {
             <a href='https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectorysecurityinheritance?view=netframework-4.8'>
                 https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectorysecurityinheritance?view=netframework-4.8
             </a>
+            <br />
+            <a href='https://github.com/Kevin-Robertson/Powermad#new-machineaccount'>
+                https://github.com/Kevin-Robertson/Powermad#new-machineaccount
+            </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/dacl/addmember'>
+                https://www.thehacker.recipes/ad/movement/dacl/addmember
+            </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/dacl/targeted-kerberoasting'>
+                https://www.thehacker.recipes/ad/movement/dacl/targeted-kerberoasting
+            </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/group-policies'>
+                https://www.thehacker.recipes/ad/movement/group-policies
+            </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/dacl/forcechangepassword'>
+                https://www.thehacker.recipes/ad/movement/dacl/forcechangepassword
+            </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/kerberos/shadow-credentials'>
+                https://www.thehacker.recipes/ad/movement/kerberos/shadow-credentials
+            </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/credentials/dumping/dcsync'>
+                https://www.thehacker.recipes/ad/movement/credentials/dumping/dcsync
+            </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/kerberos/delegations/rbcd'>
+                https://www.thehacker.recipes/ad/movement/kerberos/delegations/rbcd
+            </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/dacl/grant-rights'>
+                https://www.thehacker.recipes/ad/movement/dacl/grant-rights
+            </a>
         </>
     );
 };

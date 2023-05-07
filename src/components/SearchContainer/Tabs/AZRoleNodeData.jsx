@@ -95,13 +95,6 @@ const AZRoleNodeData = ({}) => {
                         property={'Active Assignments'}
                         target={objectid}
                     />
-                    <NodeCypherLink
-                        baseQuery={
-                            'MATCH p=(n)-[:AZCanGrant|AZGrantSelf|AZMemberOf*1..2]->(:AZRole {objectid:$objectid})'
-                        }
-                        property={'PIM Assignments'}
-                        target={objectid}
-                    />
                 </CollapsibleSectionTable>
 
             </div>

@@ -38,6 +38,7 @@ const fullEdgeList = [
     'SQLAdmin',
     'HasSIDHistory',
     'AZAddMembers',
+    'AZAddOwner',
     'AZAddSecret',
     'AZAvereContributor',
     'AZContains',
@@ -47,12 +48,11 @@ const fullEdgeList = [
     'AZGetKeys',
     'AZGetSecrets',
     'AZGlobalAdmin',
-    'AZGrant',
-    'AZGrantSelf',
     'AZHasRole',
+    'AZManagedIdentity',
     'AZMemberOf',
-    'AZOwner',
     'AZOwns',
+    'AZPrivilegedAuthAdmin',
     'AZPrivilegedRoleAdmin',
     'AZResetPassword',
     'AZUserAccessAdministrator',
@@ -61,6 +61,8 @@ const fullEdgeList = [
     'AZRunsAs',
     'AZKeyVaultContributor',
     'AZVMAdminLogin',
+    'AZVMContributor',
+    'AZLogicAppContributor',
     'Contains',
     'GPLink',
     'AllExtendedRights',
@@ -79,8 +81,9 @@ const fullEdgeList = [
     'AddSelf',
     'WriteSPN',
     'AddKeyCredentialLink',
-    'SyncLAPSPassword',
-    'DumpSMSAPassword'
+    'DumpSMSAPassword',
+    'DCSync',
+    'SyncLAPSPassword'
 ];
 
 export default class AppContainer extends Component {

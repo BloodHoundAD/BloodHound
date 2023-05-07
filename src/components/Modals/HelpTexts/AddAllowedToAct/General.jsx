@@ -1,7 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { groupSpecialFormat } from '../Formatter';
 
-const General = (sourceName, sourceType, targetName) => {
+const General = ({sourceName, sourceType, targetName}) => {
     return (
         <>
             <p>
@@ -41,6 +42,12 @@ const General = (sourceName, sourceType, targetName) => {
             </p>
         </>
     );
+};
+
+General.propTypes = {
+    sourceName: PropTypes.string,
+    sourceType: PropTypes.string,
+    targetName: PropTypes.string,
 };
 
 export default General;
