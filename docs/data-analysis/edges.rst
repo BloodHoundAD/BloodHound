@@ -1962,15 +1962,17 @@ Abuse Info
 Having this privilege over a user grants the ability to reset the user's password. For
 more information about that, see the ForceChangePassword edge section
 
-**Groups**
-
-This privilege grants the ability to modify group memberships. For more information on
-that, see the AddMembers edge section
-
 **Computers**
 
 You may perform resource-based constrained delegation with this privilege over a computer
 object. For more information about that, see the GenericAll edge section.
+
+**Domain**
+The AllExtendedRights privilege grants both the
+DS-Replication-Get-Changes and DS-Replication-Get-Changes-All 
+privileges, which combined allow a principal to replicate objects from the domain.
+This can be abused using the lsadump::dcsync command in mimikatz.
+
 
 Opsec Considerations
 --------------------
