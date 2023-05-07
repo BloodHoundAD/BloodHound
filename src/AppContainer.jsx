@@ -81,6 +81,7 @@ const fullEdgeList = [
     'AddSelf',
     'WriteSPN',
     'AddKeyCredentialLink',
+    'DumpSMSAPassword',
     'DCSync',
     'SyncLAPSPassword'
 ];

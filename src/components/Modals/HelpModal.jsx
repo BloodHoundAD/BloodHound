@@ -58,6 +58,7 @@ import AddKeyCredentialLink from './HelpTexts/AddKeyCredentialLink/AddKeyCredent
 import DCSync from './HelpTexts/DCSync/DCSync';
 import SyncLAPSPassword from './HelpTexts/SyncLAPSPassword/SyncLAPSPassword';
 import WriteAccountRestrictions from './HelpTexts/WriteAccountRestrictions/WriteAccountRestrictions';
+import DumpSMSAPassword from './HelpTexts/DumpSMSAPassword/DumpSMSAPassword';
 import AZMGAddMember from './HelpTexts/AZMGAddMember/AZMGAddMember';
 import AZMGAddOwner from './HelpTexts/AZMGAddOwner/AZMGAddOwner';
 import AZMGAddSecret from './HelpTexts/AZMGAddSecret/AZMGAddSecret';
@@ -170,6 +171,7 @@ const HelpModal = () => {
         DCSync: DCSync,
         SyncLAPSPassword: SyncLAPSPassword,
         WriteAccountRestrictions: WriteAccountRestrictions,
+        DumpSMSAPassword: DumpSMSAPassword,
         AZMGAddMember: AZMGAddMember,
         AZMGAddOwner: AZMGAddOwner,
         AZMGAddSecret: AZMGAddSecret,

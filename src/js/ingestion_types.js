@@ -72,6 +72,7 @@
  * @property {Array.<TypedPrincipal>} AllowedToDelegate
  * @property {Array.<TypedPrincipal>} AllowedToAct
  * @property {Array.<TypedPrincipal>} HasSIDHistory
+ * @property {Array.<TypedPrincipal>} DumpSMSAPassword
  * @property {SessionAPIResult} Sessions
  * @property {SessionAPIResult} PrivilegedSessions
  * @property {SessionAPIResult} RegistrySessions
