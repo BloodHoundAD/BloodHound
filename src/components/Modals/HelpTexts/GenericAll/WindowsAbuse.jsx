@@ -257,7 +257,7 @@ const WindowsAbuse = ({
                         </p>
 
                         <p>
-                            Abusing this primitive is currently only possible
+                            Abusing this primitive is possible
                             through the Rubeus project.
                         </p>
 
@@ -357,7 +357,7 @@ const WindowsAbuse = ({
                         </p>
 
                         <p>
-                            Abusing this primitive is currently only possible
+                            Abusing this primitive is possible
                             through the Rubeus project.
                         </p>
 

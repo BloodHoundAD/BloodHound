@@ -23,6 +23,10 @@ const References = () => {
                 https://www.thehacker.recipes/ad/movement/dacl/readlapspassword
             </a>
             <br />
+            <a href='https://eladshamir.com/2019/01/28/Wagging-the-Dog.html'>
+                https://eladshamir.com/2019/01/28/Wagging-the-Dog.html
+            </a>
+            <br />
             <a href='https://www.thehacker.recipes/ad/movement/credentials/dumping/dcsync'>
                 https://www.thehacker.recipes/ad/movement/credentials/dumping/dcsync
             </a>

