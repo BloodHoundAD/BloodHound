@@ -308,14 +308,31 @@ const MenuContainer = () => {
                         }
                     }
                 } else {
-                    for (let key in processedData) {
-                        let props = processedData[key].props;
-                        if (props.length === 0) continue;
-                        let chunked = props.chunk();
-                        let statement = processedData[key].statement;
+                    if (Array.isArray(processedData)) {
+                        for (let data in processedData) {
+                            data = processedData[data];
+                            for (let key in data) {
+                                let props = data[key].props;
+                                if (props.length === 0) continue;
+                                let chunked = props.chunk();
+                                let statement = data[key].statement;
 
-                        for (let chunk of chunked) {
-                            await uploadData(statement, chunk);
+                                for (let chunk of chunked) {
+                                    await uploadData(statement, chunk);
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        for (let key in processedData) {
+                            let props = processedData[key].props;
+                            if (props.length === 0) continue;
+                            let chunked = props.chunk();
+                            let statement = processedData[key].statement;
+
+                            for (let chunk of chunked) {
+                                await uploadData(statement, chunk);
+                            }
                         }
                     }
                 }

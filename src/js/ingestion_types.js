@@ -115,6 +115,17 @@
  * @property {Array.<TypedPrincipal>} DcomUsers
  * @property {Array.<TypedPrincipal>} PSRemoteUsers
  * @property {Array.<TypedPrincipal>} AffectedComputers
+ * @property {boolean} BlockInheritance
+ * @property {LinkType} Unenforced
+ * @property {LinkType} Enforced
+ */
+
+/**
+ * @typedef {Object} LinkType
+ * @property {Dictionary.<string,int>} PasswordPolicies
+ * @property {Dictionary.<string,bool>} SMBSigning
+ * @property {Dictionary.<string,bool>} LDAPSigning
+ * @property {Dictionary.<string,int>} LMAuthenticationLevel
  */
 
 /**

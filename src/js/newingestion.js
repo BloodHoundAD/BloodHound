@@ -1,5 +1,6 @@
 import { groupBy } from 'lodash/collection';
 
+var blockInheritanceComputers = [];
 const TRUST_DIRECTION_INBOUND = 'Inbound';
 const TRUST_DIRECTION_OUTBOUND = 'Outbound';
 const TRUST_DIRECTION_BIDIRECTIONAL = 'Bidirectional';
@@ -34,6 +35,11 @@ export const ADLabels = {
     Contains: 'Contains',
     GPLink: 'GPLink',
     TrustedBy: 'TrustedBy',
+    PasswordPolicies: 'PasswordPolicies',
+    SMBSigning: 'SMBSigning',
+    LDAPSigning: 'LDAPSigning',
+    LMAuthenticationLevel: 'LMAuthenticationLevel',
+    GPOChanges: 'GPOChanges',
 };
 
 const AzureApplicationAdministratorRoleId =
@@ -527,13 +533,17 @@ export function buildContainerJsonNew(chunk) {
 /**
  * @param {Array.<OU>} chunk
  * @return {{}}
- */
+*/
 export function buildOuJsonNew(chunk) {
     let queries = {};
     queries.properties = {
         statement: PROP_QUERY.format(ADLabels.OU),
         props: [],
     };
+
+    let computerStatement = PROP_QUERY.format(ADLabels.Computer);
+    let queriesComputers = {};
+    var linkTypeProperties = [];
 
     for (let ou of chunk) {
         let properties = ou.Properties;
@@ -543,6 +553,7 @@ export function buildOuJsonNew(chunk) {
         let identifier = ou.ObjectIdentifier.toUpperCase();
         properties.objectid = identifier;
         let aces = ou.Aces;
+        let blockInheritance = ou.GPOChanges.BlockInheritance;
 
         processAceArrayNew(aces, identifier, 'OU', queries);
 
@@ -550,6 +561,100 @@ export function buildOuJsonNew(chunk) {
             objectid: identifier,
             map: properties,
         });
+        // add GPOChanges properties to the affected computers
+        let computers = ou.GPOChanges.AffectedComputers;
+        let computerProperties = {"unenforced": {}, "enforced": {}};
+        let linkType = [ou.GPOChanges.Unenforced, ou.GPOChanges.Enforced];
+        // add enforced and unenforced properties separatly
+        for (let index=0;index<linkType.length;index++) {
+            computerProperties[Object.keys(computerProperties)[index]] = {
+                // password policies
+                "minimumPasswordAge": linkType[index].PasswordPolicies.MinimumPasswordAge,
+                "maximumPasswordAge": linkType[index].PasswordPolicies.MaximumPasswordAge,
+                "minimumPasswordLength": linkType[index].PasswordPolicies.MinimumPasswordLength,
+                "passwordComplexity": linkType[index].PasswordPolicies.PasswordComplexity,
+                "passwordHistorySize": linkType[index].PasswordPolicies.PasswordHistorySize,
+                "clearTextPassword": linkType[index].PasswordPolicies.ClearTextPassword,
+                // lockout policies
+                "lockoutDuration": linkType[index].LockoutPolicies.LockoutDuration,
+                "lockoutBadCount": linkType[index].LockoutPolicies.LockoutBadCount,
+                "resetLockoutCount": linkType[index].LockoutPolicies.ResetLockoutCount,
+                "forceLogoffWhenHourExpire": linkType[index].LockoutPolicies.ForceLogoffWhenHourExpire,
+                // SMB signings
+                "requiresServerSMBSigning": linkType[index].SMBSigning.RequiresServerSMBSigning,
+                "enablesServerSMBSigning": linkType[index].SMBSigning.EnablesServerSMBSigning,
+                "requiresClientSMBSigning": linkType[index].SMBSigning.RequiresClientSMBSigning,
+                "enablesClientSMBSigning": linkType[index].SMBSigning.EnablesClientSMBSigning,
+                // LDAP signing
+                "requiresLDAPClientSigning": linkType[index].LDAPSigning.RequiresLDAPClientSigning,
+                // LM authentication level
+                "lmCompatibilityLevel": linkType[index].LMAuthenticationLevel.LmCompatibilityLevel
+            };
+        };
+
+        var computerIdentifier = "";
+        var found;
+        // add properties for each affected computer
+        for (let index=0;index<computers.length;index++){
+            found = false;
+            computerIdentifier = computers[index].ObjectIdentifier.toUpperCase();
+            if(!blockInheritanceComputers.includes(computerIdentifier)){
+                // unenforced are added first and may be overridden by enforced
+                for (let prop of linkTypeProperties){
+                    // if the computer is already affected by properties
+                    if(prop.objectid === computerIdentifier){
+                        // add the ones which do not exist yet
+                        for(let [key, value] of Object.entries(computerProperties["unenforced"])){
+                        if(prop.map[key] === undefined && !(value === undefined)){
+                                prop.map[key] = value;
+                            }
+                        }
+                        found = true;
+                    }
+                }
+
+                // if the computer has not already been affected by properties
+                if(!found){
+                    linkTypeProperties.push({
+                        objectid: computerIdentifier,
+                        map: computerProperties["unenforced"],
+                    });
+                }
+
+                // add the computer to the block inheritance array if needed
+                if(blockInheritance){
+                    blockInheritanceComputers.push(computerIdentifier);
+                }
+            }
+
+            // enforced properties are always applied (even if the computer is under a node which blocks inheritance)
+            for (let prop of linkTypeProperties){
+                // if the computer is already affected by properties
+                if(prop.objectid === computerIdentifier){
+                    for(let [key, value] of Object.entries(computerProperties["enforced"])){
+                        if(!(value === undefined)){
+                            prop.map[key] = value;
+                        }
+                    }
+                    found = true;
+                }
+            }
+
+            // if the computer has not already been affected by properties
+            if(!found){
+                linkTypeProperties.push({
+                    objectid: computerIdentifier,
+                    map: computerProperties["enforced"],
+                });
+            }
+        }
+
+        queriesComputers = {
+            properties: {
+                statement: computerStatement,
+                props: linkTypeProperties,
+            }
+        };
 
         let format = [ADLabels.OU, '', ADLabels.Contains, NON_ACL_PROPS];
         let grouped = groupBy(children, GROUP_OBJECT_TYPE);
@@ -577,8 +682,6 @@ export function buildOuJsonNew(chunk) {
             };
         });
         insertNew(queries, format, props);
-
-        let computers = ou.GPOChanges.AffectedComputers;
 
         format = [
             '',
@@ -664,7 +767,7 @@ export function buildOuJsonNew(chunk) {
             insertNew(queries, format, flattened);
         }
     }
-    return queries;
+    return [queries, queriesComputers];
 }
 
 /**
@@ -679,6 +782,16 @@ export function buildDomainJsonNew(chunk) {
         props: [],
     };
 
+    let computerStatement = PROP_QUERY.format(ADLabels.Computer);
+    let queriesComputers = [
+        {
+            properties: {
+                statement: computerStatement,
+                props: [],
+            }
+        }
+    ];
+
     for (let domain of chunk) {
         let properties = domain.Properties;
         let children = domain.ChildObjects;
@@ -686,6 +799,69 @@ export function buildDomainJsonNew(chunk) {
         let aces = domain.Aces;
         let links = domain.Links;
         let trusts = domain.Trusts;
+        let computers = domain.GPOChanges.AffectedComputers;
+        let blockInheritance = domain.GPOChanges.BlockInheritance;
+
+        // add GPOChanges properties to the affected computers
+        let computerProperties = {"unenforced": {}, "enforced": {}};
+        let linkType = [domain.GPOChanges.Unenforced, domain.GPOChanges.Enforced];
+        for (let index=0;index<linkType.length;index++) {
+            computerProperties[Object.keys(computerProperties)[index]] = {
+                // password policies
+                "minimumPasswordAge": linkType[index].PasswordPolicies.MinimumPasswordAge,
+                "maximumPasswordAge": linkType[index].PasswordPolicies.MaximumPasswordAge,
+                "minimumPasswordLength": linkType[index].PasswordPolicies.MinimumPasswordLength,
+                "passwordComplexity": linkType[index].PasswordPolicies.PasswordComplexity,
+                "passwordHistorySize": linkType[index].PasswordPolicies.PasswordHistorySize,
+                "clearTextPassword": linkType[index].PasswordPolicies.ClearTextPassword,
+                // lockout policies
+                "lockoutDuration": linkType[index].LockoutPolicies.LockoutDuration,
+                "lockoutBadCount": linkType[index].LockoutPolicies.LockoutBadCount,
+                "resetLockoutCount": linkType[index].LockoutPolicies.ResetLockoutCount,
+                "forceLogoffWhenHourExpire": linkType[index].LockoutPolicies.ForceLogoffWhenHourExpire,
+                // SMB signings
+                "requiresServerSMBSigning": linkType[index].SMBSigning.RequiresServerSMBSigning,
+                "enablesServerSMBSigning": linkType[index].SMBSigning.EnablesServerSMBSigning,
+                "requiresClientSMBSigning": linkType[index].SMBSigning.RequiresClientSMBSigning,
+                "enablesClientSMBSigning": linkType[index].SMBSigning.EnablesClientSMBSigning,
+                // LDAP signing
+                "requiresLDAPClientSigning": linkType[index].LDAPSigning.RequiresLDAPClientSigning,
+                // LM authentication level
+                "lmCompatibilityLevel": linkType[index].LMAuthenticationLevel.LmCompatibilityLevel
+            };
+        };
+
+        var computerIdentifier = "";
+        // add properties for each affected computer
+        for (let index=0;index<computers.length;index++) {
+            computerIdentifier = computers[index].ObjectIdentifier.toUpperCase();
+
+            if(!blockInheritanceComputers.includes(computerIdentifier)){
+                // unenforced will be overridden by enforced
+                computerProperties = _.merge(computerProperties["unenforced"], computerProperties["enforced"]);
+
+                // add the computer to the block inheritance array if needed
+                if(blockInheritance){
+                    blockInheritanceComputers.push(computerIdentifier);
+                }
+
+            } else {
+                // enforced properties are applied even if the computer is under a node which blocks inheritance
+                computerProperties = computerProperties["enforced"];
+            }
+
+            queriesComputers[index] = {
+                properties: {
+                    statement: computerStatement,
+                    props: [
+                        {
+                            objectid: computerIdentifier,
+                            map: computerProperties,
+                        }
+                    ],
+                }
+            };
+        }
 
         processAceArrayNew(aces, identifier, 'Domain', queries);
 
@@ -720,8 +896,6 @@ export function buildDomainJsonNew(chunk) {
             };
         });
         insertNew(queries, format, props);
-
-        let computers = domain.GPOChanges.AffectedComputers;
 
         format = [
             '',
@@ -861,7 +1035,7 @@ export function buildDomainJsonNew(chunk) {
         }
     }
 
-    return queries;
+    return [queries, queriesComputers].flat();
 }
 
 const baseInsertStatement =
