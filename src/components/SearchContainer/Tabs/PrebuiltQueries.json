@@ -421,7 +421,7 @@
 			"queryList": [
 				{
 					"final": true,
-					"query": "MATCH (n:Group) WHERE n.objectid CONTAINS 'S-1-5' AND n.azsyncid IS NOT NULL RETURN n"
+					"query": "MATCH (g:AZGroup {onpremsyncenabled: True}) RETURN g"
 				}
 			]
 		},
