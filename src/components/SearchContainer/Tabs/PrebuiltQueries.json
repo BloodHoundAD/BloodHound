@@ -416,16 +416,6 @@
 			]
 		},
 		{
-			"name": "Return All Azure Users and their Groups",
-			"category": "Azure",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH p=(m:AZUser)-[r:MemberOf]->(n) WHERE NOT m.objectid CONTAINS 'S-1-5' RETURN p"
-				}
-			]
-		},
-		{
 			"name": "Return All Azure AD Groups that are synchronized with On-Premise AD",
 			"category": "Azure",
 			"queryList": [
