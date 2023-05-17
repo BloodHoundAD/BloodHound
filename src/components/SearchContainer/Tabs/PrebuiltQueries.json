@@ -396,16 +396,6 @@
 			]
 		},
 		{
-			"name": "Return All On-Prem users with edges to Azure",
-			"category": "Azure",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH  p=(m:User)-[r:AZResetPassword|AZOwns|AZUserAccessAdministrator|AZContributor|AZAddMembers|AZGlobalAdmin|AZVMContributor|AZOwnsAZAvereContributor]->(n) WHERE m.objectid CONTAINS 'S-1-5-21' RETURN p"
-				}
-			]
-		},
-		{
 			"name": "Find all paths to an Azure VM",
 			"category": "Azure",
 			"queryList": [
