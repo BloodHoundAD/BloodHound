@@ -605,7 +605,7 @@
 			"queryList": [
 				{
 					"final": true,
-					"query": "MATCH p=(:AZVM)-[:AZManagedIdentity]->(n) RETURN p",
+					"query": "MATCH (m:AZServicePrincipal {serviceprincipaltype: 'ManagedIdentity'})-[*]->(kv:AZKeyVault) WITH collect(m) AS managedIdentities MATCH p = (n)-[r]->(kv:AZKeyVault) WHERE n IN managedIdentities RETURN p",
 					"allowCollapse": true
 				}
 			]
