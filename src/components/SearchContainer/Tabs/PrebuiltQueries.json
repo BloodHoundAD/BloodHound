@@ -445,6 +445,17 @@
 				}
 			]
 		},
+        {
+			"name": "Return all paths to Azure Keyvaults from owned principals",
+			"category": "Azure",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p = ({owned: true})-[r]->(g:AZKeyVault) RETURN p",
+					"allowCollapse": true
+				}
+			]
+		},
 		{
 			"name": "Return All Service Principals with MS Graph App Role Assignments",
 			"category": "Azure - MS Graph",
