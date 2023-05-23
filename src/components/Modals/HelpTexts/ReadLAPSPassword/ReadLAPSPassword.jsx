@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Tabs, Tab } from 'react-bootstrap';
 import General from './General';
-import Abuse from './Abuse';
+import WindowsAbuse from './WindowsAbuse';
+import LinuxAbuse from './LinuxAbuse';
 import Opsec from './Opsec';
 import References from './References';
 
@@ -21,13 +22,16 @@ const ReadLAPSPassword = ({
                     targetName={targetName}
                 />
             </Tab>
-            <Tab eventKey={2} title='Abuse Info'>
-                <Abuse sourceName={sourceName} sourceType={sourceType} />
+            <Tab eventKey={2} title='Windows Abuse'>
+                <WindowsAbuse sourceName={sourceName} sourceType={sourceType} />
             </Tab>
-            <Tab eventKey={3} title='Opsec Considerations'>
+            <Tab eventKey={3} title='Linux Abuse'>
+                <LinuxAbuse sourceName={sourceName} sourceType={sourceType} />
+            </Tab>
+            <Tab eventKey={4} title='Opsec'>
                 <Opsec />
             </Tab>
-            <Tab eventKey={4} title='References'>
+            <Tab eventKey={5} title='Refs'>
                 <References />
             </Tab>
         </Tabs>

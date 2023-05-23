@@ -7,13 +7,13 @@ performance, output, and other behaviors.
 Enumeration Options
 ^^^^^^^^^^^^^^^^^^^
 
-CollectionMethod
+CollectionMethods
 ----------------
 
 This tells SharpHound what kind of data you want to collect. These are the most
 common options you'll likely use:
 
-* **Default:** You can specify default collection, or don't use the CollectionMethod
+* **Default:** You can specify default collection, or don't use the CollectionMethods
   option and this is what SharpHound will do. Default collection includes Active
   Directory security group membership, domain trusts, abusable permissions on AD
   objects, OU tree structure, Group Policy links, the most relevant AD object

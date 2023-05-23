@@ -34,7 +34,24 @@ export const ADLabels = {
     Contains: 'Contains',
     GPLink: 'GPLink',
     TrustedBy: 'TrustedBy',
+    DumpSMSAPassword: 'DumpSMSAPassword',
 };
+
+const TrustDirections =
+{
+    0: "Disabled",
+    1: "Inbound",
+    2: "Outbound",
+    3: "Bidirectional"
+}
+
+const TrustTypes =
+{
+    0: "ParentChild",
+    1: "CrossLink",
+    2: "Forest",
+    3: "External"
+}
 
 const AzureApplicationAdministratorRoleId =
     '9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3';
@@ -232,6 +249,7 @@ export function buildComputerJsonNew(chunk) {
         let privSessions = computer.PrivilegedSessions.Results;
         let regSessions = computer.RegistrySessions.Results;
         let aces = computer.Aces;
+        let dumpSMSAPassword = computer.DumpSMSAPassword;
 
         queries.properties.props.push({
             objectid: identifier,
@@ -278,6 +296,22 @@ export function buildComputerJsonNew(chunk) {
             });
             insertNew(queries, format, props);
         }
+
+        format = [
+            ADLabels.Computer,
+            ADLabels.User,
+            ADLabels.DumpSMSAPassword,
+            NON_ACL_PROPS,
+        ];
+
+        if (dumpSMSAPassword === undefined)
+            dumpSMSAPassword = [];
+
+        props = dumpSMSAPassword.map((principal) => {
+            return { source: identifier, target: principal.ObjectIdentifier };
+        });
+
+        insertNew(queries, format, props);
 
         format = [
             ADLabels.Computer,
@@ -821,11 +855,19 @@ export function buildDomainJsonNew(chunk) {
         ];
 
         for (let trust of trusts) {
-            let direction = trust.TrustDirection;
+
+            let direction = "Unknown"
+            let trustType = "Unknown"
+            if (TrustDirections.hasOwnProperty(trust.TrustDirection)) {
+                direction = TrustDirections[trust.TrustDirection];
+            }
+            if (TrustTypes.hasOwnProperty(trust.TrustType)) {
+                trustType = TrustTypes[trust.TrustType];
+            }
+
             let transitive = trust.IsTransitive;
             let target = trust.TargetDomainSid;
             let sidFilter = trust.SidFilteringEnabled;
-            let trustType = trust.TrustType;
             let targetName = trust.TargetDomainName;
 
             queries.properties.props.push({
@@ -1380,6 +1422,8 @@ export function convertAzureGroup(data, ingestionData) {
                 securityidentifier: data.securityIdentifier,
                 name: `${data.displayName}@${data.tenantName}`.toUpperCase(),
                 tenantid: data.tenantId.toUpperCase(),
+                groupTypes: data.groupTypes,
+                membershipRule: data.membershipRule,
             },
         },
         false

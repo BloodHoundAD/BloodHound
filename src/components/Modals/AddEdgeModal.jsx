@@ -322,6 +322,9 @@ const AddEdgeModal = () => {
                             <option value='WriteAccountRestrictions'>
                                 WriteAccountRestrictions
                             </option>
+                            <option value='DumpSMSAPassword'>
+                                DumpSMSAPassword
+                            </option>
                         </FormControl>
                         {errors.edgeErrors.length > 0 && (
                             <span className={styles.error}>

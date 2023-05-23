@@ -10,6 +10,9 @@ const References = () => {
             <a href='https://adsecurity.org/?p=3164'>
                 https://adsecurity.org/?p=3164
             </a>
+            <a href='https://www.thehacker.recipes/ad/movement/dacl/readlapspassword'>
+                https://www.thehacker.recipes/ad/movement/dacl/readlapspassword
+            </a>
         </>
     );
 };

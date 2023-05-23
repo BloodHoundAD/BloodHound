@@ -7,7 +7,7 @@ const General = ({ sourceName, sourceType, targetName, targetType }) => {
         <>
             <p>
                 {groupSpecialFormat(sourceType, sourceName)} the
-                AllExtendedRights privilege to the {typeFormat(targetType)}
+                AllExtendedRights privilege to the {typeFormat(targetType)} 
                 {targetName}.
             </p>
 

@@ -1242,7 +1242,7 @@ binary bytes for the new DACL/ACE:
   $SD.GetBinaryForm($SDBytes, 0)
 
 Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity
-field of the comptuer account we're taking over, again using PowerView in this case:
+field of the computer account we're taking over, again using PowerView in this case:
 
 ::
 
@@ -1507,6 +1507,29 @@ See the abuse info under the AddMembers edge for more information
 With GenericWrite over a computer, perform resource-based constrained delegation against the
 computer. See the GenericAll edge abuse info for more information about that attack.
 
+**GPO**
+
+With GenericWrite on a GPO, you may make modifications
+to that GPO which will then apply to the users and
+computers affected by the GPO. Select the target object
+you wish to push an evil policy down to, then use the
+gpedit GUI to modify the GPO, using an evil policy that
+allows item-level targeting, such as a new immediate
+scheduled task. Then wait for the group
+policy client to pick up and execute the new evil
+policy. See the references tab for a more detailed write
+up on this abuse.
+
+This edge can be a false positive in rare scenarios. If you have 
+GenericWrite on the GPO with 'This object only' (no inheritance) 
+and no other permissions in the ACL, it is not possible to add or 
+modify settings of the GPO. The GPO's settings are stored in 
+SYSVOL under a folder for the given GPO. Therefore, you need write 
+access to child objects of this folder or create child objects 
+permission. The security descriptor of the GPO is reflected on 
+the folder, meaning permissions to write child items on the GPO
+are required.
+
 Opsec Considerations
 --------------------
 
@@ -1711,7 +1734,7 @@ To abuse this privilege, use Whisker:
 
     Whisker.exe add /target:<TargetPrincipal>
     
-For other optional parameters, view the Whisper documentation.
+For other optional parameters, view the Whisker documentation.
 
 Opsec Considerations
 --------------------
@@ -1939,15 +1962,17 @@ Abuse Info
 Having this privilege over a user grants the ability to reset the user's password. For
 more information about that, see the ForceChangePassword edge section
 
-**Groups**
-
-This privilege grants the ability to modify group memberships. For more information on
-that, see the AddMembers edge section
-
 **Computers**
 
 You may perform resource-based constrained delegation with this privilege over a computer
 object. For more information about that, see the GenericAll edge section.
+
+**Domain**
+The AllExtendedRights privilege grants both the
+DS-Replication-Get-Changes and DS-Replication-Get-Changes-All 
+privileges, which combined allow a principal to replicate objects from the domain.
+This can be abused using the lsadump::dcsync command in mimikatz.
+
 
 Opsec Considerations
 --------------------
@@ -2195,6 +2220,86 @@ References
 
 * https://github.com/simondotsh/DirSync
 * https://simondotsh.com/infosec/2022/07/11/dirsync.html
+
+|
+
+----
+
+|
+
+DumpSMSAPassword
+^^^^^^^^^^^^^^^^^^^^
+
+A computer with this indicates that a Standalone Managed Service Account (sMSA)
+is installed on it. An actor with administrative privileges on the computer
+can retrieve the sMSA's password by dumping LSA secrets.
+
+Abuse Info
+------------
+
+From an elevated command prompt on the computer where the sMSA resides, run
+mimikatz then execute the following commands:
+
+::
+
+    privilege::debug
+    token::elevate
+    lsadump::secrets
+
+In the output, find *_SC_{262E99C9-6160-4871-ACEC-4E61736B6F21}_* suffixed by the
+name of the targeted sMSA. The next line contains *cur/hex :* followed with the
+sMSA's password hex-encoded.
+
+To use this password, its NT hash must be calculated. This can be done using
+a small python script:
+
+::
+
+    # nt.py
+    import sys, hashlib
+
+    pw_hex = sys.argv[1]
+    nt_hash = hashlib.new('md4', bytes.fromhex(pw_hex)).hexdigest()
+
+    print(nt_hash)
+
+Execute it like so:
+
+::
+
+    python3 nt.py 35f3e1713d61...
+
+To authenticate as the sMSA, leverage pass-the-hash.
+
+Alternatively, to avoid executing mimikatz on the host, you can save a copy of
+the *SYSTEM* and *SECURITY* registry hives from an elevated prompt:
+
+::
+
+    reg save HKLM\SYSTEM %temp%\SYSTEM & reg save HKLM\SECURITY %temp%\SECURITY
+
+Transfer the files named *SYSTEM* and *SECURITY* that were saved at *%temp%* to
+another computer where mimikatz can be safely executed.
+
+On this other computer, run mimikatz from a command prompt then execute the
+following command to obtain the hex-encoded password:
+
+::
+
+    lsadump::secrets /system:C:\path\to\file\SYSTEM /security:C:\path\to\file\SECURITY
+
+Opsec Considerations
+--------------------
+
+Access to registry hives can be monitored and alerted via event ID 4656
+(A handle to an object was requested).
+
+References
+----------
+
+* https://simondotsh.com/infosec/2022/12/12/assessing-smsa.html
+* https://www.ired.team/offensive-security/credential-access-and-credential-dumping/dumping-lsa-secrets
+* https://github.com/gentilkiwi/mimikatz
 
 |
 
@@ -2974,7 +3079,7 @@ References
 
 |
 
-AZKeyVaultKVContributor
+AZKeyVaultContributor
 ^^^^^^^
 
 The Key Vault Contributor role grants full control of the 
@@ -3047,6 +3152,58 @@ References
 ----
 
 |
+
+AZManagedIdentity
+^^^^^^^^
+
+Azure resources like Virtual Machines, Logic Apps, and Automation Accounts
+can be assigned to either System- or User-Assigned Managed Identities.
+This assignment allows the Azure resource to authenticate to Azure services
+as the Managed Identity without needing to know the credential for that 
+Managed Identity. Managed Identities, whether System- or User-Assigned, are
+AzureAD Service Principals.
+
+Abuse Info
+------------
+
+You can modify the Azure RM resource to execute actions against Azure with the 
+privileges of the Managed Identity Service Principal.
+
+It is also possible to extract a JSON Web Token (JWT) for the Service Principal, 
+then use that JWT to authenticate as the Service Principal outside the scope of
+the Azure RM resource. Here is how you extract the JWT using PowerShell:
+
+::
+
+
+  $tokenAuthURI = $env:MSI_ENDPOINT + "?resource=https://graph.microsoft.com/&api-version=2017-09-01"
+  $tokenResponse = Invoke-RestMethod -Method Get -Headers @{"Secret"="$env:MSI_SECRET"} -Uri $tokenAuthURI
+  $tokenResponse.access_token
+
+
+We can then use this JWT to authenticate as the Service Principal to the Microsoft 
+Graph APIs using BARK for example.
+
+
+Opsec Considerations
+--------------------
+
+This will depend on which particular abuse you perform, but in general Azure will create a log event for each abuse.
+
+References
+----------
+
+* https://attack.mitre.org/techniques/T1078/
+* https://posts.specterops.io/managed-identity-attack-paths-part-1-automation-accounts-82667d17187a
+* https://m365internals.com/2021/11/30/lateral-movement-with-managed-identities-of-azure-virtual-machines
+* https://github.com/BloodHoundAD/BARK
+
+|
+
+----
+
+|
+
 
 AZMemberOf
 ^^^^^^^
@@ -3830,6 +3987,36 @@ References
 
 * https://blog.netspi.com/attacking-azure-with-custom-script-extensions/
 * https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#owner
+
+|
+
+----
+
+|
+
+AZPrivilegedAuthAdmin
+^^^^^^^^^^^^^
+
+This edge indicates the principal has the Privileged Authentication Administrator 
+role active against the target tenant. Principals with this role can update
+sensitive properties for all users. Privileged Authentication Administrator can 
+set or reset any authentication method (including passwords) for any user,
+including Global Administrators.
+
+Abuse Info
+------------
+
+See the abuse info under AZAddSecret or AZResetPassword.
+
+Opsec Considerations
+--------------------
+
+See the opsec consideration under AZAddSecret or AZResetPassword.
+
+References
+----------
+
+* https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference#privileged-authentication-administrator
 
 |
 

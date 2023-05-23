@@ -10,6 +10,10 @@ const References = () => {
             <a href='https://blog.harmj0y.net/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/'>
                 https://blog.harmj0y.net/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/
             </a>
+            <br />
+            <a href='https://www.thehacker.recipes/ad/movement/credentials/dumping/dcsync'>
+                https://www.thehacker.recipes/ad/movement/credentials/dumping/dcsync
+            </a>
         </>
     );
 };
