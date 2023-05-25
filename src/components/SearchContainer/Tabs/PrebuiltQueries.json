@@ -478,6 +478,17 @@
 				}
 			]
 		},
+        {
+			"name": "Return OnPrem synced Users with Paths to High Value Targets",
+			"category": "Azure",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (m:AZUser WHERE m.onpremisesyncenabled = true),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= \"GetChanges\") AND NONE (r in relationships(p) WHERE type(r)=\"GetChangesAll\") AND NOT m=n RETURN p",
+					"allowCollapse": true
+				}
+			]
+		},
 		{
 			"name": "Return All Service Principals with MS Graph App Role Assignments",
 			"category": "Azure - MS Graph",
