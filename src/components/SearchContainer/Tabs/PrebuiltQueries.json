@@ -467,6 +467,17 @@
 				}
 			]
 		},
+        {
+			"name": "Return Azure Users that are synced from OnPrem",
+			"category": "Azure",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (n:AZUser WHERE n.onpremisesyncenabled = true) RETURN n",
+					"allowCollapse": true
+				}
+			]
+		},
 		{
 			"name": "Return All Service Principals with MS Graph App Role Assignments",
 			"category": "Azure - MS Graph",
