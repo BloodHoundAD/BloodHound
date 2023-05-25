@@ -1,8 +1,7 @@
 import { groupBy } from 'lodash/collection';
 
-var blockInheritanceComputers = [];
-var linkTypeProperties = [];
-var enforcedProperties = {};
+let unenforcedDomainProperties = {};
+let enforcedDomainPropertyKeys = {};
 const TRUST_DIRECTION_INBOUND = 'Inbound';
 const TRUST_DIRECTION_OUTBOUND = 'Outbound';
 const TRUST_DIRECTION_BIDIRECTIONAL = 'Bidirectional';
@@ -38,6 +37,7 @@ export const ADLabels = {
     GPLink: 'GPLink',
     TrustedBy: 'TrustedBy',
     PasswordPolicies: 'PasswordPolicies',
+    LockoutPolicies: 'LockoutPolicies',
     SMBSigning: 'SMBSigning',
     LDAPSigning: 'LDAPSigning',
     LMAuthenticationLevel: 'LMAuthenticationLevel',
@@ -544,13 +544,17 @@ export function buildOuJsonNew(chunk) {
     };
 
     let computerStatement = PROP_QUERY.format(ADLabels.Computer);
-    let queriesComputers = {};
+    let computerQuery = {};
+    let computerProperties = [];
+    let blockInheritanceComputers = [];
+    let enforcedOuProperties = {};
 
     // sort OU from the children to the parent using the length of the distinguished name
     chunk.sort((a,b) => {
         return b.Properties.distinguishedname.length - a.Properties.distinguishedname.length;
     });
 
+    // OU are processed from the bottom up, so the default behavior is to not override already set properties
     for (let ou of chunk) {
         let properties = ou.Properties;
         let links = ou.Links;
@@ -567,13 +571,15 @@ export function buildOuJsonNew(chunk) {
             objectid: identifier,
             map: properties,
         });
+
         // add GPOChanges properties to the affected computers
         let computers = ou.GPOChanges.AffectedComputers;
-        let computerProperties = {"unenforced": {}, "enforced": {}};
+        let ouProperties = {"unenforced": {}, "enforced": {}};
         let linkType = [ou.GPOChanges.Unenforced, ou.GPOChanges.Enforced];
+
         // add enforced and unenforced properties separatly
         for (let index=0;index<linkType.length;index++) {
-            computerProperties[Object.keys(computerProperties)[index]] = {
+            ouProperties[Object.keys(ouProperties)[index]] = {
                 // password policies
                 "minimumPasswordAge": linkType[index].PasswordPolicies.MinimumPasswordAge,
                 "maximumPasswordAge": linkType[index].PasswordPolicies.MaximumPasswordAge,
@@ -598,66 +604,77 @@ export function buildOuJsonNew(chunk) {
             };
         };
 
-        var computerIdentifier = "";
-        var found;
-        // build a vector of properties for each affected computer, taking into account the blocInheritance and the enforced precedences
+        // add properties
         for (let index=0;index<computers.length;index++){
-            found = false;
-            computerIdentifier = computers[index].ObjectIdentifier.toUpperCase();
+            let computerIdentifier = computers[index].ObjectIdentifier.toUpperCase();
+            let found = false;
+
+            // remove unenforced OU properties overlapping with domain enforced properties
+            if(Object.keys(enforcedDomainPropertyKeys).includes(computerIdentifier)){
+                for (let key of enforcedDomainPropertyKeys[computerIdentifier]){
+                    delete ouProperties["unenforced"][key];
+                }
+            }
+
+            // unenforced properties
             if(!blockInheritanceComputers.includes(computerIdentifier)){
-                // unenforced are added first and may be overridden by enforced
-                for (let prop of linkTypeProperties){
-                    // if the computer is already affected by properties
+                // add, if the computer is already affected by properties
+                for (let prop of computerProperties){
                     if(prop.objectid === computerIdentifier){
-                        // add the ones which do not exist yet
-                        for(let [key, value] of Object.entries(computerProperties["unenforced"])){
-                            if(prop.map[key] === undefined && value != undefined){
-                                    prop.map[key] = value;
+                        // add properties which do not exist yet and are not enforced at the domain level
+                        for(let [key, value] of Object.entries(ouProperties["unenforced"])){
+                            if(prop.map[key] === undefined && (!Object.keys(enforcedDomainPropertyKeys).includes(computerIdentifier) || !enforcedDomainPropertyKeys[computerIdentifier].includes(key)) && value !== undefined){
+                                prop.map[key] = value;
                             }
                         }
                         found = true;
                     }
                 }
 
-                // if the computer has not already been affected by properties
+                // create, if the computer has not already been affected by properties
                 if(!found){
-                    linkTypeProperties.push({
+                    computerProperties.push({
                         objectid: computerIdentifier,
-                        // clone the object, without using the same reference
-                        map: Object.assign({}, computerProperties["unenforced"]),
+                        map: Object.assign({}, ouProperties["unenforced"]),
                     });
-                    enforcedProperties[computerIdentifier] = [];
                 }
 
-                // add the computer to the block inheritance array if needed
                 if(blockInheritance){
+                    // add the computer to the block inheritance array
                     blockInheritanceComputers.push(computerIdentifier);
+                    // remove unenforced properties set by domains
+                    delete unenforcedDomainProperties[computerIdentifier];
                 }
             }
 
-            // enforced properties are always applied (even if the computer is under a node which blocks inheritance)
-            for (let prop of linkTypeProperties){
-                // if this computer is already affected by properties
+            // enforced properties
+            // add, if this computer is already affected by properties
+            for (let prop of computerProperties){
                 if(computerIdentifier === prop.objectid){
-                    for(let [key, value] of Object.entries(computerProperties["enforced"])){
-                        // rewrite the property if it is empty or an unenforced one
-                        if(value != undefined && (!Object.keys(enforcedProperties).includes(computerIdentifier) || !(enforcedProperties[computerIdentifier].includes(key)))){
+                    for(let [key, value] of Object.entries(ouProperties["enforced"])){
+                        // override the property if it is empty or an not enforced at a lower OU level
+                        if(value !== undefined && (!Object.keys(enforcedOuProperties).includes(computerIdentifier) || !(enforcedOuProperties[computerIdentifier].includes(key)))){
                             prop.map[key] = value;
-                            enforcedProperties[computerIdentifier].push(key);
+                            // store the property keys as enforced
+                            try{
+                                enforcedOuProperties[computerIdentifier].push(key);
+                            } catch (ReferenceRerror){
+                                enforcedOuProperties[computerIdentifier] = [key];
+                            }
                         }
                     }
                     found = true;
                 }
             }
 
-            // if the computer has not already been affected by properties
+            // create,if the computer has not already been affected by properties
             if(!found){
-                linkTypeProperties.push({
+                computerProperties.push({
                     objectid: computerIdentifier,
-                    // clone the object, without using the same reference
-                    map: Object.assign({}, computerProperties["enforced"]),
+                    map: Object.assign({}, ouProperties["enforced"]),
                 });
-                enforcedProperties[computerIdentifier] = Object.keys(computerProperties["enforced"]);
+                // store the property keys as enforced
+                enforcedOuProperties[computerIdentifier] = Object.keys(ouProperties["enforced"]);
             }
         }
 
@@ -773,14 +790,26 @@ export function buildOuJsonNew(chunk) {
         }
     }
 
-    queriesComputers = {
+    // Finally add domain unenforced properties, without overriding existing properties
+    for (let domainComputerId of Object.keys(unenforcedDomainProperties)){
+        for (let prop of computerProperties){
+            if(domainComputerId === prop.objectid){
+                for (let [key, value] of Object.entries(prop.map)){
+                    if(unenforcedDomainProperties[domainComputerId][key] !== undefined && value === undefined){
+                        prop.map[key] = unenforcedDomainProperties[domainComputerId][key];
+                    }
+                }
+            }
+        }
+    }
+    computerQuery = {
         properties: {
             statement: computerStatement,
-            props: linkTypeProperties,
+            props: computerProperties,
         }
     };
 
-    return [queries, queriesComputers];
+    return [queries, computerQuery];
 }
 
 /**
@@ -796,7 +825,8 @@ export function buildDomainJsonNew(chunk) {
     };
 
     let computerStatement = PROP_QUERY.format(ADLabels.Computer);
-    let queriesComputers = {};
+    let computerQuery = {};
+    let computerProperties = [];
 
     for (let domain of chunk) {
         let properties = domain.Properties;
@@ -806,13 +836,12 @@ export function buildDomainJsonNew(chunk) {
         let links = domain.Links;
         let trusts = domain.Trusts;
         let computers = domain.GPOChanges.AffectedComputers;
-        let blockInheritance = domain.GPOChanges.BlockInheritance;
 
         // add GPOChanges properties to the affected computers
-        let computerProperties = {"unenforced": {}, "enforced": {}};
+        let domainProperties = {"unenforced": {}, "enforced": {}};
         let linkType = [domain.GPOChanges.Unenforced, domain.GPOChanges.Enforced];
         for (let index=0;index<linkType.length;index++) {
-            computerProperties[Object.keys(computerProperties)[index]] = {
+            domainProperties[Object.keys(domainProperties)[index]] = {
                 // password policies
                 "minimumPasswordAge": linkType[index].PasswordPolicies.MinimumPasswordAge,
                 "maximumPasswordAge": linkType[index].PasswordPolicies.MaximumPasswordAge,
@@ -837,65 +866,21 @@ export function buildDomainJsonNew(chunk) {
             };
         };
 
-        var computerIdentifier = "";
-        var found;
         // add properties for each affected computer
+        // a computer can belong to one domain max
         for (let index=0;index<computers.length;index++){
-            found = false;
-            computerIdentifier = computers[index].ObjectIdentifier.toUpperCase();
-            if(!blockInheritanceComputers.includes(computerIdentifier)){
-                // unenforced are added first and may be overridden by enforced
-                for (let prop of linkTypeProperties){
-                    // if the computer is already affected by properties
-                    if(prop.objectid === computerIdentifier){
-                        // add the ones which do not exist yet
-                        for(let [key, value] of Object.entries(computerProperties["unenforced"])){
-                        if(prop.map[key] === undefined && value != undefined){
-                                prop.map[key] = value;
-                            }
-                        }
-                        found = true;
-                    }
-                }
+            let computerIdentifier = computers[index].ObjectIdentifier.toUpperCase();
 
-                // if the computer has not already been affected by properties
-                if(!found){
-                    linkTypeProperties.push({
-                        objectid: computerIdentifier,
-                        // clone the object, without using the same reference
-                        map: Object.assign({}, computerProperties["unenforced"]),
-                    });
-                    enforcedProperties[computerIdentifier] = [];
-                }
+            // store unenforced propertiesto manage precedences with OU properties
+            unenforcedDomainProperties[computerIdentifier] = domainProperties["unenforced"];
 
-                // add the computer to the block inheritance array if needed
-                if(blockInheritance){
-                    blockInheritanceComputers.push(computerIdentifier);
-                }
-            }
-
-            // enforced properties are always applied (even if the computer is under a node which blocks inheritance)
-            for (let prop of linkTypeProperties){
-                // if this computer is already affected by properties
-                if(prop.objectid === computerIdentifier){
-                    for(let [key, value] of Object.entries(computerProperties["enforced"])){
-                        if(value != undefined && (!Object.keys(enforcedProperties).includes(computerIdentifier) || !(enforcedProperties[computerIdentifier].includes(key)))){                            prop.map[key] = value;
-                            enforcedProperties[computerIdentifier].push(key);
-                        }
-                    }
-                    found = true;
-                }
-            }
-
-            // if the computer has not already been affected by properties
-            if(!found){
-                linkTypeProperties.push({
-                    objectid: computerIdentifier,
-                    // clone the object, without using the same reference
-                    map: Object.assign({}, computerProperties["enforced"]),
-                });
-                enforcedProperties[computerIdentifier] = Object.keys(computerProperties["enforced"]);
-            }
+            // add enforced properties
+            computerProperties.push({
+                objectid: computerIdentifier,
+                map: Object.assign({}, domainProperties["enforced"]),
+            });
+            // store defined property keys
+            enforcedDomainPropertyKeys[computerIdentifier] = Object.keys(domainProperties["enforced"]).filter(key => domainProperties["enforced"][key] !== undefined);
         }
 
         processAceArrayNew(aces, identifier, 'Domain', queries);
@@ -1070,14 +1055,14 @@ export function buildDomainJsonNew(chunk) {
         }
     }
 
-    queriesComputers = {
+    computerQuery = {
         properties: {
             statement: computerStatement,
-            props: linkTypeProperties,
+            props: computerProperties,
         }
     };
 
-    return [queries, queriesComputers];
+    return [queries, computerQuery];
 }
 
 const baseInsertStatement =

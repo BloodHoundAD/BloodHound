@@ -123,6 +123,7 @@
 /**
  * @typedef {Object} LinkType
  * @property {Dictionary.<string,int>} PasswordPolicies
+ * @property {Dictionary.<string,int>} LockoutPolicies
  * @property {Dictionary.<string,bool>} SMBSigning
  * @property {Dictionary.<string,bool>} LDAPSigning
  * @property {Dictionary.<string,int>} LMAuthenticationLevel
