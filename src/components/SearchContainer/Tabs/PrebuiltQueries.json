@@ -401,7 +401,7 @@
 			"queryList": [
 				{
 					"final": true,
-					"query": "MATCH p=(n)-[:AZHasRole|AZMemberOf*1..2]->(r:AZRole WHERE r.displayname IN ['Cloud Application Administrator','Global Administrator','User Administrator']) RETURN p"
+					"query": "MATCH p=(n)-[:AZHasRole|AZMemberOf*1..2]->(r:AZRole WHERE r.displayname IN ['Cloud Application Administrator','Global Administrator','User Administrator','Authentication Administrator']) RETURN p"
 				}
 			]
 		},
