@@ -386,8 +386,8 @@
             ]
         },
         {
-			"name": "Return All Azure Users that are part of the 'Global Administrator' Role",
-			"category": "Azure",
+			"name": "Return all Members of the 'Global Administrator' Role",
+			"category": "Azure - General",
 			"queryList": [
 				{
 					"final": true,
@@ -395,81 +395,9 @@
 				}
 			]
 		},
-		{
-			"name": "Find all paths to an Azure VM",
-			"category": "Azure",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH p = (n)-[r]->(g:AZVM) RETURN p"
-				}
-			]
-		},
-		{
-			"name": "Find all paths to an Azure KeyVault",
-			"category": "Azure",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH p = (n)-[r]->(g:AZKeyVault) RETURN p"
-				}
-			]
-		},
-		{
-			"name": "Return All Azure AD Groups that are synchronized with On-Premise AD",
-			"category": "Azure",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH (g:AZGroup {onpremsyncenabled: True}) RETURN g"
-				}
-			]
-		},
         {
-			"name": "Return all Azure Users with a Path to High Value Targets",
-			"category": "Azure",
-			"queryList": [
-				{
-					"final": true,
-					"query": "Return all Azure Users with a Path to High Value Targets MATCH (m:AZUser),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= \"GetChanges\") AND NONE (r in relationships(p) WHERE type(r)=\"GetChangesAll\") AND NOT m=n RETURN p",
-					"allowCollapse": true
-				}
-			]
-		},
-		{
-			"name": "Find all Privileged Service Principals",
-			"category": "Azure - Service Principals",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH p = (g:AZServicePrincipal)-[r]->(n) RETURN p"
-				}
-			]
-		},
-		{
-			"name": "Find all Owners of Azure Applications",
-			"category": "Azure",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH p = (n)-[r:AZOwns]->(g:AZApp) RETURN p"
-				}
-			]
-		},
-        {
-			"name": "Return all paths to Azure Keyvaults from owned principals",
-			"category": "Azure",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH p = ({owned: true})-[r]->(g:AZKeyVault) RETURN p",
-					"allowCollapse": true
-				}
-			]
-		},
-        {
-			"name": "Return Azure Users that are synced from OnPrem",
-			"category": "Azure",
+			"name": "Return all Azure Users that are synced from OnPrem AD",
+			"category": "Azure - General",
 			"queryList": [
 				{
 					"final": true,
@@ -479,8 +407,39 @@
 			]
 		},
         {
-			"name": "Return OnPrem synced Users with Paths to High Value Targets",
-			"category": "Azure",
+			"name": "Return all Azure Groups that are synced from OnPrem AD",
+			"category": "Azure - General",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (g:AZGroup {onpremsyncenabled: True}) RETURN g"
+				}
+			]
+		},
+        {
+			"name": "Return all Owners of Azure Applications",
+			"category": "Azure - General",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p = (n)-[r:AZOwns]->(g:AZApp) RETURN p"
+				}
+			]
+		},
+        {
+			"name": "Find all Azure Users with a Path to High Value Targets",
+			"category": "Azure - Paths",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (m:AZUser),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= \"GetChanges\") AND NONE (r in relationships(p) WHERE type(r)=\"GetChangesAll\") AND NOT m=n RETURN p",
+					"allowCollapse": true
+				}
+			]
+		},
+        {
+			"name": "Find OnPrem synced Users with Paths to High Value Targets",
+			"category": "Azure - Paths",
 			"queryList": [
 				{
 					"final": true,
@@ -490,7 +449,49 @@
 			]
 		},
 		{
-			"name": "Return All Service Principals with MS Graph App Role Assignments",
+			"name": "Find all Paths to Azure VMs",
+			"category": "Azure - Paths",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p = (n)-[r]->(g:AZVM) RETURN p"
+				}
+			]
+		},
+        {
+			"name": "Find shortest Path from Owned Azure Users to VMs",
+			"category": "Azure - Paths",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (n:AZVM) MATCH p = shortestPath((m:AZUser{owned: true})-[*..]->(n)) RETURN p",
+					"allowCollapse": true
+				}
+			]
+		},
+		{
+			"name": "Find all Paths to Azure KeyVaults",
+			"category": "Azure - Paths",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p = (n)-[r]->(g:AZKeyVault) RETURN p"
+				}
+			]
+		},
+		{
+			"name": "Find all Paths to Azure KeyVaults from Owned Principals",
+			"category": "Azure - Paths",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p = ({owned: true})-[r]->(g:AZKeyVault) RETURN p",
+					"allowCollapse": true
+				}
+			]
+		},
+        {
+			"name": "Return all Service Principals with MS Graph App Role Assignments",
 			"category": "Azure - MS Graph",
 			"queryList": [
 				{
@@ -501,7 +502,7 @@
 			]
 		},
 		{
-			"name": "Return all direct controllers of MS Graph",
+			"name": "Return all direct Controllers of MS Graph",
 			"category": "Azure - MS Graph",
 			"queryList": [
 				{
@@ -512,7 +513,7 @@
 			]
 		},
 		{
-			"name": "Find shortest paths to MS Graph",
+			"name": "Find shortest Paths to MS Graph",
 			"category": "Azure - MS Graph",
 			"queryList": [
 				{
@@ -522,8 +523,51 @@
 				}
 			]
 		},
+        {
+			"name": "Return all Azure Service Principals",
+			"category": "Azure - Service Principals",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (sp:AZServicePrincipal) RETURN sp",
+					"allowCollapse": true
+				}
+			]
+		},
+        {
+			"name": "Find all VMs with a tied Managed Identity",
+			"category": "Azure - Service Principals",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p=(:AZVM)-[:AZManagedIdentity]->(n) RETURN p",
+					"allowCollapse": true
+				}
+			]
+		},
+        {
+			"name": "Return all Azure Service Principals that are Managed Identities",
+			"category": "Azure - Service Principals",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (sp:AZServicePrincipal {serviceprincipaltype: 'ManagedIdentity'}) RETURN sp",
+					"allowCollapse": true
+				}
+			]
+		},
+        {
+			"name": "Find all Azure Privileged Service Principals",
+			"category": "Azure - Service Principals",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p = (g:AZServicePrincipal)-[r]->(n) RETURN p"
+				}
+			]
+		},
 		{
-			"name": "Shortest path from Owned Azure Users to all Service Principals",
+			"name": "Find shortest Paths from Owned Azure Users to Azure Service Principals",
 			"category": "Azure - Service Principals",
 			"queryList": [
 				{
@@ -534,7 +578,7 @@
 			]
 		},
 		{
-			"name": "Shortest path from Owned Azure Users to all Service Principals that are Managed Identities",
+			"name": "Find shortest Paths from Owned Azure Users to Azure Service Principals that are Managed Identities",
 			"category": "Azure - Service Principals",
 			"queryList": [
 				{
@@ -545,7 +589,7 @@
 			]
 		},
 		{
-			"name": "Shortest path from ALL Azure Users to all Service Principals that are Managed Identities",
+			"name": "Find shortest Paths from all Azure Users to Azure Service Principals that are Managed Identities",
 			"category": "Azure - Service Principals",
 			"queryList": [
 				{
@@ -555,96 +599,8 @@
 				}
 			]
 		},
-		{
-			"name": "List all Azure Service Principals",
-			"category": "Azure - Service Principals",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH (sp:AZServicePrincipal) RETURN sp",
-					"allowCollapse": true
-				}
-			]
-		},
-		{
-			"name": "List all Azure Service Principals that are Managed Identities",
-			"category": "Azure - Service Principals",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH (sp:AZServicePrincipal {serviceprincipaltype: 'ManagedIdentity'}) RETURN sp",
-					"allowCollapse": true
-				}
-			]
-		},
-		{
-			"name": "List all users possibly related to AADConnect",
-			"category": "Azure - AADConnect",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH (u) WHERE (u:User OR u:AZUser) AND (u.name =~ '(?i)^MSOL_|.*AADConnect.*' OR u.userprincipalname =~ '(?i)^sync_.*') OPTIONAL MATCH (u)-[:HasSession]->(s:Session) RETURN u, s",
-					"allowCollapse": true
-				}
-			]
-		},
-		{
-			"name": "Shortest Path from Owned Azure Users to VMs",
-			"category": "Azure",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH (n:AZVM) MATCH p = shortestPath((m:AZUser{owned: true})-[*..]->(n)) RETURN p",
-					"allowCollapse": true
-				}
-			]
-		},
-		{
-			"name": "Return all Sessions of possibly AADConnect related Accounts",
-			"category": "Azure - AADConnect",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH p=(m:Computer)-[:HasSession]->(n) WHERE (n:User OR n:AZUser) AND ((n.name =~ '(?i)^MSOL_|.*AADConnect.*') OR (n.userPrincipalName =~ '(?i)^sync_.*')) RETURN p",
-					"allowCollapse": true
-				}
-			]
-		},
-		{
-			"name": "Return all AADConnect Servers (extracted from the SYNC_ Account names)",
-			"category": "Azure - AADConnect",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH (n:AZUser) WHERE n.name =~ '(?i)^SYNC_(.*?)_(.*?)@.*' WITH n, split(n.name, '_')[1] AS computerNamePattern MATCH (c:Computer) WHERE c.name CONTAINS computerNamePattern RETURN c",
-					"allowCollapse": true
-				}
-			]
-		},
-		{
-			"name": "Shortest Path to AADConnect Servers from owned Users",
-			"category": "Azure - AADConnect",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH (n:AZUser) WHERE n.name =~ '(?i)^SYNC_(.*?)_(.*?)@.*' WITH n, split(n.name, '_')[1] AS computerNamePattern MATCH (c:Computer) WHERE c.name CONTAINS computerNamePattern WITH collect(c) AS computers MATCH p = shortestPath((u:User)-[*]-(c:Computer)) WHERE c IN computers AND length(p) > 0 AND u.owned = true RETURN u, p",
-					"allowCollapse": true
-				}
-			]
-		},
-		{
-			"name": "Return all VMs with a tied Managed Identity",
-			"category": "Azure - Service Principals",
-			"queryList": [
-				{
-					"final": true,
-					"query": "MATCH p=(:AZVM)-[:AZManagedIdentity]->(n) RETURN p",
-					"allowCollapse": true
-				}
-			]
-		},
-		{
-			"name": "Return all Service Principals that are a Managed Identity an have a path to a Key Vault",
+        {
+			"name": "Find all Service Principals that are Managed Identities an have a Path to an Azure Key Vault",
 			"category": "Azure - Service Principals",
 			"queryList": [
 				{
@@ -655,7 +611,7 @@
 			]
 		},
 		{
-			"name": "Return paths from Managed Identities tied to a VM with a path to a Key Vault",
+			"name": "Find Paths from Managed Identities tied to a VM with a path to a Key Vault",
 			"category": "Azure - Service Principals",
 			"queryList": [
 				{
@@ -664,6 +620,50 @@
 					"allowCollapse": true
 				}
 			]
+		},
+		{
+			"name": "Return all Users and Azure Users possibly related to AADConnect",
+			"category": "Azure - AADConnect",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (u) WHERE (u:User OR u:AZUser) AND (u.name =~ '(?i)^MSOL_|.*AADConnect.*' OR u.userprincipalname =~ '(?i)^sync_.*') OPTIONAL MATCH (u)-[:HasSession]->(s:Session) RETURN u, s",
+					"allowCollapse": true
+				}
+			]
+		},
+		{
+			"name": "Find all Sessions of possibly AADConnect related Accounts",
+			"category": "Azure - AADConnect",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p=(m:Computer)-[:HasSession]->(n) WHERE (n:User OR n:AZUser) AND ((n.name =~ '(?i)^MSOL_|.*AADConnect.*') OR (n.userPrincipalName =~ '(?i)^sync_.*')) RETURN p",
+					"allowCollapse": true
+				}
+			]
+		},
+		{
+			"name": "Find all AADConnect Servers (extracted from the SYNC_ Account names)",
+			"category": "Azure - AADConnect",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (n:AZUser) WHERE n.name =~ '(?i)^SYNC_(.*?)_(.*?)@.*' WITH n, split(n.name, '_')[1] AS computerNamePattern MATCH (c:Computer) WHERE c.name CONTAINS computerNamePattern RETURN c",
+					"allowCollapse": true
+				}
+			]
+		},
+		{
+			"name": "Find shortest Paths to AADConnect Servers from Owned Users",
+			"category": "Azure - AADConnect",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (n:AZUser) WHERE n.name =~ '(?i)^SYNC_(.*?)_(.*?)@.*' WITH n, split(n.name, '_')[1] AS computerNamePattern MATCH (c:Computer) WHERE c.name CONTAINS computerNamePattern WITH collect(c) AS computers MATCH p = shortestPath((u:User)-[*]-(c:Computer)) WHERE c IN computers AND length(p) > 0 AND u.owned = true RETURN u, p",
+					"allowCollapse": true
+				}
+			]
 		}
-    ]
+	 ]
 }
