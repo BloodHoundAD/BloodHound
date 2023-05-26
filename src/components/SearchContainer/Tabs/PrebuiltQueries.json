@@ -395,6 +395,16 @@
 				}
 			]
 		},
+		{
+			"name": "Return all Members of High Privileged Roles",
+			"category": "Azure - General",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p=(n)-[:AZHasRole|AZMemberOf*1..2]->(r:AZRole WHERE r.displayname IN ['Cloud Application Administrator','Global Administrator','User Administrator']) RETURN p"
+				}
+			]
+		},
         {
 			"name": "Return all Azure Users that are synced from OnPrem AD",
 			"category": "Azure - General",
@@ -486,6 +496,17 @@
 				{
 					"final": true,
 					"query": "MATCH p = ({owned: true})-[r]->(g:AZKeyVault) RETURN p",
+					"allowCollapse": true
+				}
+			]
+		},
+		{
+			"name": "Return all Service Principals with MS Graph AZMGGrantAppRoles rights -> PrivEsc Path to Global Admin",
+			"category": "Azure - MS Graph",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p=(n)-[r:AZMGGrantAppRoles]->(o:AZTenant) RETURN p",
 					"allowCollapse": true
 				}
 			]
