@@ -447,6 +447,26 @@
 			]
 		},
         {
+			"name": "Return all Azure Subscriptions",
+			"category": "Azure - General",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (n:AZSubscription) RETURN n"
+				}
+			]
+		},
+		{
+			"name": "Return all Azure Subscriptions and their direct Controllers",
+			"category": "Azure - General",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p = (n)-[r:AZOwns|AZUserAccessAdministrator]->(g:AZSubscription) RETURN p"
+				}
+			]
+		},
+        {
 			"name": "Find all Azure Users with a Path to High Value Targets",
 			"category": "Azure - Paths",
 			"queryList": [
@@ -523,6 +543,17 @@
 		},
 		{
 			"name": "Find all Paths to Azure KeyVaults from Owned Principals",
+			"category": "Azure - Paths",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p = ({owned: true})-[r]->(g:AZKeyVault) RETURN p",
+					"allowCollapse": true
+				}
+			]
+		},
+        {
+			"name": "Find shortest Paths to Azure Subscriptions",
 			"category": "Azure - Paths",
 			"queryList": [
 				{
