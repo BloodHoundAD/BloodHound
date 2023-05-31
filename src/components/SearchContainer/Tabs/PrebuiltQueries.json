@@ -468,6 +468,17 @@
 				}
 			]
 		},
+        {
+			"name": "Find shortest Paths to High Value Roles",
+			"category": "Azure - Paths",
+			"queryList": [
+				{
+					"final": true,
+					"query": "splayname =~ '(?i)Global Administrator|User Administrator|Cloud Application Administrator|Authentication Policy Administrator|Exchange Administrator|Helpdesk Administrator|PRIVILEGED AUTHENTICATION ADMINISTRATOR'), (m), p=shortestPath((m)-[r*1..]->(n)) WHERE NOT m=n RETURN p",
+					"allowCollapse": true
+				}
+			]
+		},
 		{
 			"name": "Find Azure Applications with Paths to High Value Targets",
 			"category": "Azure - Paths",
