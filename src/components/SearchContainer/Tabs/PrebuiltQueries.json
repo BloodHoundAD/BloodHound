@@ -487,6 +487,26 @@
 			]
 		},
         {
+			"name": "Return all Azure Users that DON'T hold an Azure Role but the RBAC Role \"User Access Administrator\"",
+			"category": "Azure - General",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (u:AZUser) WHERE NOT EXISTS((u)-[:AZMemberOf|AZHasRole*1..]->(:AZRole)) AND EXISTS((u)-[:AZUserAccessAdministrator]->()) RETURN u"
+				}
+			]
+		},
+		{
+			"name": "Return all Azure Principals that DON'T hold an Azure Role but the RBAC Role \"User Access Administrator\"",
+			"category": "Azure - General",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH (u) WHERE NOT EXISTS((u)-[:AZMemberOf|AZHasRole*1..]->(:AZRole)) AND EXISTS((u)-[:AZUserAccessAdministrator]->()) RETURN u"
+				}
+			]
+		},
+        {
 			"name": "Find all Azure Users with a Path to High Value Targets",
 			"category": "Azure - Paths",
 			"queryList": [
@@ -579,6 +599,28 @@
 				{
 					"final": true,
 					"query": "MATCH (n:AZSubscription), (m), p=shortestPath((m)-[r*1..]->(n)) WHERE NOT m=n RETURN p",
+					"allowCollapse": true
+				}
+			]
+		},
+        {
+			"name": "Find the Paths to Resources from Azure Users that DON'T hold an Azure Role but the RBAC Role \"User Access Administrator\"",
+			"category": "Azure - Paths",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p=(u:AZUser)-[:AZUserAccessAdministrator]->(target) WHERE NOT EXISTS((u)-[:AZMemberOf|AZHasRole*1..]->(:AZRole)) RETURN u, p",
+					"allowCollapse": true
+				}
+			]
+		},
+		{
+			"name": "Find the Paths to Resources from Azure Principals that DON'T hold an Azure Role but the RBAC \"User Access Administrator\"",
+			"category": "Azure - Paths",
+			"queryList": [
+				{
+					"final": true,
+					"query": "MATCH p=(u)-[:AZUserAccessAdministrator]->(target) WHERE NOT EXISTS((u)-[:AZMemberOf|AZHasRole*1..]->(:AZRole)) RETURN u, p",
 					"allowCollapse": true
 				}
 			]
