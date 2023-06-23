@@ -168,7 +168,7 @@ If you are on the blue team side, you can use the same AV bypass techniques used
 the red team, or you can request an exception for the SharpHound binary itself or
 possibly a folder that you run SharpHound out of. Be aware though that AV excluded
 folders and files can commonly be enumerated by low-privilege users running on the
-same system, so try to be as specific as possible with your white-list exceptions.
+same system, so try to be as specific as possible with your exceptions.
 
 Finally, remember that SharpHound is free and *open source*. You can build SharpHound
 from source and apply your own obfuscation techniques to the source code itself during
