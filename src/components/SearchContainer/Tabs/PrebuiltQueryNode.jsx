@@ -117,4 +117,4 @@ export default class PrebuiltQueryNode extends Component {
         );
     }
 }
-export default withAlert()(PrebuiltQueryNode)
+//export default withAlert()(PrebuiltQueryNode)
