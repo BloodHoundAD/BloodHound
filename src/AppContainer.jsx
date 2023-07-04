@@ -83,7 +83,12 @@ const fullEdgeList = [
     'AddKeyCredentialLink',
     'DumpSMSAPassword',
     'DCSync',
-    'SyncLAPSPassword'
+    'SyncLAPSPassword',
+    'Enroll',
+    'AutoEnroll',
+    'ManageCa',
+    'ManageCertificates',
+    'EnabledBy'
 ];
 
 export default class AppContainer extends Component {
