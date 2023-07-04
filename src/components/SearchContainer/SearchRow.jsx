@@ -43,6 +43,12 @@ const SearchRow = ({ item, search }) => {
         case 'OU':
             icon.className = 'fa fa-sitemap';
             break;
+        case 'CA':
+            icon.className = 'fa fa-university';
+            break;
+        case 'CertificateTemplate':
+            icon.className = 'fa fa-id-card';
+            break;
         case 'Container':
             icon.className = 'fa fa-box'
             break
@@ -104,8 +110,12 @@ const SearchRow = ({ item, search }) => {
             icon.className = 'fa fa-window-restore'
             break
         default:
-            icon.className = 'fa fa-question';
-            type = 'Base';
+            if (item.hasOwnProperty("bl-icon")){
+                icon.className = 'fa '+ item["bl-icon"];
+            }else{
+                icon.className = 'fa fa-question';
+                type = 'Base';
+            }
             break;
     }
 
