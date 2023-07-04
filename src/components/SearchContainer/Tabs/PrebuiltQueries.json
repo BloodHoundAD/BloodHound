@@ -384,6 +384,176 @@
                     "endNode": "{}"
                 }
             ]
+        },
+        {
+            "name": "Find all Certificate Templates",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:CertificateTemplate) RETURN n"
+                }
+            ]
+        },
+        {
+            "name": "Find enabled Certificate Templates",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:CertificateTemplate) WHERE n.Enabled = true RETURN n"
+                }
+            ]
+        },
+        {
+            "name": "Find Certificate Authorities",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:CA) RETURN n"
+                }
+            ]
+        },
+        {
+            "name": "Find Misconfigured Certificate Templates (ESC1)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:CertificateTemplate) WHERE n.`Enrollee Supplies Subject` = true and n.`Client Authentication` = true and n.`Enabled` = true  RETURN n"
+                }
+            ]
+        },
+        {
+            "name": "Shortest Paths to Misconfigured Certificate Templates from Owned Principals (ESC1)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p=allShortestPaths((g {owned:true})-[r*1..]->(n:CertificateTemplate)) WHERE g<>n and n.`Enrollee Supplies Subject` = true and n.`Client Authentication` = true and n.`Enabled` = true and NONE(rel in r WHERE type(rel) in ['EnabledBy','Read','ManageCa','ManageCertificates']) return p"
+                }
+            ]
+        },
+        {
+            "name": "Find Misconfigured Certificate Templates (ESC2)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:CertificateTemplate) WHERE n.`Enabled` = true and n.`Any Purpose` = true RETURN n"
+                }
+            ]
+        },
+        {
+            "name": "Shortest Paths to Misconfigured Certificate Templates from Owned Principals (ESC2)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p=allShortestPaths((g {owned:true})-[r*1..]->(n:CertificateTemplate)) WHERE g<>n and n.`Enabled` = true and  n.`Any Purpose` = true and NONE(rel in r WHERE type(rel) in ['EnabledBy','Read','ManageCa','ManageCertificates']) return p"
+                }
+            ]
+        },
+        {
+            "name": "Find Enrollment Agent Templates (ESC3)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:CertificateTemplate) WHERE n.`Enabled` = true and n.`Enrollment Agent` = true RETURN n"
+                }
+            ]
+        },
+        {
+            "name": "Shortest Paths to Enrollment Agent Templates from Owned Principals (ESC3)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p=allShortestPaths((g {owned:true})-[r*1..]->(n:CertificateTemplate)) WHERE g<>n and n.`Enabled` = true and n.`Enrollment Agent` = true and NONE(rel in r WHERE type(rel) in ['EnabledBy','Read','ManageCa','ManageCertificates']) return p"
+                }
+            ]
+        },
+        {
+            "name": "Shortest Paths to Vulnerable Certificate Template Access Control (ESC4)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p=shortestPath((g)-[r*1..]->(n:CertificateTemplate)) WHERE g<>n and n.`Enabled` = true and NONE(rel in r WHERE type(rel) in ['EnabledBy','Read','ManageCa','ManageCertificates','Enroll','AutoEnroll']) RETURN p"
+                }
+            ]
+        },
+        {
+            "name": "Shortest Paths to Vulnerable Certificate Template Access Control from Owned Principals (ESC4)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p=allShortestPaths((g {owned:true})-[r*1..]->(n:CertificateTemplate)) WHERE g<>n and n.Enabled = true and NONE(rel in r WHERE type(rel) in ['EnabledBy','Read','ManageCa','ManageCertificates','Enroll','AutoEnroll']) return p"
+                }
+            ]
+        },
+        {
+            "name": "Find Certificate Authorities with User Specified SAN (ESC6)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:CA) WHERE n.`User Specified SAN` = 'Enabled' RETURN n"
+                }
+            ]
+        },
+        {
+            "name": "Shortest Paths to Vulnerable Certificate Authority Access Control (ESC7)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p=allShortestPaths((g)-[r*1..]->(n:CA)) WHERE g<>n and NONE(rel in r WHERE type(rel) in ['EnabledBy','Read','Enroll','AutoEnroll']) RETURN p"
+                }
+            ]
+        },
+        {
+            "name": "Shortest Paths to Vulnerable Certificate Authority Access Control from Owned Principals (ESC7)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p=allShortestPaths((g {owned:true})-[r*1..]->(n:CA)) WHERE g<>n and NONE(rel in r WHERE type(rel) in ['EnabledBy','Read','Enroll','AutoEnroll']) RETURN p"
+                }
+            ]
+        },
+        {
+            "name": "Find Certificate Authorities with HTTP Web Enrollment (ESC8)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:CA) WHERE n.`Web Enrollment` = 'Enabled' RETURN n"
+                }
+            ]
+        },
+        {
+            "name": "Find Unsecured Certificate Templates (ESC9)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:CertificateTemplate) WHERE 'NoSecurityExtension' in n.`Enrollment Flag` and n.`Enabled` = true  RETURN n"
+                }
+            ]
+        },
+        {
+            "name": "Shortest Paths to Unsecured Certificate Templates from Owned Principals (ESC9)",
+            "category": "PKI",
+            "queryList": [
+                {
+                    "final": true,
+                    "query": "MATCH p=allShortestPaths((g {owned:true})-[r*1..]->(n:CertificateTemplate)) WHERE g<>n and 'NoSecurityExtension' in n.`Enrollment Flag` and n.`Enabled` = true and NONE(rel in r WHERE type(rel) in ['EnabledBy','Read','ManageCa','ManageCertificates']) return p"
+                }
+            ]
         }
     ]
 }
