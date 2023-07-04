@@ -24,12 +24,14 @@ const RawQuery = () => {
     const onKeyDown = (e) => {
         let key = e.keyCode ? e.keyCode : e.which;
 
-        if (key === 13) {
+        if ((key == 10 || key == 13) && e.ctrlKey) {
             emitter.emit('query', query);
         }
     };
 
     const onChange = (e) => {
+        e.target.style.height = 'inherit';
+        e.target.style.height = `${e.target.scrollHeight}px`;
         setQueryFromEvent(e.target.value);
     };
 
@@ -59,7 +61,7 @@ const RawQuery = () => {
                 transition={{ duration: 0.25 }}
                 animate={open ? 'open' : 'closed'}
             >
-                <input
+                {/* <input
                     type='text'
                     onChange={onChange}
                     value={query}
@@ -67,7 +69,18 @@ const RawQuery = () => {
                     className={clsx(styles.input, 'form-control')}
                     autoComplete='off'
                     placeholder='Enter a cypher query. Your query must return nodes or paths.'
-                />
+                /> */}
+                <textarea
+                    type='text'
+                    onChange={onChange}
+                    value={query}
+                    onKeyDown={onKeyDown}
+                    className={clsx(styles.input, 'form-control')}
+                    autoComplete='off'
+                    rows='1'
+                    placeholder='Enter a cypher query. Your query must return nodes or paths. Use Ctrl+Enter to submit'>
+
+                </textarea>
             </motion.div>
         </div>
     );
