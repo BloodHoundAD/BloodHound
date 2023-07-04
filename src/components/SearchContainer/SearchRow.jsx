@@ -26,7 +26,11 @@ const SearchRow = ({ item, search }) => {
 
     switch (type) {
         case 'Group':
-            icon.className = 'fa fa-users';
+            if (item.hasOwnProperty("bl-icon")){
+                icon.className = 'fa '+ item["bl-icon"];
+            }else{
+                icon.className = 'fa fa-users';
+            }
             break;
         case 'User':
             icon.className = 'fa fa-user';
