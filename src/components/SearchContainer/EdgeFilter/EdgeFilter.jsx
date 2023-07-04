@@ -112,6 +112,21 @@ const EdgeFilter = ({ open }) => {
                     <EdgeFilterCheck name='SQLAdmin' />
                     <EdgeFilterCheck name='HasSIDHistory' />
                     <EdgeFilterCheck name='DumpSMSAPassword' />
+                    <EdgeFilterSection
+                        title='PKI'
+                        sectionName='pki'
+                        edges={[
+                            'Enroll',
+                            'AutoEnroll',
+                            'ManageCa',
+                            'ManageCertificates',
+                            'EnabledBy',
+                        ]}
+                    />
+                    <EdgeFilterCheck name='Enroll' />
+                    <EdgeFilterCheck name='AutoEnroll' />
+                    <EdgeFilterCheck name='ManageCa' />
+                    <EdgeFilterCheck name='ManageCertificates' />
                 </div>
                 <div>
                     <EdgeFilterSection
