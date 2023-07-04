@@ -142,7 +142,7 @@ const TemplateNodeData = () => {
                                     property='First Degree Enrollment Rights'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n)-[r:AutoEnroll|Enroll]->(u1:CertificateTemplate {objectid: $objectid}) WHERE r.isacl=true'
+                                        'MATCH p=(n)-[r:AutoEnroll|Enroll|GenericAll]->(u1:CertificateTemplate {objectid: $objectid}) WHERE r.isacl=true'
                                     }
                                     end={label}
                                     distinct
@@ -151,7 +151,7 @@ const TemplateNodeData = () => {
                                     property='Group Delegated Enrollment Rights'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1:AutoEnroll|Enroll]->(u:CertificateTemplate {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = u.objectid) AND NOT n.objectid = u.objectid'
+                                        'MATCH p=(n)-[r:MemberOf*1..]->(g:Group)-[r1:AutoEnroll|Enroll|GenericAll]->(u:CertificateTemplate {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = u.objectid) AND NOT n.objectid = u.objectid'
                                     }
                                     end={label}
                                     distinct
