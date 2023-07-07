@@ -26,7 +26,11 @@ const SearchRow = ({ item, search }) => {
 
     switch (type) {
         case 'Group':
-            icon.className = 'fa fa-users';
+            if (item.hasOwnProperty("bl-icon")){
+                icon.className = 'fa '+ item["bl-icon"];
+            }else{
+                icon.className = 'fa fa-users';
+            }
             break;
         case 'User':
             icon.className = 'fa fa-user';
@@ -42,6 +46,12 @@ const SearchRow = ({ item, search }) => {
             break;
         case 'OU':
             icon.className = 'fa fa-sitemap';
+            break;
+        case 'CA':
+            icon.className = 'fa fa-university';
+            break;
+        case 'CertificateTemplate':
+            icon.className = 'fa fa-id-card';
             break;
         case 'Container':
             icon.className = 'fa fa-box'
@@ -104,8 +114,12 @@ const SearchRow = ({ item, search }) => {
             icon.className = 'fa fa-window-restore'
             break
         default:
-            icon.className = 'fa fa-question';
-            type = 'Base';
+            if (item.hasOwnProperty("bl-icon")){
+                icon.className = 'fa '+ item["bl-icon"];
+            }else{
+                icon.className = 'fa fa-question';
+                type = 'Base';
+            }
             break;
     }
 

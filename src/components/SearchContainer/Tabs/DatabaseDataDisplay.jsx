@@ -114,6 +114,20 @@ const DatabaseDataDisplay = () => {
                             label={'Computers'}
                         />
                         <DatabaseDataLabel
+                            query={
+                                'MATCH (n:CertificateTemplate) RETURN count(n) AS count'
+                            }
+                            index={index}
+                            label={'Certificate Templates'}
+                        />
+                        <DatabaseDataLabel
+                            query={
+                                'MATCH (n:CA) RETURN count(n) AS count'
+                            }
+                            index={index}
+                            label={'Certificate Authorities'}
+                        />
+                        <DatabaseDataLabel
                             query={'MATCH (n:OU) RETURN count(n) AS count'}
                             index={index}
                             label={'OUS'}
