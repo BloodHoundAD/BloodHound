@@ -547,7 +547,6 @@ export function buildOuJsonNew(chunk) {
     let computerQuery = {};
     let computerProperties = [];
     let blockInheritanceComputers = [];
-    let enforcedOuProperties = {};
 
     // sort OU from the children to the parent using the length of the distinguished name
     chunk.sort((a,b) => {
@@ -652,15 +651,9 @@ export function buildOuJsonNew(chunk) {
             for (let prop of computerProperties){
                 if(computerIdentifier === prop.objectid){
                     for(let [key, value] of Object.entries(ouProperties["enforced"])){
-                        // override the property if it is empty or an not enforced at a lower OU level
-                        if(value !== undefined && (!Object.keys(enforcedOuProperties).includes(computerIdentifier) || !(enforcedOuProperties[computerIdentifier].includes(key)))){
+                        // override the property if it is empty or an not enforced at domain level
+                        if(value !== undefined && (!Object.keys(enforcedDomainPropertyKeys).includes(computerIdentifier) || !(enforcedDomainPropertyKeys[computerIdentifier].includes(key)))){
                             prop.map[key] = value;
-                            // store the property keys as enforced
-                            try{
-                                enforcedOuProperties[computerIdentifier].push(key);
-                            } catch (ReferenceRerror){
-                                enforcedOuProperties[computerIdentifier] = [key];
-                            }
                         }
                     }
                     found = true;
@@ -673,8 +666,6 @@ export function buildOuJsonNew(chunk) {
                     objectid: computerIdentifier,
                     map: Object.assign({}, ouProperties["enforced"]),
                 });
-                // store the property keys as enforced
-                enforcedOuProperties[computerIdentifier] = Object.keys(ouProperties["enforced"]);
             }
         }
 
