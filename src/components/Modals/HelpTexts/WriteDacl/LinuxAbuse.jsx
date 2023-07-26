@@ -387,7 +387,7 @@ const LinuxAbuse = ({
                     <pre>
                         <code>
                             {
-                                "dacledit.py -action 'DCSync' -rights 'FullControl' -principal 'controlledUser' -target-dn 'DomainDisinguishedName' 'domain'/'controlledUser':'password'"
+                                "dacledit.py -action 'write' -rights 'DCSync' -principal 'controlledUser' -target-dn 'DomainDisinguishedName' 'domain'/'controlledUser':'password'"
                             }
                         </code>
                     </pre>
