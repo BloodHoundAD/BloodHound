@@ -1,3 +1,10 @@
+.. note::
+   This documentation applies to Legacy BloodHound and is no longer maintained.
+
+   See up-to-date documentation for BloodHound CE here: `About BloodHound Edges`_
+
+.. _About BloodHound Edges: https://support.bloodhoundenterprise.io/hc/en-us/articles/17224136169371
+
 Edges
 =====
 
