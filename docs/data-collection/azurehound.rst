@@ -41,7 +41,13 @@ need to supply a username or password when supplying a JWT:
 ::
 
     ./azurehound -j "ey..." list users --tenant "contoso.onmicrosoft.com"
-    
+
+If you're currently authenticated through the Azure CLI, you can use:
+
+::
+
+    ./azurehound -j "$(az account get-access-token --resource=https://graph.microsoft.com/ | jq -r .accessToken)" list users --tenant "contoso.onmicrosoft.com"
+
 When collecting data for import into BloodHound, you must use the -o switch to instruct
 AzureHound to output to a file. For example, to list all available data in both AzureAD
 and AzureRM, you can do this:
