@@ -1,3 +1,10 @@
+.. note::
+   This documentation applies to Legacy BloodHound and is no longer maintained.
+
+   See up-to-date documentation for BloodHound CE here: `About BloodHound Nodes`_
+
+.. _About BloodHound Nodes: https://support.bloodhoundenterprise.io/hc/en-us/articles/17605671475867
+
 Nodes
 =====
 
