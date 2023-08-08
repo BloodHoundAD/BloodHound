@@ -1,7 +1,16 @@
+# Latest Version of BloodHound Community Edition is Released
+
+For the latest version of BloodHound you may follow [this link to the BloodHound Community Edition repository](https://github.com/SpecterOps/BloodHound).
+
+## Deprecation Notice
+
+This repository will be archived in the near future.
+
+<hr />
+
 [![Build](https://github.com/BloodHoundAD/BloodHound/actions/workflows/build.yml/badge.svg)](https://github.com/BloodHoundAD/BloodHound/actions/workflows/build.yml)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/BloodHoundAD/BloodHound)](https://github.com/BloodHoundAD/BloodHound/releases/latest)
 ![GitHub all releases](https://img.shields.io/github/downloads/BloodHoundAD/BloodHound/total)
-
 
 # Getting Started with BloodHound
 
