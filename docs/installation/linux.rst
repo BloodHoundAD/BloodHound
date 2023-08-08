@@ -1,3 +1,10 @@
+.. note::
+   This documentation applies to Legacy BloodHound and is no longer maintained.
+
+   See up-to-date documentation for BloodHound CE here: `Install BloodHound Community Edition with Docker Compose`_
+
+.. _Install BloodHound Community Edition with Docker Compose: https://support.bloodhoundenterprise.io/hc/en-us/articles/17468450058267
+
 Linux
 =====
 
