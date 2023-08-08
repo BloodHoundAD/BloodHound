@@ -1,3 +1,10 @@
+.. note::
+   This documentation applies to Legacy BloodHound and is no longer maintained.
+
+   See up-to-date documentation for BloodHound CE here: `SharpHound CE`_
+
+.. _SharpHound CE: https://support.bloodhoundenterprise.io/hc/en-us/articles/17481151861019
+
 SharpHound
 ==========
 
