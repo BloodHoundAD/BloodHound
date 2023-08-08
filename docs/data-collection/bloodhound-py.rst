@@ -1,3 +1,11 @@
+.. note::
+   This documentation applies to Legacy BloodHound and is no longer maintained.
+
+   See up-to-date documentation for BloodHound.py here: `BloodHound.py`_
+
+.. _BloodHound.py: https://github.com/dirkjanm/BloodHound.py
+
+
 BloodHound.py
 =============
 
