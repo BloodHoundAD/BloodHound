@@ -1,3 +1,10 @@
+.. note::
+   This documentation applies to Legacy BloodHound and is no longer maintained.
+
+   See up-to-date documentation for BloodHound CE here: `All SharpHound Community Edition Flags, Explained`_
+
+.. _All SharpHound Community Edition Flags, Explained: https://support.bloodhoundenterprise.io/hc/en-us/articles/17481375424795
+
 All SharpHound Flags, Explained
 ===============================
 
