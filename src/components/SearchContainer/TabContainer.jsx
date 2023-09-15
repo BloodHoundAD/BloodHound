@@ -36,9 +36,6 @@ import AZManagementGroupNodeData from "./Tabs/AZManagementGroupNodeData";
 import AZRoleNodeData from "./Tabs/AZRoleNodeData";
 import AZStorageAccountNodeData from './Tabs/AZStorageAccountNodeData';
 import AZStorageContainerNodeData from './Tabs/AZStorageContainerNodeData';
-import AZAutomationAccountNodeData from './Tabs/AZAutomationAccountNodeData';
-import AZLogicAppNodeData from './Tabs/AZLogicAppNodeData';
-import AZWebAppNodeData from './Tabs/AZWebAppNodeData';
 
 class TabContainer extends Component {
 
