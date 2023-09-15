@@ -37,12 +37,11 @@ import AZExecuteCommand from './HelpTexts/AZExecuteCommand/AZExecuteCommand';
 import AZGetCertificates from './HelpTexts/AZGetCertificates/AZGetCertificates';
 import AZGetKeys from './HelpTexts/AZGetKeys/AZGetKeys';
 import AZGetSecrets from './HelpTexts/AZGetSecrets/AZGetSecrets';
-import AZGrant from './HelpTexts/AZGrant/AZGrant';
-import AZGrantSelf from './HelpTexts/AZGrantSelf/AZGrantSelf';
 import AZHasRole from './HelpTexts/AZHasRole/AZHasRole';
+import AZManagedIdentity from './HelpTexts/AZManagedIdentity/AZManagedIdentity';
 import AZMemberOf from './HelpTexts/AZMemberOf/AZMemberOf';
-import AZOwner from './HelpTexts/AZOwner/AZOwner';
 import AZOwns from './HelpTexts/AZOwns/AZOwns';
+import AZPrivilegedAuthAdmin from './HelpTexts/AZPrivilegedAuthAdmin/AZPrivilegedAuthAdmin';
 import AZPrivilegedRoleAdmin from './HelpTexts/AZPrivilegedRoleAdmin/AZPrivilegedRoleAdmin';
 import AZResetPassword from './HelpTexts/AZResetPassword/AZResetPassword';
 import AZUserAccessAdministrator from './HelpTexts/AZUserAccessAdministrator/AZUserAccessAdministrator';
@@ -59,6 +58,26 @@ import AddKeyCredentialLink from './HelpTexts/AddKeyCredentialLink/AddKeyCredent
 import DCSync from './HelpTexts/DCSync/DCSync';
 import SyncLAPSPassword from './HelpTexts/SyncLAPSPassword/SyncLAPSPassword';
 import WriteAccountRestrictions from './HelpTexts/WriteAccountRestrictions/WriteAccountRestrictions';
+import DumpSMSAPassword from './HelpTexts/DumpSMSAPassword/DumpSMSAPassword';
+import AZMGAddMember from './HelpTexts/AZMGAddMember/AZMGAddMember';
+import AZMGAddOwner from './HelpTexts/AZMGAddOwner/AZMGAddOwner';
+import AZMGAddSecret from './HelpTexts/AZMGAddSecret/AZMGAddSecret';
+import AZMGGrantAppRoles from './HelpTexts/AZMGGrantAppRoles/AZMGGrantAppRoles';
+import AZMGGrantRole from './HelpTexts/AZMGGrantRole/AZMGGrantRole';
+import AZMGAppRoleAssignment_ReadWrite_All from './HelpTexts/AZMGAppRoleAssignment_ReadWrite_All/AZMGAppRoleAssignment_ReadWrite_All';
+import AZMGApplication_ReadWrite_All from './HelpTexts/AZMGApplication_ReadWrite_All/AZMGApplication_ReadWrite_All';
+import AZMGDirectory_ReadWrite_All from './HelpTexts/AZMGDirectory_ReadWrite_All/AZMGDirectory_ReadWrite_All';
+import AZMGGroupMember_ReadWrite_All from './HelpTexts/AZMGGroupMember_ReadWrite_All/AZMGGroupMember_ReadWrite_All';
+import AZMGGroup_ReadWrite_All from './HelpTexts/AZMGGroup_ReadWrite_All/AZMGGroup_ReadWrite_All';
+import AZMGRoleManagement_ReadWrite_Directory from './HelpTexts/AZMGRoleManagement_ReadWrite_Directory/AZMGRoleManagement_ReadWrite_Directory';
+import AZMGServicePrincipalEndpoint_ReadWrite_All from './HelpTexts/AZMGServicePrincipalEndpoint_ReadWrite_All/AZMGServicePrincipalEndpoint_ReadWrite_All';
+import AZWebsiteContributor from './HelpTexts/AZWebsiteContributor/AZWebsiteContributor';
+import AZAutomationContributor from './HelpTexts/AZAutomationContributor/AZAutomationContributor';
+import AZAddOwner from './HelpTexts/AZAddOwner/AZAddOwner';
+import AZAKSContributor from './HelpTexts/AZAKSContributor/AZAKSContributor';
+import AZKeyVaultKVContributor from './HelpTexts/AZKeyVaultKVContributor/AZKeyVaultKVContributor';
+import AZLogicAppContributor from './HelpTexts/AZLogicAppContributor/AZLogicAppContributor';
+import AZNodeResourceGroup from './HelpTexts/AZNodeResourceGroup/AZNodeResourceGroup';
 
 const HelpModal = () => {
     const [sourceName, setSourceName] = useState('');
@@ -132,12 +151,11 @@ const HelpModal = () => {
         AZGetCertificates: AZGetCertificates,
         AZGetKeys: AZGetKeys,
         AZGetSecrets: AZGetSecrets,
-        AZGrant: AZGrant,
-        AZGrantSelf: AZGrantSelf,
         AZHasRole: AZHasRole,
+        AZManagedIdentity: AZManagedIdentity,
         AZMemberOf: AZMemberOf,
-        AZOwner: AZOwner,
         AZOwns: AZOwns,
+        AZPrivilegedAuthAdmin: AZPrivilegedAuthAdmin,
         AZPrivilegedRoleAdmin: AZPrivilegedRoleAdmin,
         AZResetPassword: AZResetPassword,
         AZUserAccessAdministrator: AZUserAccessAdministrator,
@@ -153,6 +171,26 @@ const HelpModal = () => {
         DCSync: DCSync,
         SyncLAPSPassword: SyncLAPSPassword,
         WriteAccountRestrictions: WriteAccountRestrictions,
+        DumpSMSAPassword: DumpSMSAPassword,
+        AZMGAddMember: AZMGAddMember,
+        AZMGAddOwner: AZMGAddOwner,
+        AZMGAddSecret: AZMGAddSecret,
+        AZMGGrantAppRoles: AZMGGrantAppRoles,
+        AZMGGrantRole: AZMGGrantRole,
+        AZMGAppRoleAssignment_ReadWrite_All: AZMGAppRoleAssignment_ReadWrite_All,
+        AZMGApplication_ReadWrite_All: AZMGApplication_ReadWrite_All,
+        AZMGDirectory_ReadWrite_All: AZMGDirectory_ReadWrite_All,
+        AZMGGroupMember_ReadWrite_All: AZMGGroupMember_ReadWrite_All,
+        AZMGGroup_ReadWrite_All: AZMGGroup_ReadWrite_All,
+        AZMGRoleManagement_ReadWrite_Directory: AZMGRoleManagement_ReadWrite_Directory,
+        AZMGServicePrincipalEndpoint_ReadWrite_All: AZMGServicePrincipalEndpoint_ReadWrite_All,
+        AZWebsiteContributor: AZWebsiteContributor,
+        AZAddOwner: AZAddOwner,
+        AZAKSContributor: AZAKSContributor,
+        AZAutomationContributor: AZAutomationContributor,
+        AZKeyVaultKVContributor: AZKeyVaultKVContributor,
+        AZLogicAppContributor: AZLogicAppContributor,
+        AZNodeResourceGroup: AZNodeResourceGroup,
     };
 
     const Component = edge in components ? components[edge] : Default;

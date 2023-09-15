@@ -72,6 +72,7 @@
  * @property {Array.<TypedPrincipal>} AllowedToDelegate
  * @property {Array.<TypedPrincipal>} AllowedToAct
  * @property {Array.<TypedPrincipal>} HasSIDHistory
+ * @property {Array.<TypedPrincipal>} DumpSMSAPassword
  * @property {SessionAPIResult} Sessions
  * @property {SessionAPIResult} PrivilegedSessions
  * @property {SessionAPIResult} RegistrySessions
@@ -132,8 +133,8 @@
  * @property {string} TargetDomainName
  * @property {boolean} IsTransitive
  * @property {boolean} SidFilteringEnabled
- * @property {string} TrustDirection
- * @property {string} TrustType
+ * @property {number} TrustDirection
+ * @property {number} TrustType
  */
 
 /**
@@ -227,7 +228,10 @@
  * @property {string} tenantId
  * @property {string} id
  * @property {string} tenantName
+ * @property {String} azureGroupTypes
+ * @property {String} azureMembershipRule
  */
+
 
 /**
  * @typedef {Object} AzureGroupMember

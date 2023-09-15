@@ -116,10 +116,8 @@ const AZAutomationAccountNodeData = () => {
                 <hr></hr>
 
                 <CollapsibleSection header='Role Assignments'>
-                    <div className={styles.itemlist}>
-                        <Table>
-                            <thead></thead>
-                            <tbody className='searchable'>
+
+                <hr></hr>
                                 <NodeCypherLinkComplex
                                     countQuery={
                                         'MATCH p = (d)-[r:Owner*1..]->(u:AZAutomationAccount {objectid: $objectid}) RETURN COUNT(p)'
@@ -160,11 +158,43 @@ const AZAutomationAccountNodeData = () => {
                                     property={'All Relations'}
                                     target={objectid}
                                 />
+                </CollapsibleSection>
+                <CollapsibleSection header={'INBOUND OBJECT CONTROL'}>
+                    <div className={styles.itemlist}>
+                        <Table>
+                            <thead></thead>
+                            <tbody className='searchable'>
+                                <NodeCypherLink
+                                    property='Explicit Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(n)-[r:AZAutomationContributor|AZContributor|AZUserAccessAdministrator|AZOwns]->(c:AZAutomationAccount {objectid:$objectid})'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Unrolled Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(n)-[r:AZMemberOf]->(g)-[r1:AZAutomationContributor|AZContributor|AZUserAccessAdministrator|AZOwns]->(c:AZAutomationAccount {objectid:$objectid})'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                                <NodePlayCypherLink
+                                    property='Transitive Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r1*1..]->(c:AZAutomationAccount {objectid:$objectid}))'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
                             </tbody>
                         </Table>
                     </div>
                 </CollapsibleSection>
-                
             </div>
         </div>
     );

@@ -1,3 +1,10 @@
+.. note::
+   This documentation applies to Legacy BloodHound and is no longer maintained.
+
+   See up-to-date documentation for BloodHound CE here: `AzureHound Community Edition`_
+
+.. _AzureHound Community Edition: https://support.bloodhoundenterprise.io/hc/en-us/articles/17481394564251
+
 AzureHound
 ==========
 

@@ -135,7 +135,7 @@ const AZAppNodeData = () => {
                                     property='Explicit Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g:AZApp {objectid: $objectid})'
+                                        'MATCH p = (n)-[r:AZAddOwner|AZAddSecret|AZAppAdmin|AZCloudAppAdmin|AZMGAddOwner|AZMGAddSecret|AZOwns]->(g:AZApp {objectid: $objectid})'
                                     }
                                     end={label}
                                     distinct
@@ -144,7 +144,7 @@ const AZAppNodeData = () => {
                                     property='Unrolled Object Controllers'
                                     target={objectid}
                                     baseQuery={
-                                        'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZOwns|AZCloudAppAdmin|AZAppAdmin|AZAddSecret]->(g2:AZApp {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
+                                        'MATCH p = (n)-[r:MemberOf*1..]->(g1)-[r1:AZAddOwner|AZAddSecret|AZAppAdmin|AZCloudAppAdmin|AZMGAddOwner|AZMGAddSecret|AZOwns]->(g2:AZApp {objectid: $objectid}) WITH LENGTH(p) as pathLength, p, n WHERE NONE (x in NODES(p)[1..(pathLength-1)] WHERE x.objectid = g2.objectid) AND NOT n.objectid = g2.objectid'
                                     }
                                     end={label}
                                     distinct

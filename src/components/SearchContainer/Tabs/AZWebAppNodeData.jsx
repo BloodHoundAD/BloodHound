@@ -96,7 +96,6 @@ const AZWebAppNodeData = () => {
                         </Table>
                     </div>
                 </CollapsibleSection>
-                
                 <hr></hr>
 
                 <MappedNodeProps
@@ -104,7 +103,6 @@ const AZWebAppNodeData = () => {
                     properties={nodeProps}
                     label={label}
                 />
-            
                 <hr></hr>
 
                 <ExtraNodeProps
@@ -164,7 +162,38 @@ const AZWebAppNodeData = () => {
                         </Table>
                     </div>
                 </CollapsibleSection>
-                
+                <hr></hr>
+
+                <CollapsibleSection header={'INBOUND OBJECT CONTROL'}>
+                                <NodeCypherLink
+                                    property='Explicit Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(n)-[r:AZWebsiteContributor|AZContributor|AZUserAccessAdministrator|AZOwns]->(c:AZWebApp {objectid:$objectid})'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                                <NodeCypherLink
+                                    property='Unrolled Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH p=(n)-[r:AZMemberOf]->(g)-[r1:AZWebsiteContributor|AZContributor|AZUserAccessAdministrator|AZOwns]->(c:AZWebApp {objectid:$objectid})'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                                <NodePlayCypherLink
+                                    property='Transitive Object Controllers'
+                                    target={objectid}
+                                    baseQuery={
+                                        'MATCH (n) WHERE NOT n.objectid=$objectid WITH n MATCH p = shortestPath((n)-[r1*1..]->(c:AZWebApp {objectid:$objectid}))'
+                                    }
+                                    end={label}
+                                    distinct
+                                />
+                            
+                </CollapsibleSection>
             </div>
         </div>
     );

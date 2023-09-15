@@ -26,7 +26,7 @@ const General = ({ sourceName, sourceType, targetName }) => {
             <p>
                 Finally, administrators can often disable host-based security
                 controls that would otherwise prevent the aforementioned
-                techniques.`;
+                techniques.
             </p>
         </>
     );

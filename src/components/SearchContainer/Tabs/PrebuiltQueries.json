@@ -222,7 +222,7 @@
             "queryList": [
                 {
                     "final": true,
-                    "query": "MATCH (u:User {hasspn:true}) OPTIONAL MATCH (u)-[:AdminTo]->(c1:Computer) OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c2:Computer) WITH u,COLLECT(c1) + COLLECT(c2) AS tempVar UNWIND tempVar AS comps RETURN u.name,COUNT(DISTINCT(comps)) ORDER BY COUNT(DISTINCT(comps)) DESC",
+                    "query": "MATCH (u:User {hasspn:true}) OPTIONAL MATCH (u)-[:AdminTo]->(c1:Computer) OPTIONAL MATCH (u)-[:MemberOf*1..]->(:Group)-[:AdminTo]->(c2:Computer) WITH u,COLLECT(c1) + COLLECT(c2) AS tempVar UNWIND tempVar AS comps RETURN u,COUNT(DISTINCT(comps)) ORDER BY COUNT(DISTINCT(comps)) DESC",
                     "allowCollapse": true
                 }
             ]
@@ -382,6 +382,160 @@
                     "query": "MATCH p=shortestPath((n)-[:{}*1..]->(m:Group {name:$result})) WHERE NOT n=m RETURN p",
                     "allowCollapse": true,
                     "endNode": "{}"
+                }
+            ]
+        },
+        {
+            "name": "Find all Global Administrators",
+            "category": "Azure - General",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH p =(n)-[r:AZGlobalAdmin*1..]->(m) RETURN p",
+                    "allowCollapse": false
+                }
+            ]
+        },
+        {
+            "name": "Find all Members of High Privileged Roles",
+            "category": "Azure - General",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH p=(n)-[:AZHasRole|AZMemberOf*1..2]->(r:AZRole WHERE r.displayname =~ '(?i)Global Administrator|User Administrator|Cloud Application Administrator|Authentication Policy Administrator|Exchange Administrator|Helpdesk Administrator|PRIVILEGED AUTHENTICATION ADMINISTRATOR') RETURN p",
+                    "allowCollapse": false
+                }
+            ]
+        },
+        {
+            "name": "Find all Members of High Privileged Roles that are synced from OnPrem AD",
+            "category": "Azure - General",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH p=(n WHERE n.onpremisesyncenabled = true)-[:AZHasRole|AZMemberOf*1..2]->(r:AZRole WHERE r.displayname =~ '(?i)Global Administrator|User Administrator|Cloud Application Administrator|Authentication Policy Administrator|Exchange Administrator|Helpdesk Administrator|PRIVILEGED AUTHENTICATION ADMINISTRATOR') RETURN p",
+                    "allowCollapse": false
+                }
+            ]
+        },
+        {
+            "name": "Find all Azure Users with a Path to High Value Targets",
+            "category": "Azure - Paths",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH (m:AZUser),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= \"GetChanges\") AND NONE (r in relationships(p) WHERE type(r)=\"GetChangesAll\") AND NOT m=n RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find OnPrem synced Users with Paths to High Value Targets",
+            "category": "Azure - Paths",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH (m:AZUser WHERE m.onpremisesyncenabled = true),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= \"GetChanges\") AND NONE (r in relationships(p) WHERE type(r)=\"GetChangesAll\") AND NOT m=n RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find shortest Paths to Privileged Roles",
+            "category": "Azure - Paths",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:AZRole WHERE n.displayname =~ '(?i)Global Administrator|User Administrator|Cloud Application Administrator|Authentication Policy Administrator|Exchange Administrator|Helpdesk Administrator|PRIVILEGED AUTHENTICATION ADMINISTRATOR'), (m), p=shortestPath((m)-[r*1..]->(n)) WHERE NOT m=n RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find Azure Applications with Paths to High Value Targets",
+            "category": "Azure - Paths",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH (m:AZApp),(n {highvalue:true}),p=shortestPath((m)-[r*1..]->(n)) WHERE NONE (r IN relationships(p) WHERE type(r)= \"GetChanges\") AND NONE (r in relationships(p) WHERE type(r)=\"GetChangesAll\") AND NOT m=n RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find shortest Paths to Azure Subscriptions",
+            "category": "Azure - Paths",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:AZSubscription), (m), p=shortestPath((m)-[r*1..]->(n)) WHERE NOT m=n RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find shortest Paths from Owned Principals to to High Value Targets",
+            "category": "Azure - Paths",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH p = shortestPath((n {owned: true})-[*..]->(m {highvalue:true}) WHERE m<>n RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find shortest Paths to Privileged Roles",
+            "category": "Azure - Paths",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH (n:AZRole WHERE n.displayname =~ '(?i)Global Administrator|User Administrator|Cloud Application Administrator|Authentication Policy Administrator|Exchange Administrator|Helpdesk Administrator|PRIVILEGED AUTHENTICATION ADMINISTRATOR'), (m), p=shortestPath((m {owned: true})-[r*1..]->(n)) WHERE NOT m=n RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find all Service Principals with MS Graph Privilege to grant arbitrary App Roles",
+            "category": "Azure - MS Graph",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH p=(n)-[r:AZMGGrantAppRoles]->(o:AZTenant) RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find all Service Principals with MS Graph App Role Assignments",
+            "category": "Azure - MS Graph",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH p=(m:AZServicePrincipal)-[r:AZMGAppRoleAssignment_ReadWrite_All|AZMGApplication_ReadWrite_All|AZMGDirectory_ReadWrite_All|AZMGGroupMember_ReadWrite_All|AZMGGroup_ReadWrite_All|AZMGRoleManagement_ReadWrite_Directory|AZMGServicePrincipalEndpoint_ReadWrite_All]->(n:AZServicePrincipal) RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find all direct Controllers of MS Graph",
+            "category": "Azure - MS Graph",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH p = (n)-[r:AZAddOwner|AZAddSecret|AZAppAdmin|AZCloudAppAdmin|AZMGAddOwner|AZMGAddSecret|AZOwns]->(g:AZServicePrincipal {appdisplayname: \"Microsoft Graph\"}) RETURN p",
+                    "allowCollapse": true
+                }
+            ]
+        },
+        {
+            "name": "Find shortest Paths to MS Graph",
+            "category": "Azure - MS Graph",
+            "querylist": [
+                {
+                    "final": true,
+                    "query": "MATCH p = shortestPath((n)-[r*1..]->(g:AZServicePrincipal {appdisplayname: \"Microsoft Graph\"})) WHERE n<>g RETURN p",
+                    "allowCollapse": true
                 }
             ]
         }

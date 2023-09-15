@@ -1,3 +1,10 @@
+.. note::
+   This documentation applies to Legacy BloodHound and is no longer maintained.
+
+   See up-to-date documentation for BloodHound CE here: `All AzureHound Community Edition Flags, Explained`_
+
+.. _All AzureHound Community Edition Flags, Explained: https://support.bloodhoundenterprise.io/hc/en-us/articles/17481642843803
+
 All AzureHound Flags, Explained
 ===============================
 

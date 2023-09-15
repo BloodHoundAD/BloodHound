@@ -1,3 +1,10 @@
+.. note::
+   This documentation applies to Legacy BloodHound and is no longer maintained.
+
+   See up-to-date documentation for BloodHound CE here: `BloodHound Support`_
+
+.. _BloodHound Support: https://support.bloodhoundenterprise.io/hc/en-us
+
 BloodHound JSON Formats
 =======================
 
