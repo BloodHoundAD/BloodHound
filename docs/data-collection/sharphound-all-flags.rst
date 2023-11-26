@@ -36,9 +36,12 @@ common options you'll likely use:
   collection method.
 * **Session:** Just does user session collection. You will likely couple this with
   the --Loop option. See SharpHound examples below for more info on that.
-* **LoggedOn:** Does session collection using the privileged collection method. Use
-  this if you are running as a user with local admin rights on lots of systems
-  for the best user session data.
+* **LoggedOn:** Does session collection using two methods: the privileged and the remote registry
+  collection method. Use this if you are running as a user with local admin rights on lots of systems
+  for the best user session data, but it is also useful running as a normal unprivilieged user on
+  server targets (remote registry method). For the latter, the RemoteRegistry service needs to be
+  installed on the targets (default on servers), but does not need to be running, it'll be triggered
+  temporarily.
 
 Here are the less common CollectionMethods and what they do:
 
