@@ -292,6 +292,22 @@ DisableKerberosSigning
 
 Disables LDAP encryption. Not recommended.
 
+DoLocalAdminSessionEnum
+-----------------------
+
+Tells SharpHound to use a dedicated local user to enumerate sessions in case admin privileges are needed. 
+Needs the other two options LocalAdminUsername and LocalAdminPassword to be set.
+
+LocalAdminUsername
+------------------
+
+The local admin username to use for elevated session enumeration. Needs the doLocalAdminSessionEnum flag to be set.
+
+LocalAdminPassword
+------------------
+
+The local admin password to use for elevated session enumeration. Needs the doLocalAdminSessionEnum flag to be set.
+
 Performance Options
 ^^^^^^^^^^^^^^^^^^^
 
