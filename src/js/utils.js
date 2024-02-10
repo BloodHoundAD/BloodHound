@@ -197,11 +197,11 @@ async function dropIndexes() {
     let session = driver.session();
     let indexes = [];
 
-    let result = await session.run('CALL db.constraints')
+    let result = await session.run('CALL db.indexes')
 
     for (let record of result.records){
-        let constraint = record.get(0)
-        let query = 'DROP INDEX ' + constraint;
+        let index = record.get(1)
+        let query = 'DROP INDEX ' + index;
 
         indexes.push(query)
     }
