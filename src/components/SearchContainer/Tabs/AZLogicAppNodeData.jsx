@@ -75,18 +75,27 @@ const AZLogicAppNodeData = () => {
                                     property='See Logic App within Tenant'
                                     query='MATCH p = (d:AZTenant)-[r:AZContains*1..]->(u:AZLogicApp {objectid: $objectid}) RETURN p'
                                 />
-                                <NodeCypherLink
-                                    baseQuery={
-                                        'MATCH p=(:AZLogicApp {objectid:$objectid})-[:AZManagedIdentity]->(n)'
+                                <NodeCypherNoNumberLink
+                                    target={objectid}
+                                    property='See Logic App within Resource group'
+                                    query='MATCH p = (d:AZResourceGroup)-[r:AZContains*1..]->(u:AZLogicApp {objectid: $objectid}) RETURN p'
+                                />
+                                <NodeCypherLinkComplex
+                                    countQuery={
+                                        'MATCH p=(:AZLogicApp {objectid:$objectid})-[:AZManagedIdentity]->(n) RETURN COUNT(p)'
                                     }
+                                    graphQuery={
+                                        'MATCH p=(:AZLogicApp {objectid:$objectid})-[:AZManagedIdentity]->(n) RETURN p'
+                                    }
+                                    start={label}
                                     property={'Managed Identities'}
                                     target={objectid}
+                                    distinct
                                 />
                             </tbody>
                         </Table>
                     </div>
                 </CollapsibleSection>
-
                 <hr></hr>
 
                 <MappedNodeProps
@@ -94,7 +103,6 @@ const AZLogicAppNodeData = () => {
                     properties={nodeProps}
                     label={label}
                 />
-
                 <hr></hr>
 
                 <ExtraNodeProps
@@ -102,14 +110,60 @@ const AZLogicAppNodeData = () => {
                     properties={nodeProps}
                     label={label}
                 />
-
+                        
                 <hr></hr>
 
-                <CollapsibleSection header={'INBOUND OBJECT CONTROL'}>
+                <CollapsibleSection header='Role Assignments'>
                     <div className={styles.itemlist}>
                         <Table>
                             <thead></thead>
                             <tbody className='searchable'>
+                                <NodeCypherLinkComplex
+                                    countQuery={
+                                        'MATCH p = (d)-[r:Owner*1..]->(u:AZLogicApp {objectid: $objectid}) RETURN COUNT(p)'
+                                    }
+                                    graphQuery={
+                                        'MATCH p = (d)-[r:Owner*1..]->(u:AZLogicApp {objectid: $objectid}) RETURN p'
+                                    }
+                                    property={'Logic App Owners'}
+                                    target={objectid}
+                                />
+                                <NodeCypherLinkComplex
+                                    countQuery={
+                                        'MATCH p = (d)-[r:Contributor*1..]->(u:AZLogicApp {objectid: $objectid}) RETURN COUNT(p)'
+                                    }
+                                    graphQuery={
+                                        'MATCH p = (d)-[r:Contributor*1..]->(u:AZLogicApp {objectid: $objectid}) RETURN p'
+                                    }
+                                    property={'Logic App Contributors'}
+                                    target={objectid}
+                                />
+                                <NodeCypherLinkComplex
+                                    countQuery={
+                                        'MATCH p = (d)-[r:UserAccessAdministrator*1..]->(u:AZLogicApp {objectid: $objectid}) RETURN COUNT(p)'
+                                    }
+                                    graphQuery={
+                                        'MATCH p = (d)-[r:UserAccessAdministrator*1..]->(u:AZLogicApp {objectid: $objectid}) RETURN p'
+                                    }
+                                    property={'User Access Administrators'}
+                                    target={objectid}
+                                />
+                                <NodeCypherLinkComplex
+                                    countQuery={
+                                        'MATCH p = (d)-[r]->(u:AZLogicApp {objectid: $objectid}) RETURN COUNT(p)'
+                                    }
+                                    graphQuery={
+                                        'MATCH p = (d)-[r]->(u:AZLogicApp {objectid: $objectid}) RETURN p'
+                                    }
+                                    property={'All Relations'}
+                                    target={objectid}
+                                />
+                            </tbody>
+                        </Table>
+                    </div>
+                </CollapsibleSection>
+                <hr></hr>
+                <CollapsibleSection header={'INBOUND OBJECT CONTROL'}>
                                 <NodeCypherLink
                                     property='Explicit Object Controllers'
                                     target={objectid}
@@ -137,11 +191,8 @@ const AZLogicAppNodeData = () => {
                                     end={label}
                                     distinct
                                 />
-                            </tbody>
-                        </Table>
-                    </div>
                 </CollapsibleSection>
-
+                           
             </div>
         </div>
     );

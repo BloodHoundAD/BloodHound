@@ -120,7 +120,9 @@ export const AzureLabels = {
     WebsiteContributor: 'AZWebsiteContributor',
     LogicAppContributor: 'AZLogicAppContributor',
     AutomationContributor: 'AZAutomationContributor',
-    AKSContributor: 'AZAKSContributor'
+    AKSContributor: 'AZAKSContributor',
+    StorageAccount: 'AZStorageAccount',
+    StorageContainer: 'AZStorageContainer'
 };
 
 const AzurehoundKindLabels = {
@@ -175,7 +177,45 @@ const AzurehoundKindLabels = {
     KindAZVMContributor: 'AZVMContributor',
     KindAZVMOwner: 'AZVMOwner',
     KindAZVMUserAccessAdmin: 'AZVMUserAccessAdmin',
+    KindAZStorageAccount : "AZStorageAccount",
+	KindAZStorageContainer   : "AZStorageContainer",
+    KindAZStorageAccountRoleAssignment : "AZStorageAccountRoleAssignment",
+                
 };
+
+export const AzureRoleDefinitions = {
+    "b24988ac-6180-42a0-ab88-20f7382dd24c" : "Contributor",
+    "acdd72a7-3385-48ef-bd42-f606fba81ae7" : "Reader",
+    "8e3af657-a8ff-443c-a75c-2fe8c4bcb635" : "Owner",
+    "c12c1c16-33a1-487b-954d-41c89c60f349" : "ReaderAndDataAccess",
+    "8a0f0c08-91a1-4084-bc3d-661d67233fed" : "StorageQueueDataMessageProcessor",
+    "b7e6dc6d-f1e8-4753-8033-0f276bb0955b" : "StorageBlobDataOwner",
+    "18d7d88d-d35e-4fb5-a5c3-7773c20a72d9" : "UserAccessAdministrator",
+    "e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1" : "StorageAccountBackupContributor",
+    "17d1049b-9a84-46fb-8f53-869881c3d3ab" : "StorageAccountContributor",
+    "81a9662b-bebf-436f-a333-f67b29880f12" : "StorageAccountKeyOperator",
+    "ba92f5b4-2d11-453d-a403-e96b0029c9fe" : "StorageBlobDataContributor",
+	"b7e6dc6d-f1e8-4753-8033-0f276bb0955b" : "StorageBlobDataOwner",
+	"2a2b9908-6ea1-4ae2-8e65-a410df84e7d1" : "StorageBlobDataReader",
+	"db58b8e5-c6ad-4a2a-8342-4190687cbf4a" : "StorageBlobDelegator",
+    "0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb" : "StorageFileDataSMBShareContributor",
+	"a7264617-510b-434b-a828-9731dc254ea7" : "StorageFileDataSMBShareElevatedContributor",
+	"aba4ae5f-2193-4029-9191-0cb91df5e314" : "StorageFileDataSMBShareReader",
+    "974c5e8b-45b9-4653-ba55-5f855dd0fb88" : "StorageQueueDataContributor",
+    "8a0f0c08-91a1-4084-bc3d-661d67233fed" : "StorageQueueDataMessageProcessor",
+    "c6a89b2d-59bc-44d0-9896-0f6e12d7b80a" : "StorageQueueDataMessageSender",
+    "19e7f393-937e-4f77-808e-94535e297925" : "StorageQueueDataReader",
+	"0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3" : "StorageTableDataContributor",
+    "76199698-9eea-4c19-bc75-cec21354c6b6" : "StorageTableDataReader",    
+	"f353d9bd-d4a6-484e-a77a-8050b599b867" : "AutomationContributor",
+	"4fe576fe-1146-4730-92eb-48519fa6bf9f" : "AutomationJobOperator",
+	"d3881f73-407a-4167-8283-e981cbba0404" : "AutomationOperator",
+	"5fb5aef8-1081-4b8e-bb16-9d5d0385bab5" : "AutomationRunbookOperator",
+    "87a39d53-fc1b-424a-814c-f7e04687dc9e" : "LogicAppContributor",
+	"515c2055-d9d4-4321-b1b9-bd0c9a0f79fe" : "LogicAppOperator",
+    "de139f84-1756-47ae-9be6-808fbbe84772" : "WebsiteContributor",
+
+}
 
 const DirectoryObjectEntityTypes = {
     User: '#microsoft.graph.user',
@@ -1071,25 +1111,25 @@ export function convertAzureData(chunk) {
                 convertAzureAutomationAccount(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZAutomationAccountRoleAssignment:
-                convertAzureAutomationAccountRoleAssignment(item.data, data);
+                convertAzureRoleAssignments(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZLogicApp:
                 convertAzureLogicApp(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZLogicAppRoleAssignment:
-                convertAzureLogicAppRoleAssignment(item.data, data);
+                convertAzureRoleAssignments(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZFunctionApp:
                 convertAzureFunctionApp(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZFunctionAppRoleAssignment:
-                convertAzureFunctionAppRoleAssignment(item.data, data);
+                convertAzureRoleAssignments(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZWebApp:
                 convertAzureWebApp(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZWebAppRoleAssignment:
-                convertAzureWebAppRoleAssignment(item.data, data);
+                convertAzureRoleAssignments(item.data, data);
                 break;
             case AzurehoundKindLabels.KindAZManagedCluster:
                 convertAzureManagedCluster(item.data, data);
@@ -1186,6 +1226,15 @@ export function convertAzureData(chunk) {
                 break;
             case AzurehoundKindLabels.KindAZVMUserAccessAdmin:
                 convertAzureVirtualMachineUserAccessAdmins(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZStorageAccount:
+                convertAzureStorageAccount(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZStorageContainer:
+                convertAzureStorageContainer(item.data, data);
+                break;
+            case AzurehoundKindLabels.KindAZStorageAccountRoleAssignment:
+                convertAzureRoleAssignments(item.data, data);
                 break;
             default:
                 console.error(`invalid azure type detected: ${item.kind}`);
@@ -1637,74 +1686,6 @@ export function convertAzureContainerRegistryRoleAssignment(data, ingestionData)
 
 /**
  *
- * @param {AzureAutomationAccount} data
- * @param {AzureIngestionData} ingestionData
- */
-export function convertAzureAutomationAccount(data, ingestionData) {
-    insertNewAzureNodeProp(
-        ingestionData,
-        AzureLabels.AutomationAccount,
-        {
-            objectid: data.id.toUpperCase(),
-            map: {
-                name: data.name.toUpperCase(),
-                tenantid: data.tenantId.toUpperCase(),
-            },
-        },
-        false
-    );
-
-    insertNewAzureRel(
-        ingestionData,
-        fProps(
-            AzureLabels.ResourceGroup,
-            AzureLabels.AutomationAccount,
-            AzureLabels.Contains
-        ),
-        {
-            source: data.resourceGroupId.toUpperCase(),
-            target: data.id.toUpperCase(),
-        }
-    );
-
-    if (data.identity.principalId) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(
-                AzureLabels.AutomationAccount,
-                AzureLabels.ServicePrincipal,
-                AzureLabels.ManagedIdentity
-            ),
-            {
-                source: data.id.toUpperCase(),
-                target: data.identity.principalId.toUpperCase(),
-            }
-        );
-    }
-
-    if (data.identity.userAssignedIdentities) {
-        for (let key in data.identity.userAssignedIdentities) {
-            let user = data.identity.userAssignedIdentities[key];
-            if (user.clientId !== '') {
-                insertNewAzureRel(
-                    ingestionData,
-                    fProps(
-                        AzureLabels.AutomationAccount,
-                        AzureLabels.ServicePrincipal,
-                        AzureLabels.ManagedIdentity
-                    ),
-                    {
-                        source: data.id.toUpperCase(),
-                        target: user.principalId.toUpperCase(),
-                    }
-                );
-            }
-        }
-    }
-}
-
-/**
- *
  * @param {AzureIngestionData} ingestionData
  * @param {AzureAutomationAccountRoleAssignment} data
  */
@@ -1745,74 +1726,6 @@ export function convertAzureAutomationAccountRoleAssignment(data, ingestionData)
                 );
             }
 
-        }
-    }
-}
-
-/**
- *
- * @param {AzureLogicApp} data
- * @param {AzureIngestionData} ingestionData
- */
-export function convertAzureLogicApp(data, ingestionData) {
-    insertNewAzureNodeProp(
-        ingestionData,
-        AzureLabels.LogicApp,
-        {
-            objectid: data.id.toUpperCase(),
-            map: {
-                name: data.name.toUpperCase(),
-                tenantid: data.tenantId.toUpperCase(),
-            },
-        },
-        false
-    );
-
-    insertNewAzureRel(
-        ingestionData,
-        fProps(
-            AzureLabels.ResourceGroup,
-            AzureLabels.LogicApp,
-            AzureLabels.Contains
-        ),
-        {
-            source: data.resourceGroupId.toUpperCase(),
-            target: data.id.toUpperCase(),
-        }
-    );
-
-    if (data.identity.principalId) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(
-                AzureLabels.LogicApp,
-                AzureLabels.ServicePrincipal,
-                AzureLabels.ManagedIdentity
-            ),
-            {
-                source: data.id.toUpperCase(),
-                target: data.identity.principalId.toUpperCase(),
-            }
-        );
-    }
-
-    if (data.identity.userAssignedIdentities) {
-        for (let key in data.identity.userAssignedIdentities) {
-            let user = data.identity.userAssignedIdentities[key];
-            if (user.clientId !== '') {
-                insertNewAzureRel(
-                    ingestionData,
-                    fProps(
-                        AzureLabels.LogicApp,
-                        AzureLabels.ServicePrincipal,
-                        AzureLabels.ManagedIdentity
-                    ),
-                    {
-                        source: data.id.toUpperCase(),
-                        target: user.principalId.toUpperCase(),
-                    }
-                );
-            }
         }
     }
 }
@@ -1876,6 +1789,11 @@ export function convertAzureFunctionApp(data, ingestionData) {
             objectid: data.id.toUpperCase(),
             map: {
                 name: data.name.toUpperCase(),
+                location: data.location.toUpperCase(),
+                enabledHostnames: data.properties.enabledHostnames,
+                defaultHostname: data.properties.defaultHostName,
+                publicNetworkAccess: data.properties.publicNetworkAccess,
+                hostnames: data.properties.hostnames,
                 tenantid: data.tenantId.toUpperCase(),
             },
         },
@@ -1973,74 +1891,6 @@ export function convertAzureFunctionAppRoleAssignment(data, ingestionData) {
                 );
             }
 
-        }
-    }
-}
-
-/**
- *
- * @param {AzureWebApp} data
- * @param {AzureIngestionData} ingestionData
- */
-export function convertAzureWebApp(data, ingestionData) {
-    insertNewAzureNodeProp(
-        ingestionData,
-        AzureLabels.WebApp,
-        {
-            objectid: data.id.toUpperCase(),
-            map: {
-                name: data.name.toUpperCase(),
-                tenantid: data.tenantId.toUpperCase(),
-            },
-        },
-        false
-    );
-
-    insertNewAzureRel(
-        ingestionData,
-        fProps(
-            AzureLabels.ResourceGroup,
-            AzureLabels.WebApp,
-            AzureLabels.Contains
-        ),
-        {
-            source: data.resourceGroupId.toUpperCase(),
-            target: data.id.toUpperCase(),
-        }
-    );
-
-    if (data.identity.principalId) {
-        insertNewAzureRel(
-            ingestionData,
-            fProps(
-                AzureLabels.WebApp,
-                AzureLabels.ServicePrincipal,
-                AzureLabels.ManagedIdentity
-            ),
-            {
-                source: data.id.toUpperCase(),
-                target: data.identity.principalId.toUpperCase(),
-            }
-        );
-    }
-
-    if (data.identity.userAssignedIdentities) {
-        for (let key in data.identity.userAssignedIdentities) {
-            let user = data.identity.userAssignedIdentities[key];
-            if (user.clientId !== '') {
-                insertNewAzureRel(
-                    ingestionData,
-                    fProps(
-                        AzureLabels.WebApp,
-                        AzureLabels.ServicePrincipal,
-                        AzureLabels.ManagedIdentity
-                    ),
-                    {
-                        source: data.id.toUpperCase(),
-                        target: user.principalId.toUpperCase(),
-                    }
-                );
-            }
         }
     }
 }
@@ -3166,6 +3016,382 @@ export function convertAzureVirtualMachineUserAccessAdmins(
         }
     }
 }
+
+/**
+ *
+ * @param {AzureStorageAccount} data
+ * @param ingestionData
+ */
+export function convertAzureStorageAccount(data, ingestionData) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.StorageAccount,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                kind: data.kind.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+                allowedSharedKeyAccess: data.properties.allowSharedKeyAccess,
+                blobPrimaryEndpoint: data.properties.primaryEndpoints.blob,
+                dfsPrimaryEndpoint: data.properties.primaryEndpoints.dfs,
+                filePrimaryEndpoint: data.properties.primaryEndpoints.file,
+                queuePrimaryEndpoint: data.properties.primaryEndpoints.queue,
+                tablePrimaryEndpoint: data.properties.primaryEndpoints.table,
+                webPrimaryEndpoint: data.properties.primaryEndpoints.web
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.StorageAccount, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.StorageAccount,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+}
+
+/** *
+ * @param {AzureStorageContainer} data
+ * @param ingestionData
+ */
+export function convertAzureStorageContainer(
+    data,
+    ingestionData
+) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.StorageContainer,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+                publicAccess: data.properties.publicAccess.toUpperCase(),
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.StorageContainer, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.StorageContainer,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.StorageAccount,
+            AzureLabels.StorageContainer,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.storageAccountId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+}
+
+/**
+ *
+ * @param {AzureRoleAssignments} data
+ * @param ingestionData
+ */
+export function convertAzureRoleAssignments(
+    data,
+    ingestionData
+) {
+    if (data.assignees === null) return;
+    for (let assignee of data.assignees) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.Base,
+                AzureLabels.Base,
+                AzureRoleDefinitions[assignee.roleDefinitionId]
+            ),
+            {
+                source: assignee.assignee.properties.principalId.toUpperCase(),
+                target:assignee.assignee.properties.scope.toUpperCase(),
+            }
+        );    
+    }
+    
+            
+}
+
+/**
+ *
+ * @param {AzureAutomationAccount} data
+ * @param ingestionData
+ */
+export function convertAzureAutomationAccount(data, ingestionData) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.AutomationAccount,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+                publicNetworkAccess:  data.properties.publicNetworkAccess,
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.AutomationAccount, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.AutomationAccount,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    if (data.identity.principalId) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.AutomationAccount,
+                AzureLabels.ServicePrincipal,
+                AzureLabels.ManagedIdentity
+            ),
+            {
+                source: data.id.toUpperCase(),
+                target: data.identity.principalId.toUpperCase(),
+            }
+        );
+    }
+
+    if (data.identity.userAssignedIdentities) {
+        for (let key in data.identity.userAssignedIdentities) {
+            let user = data.identity.userAssignedIdentities[key];
+            if (user.clientId !== '') {
+                insertNewAzureRel(
+                    ingestionData,
+                    fProps(
+                        AzureLabels.AutomationAccount,
+                        AzureLabels.ServicePrincipal,
+                        AzureLabels.ManagedIdentity
+                    ),
+                    {
+                        source: data.id.toUpperCase(),
+                        target: user.principalId.toUpperCase(),
+                    }
+                );
+            }
+        }
+    }
+}
+
+
+/**
+ *
+ * @param {AzureLogicApp} data
+ * @param ingestionData
+ */
+export function convertAzureLogicApp(data, ingestionData) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.LogicApp,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                location: data.location.toUpperCase(),
+                accessEndpoint : data.properties.accessEndpoint,
+                state : data.properties.state.toUpperCase(),
+                type : data.type.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.LogicApp, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.LogicApp,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    if (data.identity.principalId) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.LogicApp,
+                AzureLabels.ServicePrincipal,
+                AzureLabels.ManagedIdentity
+            ),
+            {
+                source: data.id.toUpperCase(),
+                target: data.identity.principalId.toUpperCase(),
+            }
+        );
+    }
+
+    if (data.identity.userAssignedIdentities) {
+        for (let key in data.identity.userAssignedIdentities) {
+            let user = data.identity.userAssignedIdentities[key];
+            if (user.clientId !== '') {
+                insertNewAzureRel(
+                    ingestionData,
+                    fProps(
+                        AzureLabels.LogicApp,
+                        AzureLabels.ServicePrincipal,
+                        AzureLabels.ManagedIdentity
+                    ),
+                    {
+                        source: data.id.toUpperCase(),
+                        target: user.principalId.toUpperCase(),
+                    }
+                );
+            }
+        }
+    }
+}
+
+/**
+ *
+ * @param {AzureWebApp} data
+ * @param ingestionData
+ */
+export function convertAzureWebApp(data, ingestionData) {
+    insertNewAzureNodeProp(
+        ingestionData,
+        AzureLabels.WebApp,
+        {
+            objectid: data.id.toUpperCase(),
+            map: {
+                name: data.name.toUpperCase(),
+                location: data.location.toUpperCase(),
+                type: data.type.toUpperCase(),
+                tenantid: data.tenantId.toUpperCase(),
+            },
+        },
+        false
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(AzureLabels.Tenant, AzureLabels.WebApp, AzureLabels.Contains),
+        {
+            source: data.tenantId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    insertNewAzureRel(
+        ingestionData,
+        fProps(
+            AzureLabels.ResourceGroup,
+            AzureLabels.WebApp,
+            AzureLabels.Contains
+        ),
+        {
+            source: data.resourceGroupId.toUpperCase(),
+            target: data.id.toUpperCase(),
+        }
+    );
+
+    if (data.identity.principalId) {
+        insertNewAzureRel(
+            ingestionData,
+            fProps(
+                AzureLabels.WebApp,
+                AzureLabels.ServicePrincipal,
+                AzureLabels.ManagedIdentity
+            ),
+            {
+                source: data.id.toUpperCase(),
+                target: data.identity.principalId.toUpperCase(),
+            }
+        );
+    }
+
+    if (data.identity.userAssignedIdentities) {
+        for (let key in data.identity.userAssignedIdentities) {
+            let user = data.identity.userAssignedIdentities[key];
+            if (user.clientId !== '') {
+                insertNewAzureRel(
+                    ingestionData,
+                    fProps(
+                        AzureLabels.WebApp,
+                        AzureLabels.ServicePrincipal,
+                        AzureLabels.ManagedIdentity
+                    ),
+                    {
+                        source: data.id.toUpperCase(),
+                        target: user.principalId.toUpperCase(),
+                    }
+                );
+            }
+        }
+    }
+}
+
 
 /**
  * Inserts a query into the azure ingestion table
