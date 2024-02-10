@@ -87,7 +87,7 @@ Or use systemctl to start neo4j:
 
   sudo systemctl start neo4j
 
-7. Open a web browser and navigate to https://localhost:7474/. You should see the neo4j web console.
+7. Open a web browser and navigate to http://localhost:7474/. You should see the neo4j web console.
 
 8. Authenticate to neo4j in the web console with username neo4j, password neo4j. You’ll be prompted
    to change this password.
